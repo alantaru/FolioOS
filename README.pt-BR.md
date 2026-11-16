@@ -30,6 +30,16 @@ Escrita com Markdown ao vivo, modo foco, máquina de escrever, sprints e metas, 
 rolagem automática, exportação para **DOCX, ODT, EPUB, HTML, RTF e TXT**, versões automáticas,
 20 temas e editor de temas, fontes TrueType até 4K, abas opcionais e player de MP3.
 
+## Tour rápido
+
+| | |
+|---|---|
+| <img src="docs/screenshots/focus-mode.png" alt="Modo foco"> **Modo foco (F2):** só o parágrafo atual em destaque. | <img src="docs/screenshots/reading-mode.png" alt="Modo leitura"> **Leitura (Ctrl+P):** o texto diagramado como livro, com rolagem automática. |
+| <img src="docs/screenshots/export.png" alt="Exportar"> **Exportar (Ctrl+Shift+S):** DOCX, ODT, EPUB, HTML, RTF, TXT. | <img src="docs/screenshots/themes.png" alt="Temas"> **Temas (F12):** 20 prontos e editor para criar os seus. |
+| <img src="docs/screenshots/command-palette.png" alt="Paleta de comandos"> **Paleta (Ctrl+K):** qualquer comando digitando poucas letras. | <img src="docs/screenshots/tabs.png" alt="Abas"> **Abas (opcional):** vários documentos, que voltam após reiniciar. |
+
+O tour completo, com todas as telas, está no [README em inglês](README.md#a-tour-of-folioos).
+
 ## Instalar em 3 minutos
 
 1. **Baixe** o `FolioOS.zip` da [última versão](https://github.com/alantaru/FolioOS/releases/latest).

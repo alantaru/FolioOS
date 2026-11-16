@@ -1,171 +1,397 @@
 <div align="center">
 
-# FolioOS
+# FolioOS — the distraction-free writing OS that boots from a USB stick
 
-### A distraction-free writing machine that boots from a USB stick
-
-**No Windows. No Linux. No internet. No notifications. Just you and the text.**
-
-FolioOS turns almost any x86 PC or laptop into a dedicated digital typewriter — a
-"writerdeck" — in seconds: plug in the USB drive, boot, write. Your work stays in plain
-Markdown files on an ordinary FAT32 drive that opens on every computer.
+**Turn any old laptop into a dedicated writing machine.**<br>
+No Windows. No Linux. No internet. No notifications. Just you and the text.
 
 [![Build](https://github.com/alantaru/FolioOS/actions/workflows/build.yml/badge.svg)](https://github.com/alantaru/FolioOS/actions/workflows/build.yml)
+[![Latest release](https://img.shields.io/github/v/release/alantaru/FolioOS?label=download&color=b4561f)](https://github.com/alantaru/FolioOS/releases/latest)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
-[![Platform: UEFI x64 | IA32](https://img.shields.io/badge/platform-UEFI%20x64%20%7C%20IA32-555)](#hardware)
-[![Languages: 15](https://img.shields.io/badge/languages-15-success)](#languages)
+[![Platform: UEFI x64 | IA32](https://img.shields.io/badge/platform-UEFI%20x64%20%7C%20IA32-555)](#hardware-compatibility)
+[![Languages: 15](https://img.shields.io/badge/languages-15-success)](#13-15-languages-and-counting)
 [![Translations welcome](https://img.shields.io/badge/translations-welcome-ff69b4)](docs/TRANSLATING.md)
-[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-[**Download**](https://github.com/alantaru/FolioOS/releases/latest) ·
+[**⬇ Download**](https://github.com/alantaru/FolioOS/releases/latest) ·
 [Install](#install-in-3-minutes) ·
-[Features](#features) ·
-[Languages](#languages) ·
+[Tour](#a-tour-of-folioos) ·
+[Languages](#13-15-languages-and-counting) ·
+[FAQ](#faq) ·
 [Build](#build-from-source) ·
 [Contribute](CONTRIBUTING.md) ·
 [Português](README.pt-BR.md)
 
-<img src="docs/screenshots/editor.png" alt="FolioOS editor: a chapter of prose on a paper sheet, with no menus or notifications" width="860">
+<img src="docs/screenshots/hero.png" alt="FolioOS writing screen: a short story on a cream paper sheet, with only a word count and a clock around it" width="900">
 
 </div>
 
----
+FolioOS is a **bootable writing environment**: a tiny operating system that does one thing — let you
+write. Plug the USB drive into almost any PC made in the last decade, boot from it, and within seconds
+you are in a full-screen, beautifully typeset Markdown editor, exactly where you stopped last time.
+There is no browser, no email, no app store and no Wi-Fi to pull you away.
 
-## Why FolioOS?
+Your writing is saved as **plain Markdown files on an ordinary FAT32 drive**, so the same USB stick
+opens on Windows, macOS and Linux. Export to Word, LibreOffice, EPUB, HTML or RTF whenever you need to
+share.
 
-Writing apps live inside operating systems built for distraction. Dedicated writing devices
-(Freewrite, AlphaSmart, Pomera) solve that — at the price of new hardware. FolioOS takes the
-other road: it **is** the operating system. It boots straight from UEFI firmware into a
-full-screen, beautifully typeset editor, with nothing else running on the machine.
+## Who is it for?
 
-- **Instant focus** — boots in seconds into your last document, exactly where you stopped.
-- **Your old laptop becomes a writer's tool** — runs on 64-bit and 32-bit UEFI PCs, from
-  netbooks to 4K desktops, without installing anything on the internal disk.
-- **Your files, forever** — plain `.md` text on plain FAT32. No database, no cloud, no lock-in.
-- **Tiny and auditable** — a ~600 KB freestanding C binary: no libc, no kernel, no browser engine.
-- **Universal** — 15 interface languages, 14 keyboard layouts, all as text files anyone can add.
-
-## Features
-
-| Writing | Reading & export | Comfort |
-|---|---|---|
-| Live Markdown (headings, bold, lists, quotes, tasks) | Reading mode with book-like pagination | 20 hand-tuned themes + theme editor |
-| Focus mode: sentence, paragraph or line | Auto-scroll at your reading pace | Real TrueType rendering with kerning, up to 4K |
-| Typewriter scrolling | Chapter outline (`#`), jump between chapters | Paper sheet or full-screen layout |
-| Smart typography (— “ ” …) per language | Export to **DOCX, ODT, EPUB, HTML, RTF, TXT** | Add any `.ttf` font; 11-family font pack |
-| Writing sprints, daily goals, word counts | Automatic versions of every saved file | MP3 player for background music |
-| Hemingway mode (no deleting) | Restores the session after every reboot | Tabs, Sublime Text style (optional) |
-| Command palette (Ctrl+K), full keyboard control | File manager: drives, folders, rename, delete | Mouse, touchpad, touch screen, rotation |
-
-<div align="center">
-<img src="docs/screenshots/dark-theme.png" alt="FolioOS dark theme" width="49%">
-<img src="docs/screenshots/themes.png" alt="FolioOS theme gallery" width="49%">
-</div>
+- **Novelists, journalists, students and bloggers** who want a *writerdeck* — a dedicated distraction-free
+  writing device — without buying new hardware.
+- **NaNoWriMo participants** and anyone doing timed writing sprints or morning pages.
+- **People with an old laptop in a drawer**: FolioOS gives it a second life without touching its disk.
+- **Schools and libraries** that need a simple, offline writing station.
+- **Privacy-minded writers**: no network stack, no telemetry, no cloud.
 
 ## Install in 3 minutes
 
-1. **Download** `FolioOS.zip` from the [latest release](https://github.com/alantaru/FolioOS/releases/latest).
-2. **Unzip it at the root of a FAT32 USB drive.** Most drives up to 32 GB already are FAT32;
-   files already on the drive are kept. ([Formatting help](docs/INSTALL.txt))
-3. **Boot from the drive:** open the boot menu (F12 Dell/Lenovo · F9 HP · F8 Asus ·
-   Esc/F11 others) and pick its **UEFI** entry. If it is not listed, disable *Secure Boot*.
+1. **Download** [`FolioOS.zip`](https://github.com/alantaru/FolioOS/releases/latest) from the latest release.
+2. **Unzip it at the root of a USB drive formatted as FAT32.** Most drives up to 32 GB already are.
+   Files already on the drive are kept. ([How to format as FAT32](docs/INSTALL.txt))
+3. **Restart the PC and open the boot menu** — usually **F12** (Dell, Lenovo), **F9** (HP), **F8** (Asus) or
+   **Esc/F11** — and choose the drive's **UEFI** entry. If it does not appear, turn off *Secure Boot* in
+   the firmware setup.
 
-The drive stays a normal USB drive: your writing is in `DOCUMENTS\`, readable on Windows,
-macOS and Linux. Optional packs: `FOLIO-FONTS-EXTRA.zip` (11 writing fonts) and
-`FOLIO-FONTS-CJK.zip` (Chinese, Japanese and Korean interface).
+<details>
+<summary><b>Other ways to install</b></summary>
 
-> **Try it without rebooting:** `build\folio_sim.exe` runs the same code in a Windows window,
-> and `build\efi_host.exe build\efi\BOOTX64.EFI` runs the real UEFI binary.
+- **Disk image:** `FolioOS-disk-image.zip` contains a ready 256 MB image for
+  [Rufus](https://rufus.ie) (DD mode), [balenaEtcher](https://etcher.balena.io) or `dd`. Unzipping
+  `FolioOS.zip` is still recommended: it keeps the rest of the drive free for your files.
+- **From source on Windows:** `.\build.ps1` then `.\flash_usb.ps1 -DriveLetter E:` (installs or updates a
+  drive without deleting anything).
+- **Optional packs** (unzip at the drive root too): `FOLIO-FONTS-EXTRA.zip` — 11 free fonts for writing and
+  reading; `FOLIO-FONTS-CJK.zip` — fonts for the Chinese, Japanese and Korean interface.
 
-## Languages
+</details>
 
-FolioOS speaks **English, Español, Français, Deutsch, Italiano, Português (Brasil),
-Português (Portugal), Nederlands, Polski, Türkçe, Русский, Українська, 简体中文, 日本語 and 한국어**.
-On first boot it follows the language of your firmware setup.
+> **Try it without rebooting:** `folio_sim.exe` runs the same code in a Windows window, and `efi_host.exe`
+> runs the real UEFI binary — see [Build from source](#build-from-source).
 
-Nothing about language is hard-coded: every translation is a standard **gettext `.po`** file
-in `FOLIO/LANGUAGES` — with its own plural rules, smart quotes, date format, decimal
-separator, default keyboard and fonts. **Adding a language is dropping a file on the
-drive.** Keyboard layouts are plain-text files in `FOLIO/KEYBOARDS`.
+---
+
+## A tour of FolioOS
+
+### 1. Start up
+
+<img src="docs/screenshots/splash.png" alt="FolioOS splash screen with the logo and a progress bar" width="49%" align="right">
+
+FolioOS starts straight from the firmware. The splash screen shows while fonts load, and any key skips it
+— you can start typing immediately. Its duration (1–60 s) is configurable, or you can turn it off.
+
+On the very first boot FolioOS follows the language of your PC's firmware setup and opens a short welcome
+text. After that it always reopens **your last document at the exact line you were on** — even if you
+were in reading mode.
+
+<br clear="right">
+
+### 2. The writing screen
+
+<img src="docs/screenshots/hero.png" alt="Writing screen with live Markdown headings, a block quote and chapter marks in the scroll bar" width="900">
+
+The page is all there is. The top and bottom bars **fade away as soon as you type** and come back when you
+move the mouse. Markdown is rendered live — `#` headings, `**bold**`, `*italic*`, `> quotes`, lists and
+`- [ ]` tasks — while the markup stays visible and editable. The thin bar on the right shows where you are
+and marks every chapter.
+
+- **Smart typography:** `--` becomes an em dash, `...` an ellipsis, and straight quotes become the right
+  curly quotes *for your language* (“ ” in English, « » in French, „ “ in German, 「 」 in Japanese).
+- **Paper or full screen:** write on a sheet of paper on a desk, or across the whole screen; choose the
+  column width (narrow, medium, wide, extra).
+- Undo/redo, word-level navigation, move paragraphs with **Alt+↑/↓**, duplicate or delete paragraphs,
+  cycle case with **Shift+F3**, wrap a selection in `( " * _`, and jump back to your last edit with **Ctrl+J**.
+
+### 3. Focus mode and zen mode
 
 <div align="center">
-<img src="docs/screenshots/japanese.png" alt="FolioOS settings in Japanese" width="32%">
-<img src="docs/screenshots/russian.png" alt="FolioOS settings in Russian" width="32%">
-<img src="docs/screenshots/german-palette.png" alt="FolioOS command palette in German" width="32%">
+<img src="docs/screenshots/focus-mode.png" alt="Focus mode: only the current paragraph is dark, the rest of the page is faded" width="49%">
+<img src="docs/screenshots/zen-mode.png" alt="Zen mode: only the text, no bars at all" width="49%">
 </div>
 
-Help translate: [**docs/TRANSLATING.md**](docs/TRANSLATING.md) — works with Poedit, Weblate,
-Crowdin or any text editor, and a validator catches broken placeholders before they ship.
+**F2** dims everything except the sentence, paragraph or line you are writing. **F3** is *typewriter mode*:
+the current line stays in the middle of the screen. **F11** is *zen mode*: no bars at all until you touch
+the top edge. **Hemingway mode** disables deleting, to keep you moving forward.
 
-## Hardware
+### 4. Reading mode
+
+<img src="docs/screenshots/reading-mode.png" alt="Reading mode: the story typeset like a book, with progress, time left and an auto-scroll control" width="900">
+
+**Ctrl+P** turns your Markdown into a typeset page, like a book. Turn pages with the arrow keys, the space
+bar or a click on the margins. The bottom bar shows how much you have read and how long the chapter and
+the whole text will take; **auto-scroll** moves the text at your reading speed (in words per minute), and
+the middle mouse button starts it or drags the text. **Esc** goes back to writing *at the paragraph you
+were reading*.
+
+### 5. Chapters and outline
+
+<img src="docs/screenshots/outline.png" alt="Outline panel listing the four chapters of the story" width="49%" align="right">
+
+Every `#` heading is a chapter. **F5** opens the outline to jump anywhere; **Ctrl+PgUp/PgDn** moves
+between chapters in both writing and reading mode. Long manuscripts stay easy to navigate — and the EPUB
+export turns those chapters into a proper e-book table of contents.
+
+<br clear="right">
+
+### 6. Find and replace
+
+<img src="docs/screenshots/find-replace.png" alt="Find and replace window with matches highlighted in the text" width="900">
+
+**Ctrl+F** highlights every match, counts them, and replaces one or all.
+
+### 7. Files: open, save and export
+
+<div align="center">
+<img src="docs/screenshots/file-manager.png" alt="File manager with drives, places and the documents folder" width="49%">
+<img src="docs/screenshots/export.png" alt="Save as / Export dialog with format chips: md, txt, html, rtf, docx, odt, epub" width="49%">
+</div>
+
+**Ctrl+O** opens a real file manager: every drive the firmware exposes, folders, create, rename and delete.
+**Ctrl+Shift+S** saves under another name or **exports to DOCX, ODT, EPUB, HTML, RTF or TXT** — one click
+on the format. Everything else is automatic:
+
+- **Autosave** (every 20 seconds by default) with **atomic writes**: a power cut never leaves half a file.
+- **Automatic versions:** the previous copy of every saved file goes to `FOLIO/VERSIONS` (the last 30 per
+  document are kept).
+- **Draft recovery** for text that was never named.
+
+### 8. Tabs (optional)
+
+<img src="docs/screenshots/tabs.png" alt="Three documents open as tabs in the top bar" width="900">
+
+Prefer several documents at once? Turn on tabs with the first icon on the top right. **Ctrl+N** opens a
+tab, **Ctrl+W** closes, **Ctrl+Tab** or **Alt+1…9** switch. Tabs — even untitled ones — come back after a
+reboot. Turned off, FolioOS stays a calm one-document-at-a-time typewriter.
+
+### 9. Goals, sprints and statistics
+
+<img src="docs/screenshots/session-goals.png" alt="Session and goals window: daily word goal ring, document and session statistics, sprint timer" width="49%" align="right">
+
+**F10** shows your daily word goal, the words in this document and session, reading time and your writing
+pace. **F4** starts a timed **writing sprint** (15–60 minutes) that ends with a gentle bell. Words written
+today are counted across documents and reboots.
+
+<br clear="right">
+
+### 10. Command palette and shortcuts
+
+<img src="docs/screenshots/command-palette.png" alt="Command palette filtering commands by typing" width="900">
+
+**Ctrl+K** finds any command by typing a few letters — in your language. **F1** lists every shortcut:
+
+<img src="docs/screenshots/shortcuts.png" alt="Keyboard shortcuts window" width="900">
+
+### 11. Themes and typography
+
+<img src="docs/screenshots/themes.png" alt="Appearance settings with a gallery of 20 themes" width="900">
+
+**F12** opens the appearance settings: **20 hand-tuned themes**, the text font, size, line spacing,
+paragraph spacing and first-line indent. Text is drawn by FolioOS's own TrueType engine with real kerning
+and anti-aliasing, crisp from small netbook screens to 4K.
+
+<div align="center">
+<img src="docs/screenshots/theme-obsidian.png" alt="Obsidian dark theme" width="24%">
+<img src="docs/screenshots/theme-midnight.png" alt="Midnight blue dark theme" width="24%">
+<img src="docs/screenshots/theme-sepia.png" alt="Sepia theme" width="24%">
+<img src="docs/screenshots/theme-phosphor.png" alt="Phosphor green retro terminal theme" width="24%">
+</div>
+
+<img src="docs/screenshots/theme-editor.png" alt="Theme editor: 16 colors, hue/saturation/lightness picker, fonts for text and interface" width="49%" align="right">
+
+**Make your own:** the theme editor lets you pick each of the 16 colors (or borrow them from any built-in
+theme), choose a font for the text and another for the interface, and see the result live. Themes are small
+`.INI` text files in `FOLIO/THEMES` — easy to share. Drop any `.ttf` font into `FOLIO/FONTS` to use it; the
+optional pack adds Literata, Lora, EB Garamond, iA Writer Quattro/Duo/Mono, Special Elite and more.
+
+<br clear="right">
+
+### 12. Music while you write
+
+**F6** opens a small MP3 player for the files in the drive's `MUSIC` folder (Intel HD Audio and AC'97).
+**F7/F8/F9** control it without leaving the page.
+
+### 13. 15 languages and counting
+
+<div align="center">
+<img src="docs/screenshots/japanese.png" alt="Settings in Japanese" width="32%">
+<img src="docs/screenshots/russian.png" alt="Settings in Russian with Cyrillic theme names" width="32%">
+<img src="docs/screenshots/german-palette.png" alt="Command palette in German" width="32%">
+</div>
+
+**English, Español, Français, Deutsch, Italiano, Português (Brasil), Português (Portugal), Nederlands,
+Polski, Türkçe, Русский, Українська, 简体中文, 日本語, 한국어.**
+
+<img src="docs/screenshots/language-settings.png" alt="Settings › System › Language and keyboard" width="49%" align="right">
+
+Nothing about language is hard-coded. Each translation is a standard **gettext `.po` file** in
+`FOLIO/LANGUAGES` that also defines its plural rules, smart quotes, date format, decimal separator,
+default keyboard and fonts — **adding a language is dropping a file on the drive**. Keyboard layouts are
+plain-text files too: US, US-International, UK, ABNT2, Portugal, Spain, Latin America, French AZERTY,
+German QWERTZ, Italian, Polish, Turkish Q, Russian and Ukrainian.
+
+Want FolioOS in your language? Read **[docs/TRANSLATING.md](docs/TRANSLATING.md)** — it works with Poedit,
+Weblate, Crowdin or any text editor.
+
+<br clear="right">
+
+### 14. Your files, on any computer
+
+```
+USB drive (FAT32)
+├── DOCUMENTS/          your .md and .txt files, and exports (.docx .odt .epub .html .rtf)
+├── MUSIC/              your .mp3 files
+├── FOLIO/
+│   ├── CONFIG.INI      preferences — plain text, editable by hand
+│   ├── FONTS/          .ttf fonts (add your own)
+│   ├── THEMES/         your themes (.INI)
+│   ├── LANGUAGES/      translations (.po)
+│   ├── KEYBOARDS/      keyboard layouts (.txt)
+│   └── VERSIONS/       automatic previous versions of saved files
+└── EFI/BOOT/           FolioOS itself (BOOTX64.EFI, BOOTIA32.EFI)
+```
+
+No database, no hidden partition, no proprietary format. Take the stick to any computer and your writing
+is right there.
+
+---
+
+## How FolioOS compares
+
+| | FolioOS | Dedicated devices (Freewrite, AlphaSmart, Pomera) | Writing apps (iA Writer, Scrivener, focus modes) |
+|---|:---:|:---:|:---:|
+| Cost | **Free** | Hundreds of dollars | Free to paid |
+| Hardware | Any UEFI PC you already own | A new device | Your regular computer |
+| Distractions within reach | **None** — no OS, no network | None | One Alt+Tab away |
+| File format | Plain Markdown on FAT32 | Device-specific sync/export | Varies |
+| Screen and typography | Full-size screen, TrueType, themes | Small e-ink or LCD | Excellent |
+| Works offline | **Always** | Mostly | Yes |
+| Open source | **Yes (GPL-3.0)** | No | Mostly no |
+
+## Hardware compatibility
 
 | | |
 |---|---|
-| **Firmware** | UEFI 2.x, 64-bit (`BOOTX64.EFI`) or 32-bit (`BOOTIA32.EFI`, Atom tablets/netbooks). Secure Boot must be off. |
-| **Display** | Any UEFI GOP framebuffer (RGB, BGR, bit-mask, Blt-only) or legacy UGA; native resolution, HiDPI scaling, portrait panels rotated automatically. |
-| **Input** | UEFI keyboard; USB/PS/2 mouse, touchpad and touch screen via the firmware's pointer protocols. |
-| **Sound** | Intel HD Audio and AC'97 (optional, for the MP3 player). |
-| **Storage** | The boot USB drive (FAT32) plus any other FAT volume the firmware exposes. |
-| **Not supported (yet)** | BIOS/CSM-only machines, Secure Boot, Wi-Fi/Bluetooth (by design), right-to-left scripts. |
+| **Firmware** | UEFI 2.x — 64-bit (`BOOTX64.EFI`) or 32-bit (`BOOTIA32.EFI`, Atom tablets and netbooks). Secure Boot must be off. Most PCs and laptops from about 2012 onwards. |
+| **Display** | Any UEFI GOP framebuffer (RGB, BGR, bit-mask, Blt-only) or legacy UGA. Native resolution, automatic HiDPI scaling, portrait panels rotated automatically. |
+| **Input** | Keyboard through the firmware; USB/PS/2 mouse, touchpad and touch screen through the firmware's pointer protocols. |
+| **Sound** | Intel HD Audio and AC'97 (only needed for the music player). |
+| **Not supported** | BIOS/CSM-only PCs, Secure Boot (for now), Apple Silicon Macs. Wi-Fi and Bluetooth are left out by design. |
 
-Something not working? FolioOS writes `FOLIO\DIAGNOSTICS.TXT` on every start — attach it to a
-[bug report](https://github.com/alantaru/FolioOS/issues/new/choose).
+Every boot writes `FOLIO/DIAGNOSTICS.TXT` with what FolioOS found. Please share yours in a
+[hardware report](https://github.com/alantaru/FolioOS/issues/new/choose) — even "it just works" helps other
+writers pick a laptop.
+
+## FAQ
+
+<details>
+<summary><b>Will it erase my computer or my USB drive?</b></summary>
+
+No. FolioOS never touches the internal disk, and installing it only adds files to the USB drive — what is
+already there stays. Take the drive out and the PC boots its usual system again.
+</details>
+
+<details>
+<summary><b>Is my writing safe if the battery dies?</b></summary>
+
+Saves are atomic (the file is written completely before it replaces the old one), autosave runs every
+20 seconds by default, untitled text has a recovery draft, and every saved file keeps its previous
+versions in `FOLIO/VERSIONS`.
+</details>
+
+<details>
+<summary><b>Can I edit my files on my normal computer too?</b></summary>
+
+Yes. They are plain `.md` files in `DOCUMENTS` on a FAT32 drive. Open them in Obsidian, Typora, VS Code,
+Notepad, TextEdit or any Markdown editor, then plug the drive back in and keep writing in FolioOS.
+</details>
+
+<details>
+<summary><b>Why does my PC not show the USB drive in the boot menu?</b></summary>
+
+Check that the drive is FAT32, that you picked the entry starting with "UEFI", and that Secure Boot is
+disabled in the firmware setup. Very old PCs that only boot in BIOS/CSM mode are not supported.
+</details>
+
+<details>
+<summary><b>Does it work on a Mac?</b></summary>
+
+Intel Macs can boot UEFI drives (hold <kbd>Option</kbd> at startup), but they have not been tested yet —
+reports are welcome. Apple Silicon Macs are not supported.
+</details>
+
+<details>
+<summary><b>Can I type in Chinese, Japanese or Korean?</b></summary>
+
+The interface is fully translated, but typing CJK text needs an input method, which is on the roadmap.
+Latin, Greek and Cyrillic scripts can be typed today with the included keyboard layouts.
+</details>
+
+<details>
+<summary><b>Is there spell checking, internet or cloud sync?</b></summary>
+
+No internet or sync, by design — FolioOS is meant to be offline. Spell checking is on the roadmap. Because
+the files are plain Markdown, you can sync them with anything once the drive is back in a regular computer.
+</details>
 
 ## Build from source
 
-Requirements: Windows 10/11 with [MinGW-w64](https://winlibs.com) `gcc` on `PATH` (any recent
-x86_64 build) and PowerShell 5.1+. No other dependencies.
+Requirements: Windows 10/11, PowerShell 5.1+, and [MinGW-w64](https://winlibs.com) `gcc` (any recent x86_64
+build) on `PATH`. Nothing else.
 
 ```powershell
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
-.\build.ps1                       # builds UEFI x64 + IA32, simulator, packages, runs all tests
-.\flash_usb.ps1 -DriveLetter E:   # installs/updates a FAT32 USB drive, keeping user files
-.\build.ps1 -Image                # optional: raw disk image for Rufus / Etcher / dd
-.\tools\fetch-cjk-fonts.ps1       # optional: fonts for the CJK font pack
+.\build.ps1                                  # UEFI x64 + IA32, simulator, packages — and the whole test suite
+.\build\folio_sim.exe                        # run FolioOS in a window
+.\build\efi_host.exe build\efi\BOOTX64.EFI   # run the real UEFI binary in a window
+.\flash_usb.ps1 -DriveLetter E:              # install/update a FAT32 USB drive, keeping user files
+.\build.ps1 -Image -ImageMB 256              # optional: raw disk image for Rufus / Etcher / dd
+.\tools\fetch-cjk-fonts.ps1                  # optional: fonts for FOLIO-FONTS-CJK.zip
+.\tools\showcase.ps1                         # regenerate the screenshots in this README
 ```
 
-The test suite drives the simulator and the real `BOOTX64.EFI` (inside a small UEFI host)
-with scripted keystrokes and mouse events, captures screenshots, checks exported files and
-validates every translation.
+The test suite drives the simulator and the real `BOOTX64.EFI` (inside a small UEFI host) with scripted
+keystrokes and mouse events, captures screenshots, validates every export (ZIP + XML), every translation
+(with a negative control for the validator) and six framebuffer formats.
 
-## Architecture
+### Architecture in one picture
 
 ```
-src/core/       portable core: editor, Markdown, TrueType rasterizer, UI toolkit, window manager,
-                export (DOCX/ODT/EPUB/…), MP3 player, i18n (gettext), keyboard layouts, themes
-src/platform/   uefi/  firmware backend: GOP/UGA video, input, FAT I/O, HD Audio/AC'97
-                win32/ simulator backend used for development and automated tests
-tools/          efi_host (runs BOOTX64.EFI on Windows), i18n tool, disk image builder
+src/core/       portable core (freestanding C, no libc): editor, Markdown, TrueType rasterizer,
+                UI toolkit and window manager, exports, MP3, i18n, keyboard layouts, themes
+src/platform/   uefi/  GOP/UGA video, input, FAT I/O, HD Audio/AC'97 — straight on the firmware
+                win32/ simulator used for development and automated tests
+tools/          efi_host (runs BOOTX64.EFI on Windows), i18n tool, disk image builder, showcase
 assets/         fonts, translations (.po), keyboard layouts, example theme
 tests/          scripted end-to-end tests
 ```
 
-The core is freestanding C (no libc): a ~600 KB binary that owns the whole machine through a
-thin platform abstraction layer. More in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+A ~600 KB binary owns the whole machine through a thin platform layer. Details in
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Roadmap
 
-- [ ] Input methods for Chinese, Japanese and Korean text (the interface is already translated)
-- [ ] Text shaping and right-to-left layout (Arabic, Hebrew, Devanagari…)
+- [ ] Input methods for Chinese, Japanese and Korean
+- [ ] Text shaping and right-to-left scripts (Arabic, Hebrew, Devanagari…)
 - [ ] Spell checking with Hunspell-compatible dictionaries
-- [ ] Secure Boot (signed shim)
-- [ ] Linux build of the simulator and tools
+- [ ] Secure Boot support (signed shim)
+- [ ] Linux and macOS builds of the simulator and tools
 
-Ideas and votes: [Discussions](https://github.com/alantaru/FolioOS/discussions).
+Vote and suggest in [Discussions](https://github.com/alantaru/FolioOS/discussions).
 
 ## Contributing
 
-Bug reports, translations, keyboard layouts, themes, fonts and code are all welcome — see
-[CONTRIBUTING.md](CONTRIBUTING.md) and our [Code of Conduct](CODE_OF_CONDUCT.md).
-Security issues: [SECURITY.md](SECURITY.md).
+Bug reports, hardware reports, translations, keyboard layouts, themes, fonts, documentation and code are
+all welcome — start with [CONTRIBUTING.md](CONTRIBUTING.md). Please follow the
+[Code of Conduct](CODE_OF_CONDUCT.md); report security issues privately as described in
+[SECURITY.md](SECURITY.md).
+
+If FolioOS helps you write, **⭐ star the repository** — it helps other writers find it.
 
 ## License
 
-FolioOS is free software under the [GNU General Public License v3.0](LICENSE).
-Bundled fonts use the SIL Open Font License; minimp3 is CC0. Details in
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+FolioOS is free software under the [GNU General Public License v3.0](LICENSE). Bundled fonts use the SIL
+Open Font License; minimp3 is CC0. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-<sub>Keywords: distraction-free writing · bootable USB writing environment · writerdeck ·
-digital typewriter · focus writing app · Markdown editor · offline writing · UEFI application ·
-bare-metal C · Freewrite / AlphaSmart alternative · novel writing · NaNoWriMo.</sub>
+<sub>FolioOS · distraction-free writing software · bootable USB writing environment · writerdeck · DIY
+Freewrite / AlphaSmart alternative · digital typewriter for old laptops · offline Markdown editor ·
+focus writing app · UEFI application written in C · novel and NaNoWriMo writing tool.</sub>

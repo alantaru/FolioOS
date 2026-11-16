@@ -1,0 +1,110 @@
+# FolioOS — README screenshots (English interface). Run with tools\showcase.ps1
+key esc
+wait 300
+open /DOCUMENTS/The Lighthouse Keeper.md
+wait 400
+move 800 420
+wait 300
+shot hero.png
+# focus mode: only the current paragraph is in full contrast
+click 700 560
+pref focus 2
+wait 500
+move 1580 880
+wait 2600
+shot focus-mode.png
+pref focus 0
+# reading mode: formatted like a book
+key ctrl+home
+key ctrl+p
+wait 800
+move 800 450
+wait 300
+shot reading-mode.png
+key esc
+wait 300
+# command palette
+key ctrl+k
+type export
+wait 400
+shot command-palette.png
+key esc
+# chapter outline
+key f5
+wait 500
+shot outline.png
+key esc
+# find and replace
+key ctrl+f
+type light
+wait 500
+shot find-replace.png
+key esc
+# file manager
+key ctrl+o
+wait 500
+shot file-manager.png
+key esc
+# export
+key ctrl+shift+s
+wait 500
+shot export.png
+key esc
+# session, goals and writing sprint
+key f10
+wait 500
+shot session-goals.png
+key esc
+# keyboard shortcuts
+key f1
+wait 500
+shot shortcuts.png
+key esc
+# theme gallery and theme editor
+key f12
+wait 500
+shot themes.png
+key esc
+key ctrl+k
+type custom theme
+key enter
+wait 600
+shot theme-editor.png
+key esc
+wait 300
+# a few of the 20 themes
+move 800 420
+themename Obsidian
+wait 400
+shot theme-obsidian.png
+themename Midnight
+wait 400
+shot theme-midnight.png
+themename Phosphor
+wait 400
+shot theme-phosphor.png
+themename Sepia
+wait 400
+shot theme-sepia.png
+themename Papyrus
+wait 300
+# tabs (optional, Sublime Text style)
+key ctrl+k
+type Tabs
+key enter
+wait 300
+open /DOCUMENTS/Novel - Notes.md
+wait 300
+open /DOCUMENTS/Poems.md
+wait 300
+key alt+1
+move 800 420
+wait 4000
+shot tabs.png
+# zen mode: nothing but the text
+key f11
+move 800 600
+wait 2600
+shot zen-mode.png
+key f11
+wait 300
