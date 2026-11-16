@@ -25,6 +25,7 @@ jobs:
         shell: pwsh
         run: Add-Content $env:GITHUB_PATH "${{ steps.msys2.outputs.msys2-location }}\ucrt64\bin"
 
+      # 256 MB image: small download; Compress-Archive (PS 5.1) cannot zip files over 2 GB
       - name: Build, test and make the disk image
         shell: powershell
         run: |
