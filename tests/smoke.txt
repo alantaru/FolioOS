@@ -1,0 +1,16 @@
+# Teste de fumaça: boas-vindas, digitação PT-BR, temas
+shot 01_boas_vindas.png
+key ctrl+a
+type # Capítulo 1¶
+type ¶A manhã chegou devagar -- como sempre chegava naquela cidade... O café estava **forte** e o *silêncio*, absoluto.¶
+type ¶- primeiro item¶segundo item¶
+key enter
+type > Uma citação para lembrar.¶
+wait 3000
+shot 02_texto.png
+assert_text — como sempre
+assert_text …
+assert_text - segundo item
+theme 2
+wait 200
+shot 03_obsidiana.png

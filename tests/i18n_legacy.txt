@@ -1,0 +1,11 @@
+# A drive set up before translations existed (CONFIG.INI with Portuguese keys and no language):
+# it keeps the Portuguese interface, the ABNT2 keyboard and the old theme name.
+assert_lang pt-BR
+assert_splash 0
+assert_theme Papyrus
+assert_tr Save => Salvar
+key ctrl+a
+raw ;
+assert_text ç
+# saving the preferences migrates them to the new (English) keys
+pref splash_secs 3

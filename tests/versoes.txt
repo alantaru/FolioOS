@@ -1,0 +1,7 @@
+key ctrl+a
+type Primeira versão do texto.
+export md /DOCUMENTS/conto.md
+type  Segunda frase.
+key ctrl+s
+wait 200
+assert_text Segunda frase

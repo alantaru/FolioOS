@@ -1,0 +1,17 @@
+# build output
+/build/
+*.exe
+*.o
+*.img
+*.vhd
+
+# downloaded at build time (tools/fetch-cjk-fonts.ps1)
+/assets/fonts-cjk/
+
+# personal / local only
+/backup_pendrive_*/
+/.specify/
+/.claude/
+*.tmp
+Thumbs.db
+.DS_Store

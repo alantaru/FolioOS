@@ -1,0 +1,67 @@
+# Abas (estilo Sublime Text): opcionais, vários documentos, lembradas entre reinícios
+# começa sem abas: tudo como antes
+assert_tabs 0
+key ctrl+a
+type Primeiro documento das abas.
+# liga pela paleta (o mesmo comando do botão na barra superior)
+key ctrl+k
+type Abas
+key enter
+assert_tabs 1
+key ctrl+n
+assert_tabs 2
+assert_active 1
+type Segundo documento, salvo em arquivo.
+export md /DOCUMENTS/aba2.md
+key ctrl+n
+type Terceiro texto sem nome.
+assert_tabs 3
+# abrir um arquivo que já está numa aba vai para ela
+open /DOCUMENTS/aba2.md
+assert_tabs 3
+assert_active 1
+assert_text Segundo documento
+key alt+1
+assert_active 0
+assert_text Primeiro documento
+assert_no_text Terceiro
+key ctrl+tab
+assert_active 1
+key ctrl+shift+tab
+assert_active 0
+move 800 120
+wait 300
+shot 20_abas.png
+# reinício: as três voltam (sem nome = rascunho em FOLIO\ABAS), na aba em que estava
+restart
+assert_tabs 3
+assert_active 0
+assert_text Primeiro documento
+key alt+3
+assert_text Terceiro texto sem nome
+assert_file /FOLIO/TABS/TAB-1.MD
+assert_file /FOLIO/TABS/TAB-2.MD
+# fechar a aba salva (sem alterações) não pergunta nada
+key alt+2
+key ctrl+w
+assert_tabs 2
+assert_nowin
+assert_text Terceiro texto
+# desligar: fica só o documento atual
+key ctrl+k
+type Abas
+key enter
+assert_tabs 0
+assert_text Terceiro texto
+key ctrl+w
+assert_text Terceiro texto
+# religar: as abas lembradas voltam
+key ctrl+k
+type Abas
+key enter
+assert_tabs 2
+assert_active 1
+restart
+assert_tabs 2
+assert_active 1
+assert_text Terceiro texto

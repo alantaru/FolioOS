@@ -1,0 +1,53 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and test (UEFI x64/IA32, simulator, translations)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install MinGW-w64 gcc
+        id: msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: false
+          install: mingw-w64-ucrt-x86_64-gcc
+
+      - name: Put gcc on PATH
+        shell: pwsh
+        run: Add-Content $env:GITHUB_PATH "${{ steps.msys2.outputs.msys2-location }}\ucrt64\bin"
+
+      - name: Fetch CJK fonts
+        shell: powershell
+        run: .\tools\fetch-cjk-fonts.ps1
+
+      - name: Build and run all tests
+        shell: powershell
+        run: .\build.ps1
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: FolioOS-packages
+          path: |
+            build/FolioOS.zip
+            build/FOLIO-FONTS-EXTRA.zip
+            build/FOLIO-FONTS-CJK.zip
+
+      - name: Upload test screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: build/shots/*.png

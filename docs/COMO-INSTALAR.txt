@@ -1,0 +1,32 @@
+FolioOS — como instalar num pen-drive (sem imagem de disco)
+===========================================================
+
+Não é preciso gravar imagem nem apagar o pen-drive inteiro. O FolioOS ocupa
+uns 7 MB; o resto do pen-drive continua livre para o que você quiser.
+
+1) O pen-drive precisa estar em FAT32 (é o que o firmware UEFI sabe ler).
+   - Pen-drives de até 32 GB quase sempre já vêm em FAT32: pule para o passo 2.
+   - Para conferir no Windows: clique com o botão direito no pen-drive >
+     Propriedades > "Sistema de arquivos".
+   - Se estiver em exFAT ou NTFS (comum acima de 32 GB), formate em FAT32
+     (isso apaga o que houver nele):
+       Windows, até 32 GB: botão direito > Formatar > FAT32.
+       Windows, acima de 32 GB: use o Rufus (rufus.ie), "Seleção de boot:
+         Não inicializável", "Sistema de arquivos: FAT32".
+       macOS: Utilitário de Disco > Apagar > "MS-DOS (FAT)", esquema
+         "Mapa de Partição GUID" ou "Master Boot Record".
+       Linux: sudo mkfs.vfat -F 32 -n FOLIO /dev/sdX1
+
+2) Descompacte este ZIP na RAIZ do pen-drive (as pastas EFI, FOLIO, DOCUMENTS e
+   MUSIC devem ficar direto em E:\, não dentro de outra pasta).
+   Se o pen-drive já tem arquivos, eles continuam lá.
+
+3) Pronto. Ligue o PC com o pen-drive, abra o menu de boot (F12 Dell/Lenovo,
+   F9 HP, F8 Asus, Esc/F11 outros) e escolha a opção "UEFI" do pen-drive.
+   Se não aparecer, desative o "Secure Boot" no setup do firmware (F2/Del).
+
+ATUALIZAR: descompacte a versão nova por cima e confirme "substituir". Só o
+sistema (EFI, FOLIOonts, folioanguages, foliokeyboards), os leia-me e o exemplo documentswelcome.md são
+substituídos; seus textos, músicas e preferências (FOLIO\CONFIG.INI) ficam.
+
+Mais detalhes em LEIA-ME.txt.

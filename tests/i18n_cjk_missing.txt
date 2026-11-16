@@ -1,0 +1,7 @@
+# Without the CJK font pack, choosing Chinese must not make the screen unreadable:
+# the language stays as it was and the user is told which pack to install.
+assert_lang en
+lang zh-CN
+assert_lang en
+lang ko
+assert_lang en

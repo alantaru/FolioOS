@@ -1,0 +1,16 @@
+wait 1500
+shot e01_boot.png
+ctrl a
+type # Teste no binario UEFI real¶¶Escrevendo direto no BOOTX64.EFI -- com acentua[cao: n'ao, cora;'ao, [Agua.¶
+wait 800
+shot e02_digitado.png
+ctrlshift s
+wait 800
+type uefi_teste
+type ¶
+wait 1200
+shot e03_salvo.png
+scan 0x16
+wait 900
+shot e04_aparencia.png
+quit

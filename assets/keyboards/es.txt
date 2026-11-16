@@ -1,0 +1,43 @@
+# FolioOS keyboard layout — Teclado español (España).
+# Each rule: what a key produces on a US keyboard -> what it should type here.
+# Format: see FOLIO/KEYBOARDS/README.txt. Copy this file to create a new layout.
+name Español (España)
+include _compose.txt
+map ; ñ
+map : Ñ
+map [ `
+map { ^
+map ' ´
+map " ¨
+map ] +
+map } *
+map \ ç
+map | Ç
+map ` º
+map ~ ª
+map - '
+map _ ?
+map = ¡
+map + ¿
+map / -
+map ? _
+map < ;
+map > :
+map @ "
+map # ·
+map ^ &
+map & /
+map * (
+map ( )
+map ) =
+altgr 1 |
+altgr 2 @
+altgr 3 #
+altgr 4 ~
+altgr ` \
+altgr [ [
+altgr ] ]
+altgr ' {
+altgr \ }
+altgr e €
+dead ` ^ ´ ¨

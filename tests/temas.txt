@@ -1,0 +1,43 @@
+# Temas do usuário (FOLIO\TEMAS\*.INI): cores + fontes, editor de temas, abertura FolioOS
+# a abertura aparece no boot e fica 10 s (padrão); some sozinha
+assert_splash 1
+shot 30_abertura.png
+wait 9000
+assert_splash 1
+wait 1800
+assert_splash 0
+# tema escrito à mão (o build.ps1 põe "Tinta azul.INI" na pasta antes do teste)
+themename Blue Ink
+assert_theme Blue Ink
+assert_font Courier Prime
+assert_uifont IBM Plex Mono
+move 800 450
+wait 300
+shot 31_tema_usuario.png
+# tema pronto: a fonte da interface volta ao padrão
+themename Papiro
+assert_uifont Fira Sans
+# editor de temas: abre com uma cópia; cancelar (Esc) devolve o tema anterior
+key ctrl+k
+type Criar tema
+key enter
+wait 400
+shot 32_editor_temas.png
+key esc
+assert_theme Papyrus
+# gravador: cria o arquivo e o tema entra na lista
+theme_save_copy Copia de teste
+assert_file /FOLIO/THEMES/Copia de teste.INI
+themename Copia de teste
+assert_theme Copia de teste
+assert_font Spectral
+restart
+assert_theme Copia de teste
+# duração configurável (abertura_segundos=): 3 s valem a partir do próximo boot
+pref splash_secs 3
+restart
+assert_splash 1
+wait 2500
+assert_splash 1
+wait 1200
+assert_splash 0

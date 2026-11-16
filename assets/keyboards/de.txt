@@ -1,0 +1,48 @@
+# FolioOS keyboard layout — Deutsche Tastatur (QWERTZ).
+# Each rule: what a key produces on a US keyboard -> what it should type here.
+# Format: see FOLIO/KEYBOARDS/README.txt. Copy this file to create a new layout.
+name Deutsch (QWERTZ)
+include _compose.txt
+map y z
+map z y
+map Y Z
+map Z Y
+map [ ü
+map { Ü
+map ; ö
+map : Ö
+map ' ä
+map " Ä
+map - ß
+map _ ?
+map = ´
+map + `
+map ` ^
+map ~ °
+map ] +
+map } *
+map \ #
+map | '
+map / -
+map ? _
+map < ;
+map > :
+map @ "
+map # §
+map ^ &
+map & /
+map * (
+map ( )
+map ) =
+altgr q @
+altgr e €
+altgr 7 {
+altgr 8 [
+altgr 9 ]
+altgr 0 }
+altgr - \
+altgr ] ~
+altgr 2 ²
+altgr 3 ³
+altgr m µ
+dead ´ ` ^

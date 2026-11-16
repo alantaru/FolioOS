@@ -1,0 +1,6 @@
+# FolioOS keyboard layout — US-International: ' " ` ~ ^ are dead keys (accent + letter). Accent + space types the sign itself.
+# Each rule: what a key produces on a US keyboard -> what it should type here.
+# Format: see FOLIO/KEYBOARDS/README.txt. Copy this file to create a new layout.
+name English (US, international)
+include _compose.txt
+dead ' " ` ~ ^

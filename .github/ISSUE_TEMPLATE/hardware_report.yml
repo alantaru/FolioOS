@@ -1,0 +1,25 @@
+name: Hardware report
+description: Tell us how FolioOS runs on your computer (working or not)
+labels: [hardware]
+body:
+  - type: input
+    id: model
+    attributes:
+      label: Computer model
+    validations:
+      required: true
+  - type: checkboxes
+    id: works
+    attributes:
+      label: What works?
+      options:
+        - label: Boots
+        - label: Display (correct resolution)
+        - label: Keyboard
+        - label: Touchpad / mouse
+        - label: Sound (MP3 player)
+        - label: Saving to the USB drive
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes and DIAGNOSTICS.TXT

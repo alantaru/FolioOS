@@ -1,0 +1,44 @@
+# FolioOS keyboard layout — Türkçe Q klavye.
+# Each rule: what a key produces on a US keyboard -> what it should type here.
+# Format: see FOLIO/KEYBOARDS/README.txt. Copy this file to create a new layout.
+name Türkçe (Q)
+include _compose.txt
+map i ı
+map [ ğ
+map { Ğ
+map ] ü
+map } Ü
+map ; ş
+map : Ş
+map ' i
+map " İ
+map , ö
+map < Ö
+map . ç
+map > Ç
+map / .
+map ? :
+map \ ,
+map | ;
+map ` "
+map ~ é
+map - *
+map _ ?
+map = -
+map + _
+map @ '
+map # ^
+map $ +
+map ^ &
+map & /
+map * (
+map ( )
+map ) =
+altgr q @
+altgr e €
+altgr 7 {
+altgr 8 [
+altgr 9 ]
+altgr 0 }
+altgr - \
+dead ^

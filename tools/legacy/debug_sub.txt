@@ -1,0 +1,10 @@
+static SimMouseEvent g_mouse_queue[512];
+static int g_mouse_q_head = 0;
+static int g_mouse_q_tail = 0;
+
+typedef struct {
+    uint64_t x, y;
+    uint32_t btn;
+} SimAbsEvent;
+
+static SimAbsEvent g_abs_q

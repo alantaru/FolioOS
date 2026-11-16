@@ -1,0 +1,26 @@
+key ctrl+a
+type # A casa do rio¶¶Ninguém sabia ao certo quando a casa tinha sido construída. A avó dizia que fora antes da enchente de 1932, mas a avó dizia muitas coisas -- e quase todas eram verdade pela metade.¶¶O rio passava a vinte passos da porta. No inverno subia até o primeiro degrau; no verão recuava tanto que se podia atravessá-lo sem molhar os joelhos... Era um rio indeciso, como a família.¶¶## I¶¶Marta chegou numa terça-feira, com uma mala de couro e um caderno de capa verde.¶
+move 960 500
+wait 600
+shot 01_editor.png
+wait 3000
+shot 02_editor_digitando.png
+key ctrl+k
+wait 300
+shot 03_paleta.png
+key esc
+click 30 27
+wait 400
+shot 04_menu.png
+key esc
+key f10
+wait 400
+shot 05_metas.png
+key esc
+key f12
+wait 400
+shot 06_aparencia.png
+key esc
+key f2
+wait 300
+shot 07_foco.png

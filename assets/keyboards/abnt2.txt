@@ -1,0 +1,36 @@
+# FolioOS keyboard layout — Teclado brasileiro ABNT2. AltGr+Q = /  AltGr+W = ?
+# Each rule: what a key produces on a US keyboard -> what it should type here.
+# Format: see FOLIO/KEYBOARDS/README.txt. Copy this file to create a new layout.
+name Português (Brasil) — ABNT2
+include _compose.txt
+map ` '
+map ~ "
+map ^ ¨
+map [ ´
+map { `
+map ] [
+map } {
+map ; ç
+map : Ç
+map ' ~
+map " ^
+map \ ]
+map | }
+map / ;
+map ? :
+altgr q /
+altgr Q /
+altgr w ?
+altgr W ?
+altgr e °
+altgr E °
+altgr 1 ¹
+altgr 2 ²
+altgr 3 ³
+altgr 4 £
+altgr 5 ¢
+altgr 6 ¬
+altgr = §
+altgr [ ª
+altgr ] º
+dead ¨ ´ ` ~ ^

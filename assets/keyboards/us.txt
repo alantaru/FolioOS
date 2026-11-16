@@ -1,0 +1,4 @@
+# FolioOS keyboard layout — US layout: keys are passed through unchanged.
+# Each rule: what a key produces on a US keyboard -> what it should type here.
+# Format: see FOLIO/KEYBOARDS/README.txt. Copy this file to create a new layout.
+name English (US)

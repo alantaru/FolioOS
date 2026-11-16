@@ -1,0 +1,72 @@
+FolioOS — a distraction-free digital typewriter that boots from this USB drive
+==============================================================================
+
+This drive works in two ways:
+
+1) BOOT FROM IT (no Windows, no internet, no distractions)
+   - Turn on the PC and open the boot menu (F9 on HP, F12 on Dell/Lenovo, F8 on
+     Asus, Esc/F11 on others). Pick the "UEFI" entry of this USB drive.
+   - If it does not show up: enter the firmware setup (F10/F2/Del) and DISABLE
+     "Secure Boot".
+
+2) AS AN ORDINARY USB DRIVE, on any Windows, Linux or macOS computer
+   Every folder is open, plain FAT32 — no proprietary format:
+
+   DOCUMENTS\          your texts (.md, .txt) and exports (.docx .odt .epub
+                       .html .rtf). Copy freely in both directions.
+   MUSIC\              put your .mp3 files here; FolioOS plays them (F8) while
+                       you write. Subfolders work too.
+   FOLIO\FONTS\        .ttf fonts used by the editor. Add your own (subfolders
+                       work). Ready-made pack: FOLIO-FONTS-EXTRA.zip.
+   FOLIO\THEMES\       your themes (plain-text .INI: #RRGGBB colors and fonts).
+   FOLIO\LANGUAGES\    interface translations (.po files — add a language by
+                       dropping a file here). See "LANGUAGES" below.
+   FOLIO\KEYBOARDS\    keyboard layouts (plain text). Copy one to make yours.
+   FOLIO\TABS\         untitled texts open in tabs (they come back after a restart).
+   FOLIO\CONFIG.INI    preferences (language, keyboard, theme, font, goals…).
+                       Editable by hand.
+   FOLIO\DRAFT.MD      automatic recovery of texts that have no name yet.
+   EFI\BOOT\           the system itself. Do not delete.
+
+   Drives set up by older versions keep their Portuguese folder names (TEXTOS,
+   MUSICA, FOLIO\FONTES, FOLIO\TEMAS…). FolioOS keeps using them; nothing is
+   renamed or moved.
+
+.md files open in any text editor (Notepad, TextEdit, VS Code, Obsidian, Typora…).
+Inside FolioOS, Ctrl+Shift+S exports to Word (.docx), LibreOffice (.odt), e-book
+(.epub), web page (.html) and RTF.
+
+Main shortcuts: F1 help · Ctrl+K commands · F2 focus · F3 typewriter ·
+F11 zen mode · F12 appearance · Ctrl+Q shut down.
+
+LANGUAGES
+   On first boot FolioOS follows the language of the firmware setup, when a
+   translation exists; otherwise it starts in English. Change it any time in
+   Settings > System > LANGUAGE AND KEYBOARD (or Ctrl+K > "Language").
+   Included: English, Español, Français, Deutsch, Italiano, Português (Brasil),
+   Português (Portugal), Nederlands, Polski, Türkçe, Русский, Українська,
+   简体中文, 日本語, 한국어.
+   Chinese, Japanese and Korean need their fonts: unzip FOLIO-FONTS-CJK.zip at the
+   root of this drive first (the interface is translated; typing CJK text needs an
+   input method that FolioOS does not have yet).
+   To add or fix a language, edit or create FOLIO\LANGUAGES\<code>.po with Poedit
+   or any text editor, and restart. Guide: docs/TRANSLATING.md in the project.
+
+KEYBOARD
+   Settings > System > Keyboard. Layouts are text files in FOLIO\KEYBOARDS:
+   US, US-International, UK, ABNT2 (Brazil), Portugal, Spain, Latin America,
+   French AZERTY, German QWERTZ, Italian, Polish, Turkish Q, Russian, Ukrainian.
+
+DISPLAY
+   FolioOS uses the native resolution of the screen and rotates the picture on
+   tablets with a portrait screen. Settings > System lets you pick another
+   resolution and rotate the screen. Ctrl+Alt+arrows rotate; Ctrl+Alt+Home goes
+   back to automatic. In CONFIG.INI: resolution=auto (or 1920x1080, or max),
+   rotation=auto (or 0, 90, 180, 270), fast_video=0 if the picture glitches.
+   If the PC shows nothing: very old graphics cards (before ~2012) only work in
+   BIOS/CSM mode, which FolioOS does not use.
+
+IF SOMETHING DOES NOT WORK (sound, display, mouse)
+   FolioOS writes FOLIO\DIAGNOSTICS.TXT on every start (and in Settings > System >
+   Save diagnostics). Open it on any computer: it says which sound card, display
+   and mouse were found and what failed. Please attach it to bug reports.

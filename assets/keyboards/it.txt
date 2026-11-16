@@ -1,0 +1,36 @@
+# FolioOS keyboard layout — Tastiera italiana.
+# Each rule: what a key produces on a US keyboard -> what it should type here.
+# Format: see FOLIO/KEYBOARDS/README.txt. Copy this file to create a new layout.
+name Italiano
+map ; ò
+map : ç
+map ' à
+map " °
+map [ è
+map { é
+map ] +
+map } *
+map \ ù
+map | §
+map ` \
+map ~ |
+map - '
+map _ ?
+map = ì
+map + ^
+map / -
+map ? _
+map < ;
+map > :
+map @ "
+map # £
+map ^ &
+map & /
+map * (
+map ( )
+map ) =
+altgr [ [
+altgr ] ]
+altgr ; @
+altgr ' #
+altgr e €

@@ -1,0 +1,14 @@
+name: Feature request
+description: Suggest an idea that keeps FolioOS distraction-free
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would it help you write?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Proposed solution

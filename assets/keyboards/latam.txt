@@ -1,0 +1,36 @@
+# FolioOS keyboard layout — Teclado latinoamericano.
+# Each rule: what a key produces on a US keyboard -> what it should type here.
+# Format: see FOLIO/KEYBOARDS/README.txt. Copy this file to create a new layout.
+name Español (Latinoamérica)
+include _compose.txt
+map ; ñ
+map : Ñ
+map [ ´
+map { ¨
+map ' {
+map " [
+map ] +
+map } *
+map \ }
+map | ]
+map ` |
+map ~ °
+map - '
+map _ ?
+map = ¿
+map + ¡
+map / -
+map ? _
+map < ;
+map > :
+map @ "
+map ^ &
+map & /
+map * (
+map ( )
+map ) =
+altgr q @
+altgr ] ~
+altgr ` ¬
+altgr - \
+dead ´ ¨

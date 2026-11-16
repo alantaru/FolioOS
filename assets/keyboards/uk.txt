@@ -1,0 +1,22 @@
+# FolioOS keyboard layout — UK layout.
+# Each rule: what a key produces on a US keyboard -> what it should type here.
+# Format: see FOLIO/KEYBOARDS/README.txt. Copy this file to create a new layout.
+name English (UK)
+map " @
+map @ "
+map # £
+map \ #
+map | ~
+map ~ ¬
+altgr 4 €
+altgr ` ¦
+altgr a á
+altgr e é
+altgr i í
+altgr o ó
+altgr u ú
+altgr A Á
+altgr E É
+altgr I Í
+altgr O Ó
+altgr U Ú

@@ -1,0 +1,23 @@
+# FolioOS keyboard layout — Polish programmer layout: US keys, Polish letters with AltGr.
+# Each rule: what a key produces on a US keyboard -> what it should type here.
+# Format: see FOLIO/KEYBOARDS/README.txt. Copy this file to create a new layout.
+name Polski (programisty)
+altgr a ą
+altgr c ć
+altgr e ę
+altgr l ł
+altgr n ń
+altgr o ó
+altgr s ś
+altgr x ź
+altgr z ż
+altgr A Ą
+altgr C Ć
+altgr E Ę
+altgr L Ł
+altgr N Ń
+altgr O Ó
+altgr S Ś
+altgr X Ź
+altgr Z Ż
+altgr u €

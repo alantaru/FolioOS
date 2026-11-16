@@ -1,0 +1,41 @@
+# FolioOS keyboard layout — Teclado português (Portugal).
+# Each rule: what a key produces on a US keyboard -> what it should type here.
+# Format: see FOLIO/KEYBOARDS/README.txt. Copy this file to create a new layout.
+name Português (Portugal)
+include _compose.txt
+map ; ç
+map : Ç
+map ' º
+map " ª
+map [ +
+map { *
+map ] ´
+map } `
+map \ ~
+map | ^
+map ` \
+map ~ |
+map - '
+map _ ?
+map = «
+map + »
+map / -
+map ? _
+map < ;
+map > :
+map @ "
+map ^ &
+map & /
+map * (
+map ( )
+map ) =
+altgr 2 @
+altgr 3 £
+altgr 4 §
+altgr 7 {
+altgr 8 [
+altgr 9 ]
+altgr 0 }
+altgr [ ¨
+altgr e €
+dead ´ ` ~ ^ ¨

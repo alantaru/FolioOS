@@ -1,0 +1,62 @@
+key ctrl+a
+type # O Farol¶
+type ¶Era uma noite *escura* e **tempestuosa** -- o mar batia nas pedras.¶
+type ¶## Parte um¶
+type ¶- [ ] revisar capítulo¶escrever abertura¶
+key enter
+type ¶1. primeiro¶segundo¶
+key enter
+type ¶| Coluna A | Coluna B |¶|---|---|¶| um | dois |¶
+type ¶Texto com `código` e [link](http://x.y).¶
+raw ¶[Agua n'ao cora;'ao "e
+assert_text Água não coração ê
+key ctrl+k
+type tema
+wait 300
+shot 10_paleta.png
+key esc
+key f12
+wait 400
+shot 11_ajustes_aparencia.png
+key esc
+key ctrl+shift+s
+wait 400
+shot 12_salvar.png
+key esc
+export md /DOCUMENTS/teste.md
+export docx /DOCUMENTS/teste.docx
+export odt /DOCUMENTS/teste.odt
+export epub /DOCUMENTS/teste.epub
+export html /DOCUMENTS/teste.html
+export rtf /DOCUMENTS/teste.rtf
+export txt /DOCUMENTS/teste.txt
+assert_file /DOCUMENTS/teste.docx
+assert_file /DOCUMENTS/teste.epub
+key ctrl+p
+wait 500
+shot 13_preview.png
+key esc
+key f5
+key f6
+wait 500
+shot 14_sumario_musica.png
+key esc
+key esc
+key ctrl+f
+type Farol
+wait 300
+shot 15_busca.png
+key esc
+key f1
+wait 400
+shot 16_ajuda.png
+key esc
+key ctrl+o
+wait 400
+shot 17_abrir.png
+key esc
+pref focus 1
+theme 5
+move 800 450
+wait 400
+shot 18_foco_oceano.png

@@ -1,0 +1,245 @@
+# Qualidade de vida: leitura e escrita (capítulos, sincronia leitura/escrita, posições, edição)
+key ctrl+a
+type # O Livro¶## Capítulo um¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 1¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 2¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 3¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 4¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 5¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 6¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 7¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 8¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 9¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 10¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 11¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 12¶
+type ## Capítulo dois¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 1¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 2¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 3¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 4¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 5¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 6¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 7¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 8¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 9¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 10¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 11¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 12¶
+type ## Capítulo três¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 1¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 2¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 3¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 4¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 5¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 6¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 7¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 8¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 9¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 10¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 11¶
+type O vento soprava do norte quando ela abriu a janela e viu o farol aceso, pela primeira vez em muitos anos, iluminando as pedras molhadas da baía. 12¶
+key ctrl+home
+key ctrl+pgdn
+assert_para 1
+key ctrl+pgdn
+assert_para 14
+key ctrl+pgdn
+assert_para 27
+key ctrl+pgdn
+assert_para 27
+key ctrl+pgup
+assert_para 14
+move 800 450
+wait 400
+shot 20_capitulos_editor.png
+# leitura abre no mesmo trecho e volta para ele
+key ctrl+p
+wait 600
+assert_para 14 15
+shot 21_leitura.png
+key right
+wait 600
+assert_para 15 26
+key ctrl+pgdn
+wait 600
+assert_para 27 29
+move 800 880
+wait 500
+shot 22_leitura_progresso.png
+click 1500 450
+wait 600
+assert_para 29 40
+key esc
+wait 300
+assert_para 29 40
+# maiúsculas, envolver seleção, duplicar, apagar, última alteração
+key ctrl+end
+type ¶teste palavra
+key shift+f3
+assert_text teste Palavra
+key shift+f3
+assert_text teste PALAVRA
+key shift+f3
+assert_text teste palavra
+type (
+assert_text teste (palavra)
+key ctrl+d
+assert_para 42
+key end
+type  dup
+assert_text (palavra) dup
+key ctrl+shift+k
+assert_no_text (palavra) dup
+assert_text teste (palavra)
+key ctrl+home
+key ctrl+j
+assert_para 41 42
+key ctrl+j
+assert_para 0
+# cada documento lembra onde parou (escrita e leitura)
+export md /DOCUMENTS/livro.md
+key ctrl+pgdn
+key ctrl+pgdn
+key ctrl+pgdn
+assert_para 27
+key ctrl+n
+wait 200
+assert_para 0
+open /DOCUMENTS/livro.md
+wait 200
+assert_para 27
+key ctrl+p
+wait 500
+key ctrl+pgup
+wait 600
+assert_para 14 16
+key esc
+key ctrl+p
+wait 500
+assert_para 14 16
+key ctrl+n
+wait 200
+open /DOCUMENTS/livro.md
+wait 300
+assert_para 14 16
+key f1
+wait 400
+shot 23_atalhos.png
+key esc
+# clicar fora de uma janela fecha (e o clique não mexe no texto)
+key f5
+wait 300
+key f6
+wait 300
+click 800 500
+wait 300
+assert_nowin
+key f12
+wait 300
+click 30 450
+wait 300
+assert_nowin
+key ctrl+k
+wait 300
+click 30 450
+wait 300
+assert_nowin
+# o diálogo "Salvar alterações?" fechado por clique fora = Cancelar (o texto continua)
+type x
+key ctrl+n
+wait 300
+click 30 450
+wait 300
+assert_nowin
+assert_text teste (palavra)
+key ctrl+s
+wait 300
+assert_text teste (palavra)
+# tela cheia: escrever e ler na largura toda, mantendo o trecho
+pref fullwidth 1
+key ctrl+home
+key ctrl+pgdn
+key ctrl+pgdn
+assert_para 14
+key ctrl+p
+wait 500
+assert_para 14 15
+key esc
+wait 200
+assert_para 14 15
+pref fullwidth 0
+# rolagem automática: nunca liga sozinha; liga pelo botão da barra ou clique do meio; Esc só para
+key ctrl+home
+key ctrl+p
+wait 600
+move 700 500
+wait 300
+assert_auto 0
+assert_still 8000
+mclick 700 500
+assert_auto 1
+assert_moving 3000
+key esc
+assert_auto 0
+wait 500
+assert_still 3000
+# o botão visível da barra liga e desliga
+barclick play
+assert_auto 1
+assert_moving 2000
+shot 25_rolagem_barra.png
+barclick play
+assert_auto 0
+wait 500
+assert_still 2000
+# janela comum aberta (música) não pausa; Esc fecha a janela e depois para a rolagem
+barclick play
+key f6
+wait 300
+move 700 520
+assert_moving 3000
+key esc
+key esc
+assert_auto 0
+# Esc durante o arrasto do botão do meio para o arrasto e NÃO liga a rolagem (bug da auditoria)
+move 700 500
+mdown
+move 700 560
+wait 300
+key esc
+mup
+assert_auto 0
+wait 500
+assert_still 3000
+# arrastar com o botão do meio rola; qualquer tecla encerra o arrasto mesmo sem o "soltar"
+move 700 500
+mdown
+move 700 760
+assert_moving 800
+key down
+wait 400
+assert_still 2000
+mup
+assert_para 12 42
+key esc
+key esc
+# pela paleta (Ctrl+K), só com o teclado, saindo do editor: abre a leitura e liga; de novo, desliga
+key ctrl+home
+key ctrl+k
+wait 300
+type rolagem auto
+wait 200
+key enter
+wait 600
+assert_auto 1
+assert_moving 2000
+key ctrl+k
+wait 300
+type rolagem auto
+wait 200
+key enter
+assert_auto 0
+wait 500
+assert_still 2000
+key esc

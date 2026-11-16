@@ -1,0 +1,38 @@
+name: Bug report
+description: Something does not work as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting! Please attach `FOLIO\DIAGNOSTICS.TXT` from the USB drive — it lists the display, sound and pointer devices FolioOS found.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, what happened instead?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: FolioOS version
+      description: Settings › System › About
+      placeholder: "4.1"
+  - type: input
+    id: hardware
+    attributes:
+      label: Computer model
+      placeholder: "Lenovo ThinkPad T480, Dell Latitude E7450…"
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where does it happen?
+      options:
+        - Booting from the USB drive (real hardware)
+        - Windows simulator (folio_sim.exe)
+        - UEFI host (efi_host.exe)
+  - type: textarea
+    id: diag
+    attributes:
+      label: DIAGNOSTICS.TXT
+      description: Drag the file here or paste its content.

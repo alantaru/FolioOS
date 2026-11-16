@@ -1,0 +1,67 @@
+# FolioOS keyboard layout — Clavier français AZERTY.
+# Each rule: what a key produces on a US keyboard -> what it should type here.
+# Format: see FOLIO/KEYBOARDS/README.txt. Copy this file to create a new layout.
+name Français (AZERTY)
+include _compose.txt
+map q a
+map w z
+map a q
+map z w
+map Q A
+map W Z
+map A Q
+map Z W
+map ; m
+map : M
+map m ,
+map M ?
+map , ;
+map < .
+map . :
+map > /
+map / !
+map ? §
+map [ ^
+map { ¨
+map ] $
+map } £
+map ' ù
+map " %
+map \ *
+map | µ
+map ` ²
+map 1 &
+map 2 é
+map 3 "
+map 4 '
+map 5 (
+map 6 -
+map 7 è
+map 8 _
+map 9 ç
+map 0 à
+map - )
+map _ °
+map ! 1
+map @ 2
+map # 3
+map $ 4
+map % 5
+map ^ 6
+map & 7
+map * 8
+map ( 9
+map ) 0
+altgr 2 ~
+altgr 3 #
+altgr 4 {
+altgr 5 [
+altgr 6 |
+altgr 7 `
+altgr 8 \
+altgr 9 ^
+altgr 0 @
+altgr - ]
+altgr = }
+altgr e €
+dead ^ ¨ ~ `

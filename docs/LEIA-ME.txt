@@ -1,0 +1,123 @@
+FOLIO 4 — máquina de escrever digital (pen-drive inicializável)
+================================================================
+
+Este pen-drive funciona de dois jeitos:
+
+1) DANDO BOOT nele (sem Windows, sem internet, sem distrações)
+   - Ligue o PC e abra o menu de boot (F9 na HP, F12 na Dell/Lenovo, F8 na Asus,
+     Esc/F11 em outras). Escolha o pen-drive "UEFI".
+   - Se não aparecer: entre no setup do firmware (F10/F2/Del) e DESATIVE o
+     "Secure Boot".
+
+2) COMO UM PEN-DRIVE COMUM, em qualquer Windows, Linux ou macOS
+   Todas as pastas são abertas, sem formato proprietário (FAT32):
+
+   DOCUMENTS\       seus textos (.md, .txt) e exportações (.docx .odt .epub
+                    .html .rtf). Copie à vontade, nos dois sentidos.
+   MUSIC\           coloque seus .mp3 aqui; o FolioOS toca (F8) enquanto você
+                    escreve. Subpastas também valem.
+   FOLIO\FONTS\     fontes .ttf usadas pelo editor. Pode acrescentar as suas
+                    (subpastas valem). Pacote pronto: FOLIO-FONTS-EXTRA.zip.
+   FOLIO\THEMES\    seus temas (.INI de texto: cores #RRGGBB e fontes).
+   FOLIO\LANGUAGES\ traduções da interface (arquivos .po). Veja IDIOMAS.
+   FOLIO\KEYBOARDS\ layouts de teclado (texto simples). Copie um para criar o seu.
+   FOLIO\TABS\      textos sem nome abertos em abas (voltam após reiniciar).
+   FOLIO\CONFIG.INI preferências (idioma, teclado, tema, fonte, metas…). Editável.
+   FOLIO\DRAFT.MD   recuperação automática de textos ainda sem nome.
+   EFI\BOOT\        o sistema em si. Não apague.
+
+   Pen-drives preparados por versões anteriores continuam com os nomes antigos
+   (TEXTOS, MUSICA, FOLIO\FONTES, FOLIO\TEMAS…): o FolioOS continua usando essas
+   pastas, sem renomear nem mover nada.
+
+IDIOMAS E TECLADOS
+   Na primeira vez, o FolioOS segue o idioma do setup do firmware, se houver
+   tradução; senão, começa em inglês. Troque quando quiser em Ajustes > Sistema >
+   IDIOMA E TECLADO (ou Ctrl+K > "Idioma"). Pen-drives já em uso continuam em
+   português. São 15 idiomas; chinês, japonês e coreano pedem o pacote
+   FOLIO-FONTS-CJK.zip (descompacte na raiz). Para acrescentar ou corrigir um
+   idioma, edite FOLIO\LANGUAGES\<código>.po (Poedit ou qualquer editor) e
+   reinicie. Os teclados (ABNT2, Portugal, EUA, internacional, Reino Unido,
+   Espanha, América Latina, AZERTY, QWERTZ, italiano, polonês, turco, russo,
+   ucraniano) são arquivos de texto em FOLIO\KEYBOARDS.
+
+Os arquivos .md abrem em qualquer editor de texto (Bloco de Notas, TextEdit,
+VS Code, Obsidian, Typora…). Dentro do FOLIO, Ctrl+Shift+S exporta para Word
+(.docx), LibreOffice (.odt), e-book (.epub), página web (.html) e RTF.
+
+Atalhos principais: F1 ajuda · Ctrl+K comandos · F2 foco · F3 máquina de
+escrever · F11 modo zen · F12 aparência · Ctrl+Q desligar.
+
+LER E ESCREVER
+   Ctrl+P alterna entre escrever e ler (texto formatado, como num livro). A
+   leitura abre no trecho em que você estava escrevendo, e Esc volta a escrever
+   exatamente no trecho que estava lendo. Na leitura: setas ← → ou espaço viram
+   a página, clicar nas margens também; a barra de baixo mostra quanto já leu e
+   quanto falta (no capítulo e no texto). F5 abre o sumário nos dois modos.
+   ROLAGEM AUTOMÁTICA: no centro da barra de baixo ficam página anterior,
+   ▶ (liga/desliga a rolagem automática), a velocidade em palavras por minuto
+   ("pal/min"; − e +, ou a roda do mouse sobre ela) e próxima página. Ela só
+   liga quando você pede. O botão do meio também liga/desliga com um clique;
+   segurado e arrastado, rola para onde você puxar (mais longe = mais rápido).
+   No pen-drive (UEFI), apertar os botões esquerdo e direito juntos vale como
+   botão do meio. Sem mouse: Ctrl+K e "rolagem automática" liga e desliga
+   (fora da leitura, abre a leitura e já liga).
+   Esc para a rolagem (nunca liga); o tempo restante na barra usa a mesma
+   velocidade. No modo zen, a barra aparece tocando a borda de baixo da tela.
+   Ctrl+PgUp / Ctrl+PgDn pulam para o capítulo (título #) anterior ou seguinte.
+   Cada documento recente lembra onde você parou, até de um dia para o outro;
+   se desligar lendo, o FOLIO volta lendo.
+   Escrevendo: Ctrl+J vai à última alteração (e de novo volta); Ctrl+D duplica
+   o parágrafo; Ctrl+Shift+K apaga o parágrafo; Shift+F3 troca entre
+   minúsculas, Iniciais e MAIÚSCULAS; com um trecho selecionado, digitar ( [ "
+   * _ ou ` envolve a seleção. A barra fina à direita mostra onde você está e
+   marca os capítulos; dá para arrastá-la. "Inserir a data de hoje" fica na
+   paleta (Ctrl+K).
+   Página ou tela cheia: em Ajustes > Aparência > PÁGINA escolha "Página" (texto
+   em coluna, sobre a folha) ou "Tela cheia" (texto em toda a largura). Na
+   página há tamanhos prontos (Estreita, Média, Larga, Extra) e ajuste fino.
+   No CONFIG.INI: full_width=1 e column=700 (largura em pixels).
+   Durante a música, os botões anterior / tocar-pausar / próxima aparecem na
+   barra de cima, ao lado da clave. Clicar fora de uma janela a fecha.
+
+ABAS (OPCIONAL)
+   O botão de abas na barra de cima (o primeiro dos ícones à direita) liga e
+   desliga. Desligadas, tudo fica como sempre: um documento por vez. Ligadas,
+   vários documentos ficam abertos, como no Sublime Text: Ctrl+N nova aba,
+   Ctrl+O abre o arquivo numa aba nova (ou vai para a aba dele), Ctrl+W fecha,
+   Ctrl+Tab / Ctrl+Shift+Tab trocam, Alt+1…9 vão direto (9 = última); o botão
+   do meio fecha a aba sob o mouse. As abas voltam iguais depois de desligar o
+   PC: arquivos são salvos no lugar deles e textos sem nome ficam em
+   FOLIO\TABS até você salvá-los. Ao desligar as abas, o FolioOS guarda a lista
+   e a reabre quando você religar. (No pen-drive, Ctrl+Tab pode chegar como
+   Ctrl+I em alguns firmwares: use Alt+número.)
+
+TEMAS E FONTES
+   Ajustes > Aparência > "+ Criar meu tema": dê um nome, escolha cada cor
+   (matiz, saturação, luminosidade, código #RRGGBB, ou pegue a mesma cor de
+   qualquer tema pronto), a fonte do texto e a da interface. Tudo muda na hora
+   enquanto você edita; Cancelar (ou Esc) desfaz. Os temas ficam em
+   FOLIO\THEMES como arquivos .INI que dá para editar e trocar com amigos
+   ("Blue Ink.INI" é um exemplo). Fontes: descompacte FOLIO-FONTS-EXTRA.zip
+   na raiz do pen-drive (11 famílias livres para escrita) ou ponha qualquer .ttf
+   em FOLIO\FONTS, e reinicie.
+
+ABERTURA
+   Ao ligar, a tela FolioOS aparece por 10 s (ajustável de 1 a 60 s em Ajustes >
+   Sistema > INICIALIZAÇÃO, ou splash_seconds=10 no CONFIG.INI).
+   Qualquer tecla ou clique pula (a tecla já vale para o texto). Para não
+   exibir: Ajustes > Sistema > INICIALIZAÇÃO, ou splash=0 no CONFIG.INI.
+
+TELA
+   O FOLIO usa a resolução nativa do monitor e gira sozinho a imagem em tablets
+   com tela em pé. Em Ajustes > Sistema dá para escolher outra resolução e girar
+   a tela. Atalhos: Ctrl+Alt+setas giram; Ctrl+Alt+Home volta ao automático
+   (use se a imagem ficar errada). No CONFIG.INI: resolution=auto (ou 1920x1080,
+   ou max), rotation=auto (ou 0, 90, 180, 270), fast_video=0 se a imagem falhar.
+   Se o PC não mostrar nada: placas de vídeo muito antigas (antes de ~2012) só
+   funcionam no modo BIOS/CSM, que o FOLIO 4 não usa.
+
+SE ALGO NÃO FUNCIONAR (som, tela, mouse)
+   O FolioOS grava FOLIO\DIAGNOSTICS.TXT a cada início (e em Ajustes > Sistema >
+   Salvar diagnóstico). Abra-o em qualquer computador: ele diz qual placa de som,
+   vídeo e mouse foram encontrados e o que falhou.

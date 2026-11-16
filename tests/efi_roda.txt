@@ -1,0 +1,95 @@
+# roda (eixo Z) no BOOTX64.EFI real: Z falso de mouse defeituoso é bloqueado; a roda de verdade continua
+# e esquerdo+direito juntos = botão do meio (liga a rolagem automática na leitura)
+wait 1500
+ctrl a
+type # Roda¶
+type linha 1 de um texto qualquer para rolar¶linha 2 de um texto qualquer para rolar¶linha 3 de um texto qualquer para rolar¶linha 4 de um texto qualquer para rolar¶linha 5 de um texto qualquer para rolar¶linha 6 de um texto qualquer para rolar¶linha 7 de um texto qualquer para rolar¶linha 8 de um texto qualquer para rolar¶linha 9 de um texto qualquer para rolar¶linha 10 de um texto qualquer para rolar¶linha 11 de um texto qualquer para rolar¶linha 12 de um texto qualquer para rolar¶linha 13 de um texto qualquer para rolar¶linha 14 de um texto qualquer para rolar¶linha 15 de um texto qualquer para rolar¶
+type linha 16 de um texto qualquer para rolar¶linha 17 de um texto qualquer para rolar¶linha 18 de um texto qualquer para rolar¶linha 19 de um texto qualquer para rolar¶linha 20 de um texto qualquer para rolar¶linha 21 de um texto qualquer para rolar¶linha 22 de um texto qualquer para rolar¶linha 23 de um texto qualquer para rolar¶linha 24 de um texto qualquer para rolar¶linha 25 de um texto qualquer para rolar¶linha 26 de um texto qualquer para rolar¶linha 27 de um texto qualquer para rolar¶linha 28 de um texto qualquer para rolar¶linha 29 de um texto qualquer para rolar¶linha 30 de um texto qualquer para rolar¶
+type linha 31 de um texto qualquer para rolar¶linha 32 de um texto qualquer para rolar¶linha 33 de um texto qualquer para rolar¶linha 34 de um texto qualquer para rolar¶linha 35 de um texto qualquer para rolar¶linha 36 de um texto qualquer para rolar¶linha 37 de um texto qualquer para rolar¶linha 38 de um texto qualquer para rolar¶linha 39 de um texto qualquer para rolar¶linha 40 de um texto qualquer para rolar¶linha 41 de um texto qualquer para rolar¶linha 42 de um texto qualquer para rolar¶linha 43 de um texto qualquer para rolar¶linha 44 de um texto qualquer para rolar¶linha 45 de um texto qualquer para rolar¶
+type linha 46 de um texto qualquer para rolar¶linha 47 de um texto qualquer para rolar¶linha 48 de um texto qualquer para rolar¶linha 49 de um texto qualquer para rolar¶linha 50 de um texto qualquer para rolar¶linha 51 de um texto qualquer para rolar¶linha 52 de um texto qualquer para rolar¶linha 53 de um texto qualquer para rolar¶linha 54 de um texto qualquer para rolar¶linha 55 de um texto qualquer para rolar¶linha 56 de um texto qualquer para rolar¶linha 57 de um texto qualquer para rolar¶linha 58 de um texto qualquer para rolar¶linha 59 de um texto qualquer para rolar¶linha 60 de um texto qualquer para rolar¶
+wait 400
+wait 400
+wait 400
+wait 400
+wait 1500
+ctrl p
+wait 1500
+scan 0x15
+wait 1500
+wheel 70
+wait 1500
+shot rtopo.png
+wheel -70
+wait 1500
+shot r01.png
+wait 700
+shot r02.png
+assert_same r01.png r02.png
+# mouse defeituoso: o mesmo Z a 125 Hz, sem parar. Depois de bloqueado, a página não se mexe mais
+zjunk 1 125
+wait 2500
+shot r03.png
+wait 1500
+shot r04.png
+assert_same r03.png r04.png
+# e o lixo não levou a página até o início (sem o filtro, levaria)
+assert_diff rtopo.png r04.png
+zjunk 0
+wait 1000
+# roda de verdade depois disso: funciona
+wheel 3
+wait 800
+shot r05.png
+assert_diff r04.png r05.png
+# rolar devagar e sem parar (um dente a cada ~190 ms: wheel = 140 ms + wait 50) nunca pode ser bloqueado.
+# r07 sai depois do 11º dente (~2 s de rolagem contínua) e r08 depois do 13º: se a roda tivesse sido
+# bloqueada (como fazia a regra antiga de 1,5 s), as duas seriam iguais. Linhas numeradas: cada posição é única.
+wheel -1
+wait 50
+wheel -1
+wait 50
+wheel -1
+wait 50
+wheel -1
+wait 50
+wheel -1
+wait 50
+wheel -1
+wait 50
+wheel -1
+wait 50
+wheel -1
+wait 50
+wheel -1
+wait 50
+wheel -1
+wait 50
+wheel -1
+wait 50
+shot r07.png
+wheel -1
+wait 50
+wheel -1
+wait 50
+shot r08.png
+assert_diff r07.png r08.png
+# esquerdo + direito juntos = clique do meio: liga a rolagem automática
+wheel 12
+wait 1200
+click
+rclick
+release
+rrelease
+wait 1500
+shot r09.png
+wait 2000
+shot r10.png
+assert_diff r09.png r10.png
+# Esc para
+scan 0x17
+wait 800
+shot r11.png
+wait 1500
+shot r12.png
+assert_same r11.png r12.png
+quit

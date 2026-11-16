@@ -1,0 +1,18 @@
+name: Translation
+description: Report a translation problem or ask to add a language
+labels: [i18n]
+body:
+  - type: input
+    id: lang
+    attributes:
+      label: Language
+      placeholder: "fr, pt-BR, hi…"
+    validations:
+      required: true
+  - type: textarea
+    id: detail
+    attributes:
+      label: What should change?
+      description: Quote the current text and your suggestion. To translate a whole language, see docs/TRANSLATING.md — pull requests are welcome.
+    validations:
+      required: true
