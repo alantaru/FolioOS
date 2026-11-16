@@ -3,6 +3,12 @@ name: Release
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to publish (e.g. v4.1.0)'
+        required: true
+        default: 'v4.1.0'
 
 permissions:
   contents: write
@@ -30,12 +36,14 @@ jobs:
         shell: powershell
         run: |
           .\tools\fetch-cjk-fonts.ps1
-          .\build.ps1 -Image
+          .\build.ps1 -Image -ImageMB 256
           Compress-Archive -Path build\folio.img -DestinationPath build\FolioOS-disk-image.zip
 
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ inputs.tag || github.ref_name }}
+          name: FolioOS ${{ inputs.tag || github.ref_name }}
           generate_release_notes: true
           files: |
             build/FolioOS.zip
