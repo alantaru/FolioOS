@@ -70,6 +70,10 @@ tylko musisz coś udostępnić.
   rozpakowanie `FolioOS.zip`: reszta pendrive’a zostaje wolna na twoje pliki.
 - **Ze źródeł w Windows:** `.\build.ps1`, a potem `.\flash_usb.ps1 -DriveLetter E:` (instaluje lub aktualizuje
   pendrive bez usuwania czegokolwiek).
+- **Komputery bez UEFI (tylko BIOS/Legacy):** uruchom raz w Windows, jako administrator,
+  `FOLIO\TOOLS\biosboot.exe E:` (`E:` to pendrive). Zapisuje tylko kod rozruchowy BIOS: żaden plik nie jest
+  ruszany, pendrive pozostaje zwykłym FAT32, a rozruch UEFI działa dalej. Ze źródeł:
+  `.\flash_usb.ps1 -DriveLetter E: -Bios`.
 - **Wszystko w zestawie:** `FolioOS.zip` zawiera już 11 wolnych czcionek do pisania i czytania oraz czcionki
   do chińskiego, japońskiego i koreańskiego — każdy język działa od razu.
 
@@ -343,11 +347,12 @@ twoje teksty tam są.
 
 | | |
 |---|---|
-| **Firmware** | UEFI 2.x — 64-bitowy (`BOOTX64.EFI`) lub 32-bitowy (`BOOTIA32.EFI`, tablety i netbooki z Atomem). Secure Boot musi być wyłączony. Większość komputerów i laptopów od około 2012 roku. |
-| **Obraz** | Dowolny framebuffer UEFI GOP (RGB, BGR, maska bitowa, tylko Blt) lub starszy UGA. Natywna rozdzielczość, automatyczne skalowanie HiDPI, pionowe ekrany obracane automatycznie. |
-| **Wejście** | Klawiatura przez firmware; mysz USB/PS/2, touchpad i ekran dotykowy przez protokoły wskaźnika firmware’u. |
+| **Firmware** | UEFI 2.x — 64-bitowy (`BOOTX64.EFI`), 32-bitowy (`BOOTIA32.EFI`, tablety i netbooki z Atomem) lub ARM64 (`BOOTAA64.EFI`: Raspberry Pi 3/4/5 ze społecznościowym firmware’em UEFI, laptopy ARM). **Komputery tylko z BIOS** (Legacy/CSM) uruchamiają się przez własny most BIOS FolioOS po jednorazowym uruchomieniu `FOLIO\TOOLS\biosboot.exe`. Secure Boot musi być wyłączony. |
+| **Obraz** | Dowolny framebuffer UEFI GOP (RGB, BGR, maska bitowa, tylko Blt) lub starszy UGA; VESA/VBE na komputerach z BIOS. Natywna rozdzielczość, automatyczne skalowanie HiDPI, pionowe ekrany obracane automatycznie. |
+| **Wejście** | Klawiatura przez firmware (na komputerach z BIOS bezpośrednio przez PS/2). Mysz, touchpad, tablet graficzny i ekran dotykowy przez firmware — a gdy firmware nie ma dla nich sterownika, przez własne sterowniki USB HID i PS/2 FolioOS. |
 | **Dźwięk** | Intel HD Audio i AC'97 (potrzebne tylko do odtwarzacza muzyki). |
-| **Nieobsługiwane** | Komputery tylko z BIOS/CSM, Secure Boot (na razie), Maki z Apple Silicon. Wi-Fi i Bluetooth zostały celowo pominięte. |
+| **Nieobsługiwane** | Secure Boot (na razie), Maki z Apple Silicon. Wi-Fi i Bluetooth zostały celowo pominięte. |
+| **Testowane na** | 13 emulowanych maszynach przy każdym wydaniu: UEFI x64, IA32 i ARM64 oraz komputery tylko z BIOS uruchamiane z USB i IDE; 8 kart graficznych, myszy PS/2 i USB, tablet USB, HD Audio i AC'97. Na każdej sprawdzane są obraz, klawiatura, mysz, dźwięk, zapisywanie i spójność systemu plików. |
 
 Każde uruchomienie zapisuje `FOLIO/DIAGNOSTICS.TXT` z tym, co znalazł FolioOS. Podziel się swoim w
 [zgłoszeniu sprzętowym](https://github.com/alantaru/FolioOS/issues/new/choose) — nawet „po prostu działa”
@@ -384,8 +389,9 @@ w FolioOS.
 <summary><b>Dlaczego mój komputer nie pokazuje pendrive’a w menu rozruchu?</b></summary>
 
 Sprawdź, czy pendrive jest w FAT32, czy wybrałeś pozycję zaczynającą się od „UEFI” i czy Secure Boot jest
-wyłączony w ustawieniach firmware’u. Bardzo stare komputery, które uruchamiają się tylko w trybie BIOS/CSM,
-nie są obsługiwane.
+wyłączony w ustawieniach firmware’u. Starsze komputery, które uruchamiają się tylko w trybie BIOS/Legacy,
+potrzebują raz kodu rozruchowego BIOS: uruchom w Windows jako administrator `FOLIO\TOOLS\biosboot.exe E:`,
+a pendrive pojawi się jako zwykły dysk USB.
 </details>
 
 <details>
@@ -429,12 +435,14 @@ komputera.
 ## Kompilacja ze źródeł
 
 Wymagania: Windows 10/11, PowerShell 5.1+ i `gcc` z [MinGW-w64](https://winlibs.com) (dowolna świeża wersja
-x86_64) w `PATH`. Nic więcej.
+x86_64) w `PATH`. Wersje ARM64 i BIOS używają też `clang` z [LLVM](https://llvm.org) i `nasm`, a laboratorium
+sprzętowe — [QEMU](https://www.qemu.org); wszystkie trzy zainstalujesz przez `winget`.
 
 ```powershell
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
-.\build.ps1                                  # UEFI x64 + IA32, symulator, paczki — i cały zestaw testów
+.\build.ps1                                  # UEFI x64 + IA32 + ARM64, BIOS, symulator, pakiety — i zestaw testów
+.\tools\qemu-lab.ps1                         # uruchamia prawdziwe binaria na 13 emulowanych maszynach i sprawdza każdą
 .\build\folio_sim.exe                        # uruchamia FolioOS w oknie
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # uruchamia prawdziwy program UEFI w oknie
 .\flash_usb.ps1 -DriveLetter E:              # instaluje/aktualizuje pendrive FAT32, zachowując pliki
@@ -445,7 +453,8 @@ cd FolioOS
 
 Zestaw testów steruje symulatorem i prawdziwym `BOOTX64.EFI` (w małym hoście UEFI) za pomocą zaprogramowanych
 naciśnięć klawiszy i zdarzeń myszy, robi zrzuty ekranu i sprawdza każdy eksport (ZIP + XML), każde
-tłumaczenie (z kontrolą negatywną walidatora) i sześć formatów framebuffera.
+tłumaczenie (z kontrolą negatywną walidatora), sześć formatów framebuffera i sterownik FAT32 mostu BIOS
+(tysiące losowych operacji sprawdzanych bajt po bajcie).
 
 <a id="architecture-in-one-picture"></a>
 
@@ -454,7 +463,8 @@ tłumaczenie (z kontrolą negatywną walidatora) i sześć formatów framebuffer
 ```
 src/core/       przenośny rdzeń (C freestanding, bez libc): edytor, Markdown, rasteryzator TrueType,
                 zestaw interfejsu i menedżer okien, eksporty, MP3, i18n, klawiatury, motywy
-src/platform/   uefi/  obraz GOP/UGA, wejście, we/wy FAT, HD Audio/AC'97 — prosto na firmware
+src/platform/   uefi/  obraz GOP/UGA, wejście, we/wy FAT, HD Audio/AC'97, sterowniki USB HID i PS/2 — na firmware’ze
+                bios/  sektory rozruchowe + most BIOS→UEFI (VBE, PS/2, własny sterownik FAT32) dla komputerów tylko z BIOS
                 win32/ symulator do tworzenia i testów automatycznych
 tools/          efi_host (uruchamia BOOTX64.EFI w Windows), narzędzie i18n, kreator obrazu dysku, showcase
 assets/         czcionki, tłumaczenia (.po), układy klawiatury, przykładowy motyw
@@ -468,6 +478,7 @@ Program o rozmiarze ~600 KB zarządza całym komputerem przez cienką warstwę p
 
 ## Plany
 
+- [x] Komputery tylko z BIOS (Legacy/CSM) i ARM64 (Raspberry Pi z firmware’em UEFI, laptopy ARM)
 - [x] Wprowadzanie koreańskie (hangul 2-zestawowy) i japońskie kana (romaji → hiragana/katakana)
 - [ ] Konwersja na kanji (japoński) i wprowadzanie pinyin (chiński) (wymagają słowników)
 - [ ] Kształtowanie tekstu i pisma od prawej do lewej (arabski, hebrajski, dewanagari…)

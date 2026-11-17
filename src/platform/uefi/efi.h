@@ -9,6 +9,11 @@ typedef int64_t INT64; typedef uint64_t UINT64; typedef uintptr_t UINTN; typedef
 typedef uint16_t CHAR16; typedef UINTN EFI_STATUS; typedef void *EFI_HANDLE; typedef void *EFI_EVENT;
 typedef UINT64 EFI_PHYSICAL_ADDRESS;
 #define EFIAPI
+#if defined(__x86_64__) || defined(__i386__)
+#define FOLIO_X86 1
+#else
+#define FOLIO_X86 0
+#endif
 #define EFI_SUCCESS 0
 #define EFI_ERR(x) (((UINTN)1 << (sizeof(UINTN) * 8 - 1)) | (x))
 #define EFI_BUFFER_TOO_SMALL EFI_ERR(5)

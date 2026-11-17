@@ -8,6 +8,13 @@ Este pen-drive funciona de dois jeitos:
      Esc/F11 em outras). Escolha o pen-drive "UEFI".
    - Se não aparecer: entre no setup do firmware (F10/F2/Del) e DESATIVE o
      "Secure Boot".
+   - PC sem UEFI (só BIOS/Legacy, em geral de antes de ~2012): no Windows, rode
+     uma vez, como administrador, FOLIO\TOOLS\biosboot.exe E: (E: = este
+     pen-drive). Ele só grava o código de boot - nenhum arquivo é tocado - e a
+     partir daí o pen-drive também inicia nesses PCs, como um disco USB comum
+     no menu de boot.
+   - Raspberry Pi 3/4/5 e notebooks ARM iniciam o EFI\BOOT\BOOTAA64.EFI pelo
+     firmware UEFI (no Pi: o firmware UEFI da comunidade).
 
 2) COMO UM PEN-DRIVE COMUM, em qualquer Windows, Linux ou macOS
    Todas as pastas são abertas, sem formato proprietário (FAT32):
@@ -114,8 +121,8 @@ TELA
    a tela. Atalhos: Ctrl+Alt+setas giram; Ctrl+Alt+Home volta ao automático
    (use se a imagem ficar errada). No CONFIG.INI: resolution=auto (ou 1920x1080,
    ou max), rotation=auto (ou 0, 90, 180, 270), fast_video=0 se a imagem falhar.
-   Se o PC não mostrar nada: placas de vídeo muito antigas (antes de ~2012) só
-   funcionam no modo BIOS/CSM, que o FOLIO 4 não usa.
+   Se o PC não mostrar nada: placas de vídeo muito antigas (antes de ~2012) podem
+   só funcionar no modo BIOS - prepare o pen-drive para o modo BIOS como no item 1).
 
 SE ALGO NÃO FUNCIONAR (som, tela, mouse)
    O FolioOS grava FOLIO\DIAGNOSTICS.TXT a cada início (e em Ajustes > Sistema >

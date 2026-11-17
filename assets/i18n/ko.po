@@ -13,457 +13,461 @@ msgstr ""
 "X-Date-Format: {yyyy}년 {month} {d}일\n"
 "X-Decimal: .\n"
 
-#: src/core/app.c:32 src/core/app.c:54 src/core/app.c:257 src/core/filedlg.c:140 src/core/md.c:239
+#: src/core/app.c:31 src/core/app.c:53 src/core/app.c:256 src/core/filedlg.c:140 src/core/md.c:239
 msgid "Untitled"
 msgstr "제목 없음"
 
-#: src/core/app.c:147
+#: src/core/app.c:146
 msgid "Could not open the file"
 msgstr "파일을 열 수 없습니다"
 
-#: src/core/app.c:269 src/core/app.c:439
+#: src/core/app.c:268 src/core/app.c:438
 msgid "Limit of 16 tabs — close one (Ctrl+W)"
 msgstr "탭은 최대 16개입니다. 하나를 닫으세요(Ctrl+W)"
 
-#: src/core/app.c:403
+#: src/core/app.c:402
 msgid "Picking up where you left off"
 msgstr "멈춘 곳에서 이어서 합니다"
 
-#: src/core/app.c:421
+#: src/core/app.c:420
 msgid "Close tab without saving?"
 msgstr "저장하지 않고 탭을 닫을까요?"
 
-#: src/core/app.c:421
+#: src/core/app.c:420
 msgid "Save changes?"
 msgstr "변경 내용을 저장할까요?"
 
-#: src/core/app.c:422
+#: src/core/app.c:421
 msgid "The current document has changes that have not been saved yet."
 msgstr "현재 문서에 아직 저장하지 않은 변경 내용이 있습니다."
 
-#: src/core/app.c:422 src/core/app.c:740 src/core/app.c:870 src/core/filedlg.c:407
+#: src/core/app.c:421 src/core/app.c:739 src/core/app.c:870 src/core/filedlg.c:407
 msgid "Save"
 msgstr "저장"
 
-#: src/core/app.c:422
+#: src/core/app.c:421
 msgid "Don't save"
 msgstr "저장 안 함"
 
-#: src/core/app.c:429
+#: src/core/app.c:428
 msgid "This format is export-only. Open the matching .md file."
 msgstr "이 형식은 내보내기 전용입니다. 해당 .md 파일을 여세요."
 
-#: src/core/app.c:450
+#: src/core/app.c:449
 msgid "Failed to create the file"
 msgstr "파일을 만들 수 없습니다"
 
-#: src/core/app.c:454
+#: src/core/app.c:453
 msgid "Write error — is the USB drive write-protected or full?"
 msgstr "쓰기 오류 — USB 메모리가 쓰기 금지되었거나 가득 찼나요?"
 
-#: src/core/app.c:467 src/core/app.c:481
+#: src/core/app.c:466 src/core/app.c:480
 #, c-format
 msgid "Saved · %s"
 msgstr "저장됨 · %s"
 
-#: src/core/app.c:483
+#: src/core/app.c:482
 #, c-format
 msgid "Exported · %s"
 msgstr "내보냄 · %s"
 
-#: src/core/app.c:531
+#: src/core/app.c:530
 msgid "Narrow"
 msgstr "좁게"
 
-#: src/core/app.c:531
+#: src/core/app.c:530
 msgid "Medium"
 msgstr "보통"
 
-#: src/core/app.c:531
+#: src/core/app.c:530
 msgid "Wide"
 msgstr "넓게"
 
-#: src/core/app.c:531
+#: src/core/app.c:530
 msgid "Extra"
 msgstr "아주 넓게"
 
-#: src/core/app.c:535
+#: src/core/app.c:534
 msgid "Full screen: the text uses the full width"
 msgstr "전체 화면: 텍스트가 전체 너비를 사용합니다"
 
-#: src/core/app.c:535
+#: src/core/app.c:534
 msgid "Page: text in a column, like on a sheet of paper"
 msgstr "페이지: 종이처럼 한 단으로 표시합니다"
 
-#: src/core/app.c:577
+#: src/core/app.c:576
 msgid "Settings"
 msgstr "설정"
 
-#: src/core/app.c:578 src/core/app.c:754 src/core/app.c:881 src/core/app.c:1579
+#: src/core/app.c:577 src/core/app.c:753 src/core/app.c:881 src/core/app.c:1579
 msgid "Find and replace"
 msgstr "찾기 및 바꾸기"
 
-#: src/core/app.c:579 src/core/app.c:881 src/core/app.c:1591
+#: src/core/app.c:578 src/core/app.c:881 src/core/app.c:1591
 msgid "Outline"
 msgstr "개요"
 
-#: src/core/app.c:580 src/core/app.c:770 src/core/app.c:1592
+#: src/core/app.c:579 src/core/app.c:770 src/core/app.c:1592
 msgid "Session and goals"
 msgstr "세션과 목표"
 
-#: src/core/app.c:581 src/core/app.c:774 src/core/app.c:885
+#: src/core/app.c:580 src/core/app.c:774 src/core/app.c:885
 msgid "Keyboard shortcuts"
 msgstr "키보드 단축키"
 
-#: src/core/app.c:582
+#: src/core/app.c:581
 msgid "Commands"
 msgstr "명령"
 
-#: src/core/app.c:583 src/core/app.c:1711
+#: src/core/app.c:582 src/core/app.c:1711
 msgid "Menu"
 msgstr "메뉴"
 
-#: src/core/app.c:585
+#: src/core/app.c:584
 msgid "Theme editor"
 msgstr "테마 편집기"
 
-#: src/core/app.c:604
+#: src/core/app.c:603
 #, c-format
 msgid "Tabs on · %d documents open (Ctrl+N new, Ctrl+W close)"
 msgstr "탭 켜짐 · 문서 %d개 열림(Ctrl+N 새로 만들기, Ctrl+W 닫기)"
 
-#: src/core/app.c:604
+#: src/core/app.c:603
 msgid "Tabs on (Ctrl+N new tab, Ctrl+W close)"
 msgstr "탭 켜짐(Ctrl+N 새 탭, Ctrl+W 닫기)"
 
-#: src/core/app.c:605
+#: src/core/app.c:604
 msgid "Tabs off — your tabs are kept for when you turn them back on"
 msgstr "탭 꺼짐 — 다시 켤 때를 위해 탭이 보관됩니다"
 
-#: src/core/app.c:608
+#: src/core/app.c:607
 msgid "Turn tabs on to use Ctrl+W (Ctrl+K → Tabs, or the button at the top)"
 msgstr "Ctrl+W를 쓰려면 탭을 켜세요 (Ctrl+K → 탭, 또는 위쪽 버튼)"
 
-#: src/core/app.c:620
+#: src/core/app.c:619
 msgid "Focus off"
 msgstr "집중 끔"
 
-#: src/core/app.c:620
+#: src/core/app.c:619
 msgid "Focus on sentence"
 msgstr "문장에 집중"
 
-#: src/core/app.c:620
+#: src/core/app.c:619
 msgid "Focus on paragraph"
 msgstr "문단에 집중"
 
-#: src/core/app.c:620
+#: src/core/app.c:619
 msgid "Focus on line"
 msgstr "줄에 집중"
 
-#: src/core/app.c:623
+#: src/core/app.c:622
 msgid "Typewriter: current line always centered"
 msgstr "타자기: 현재 줄을 항상 가운데에"
 
-#: src/core/app.c:623
+#: src/core/app.c:622
 msgid "Typewriter off"
 msgstr "타자기 끔"
 
-#: src/core/app.c:624
+#: src/core/app.c:623
 msgid "Zen mode — Esc or move the mouse to the top to leave"
 msgstr "젠 모드 — 나가려면 Esc를 누르거나 마우스를 맨 위로"
 
-#: src/core/app.c:624
+#: src/core/app.c:623
 msgid "Zen mode off"
 msgstr "젠 모드 끔"
 
-#: src/core/app.c:645
+#: src/core/app.c:644
 #, c-format
 msgid "Theme: %s"
 msgstr "테마: %s"
 
-#: src/core/app.c:646
+#: src/core/app.c:645
 #, c-format
 msgid "Font: %s"
 msgstr "글꼴: %s"
 
-#: src/core/app.c:659
+#: src/core/app.c:658
 msgid "Sprint stopped"
 msgstr "스프린트 중단됨"
 
-#: src/core/app.c:662
+#: src/core/app.c:661
 #, c-format
 msgid "%d-minute sprint started. Happy writing!"
 msgstr "%d분 스프린트를 시작했습니다. 즐겁게 쓰세요!"
 
-#: src/core/app.c:665
+#: src/core/app.c:664
 msgid "Hemingway mode: deleting is disabled"
 msgstr "헤밍웨이 모드: 지우기가 꺼져 있습니다"
 
-#: src/core/app.c:665
+#: src/core/app.c:664
 msgid "Hemingway mode off"
 msgstr "헤밍웨이 모드 끔"
 
-#: src/core/app.c:666
+#: src/core/app.c:665
 msgid "Markup hidden outside the current paragraph"
 msgstr "현재 문단 밖의 마크업 숨김"
 
-#: src/core/app.c:666
+#: src/core/app.c:665
 msgid "Markup always visible"
 msgstr "마크업 항상 표시"
 
-#: src/core/app.c:667
+#: src/core/app.c:666
 msgid "Smart typography on (— “ ” …)"
 msgstr "스마트 타이포그래피 켬(— “ ” …)"
 
-#: src/core/app.c:667
+#: src/core/app.c:666
 msgid "Smart typography off"
 msgstr "스마트 타이포그래피 끔"
 
-#: src/core/app.c:679
+#: src/core/app.c:678
 #, c-format
 msgid "Page %s"
 msgstr "페이지: %s"
 
-#: src/core/app.c:687 src/core/editor.c:711 src/core/preview.c:251
+#: src/core/app.c:686 src/core/editor.c:708 src/core/preview.c:251
 msgid "This is the last chapter"
 msgstr "마지막 장입니다"
 
-#: src/core/app.c:704
+#: src/core/app.c:703
 msgid "Mouse and touchpad off: keyboard only (Ctrl+K → Mouse turns them back on)"
 msgstr "마우스와 터치패드 꺼짐: 키보드만 사용 (Ctrl+K → 마우스로 다시 켜기)"
 
-#: src/core/app.c:704
+#: src/core/app.c:703
 msgid "Mouse and touchpad on"
 msgstr "마우스와 터치패드 켜짐"
 
-#: src/core/app.c:715
+#: src/core/app.c:714
 msgid "Could not read the language file"
 msgstr "언어 파일을 읽을 수 없습니다"
 
-#: src/core/app.c:719
+#: src/core/app.c:718
 #, c-format
 msgid "This language needs fonts (%s) that are missing from %s. Copy FolioOS.zip to the USB drive again."
 msgstr "이 언어에 필요한 글꼴(%s)이 %s에 없습니다. FolioOS.zip을 USB 드라이브에 다시 복사하세요."
 
-#: src/core/app.c:732
+#: src/core/app.c:731
 msgid "New document"
 msgstr "새 문서"
 
-#: src/core/app.c:732 src/core/app.c:869
+#: src/core/app.c:731 src/core/app.c:869
 msgid "Ctrl+N"
 msgstr "Ctrl+N"
 
-#: src/core/app.c:733
+#: src/core/app.c:732
 msgid "Tabs: several documents (on/off)"
 msgstr "탭: 여러 문서(켜기/끄기)"
 
-#: src/core/app.c:734
+#: src/core/app.c:733
 msgid "Close tab"
 msgstr "탭 닫기"
 
-#: src/core/app.c:734
+#: src/core/app.c:733
 msgid "Ctrl+W"
 msgstr "Ctrl+W"
 
-#: src/core/app.c:735
+#: src/core/app.c:734
 msgid "Next tab"
 msgstr "다음 탭"
 
-#: src/core/app.c:735
+#: src/core/app.c:734
 msgid "Ctrl+Tab"
 msgstr "Ctrl+Tab"
 
-#: src/core/app.c:736
+#: src/core/app.c:735
 msgid "Previous tab"
 msgstr "이전 탭"
 
-#: src/core/app.c:736
+#: src/core/app.c:735
 msgid "Ctrl+Shift+Tab"
 msgstr "Ctrl+Shift+Tab"
 
-#: src/core/app.c:737
+#: src/core/app.c:736
 msgid "Create a custom theme (colors and fonts)"
 msgstr "나만의 테마 만들기(색과 글꼴)"
 
-#: src/core/app.c:738
+#: src/core/app.c:737
 msgid "Edit the current theme"
 msgstr "현재 테마 편집"
 
-#: src/core/app.c:739 src/core/app.c:869
+#: src/core/app.c:738 src/core/app.c:869
 msgid "Open…"
 msgstr "열기…"
 
-#: src/core/app.c:739 src/core/app.c:869
+#: src/core/app.c:738 src/core/app.c:869
 msgid "Ctrl+O"
 msgstr "Ctrl+O"
 
-#: src/core/app.c:740 src/core/app.c:870
+#: src/core/app.c:739 src/core/app.c:870
 msgid "Ctrl+S"
 msgstr "Ctrl+S"
 
-#: src/core/app.c:741 src/core/app.c:870
+#: src/core/app.c:740 src/core/app.c:870
 msgid "Save as / Export…"
 msgstr "다른 이름으로 저장 / 내보내기…"
 
-#: src/core/app.c:741 src/core/app.c:870 src/core/app.c:1576
+#: src/core/app.c:740 src/core/app.c:870 src/core/app.c:1576
 msgid "Ctrl+Shift+S"
 msgstr "Ctrl+Shift+S"
 
-#: src/core/app.c:742
+#: src/core/app.c:741
 msgid "Reading mode (formatted Markdown)"
 msgstr "읽기 모드(서식 있는 Markdown)"
 
-#: src/core/app.c:742 src/core/app.c:1578
+#: src/core/app.c:741 src/core/app.c:1578
 msgid "Ctrl+P"
 msgstr "Ctrl+P"
 
-#: src/core/app.c:743
+#: src/core/app.c:742
 msgid "Reading auto-scroll (on/off)"
 msgstr "읽기 자동 스크롤(켜기/끄기)"
 
-#: src/core/app.c:743 src/core/app.c:1585
+#: src/core/app.c:742 src/core/app.c:1585
 msgid "Enter (reading)"
 msgstr "Enter(읽기)"
 
-#: src/core/app.c:744
+#: src/core/app.c:743
 msgid "Next chapter"
 msgstr "다음 장"
 
-#: src/core/app.c:744
+#: src/core/app.c:743
 msgid "Ctrl+PgDn"
 msgstr "Ctrl+PgDn"
 
-#: src/core/app.c:745
+#: src/core/app.c:744
 msgid "Previous chapter"
 msgstr "이전 장"
 
-#: src/core/app.c:745
+#: src/core/app.c:744
 msgid "Ctrl+PgUp"
 msgstr "Ctrl+PgUp"
 
-#: src/core/app.c:746
+#: src/core/app.c:745
 msgid "Go to the last edit"
 msgstr "마지막 편집 위치로 이동"
 
-#: src/core/app.c:746 src/core/app.c:1583
+#: src/core/app.c:745 src/core/app.c:1583
 msgid "Ctrl+J"
 msgstr "Ctrl+J"
 
-#: src/core/app.c:747 src/core/app.c:1582
+#: src/core/app.c:746 src/core/app.c:1582
 msgid "Duplicate paragraph"
 msgstr "문단 복제"
 
-#: src/core/app.c:747 src/core/app.c:1582
+#: src/core/app.c:746 src/core/app.c:1582
 msgid "Ctrl+D"
 msgstr "Ctrl+D"
 
-#: src/core/app.c:748 src/core/app.c:1582
+#: src/core/app.c:747 src/core/app.c:1582
 msgid "Delete paragraph"
 msgstr "문단 삭제"
 
-#: src/core/app.c:748 src/core/app.c:1582
+#: src/core/app.c:747 src/core/app.c:1582
 msgid "Ctrl+Shift+K"
 msgstr "Ctrl+Shift+K"
 
-#: src/core/app.c:749
+#: src/core/app.c:748
 msgid "Change case"
 msgstr "대소문자 바꾸기"
 
-#: src/core/app.c:749 src/core/app.c:1584
+#: src/core/app.c:748 src/core/app.c:1584
 msgid "Shift+F3"
 msgstr "Shift+F3"
 
-#: src/core/app.c:750
+#: src/core/app.c:749
 msgid "Insert today's date"
 msgstr "오늘 날짜 넣기"
 
-#: src/core/app.c:751
+#: src/core/app.c:750
 msgid "Focus mode (sentence / paragraph / line)"
 msgstr "집중 모드(문장 / 문단 / 줄)"
 
-#: src/core/app.c:752
+#: src/core/app.c:751
 msgid "Typewriter (centered line)"
 msgstr "타자기(줄 가운데 정렬)"
 
-#: src/core/app.c:753
+#: src/core/app.c:752
 msgid "Zen mode (no bars)"
 msgstr "젠 모드(막대 없음)"
 
-#: src/core/app.c:754 src/core/app.c:881 src/core/app.c:1579
+#: src/core/app.c:753 src/core/app.c:881 src/core/app.c:1579
 msgid "Ctrl+F"
 msgstr "Ctrl+F"
 
-#: src/core/app.c:755
+#: src/core/app.c:754
 msgid "Document outline"
 msgstr "문서 개요"
 
-#: src/core/app.c:756
+#: src/core/app.c:755
 msgid "Appearance: themes and typography"
 msgstr "모양: 테마와 타이포그래피"
 
-#: src/core/app.c:757 src/core/app.c:1588
+#: src/core/app.c:756 src/core/app.c:1588
 msgid "Next theme"
 msgstr "다음 테마"
 
-#: src/core/app.c:757 src/core/app.c:1588
+#: src/core/app.c:756 src/core/app.c:1588
 msgid "Ctrl+T"
 msgstr "Ctrl+T"
 
-#: src/core/app.c:758
+#: src/core/app.c:757
 msgid "Next font"
 msgstr "다음 글꼴"
 
-#: src/core/app.c:758
+#: src/core/app.c:757
 msgid "Ctrl+Shift+T"
 msgstr "Ctrl+Shift+T"
 
-#: src/core/app.c:759
+#: src/core/app.c:758
 msgid "Larger text"
 msgstr "글자 크게"
 
-#: src/core/app.c:759
+#: src/core/app.c:758
 msgid "Ctrl+="
 msgstr "Ctrl+="
 
-#: src/core/app.c:760
+#: src/core/app.c:759
 msgid "Smaller text"
 msgstr "글자 작게"
 
-#: src/core/app.c:760
+#: src/core/app.c:759
 msgid "Ctrl+-"
 msgstr "Ctrl+-"
 
-#: src/core/app.c:761
+#: src/core/app.c:760
 msgid "Page or full screen (text width)"
 msgstr "페이지 또는 전체 화면(텍스트 너비)"
 
-#: src/core/app.c:762
+#: src/core/app.c:761
 msgid "Page size: narrow · medium · wide · extra"
 msgstr "페이지 크기: 좁게 · 보통 · 넓게 · 아주 넓게"
 
-#: src/core/app.c:763
+#: src/core/app.c:762
 msgid "Paper sheet (show/hide)"
 msgstr "종이(표시/숨기기)"
 
-#: src/core/app.c:764 src/core/app.c:884
+#: src/core/app.c:763 src/core/app.c:884
 msgid "Writing settings"
 msgstr "쓰기 설정"
 
-#: src/core/app.c:765
+#: src/core/app.c:764
 msgid "Music: play / pause"
 msgstr "음악: 재생 / 일시 정지"
 
-#: src/core/app.c:766
+#: src/core/app.c:765
 msgid "Music: next track"
 msgstr "음악: 다음 곡"
 
-#: src/core/app.c:767
+#: src/core/app.c:766
 msgid "Music: previous track"
 msgstr "음악: 이전 곡"
 
-#: src/core/app.c:768 src/core/app.c:1591
+#: src/core/app.c:767 src/core/app.c:1591
 msgid "Music player"
 msgstr "음악 플레이어"
+
+#: src/core/app.c:768
+msgid "Sound test (chime)"
+msgstr "소리 테스트 (차임)"
 
 #: src/core/app.c:769
 msgid "Start / stop writing sprint"
@@ -1609,23 +1613,23 @@ msgid "Sprint finished: %d word. Breathe and stretch."
 msgid_plural "Sprint finished: %d words. Breathe and stretch."
 msgstr[0] "스프린트 완료: %d단어. 숨을 고르고 몸을 펴세요."
 
-#: src/core/editor.c:322
+#: src/core/editor.c:320
 msgid "Cut"
 msgstr "잘라 냄"
 
-#: src/core/editor.c:322
+#: src/core/editor.c:320
 msgid "Copied"
 msgstr "복사됨"
 
-#: src/core/editor.c:516
+#: src/core/editor.c:513
 msgid "There are no edits in this document yet"
 msgstr "이 문서에는 아직 편집 기록이 없습니다"
 
-#: src/core/editor.c:542 src/core/editor.c:659 src/core/editor.c:672
+#: src/core/editor.c:539 src/core/editor.c:656 src/core/editor.c:669
 msgid "Hemingway mode: keep going, no deleting"
 msgstr "헤밍웨이 모드: 지우지 말고 계속 쓰세요"
 
-#: src/core/editor.c:552
+#: src/core/editor.c:549
 msgid "Paragraph deleted — Ctrl+Z undoes it"
 msgstr "문단 삭제됨 — Ctrl+Z로 되돌릴 수 있습니다"
 

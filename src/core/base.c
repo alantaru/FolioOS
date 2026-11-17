@@ -3,6 +3,34 @@
 
 /* ---------------------------------------------------------------- libc */
 #ifdef FOLIO_FREESTANDING
+#if !defined(__x86_64__) && !defined(__i386__)
+/* ARM e outras: C simples. A barreira vazia em cada volta impede o compilador de trocar o laço
+ * por uma chamada a memcpy/memset (o que aqui viraria recursão infinita). */
+#define NOIDIOM __asm__ volatile("" ::: "memory")
+void *memcpy(void *d, const void *s, size_t n) {
+    u8 *dp = d; const u8 *sp = s;
+    if ((((uintptr_t)dp | (uintptr_t)sp) & 7) == 0)
+        for (; n >= 8; n -= 8, dp += 8, sp += 8) { *(u64 *)dp = *(const u64 *)sp; NOIDIOM; }
+    for (; n; n--) { *dp++ = *sp++; NOIDIOM; }
+    return d;
+}
+void *memmove(void *d, const void *s, size_t n) {
+    u8 *dp = d; const u8 *sp = s;
+    if (dp == sp || n == 0) return d;
+    if (dp < sp || dp >= sp + n) return memcpy(d, s, n);
+    while (n--) { dp[n] = sp[n]; NOIDIOM; }
+    return d;
+}
+void *memset(void *d, int c, size_t n) {
+    u8 *dp = d;
+    if (((uintptr_t)dp & 7) == 0) {
+        u64 v = (u64)(u8)c * 0x0101010101010101ull;
+        for (; n >= 8; n -= 8, dp += 8) { *(u64 *)dp = v; NOIDIOM; }
+    }
+    for (; n; n--) { *dp++ = (u8)c; NOIDIOM; }
+    return d;
+}
+#else
 /* cópias em palavras de 8 (ou 4) bytes: rápidas também em CPUs sem ERMSB e em memória sem cache */
 void *memcpy(void *d, const void *s, size_t n) {
     void *r = d;
@@ -41,6 +69,7 @@ void *memset(void *d, int c, size_t n) {
     __asm__ volatile("rep stosb" : "+D"(d), "+c"(n) : "a"(c) : "memory");
     return r;
 }
+#endif
 int memcmp(const void *a, const void *b, size_t n) {
     const u8 *x = a, *y = b;
     for (size_t i = 0; i < n; i++) if (x[i] != y[i]) return x[i] - y[i];
@@ -55,9 +84,17 @@ void *realloc(void *p, size_t n) { return mem_realloc(p, n); }
 /* ---------------------------------------------------------------- heap
  * Alocador first-fit com boundary tags e coalescência.
  * Cabeçalho de 16 bytes: tamanho do bloco (bit0 = em uso) e tamanho do anterior. */
+/* Cabeçalho de 16 bytes em TODAS as arquiteturas: os tamanhos são múltiplos de 16 (HSZ mascara os 4 bits
+ * baixos). Em 32 bits, dois usize dão só 8 bytes; sem o enchimento, cada bloco "perdia" 8 bytes na conta
+ * e o alocador entregava memória em uso (o BOOTIA32.EFI desenhava a tela por cima das fontes). */
+#if __SIZEOF_POINTER__ == 8
 typedef struct HBlk { usize size, prev; } HBlk;
+#else
+typedef struct HBlk { usize size, prev, pad[2]; } HBlk;
+#endif
+_Static_assert(sizeof(HBlk) == 16, "HBlk precisa de 16 bytes em toda arquitetura");
 typedef struct HFree { HBlk h; struct HFree *next, *prevf; } HFree;
-static u8 *heap_base, *heap_end;
+static u8 *heap_end;
 static HFree *free_list;
 static usize used_bytes, total_bytes;
 
@@ -78,7 +115,7 @@ void heap_init(void *mem, usize size) {
     u8 *p = (u8 *)(((uintptr_t)mem + 15) & ~(uintptr_t)15);
     size -= (usize)(p - (u8 *)mem);
     size &= ~(usize)15;
-    heap_base = p; heap_end = p + size - sizeof(HBlk);
+    heap_end = p + size - sizeof(HBlk);
     HFree *f = (HFree *)p;
     f->h.size = size - sizeof(HBlk); f->h.prev = 0;
     HBlk *sent = (HBlk *)heap_end; sent->size = 1; sent->prev = f->h.size;
@@ -89,7 +126,7 @@ void heap_init(void *mem, usize size) {
 void *mem_alloc(usize n) {
     if (n == 0) n = 1;
     usize need = ((n + 15) & ~(usize)15) + sizeof(HBlk);
-    if (need < sizeof(HFree) + 16) need = sizeof(HFree) + 16;
+    if (need < sizeof(HFree) + 16) need = (sizeof(HFree) + 16 + 15) & ~(usize)15;   /* múltiplo de 16 também em 32 bits */
     for (HFree *f = free_list; f; f = f->next) {
         usize sz = HSZ(&f->h);
         if (sz < need) continue;
@@ -245,6 +282,16 @@ static const char *parse_spec(const char *f, Spec *s) {
     return f;
 }
 
+bool dbg_on;
+void dbg(const char *f, ...) {
+    if (!dbg_on) return;
+    char b[512]; va_list ap; va_start(ap, f); int n = vfmt(b, (int)sizeof b - 3, f, ap); va_end(ap);
+    if (n < 0) n = 0;
+    if (n > (int)sizeof b - 3) n = (int)sizeof b - 3;
+    b[n] = '\r'; b[n + 1] = '\n'; b[n + 2] = 0;
+    pal_log(b);
+}
+int vfmt(char *buf, int cap, const char *f, va_list ap);
 int vfmt(char *buf, int cap, const char *f, va_list ap) {
     /* 1ª passada: tipos de cada argumento, pela posição (explícita ou na ordem) */
     char types[FMT_MAXARGS] = {0}; int lngs[FMT_MAXARGS] = {0}, nargs = 0, seq = 0;

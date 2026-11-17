@@ -28,7 +28,7 @@ $warn = @("-Wall", "-Wextra", "-Wno-unused-parameter")
 $free = @("-O2", "-ffreestanding", "-fno-stack-protector", "-fno-stack-check", "-mno-stack-arg-probe", "-fshort-wchar",
           "-fno-strict-aliasing", "-fno-tree-loop-distribute-patterns", "-fno-asynchronous-unwind-tables",
           "-DFOLIO_FREESTANDING", "-Isrc/libc", "-Isrc/core") + $warn
-$uefi = @("src\platform\uefi\uefi_main.c", "src\platform\uefi\hda.c")
+$uefi = @("src\platform\uefi\uefi_main.c", "src\platform\uefi\hda.c", "src\platform\uefi\usbhid.c", "src\platform\uefi\ps2mouse.c")
 $link = @("-nostdlib", "-shared", "-Wl,--subsystem,10", "-Wl,--exclude-all-symbols")
 
 Step 1 "UEFI x86_64  -> build\efi\BOOTX64.EFI"
@@ -36,6 +36,35 @@ Run gcc ($free + @("-mno-red-zone") + $core + $uefi + $link + @("-Wl,-e,efi_main
 
 Step 2 "UEFI IA32    -> build\efi\BOOTIA32.EFI (tablets/netbooks with 32-bit firmware)"
 Run gcc ($free + @("-m32", "-march=i686", "-mno-sse", "-mfpmath=387") + $core + $uefi + $link + @("-Wl,-e,_efi_main", "-o", "build\efi\BOOTIA32.EFI"))
+
+Step 2b "UEFI ARM64   -> build\efi\BOOTAA64.EFI (Raspberry Pi 3/4/5 with UEFI firmware, ARM laptops)"
+$clang = Get-Command clang -ErrorAction SilentlyContinue
+if (-not $clang -and (Test-Path "$env:ProgramFiles\LLVM\bin\clang.exe")) { $clang = "$env:ProgramFiles\LLVM\bin\clang.exe" }
+if ($clang) {
+    $aa64 = @("--target=aarch64-unknown-windows", "-O2", "-ffreestanding", "-fno-stack-protector", "-mno-stack-arg-probe", "-fshort-wchar",
+              "-fno-strict-aliasing", "-fno-math-errno", "-DFOLIO_FREESTANDING", "-Isrc/libc", "-Isrc/core") + $warn
+    Run $clang ($aa64 + $core + $uefi + @("-nostdlib", "-fuse-ld=lld", "-Wl,/subsystem:efi_application", "-Wl,/entry:efi_main", "-o", "build\efi\BOOTAA64.EFI"))
+    Remove-Item build\efi\BOOTAA64.lib -ErrorAction SilentlyContinue
+} else {
+    Write-Host "      clang (LLVM) not found: BOOTAA64.EFI not built (winget install LLVM.LLVM)" -ForegroundColor Yellow
+}
+
+Step 2c "BIOS-only PCs -> build\bios\BIOS.SYS (BIOS-to-UEFI bridge that runs BOOTIA32.EFI) + boot sectors"
+$nasm = Get-Command nasm -ErrorAction SilentlyContinue
+if ($clang -and $nasm) {
+    New-Item -ItemType Directory -Force build\bios | Out-Null
+    $b32 = @("--target=i686-unknown-none-elf", "-march=i686", "-O2", "-ffreestanding", "-fno-pic", "-fno-stack-protector", "-mno-sse", "-mno-mmx",
+             "-malign-double", "-fshort-wchar", "-fno-strict-aliasing") + $warn
+    Run $clang ($b32 + @("-nostdlib", "-static", "-fuse-ld=lld", "-Wl,-T,src/platform/bios/bridge.ld", "-Wl,--oformat=binary",
+                         "-o", "build\bios\bridge.bin", "src\platform\bios\bridge.c", "src\platform\bios\fat32.c"))
+    Run $nasm @("-f", "bin", "-DMBR", "src\platform\bios\boot.asm", "-o", "build\bios\mbr.bin")
+    Run $nasm @("-f", "bin", "-DVBR", "src\platform\bios\boot.asm", "-o", "build\bios\vbr.bin")
+    Run $nasm @("-f", "bin", "-i", "build/bios/", "src\platform\bios\stub.asm", "-o", "build\bios\BIOS.SYS")
+    Run gcc @("-O2", "-Wall", "-Wextra", "tools\biosboot.c", "-o", "build\biosboot.exe")
+    Run gcc @("-O2", "-Wall", "-Wextra", "tools\fat32_test.c", "src\platform\bios\fat32.c", "-o", "build\fat32_test.exe")
+} else {
+    Write-Host "      clang (LLVM) and nasm are needed: BIOS boot not built" -ForegroundColor Yellow
+}
 
 Step 3 "Windows simulator -> build\folio_sim.exe"
 Run gcc (@("-O2", "-g", "-fno-strict-aliasing", "-Isrc/core") + $warn + $core + @("src\platform\win32\win32_main.c", "-o", "build\folio_sim.exe", "-lgdi32", "-luser32", "-lwinmm"))
@@ -87,10 +116,18 @@ foreach ($p in @(@("TEXTOS", "DOCUMENTS"), @("MUSICA", "MUSIC"), @("FOLIO\TEMAS"
 }
 foreach ($x in "$usb\FOLIO\FONTES", "$usb\LEIA-ME.txt", "$usb\COMO-INSTALAR.txt", "$usb\FOLIO\RASCUNHO.MD", "$usb\FOLIO\DIAGNOSTICO.TXT") { if (Test-Path $x) { Remove-Item -Recurse -Force $x } }
 # only system files are refreshed: documents and music placed in DOCUMENTS and MUSIC are kept
-foreach ($d in "$usb\EFI", "$usb\FOLIO\FONTS", "$usb\FOLIO\LANGUAGES", "$usb\FOLIO\KEYBOARDS") { if (Test-Path $d) { Remove-Item -Recurse -Force $d } }
+foreach ($d in "$usb\EFI", "$usb\FOLIO\FONTS", "$usb\FOLIO\LANGUAGES", "$usb\FOLIO\KEYBOARDS", "$usb\FOLIO\TOOLS") { if (Test-Path $d) { Remove-Item -Recurse -Force $d } }
 New-Item -ItemType Directory -Force "$usb\EFI\BOOT", "$usb\FOLIO\FONTS", "$usb\FOLIO\LANGUAGES", "$usb\FOLIO\KEYBOARDS",
     "$usb\FOLIO\THEMES", "$usb\DOCUMENTS", "$usb\MUSIC" | Out-Null
 Copy-Item build\efi\BOOTX64.EFI, build\efi\BOOTIA32.EFI "$usb\EFI\BOOT\"
+if (Test-Path build\efi\BOOTAA64.EFI) { Copy-Item build\efi\BOOTAA64.EFI "$usb\EFI\BOOT\" }
+# BIOS-only PCs: the bridge, plus the Windows tool that writes the boot code (FOLIO\TOOLS\biosboot.exe E:)
+if (Test-Path build\bios\BIOS.SYS) {
+    Copy-Item build\bios\BIOS.SYS "$usb\FOLIO\BIOS.SYS"
+    New-Item -ItemType Directory -Force "$usb\FOLIO\TOOLS\bios" | Out-Null
+    Copy-Item build\biosboot.exe "$usb\FOLIO\TOOLS\"
+    Copy-Item build\bios\mbr.bin, build\bios\vbr.bin "$usb\FOLIO\TOOLS\bios\"
+}
 Copy-Item assets\fonts\*.ttf, assets\fonts\OFL-*.txt "$usb\FOLIO\FONTS\"
 # every language works out of the box: the writing fonts and the CJK fonts are part of the system
 if (-not (Test-Path "assets\fonts-cjk\_LANGUAGE\NotoSansSC.ttf")) { Write-Host "      downloading the Chinese/Japanese/Korean fonts (once)"; & .\tools\fetch-cjk-fonts.ps1 }
@@ -212,6 +249,19 @@ if (-not $NoTests) {
     }
     Remove-Item $vs
     Ok "video: RGB, 16-bit mask, Blt only, padded stride, UGA, rotated portrait - OK"
+    # FAT32 driver of the BIOS bridge: random create/write/truncate/rename/delete vs. a model, then a full volume check
+    if (Test-Path build\fat32_test.exe) {
+        Run gcc @("-O2", "-Wall", "tools\mkimg.c", "-o", "build\mkimg.exe")
+        $ft = "build\fat32t"; if (Test-Path $ft) { Remove-Item -Recurse -Force $ft }
+        New-Item -ItemType Directory -Force "$ft\seed\Docs" | Out-Null
+        Set-Content -Encoding ascii "$ft\seed\seed.txt" "seed"; Set-Content -Encoding ascii "$ft\seed\Docs\old notes.md" "old"
+        foreach ($cfg in @(@(64, 7), @(64, 21), @(1200, 99))) {
+            Run .\build\mkimg.exe @("$ft\seed", "$ft\t.img", "$($cfg[0])") | Out-Null
+            Run .\build\fat32_test.exe @("$ft\t.img", "4000", "$($cfg[1])") | Out-Null
+        }
+        Remove-Item -Recurse -Force $ft
+        Ok "FAT32 driver (BIOS bridge): 12000 random operations on 3 volumes, byte-exact, volume consistent - OK"
+    }
     Remove-Item -Recurse -Force $t
 }
 

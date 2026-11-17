@@ -64,6 +64,9 @@ FolioOS 是一个**可启动的写作环境**：一个只做一件事的小小�
 - **磁盘镜像：** `FolioOS-disk-image.zip` 包含一个现成的 256 MB 镜像，可用于 [Rufus](https://rufus.ie)（DD 模式）、
   [balenaEtcher](https://etcher.balena.io) 或 `dd`。仍然推荐解压 `FolioOS.zip`：U 盘的其余空间可以留给你的文件。
 - **在 Windows 上从源码构建：** 先运行 `.\build.ps1`，再运行 `.\flash_usb.ps1 -DriveLetter E:`（安装或更新 U 盘，不删除任何东西）。
+- **没有 UEFI 的电脑（仅 BIOS/Legacy）：** 在 Windows 中以管理员身份运行一次 `FOLIO\TOOLS\biosboot.exe E:`（`E:` 是 U 盘）。
+  它只写入 BIOS 启动代码：不会改动任何文件，U 盘仍是普通的 FAT32 盘，UEFI 启动照常可用。从源码安装：
+  `.\flash_usb.ps1 -DriveLetter E: -Bios`。
 - **一切都已包含：** `FolioOS.zip` 已附带 11 款适合写作和阅读的免费字体，以及中文、日文和韩文字体——所有语言开箱即用。
 
 </details>
@@ -311,11 +314,12 @@ U 盘（FAT32）
 
 | | |
 |---|---|
-| **固件** | UEFI 2.x——64 位（`BOOTX64.EFI`）或 32 位（`BOOTIA32.EFI`，Atom 平板和上网本）。必须关闭 Secure Boot。大约 2012 年以后的大多数电脑和笔记本。 |
-| **显示** | 任何 UEFI GOP 帧缓冲（RGB、BGR、位掩码、仅 Blt）或旧式 UGA。原生分辨率，自动 HiDPI 缩放，竖屏自动旋转。 |
-| **输入** | 键盘通过固件；USB/PS/2 鼠标、触摸板和触摸屏通过固件的指针协议。 |
+| **固件** | UEFI 2.x——64 位（`BOOTX64.EFI`）、32 位（`BOOTIA32.EFI`，Atom 平板和上网本）或 ARM64（`BOOTAA64.EFI`：装有社区 UEFI 固件的 Raspberry Pi 3/4/5、ARM 笔记本）。**仅有 BIOS 的电脑**（Legacy/CSM）在运行一次 `FOLIO\TOOLS\biosboot.exe` 后，通过 FolioOS 自己的 BIOS 桥启动。必须关闭 Secure Boot。 |
+| **显示** | 任何 UEFI GOP 帧缓冲（RGB、BGR、位掩码、仅 Blt）或旧式 UGA；BIOS 电脑上使用 VESA/VBE。原生分辨率，自动 HiDPI 缩放，竖屏自动旋转。 |
+| **输入** | 键盘通过固件（BIOS 电脑上直接通过 PS/2）。鼠标、触摸板、数位板和触摸屏通过固件；固件没有相应驱动时，使用 FolioOS 自己的 USB HID 和 PS/2 驱动。 |
 | **声音** | Intel HD Audio 和 AC'97（仅音乐播放器需要）。 |
-| **不支持** | 仅支持 BIOS/CSM 的电脑、Secure Boot（暂时）、Apple Silicon Mac。Wi-Fi 和蓝牙是刻意不支持的。 |
+| **不支持** | Secure Boot（暂时）、Apple Silicon Mac。Wi-Fi 和蓝牙是刻意不支持的。 |
+| **测试平台** | 每个版本都在 13 台模拟机器上测试：UEFI x64、IA32 和 ARM64，以及从 USB 和 IDE 启动的仅 BIOS 电脑；8 种显卡、PS/2 和 USB 鼠标、USB 数位板、HD Audio 和 AC'97。每台都检查画面、键盘、鼠标、声音、保存和文件系统完整性。 |
 
 每次启动时，FolioOS 都会把它发现的硬件写入 `FOLIO/DIAGNOSTICS.TXT`。欢迎在[硬件报告](https://github.com/alantaru/FolioOS/issues/new/choose)
 中分享你的文件——哪怕只是“一切正常”，也能帮助其他写作者挑选笔记本。
@@ -347,8 +351,8 @@ Markdown 编辑器打开，然后把 U 盘插回去，继续在 FolioOS 中写�
 <details>
 <summary><b>为什么我的电脑在启动菜单里看不到 U 盘？</b></summary>
 
-请确认 U 盘是 FAT32 格式、你选择的是以 “UEFI” 开头的选项，并且固件设置中已关闭 Secure Boot。只能以 BIOS/CSM 模式启动的
-非常老的电脑不受支持。
+请确认 U 盘是 FAT32 格式、你选择的是以 “UEFI” 开头的选项，并且固件设置中已关闭 Secure Boot。只能以 BIOS/Legacy 模式启动的
+较老电脑需要先写入一次 BIOS 启动代码：在 Windows 中以管理员身份运行 `FOLIO\TOOLS\biosboot.exe E:`，U 盘就会作为普通 USB 磁盘出现。
 </details>
 
 <details>
@@ -385,12 +389,13 @@ Intel Mac 可以从 UEFI 驱动器启动（开机时按住 <kbd>Option</kbd>）�
 ## 从源码构建
 
 要求：Windows 10/11、PowerShell 5.1+，以及 `PATH` 中的 [MinGW-w64](https://winlibs.com) `gcc`（任何较新的 x86_64 版本）。
-除此之外别无所需。
+ARM64 和 BIOS 版本还需要 [LLVM](https://llvm.org) 的 `clang` 和 `nasm`，硬件实验室需要 [QEMU](https://www.qemu.org)——三者都可以用 `winget` 安装。
 
 ```powershell
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
-.\build.ps1                                  # UEFI x64 + IA32、模拟器、发行包——以及全部测试
+.\build.ps1                                  # UEFI x64 + IA32 + ARM64、BIOS、模拟器、发布包——以及测试套件
+.\tools\qemu-lab.ps1                         # 在 13 台模拟机器上启动真正的二进制文件并逐一检查
 .\build\folio_sim.exe                        # 在窗口中运行 FolioOS
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # 在窗口中运行真正的 UEFI 程序
 .\flash_usb.ps1 -DriveLetter E:              # 安装/更新 FAT32 U 盘，保留用户文件
@@ -400,7 +405,7 @@ cd FolioOS
 ```
 
 测试套件用脚本化的按键和鼠标事件驱动模拟器和真正的 `BOOTX64.EFI`（运行在一个小型 UEFI 宿主中），截取屏幕，并验证每一种导出
-（ZIP + XML）、每一种翻译（并对校验器做反向检查）以及六种帧缓冲格式。
+（ZIP + XML）、每一种翻译（并对校验器做反向检查）、六种帧缓冲格式，以及 BIOS 桥的 FAT32 驱动（数千次随机操作，逐字节核对）。
 
 <a id="architecture-in-one-picture"></a>
 
@@ -409,7 +414,8 @@ cd FolioOS
 ```
 src/core/       可移植核心（独立 C，无 libc）：编辑器、Markdown、TrueType 光栅化器、
                 界面工具包和窗口管理器、导出、MP3、i18n、键盘布局、主题
-src/platform/   uefi/  GOP/UGA 显示、输入、FAT 读写、HD Audio/AC'97——直接运行在固件之上
+src/platform/   uefi/  GOP/UGA 显示、输入、FAT 读写、HD Audio/AC'97、USB HID 和 PS/2 驱动——运行在固件之上
+                bios/  启动扇区 + BIOS→UEFI 桥（VBE、PS/2、自有 FAT32 驱动），用于仅有 BIOS 的电脑
                 win32/ 用于开发和自动测试的模拟器
 tools/          efi_host（在 Windows 上运行 BOOTX64.EFI）、i18n 工具、磁盘镜像生成器、showcase
 assets/         字体、翻译（.po）、键盘布局、示例主题
@@ -422,6 +428,7 @@ tests/          脚本化的端到端测试
 
 ## 路线图
 
+- [x] 仅有 BIOS 的电脑（Legacy/CSM）和 ARM64（装有 UEFI 固件的 Raspberry Pi、ARM 笔记本）
 - [x] 韩文输入（两套式韩文）和日文假名输入（罗马字 → 平假名/片假名）
 - [ ] 日文汉字转换和中文拼音输入（需要词典）
 - [ ] 复杂文字排版和从右到左的文字（阿拉伯文、希伯来文、天城文…）

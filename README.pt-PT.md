@@ -70,6 +70,10 @@ de partilhar.
   `FolioOS.zip` continua a ser o recomendado: o resto da pen fica livre para os seus ficheiros.
 - **A partir do código no Windows:** `.\build.ps1` e depois `.\flash_usb.ps1 -DriveLetter E:` (instala ou
   atualiza uma pen sem apagar nada).
+- **PCs sem UEFI (só BIOS/Legacy):** execute `FOLIO\TOOLS\biosboot.exe E:` uma vez no Windows, como
+  administrador (`E:` é a pen). Só grava o código de arranque do BIOS: nenhum ficheiro é tocado, a pen
+  continua a ser um FAT32 normal e o arranque UEFI continua a funcionar. A partir do código-fonte:
+  `.\flash_usb.ps1 -DriveLetter E: -Bios`.
 - **Tudo incluído:** o `FolioOS.zip` já traz 11 tipos de letra livres para escrever e ler e os tipos de letra
   para chinês, japonês e coreano — todos os idiomas funcionam logo à partida.
 
@@ -343,11 +347,12 @@ sua escrita está lá.
 
 | | |
 |---|---|
-| **Firmware** | UEFI 2.x — 64 bits (`BOOTX64.EFI`) ou 32 bits (`BOOTIA32.EFI`, tablets e netbooks Atom). O Secure Boot tem de estar desligado. A maioria dos PCs e portáteis de 2012 em diante. |
-| **Vídeo** | Qualquer framebuffer UEFI GOP (RGB, BGR, máscara de bits, só Blt) ou UGA antigo. Resolução nativa, escala HiDPI automática, ecrãs em retrato rodados automaticamente. |
-| **Entrada** | Teclado através do firmware; rato USB/PS/2, touchpad e ecrã tátil através dos protocolos de ponteiro do firmware. |
+| **Firmware** | UEFI 2.x — 64 bits (`BOOTX64.EFI`), 32 bits (`BOOTIA32.EFI`, tablets e netbooks Atom) ou ARM64 (`BOOTAA64.EFI`: Raspberry Pi 3/4/5 com o firmware UEFI da comunidade, portáteis ARM). **PCs só com BIOS** (Legacy/CSM) arrancam pela ponte BIOS própria do FolioOS depois de executar `FOLIO\TOOLS\biosboot.exe` uma vez. O Secure Boot tem de estar desligado. |
+| **Vídeo** | Qualquer framebuffer UEFI GOP (RGB, BGR, máscara de bits, só Blt) ou UGA antigo; VESA/VBE em PCs com BIOS. Resolução nativa, escala HiDPI automática, ecrãs em retrato rodados automaticamente. |
+| **Entrada** | Teclado através do firmware (diretamente por PS/2 em PCs com BIOS). Rato, touchpad, mesa digitalizadora e ecrã tátil através do firmware — e, quando o firmware não tem controlador para eles, através dos controladores USB HID e PS/2 próprios do FolioOS. |
 | **Som** | Intel HD Audio e AC'97 (só necessário para o leitor de música). |
-| **Sem suporte** | PCs só com BIOS/CSM, Secure Boot (por agora), Macs com Apple Silicon. Wi-Fi e Bluetooth ficam de fora de propósito. |
+| **Sem suporte** | Secure Boot (por agora), Macs com Apple Silicon. Wi-Fi e Bluetooth ficam de fora de propósito. |
+| **Testado em** | 13 máquinas emuladas em cada versão: UEFI x64, IA32 e ARM64, e PCs só com BIOS a arrancar por USB e IDE; 8 placas gráficas, ratos PS/2 e USB, mesa digitalizadora USB, HD Audio e AC'97. Em cada uma verificam-se imagem, teclado, rato, som, gravação e integridade do sistema de ficheiros. |
 
 Cada arranque grava o `FOLIO/DIAGNOSTICS.TXT` com o que o FolioOS encontrou. Partilhe o seu num
 [relatório de hardware](https://github.com/alantaru/FolioOS/issues/new/choose) — até "funcionou à primeira"
@@ -384,8 +389,9 @@ escrever no FolioOS.
 <summary><b>Porque é que o meu PC não mostra a pen no menu de arranque?</b></summary>
 
 Confirme que a pen está em FAT32, que escolheu a entrada que começa por "UEFI" e que o Secure Boot está
-desativado na configuração do firmware. PCs muito antigos que só arrancam em modo BIOS/CSM não são
-suportados.
+desativado na configuração do firmware. PCs mais antigos que só arrancam em modo BIOS/Legacy precisam uma
+vez do código de arranque do BIOS: execute `FOLIO\TOOLS\biosboot.exe E:` no Windows como administrador, e a
+pen passa a aparecer como um disco USB normal.
 </details>
 
 <details>
@@ -428,12 +434,14 @@ voltar a um computador normal.
 ## Compilar a partir do código
 
 Requisitos: Windows 10/11, PowerShell 5.1+ e o `gcc` do [MinGW-w64](https://winlibs.com) (qualquer versão
-x86_64 recente) no `PATH`. Mais nada.
+x86_64 recente) no `PATH`. As versões ARM64 e BIOS usam também o `clang` do [LLVM](https://llvm.org) e o
+`nasm`, e o laboratório de hardware usa o [QEMU](https://www.qemu.org) — os três instalam-se com `winget`.
 
 ```powershell
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
-.\build.ps1                                  # UEFI x64 + IA32, simulador, pacotes — e todos os testes
+.\build.ps1                                  # UEFI x64 + IA32 + ARM64, BIOS, simulador, pacotes — e a bateria de testes
+.\tools\qemu-lab.ps1                         # arranca os binários reais em 13 máquinas emuladas e verifica cada uma
 .\build\folio_sim.exe                        # corre o FolioOS numa janela
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # corre o binário UEFI verdadeiro numa janela
 .\flash_usb.ps1 -DriveLetter E:              # instala/atualiza uma pen FAT32, mantendo os ficheiros
@@ -444,7 +452,8 @@ cd FolioOS
 
 A bateria de testes conduz o simulador e o verdadeiro `BOOTX64.EFI` (dentro de um pequeno anfitrião UEFI)
 com teclas e eventos de rato programados, tira capturas de ecrã, valida cada exportação (ZIP + XML), cada
-tradução (com um controlo negativo para o validador) e seis formatos de framebuffer.
+tradução (com um controlo negativo para o validador), seis formatos de framebuffer e o controlador FAT32 da
+ponte BIOS (milhares de operações aleatórias, verificadas byte a byte).
 
 <a id="architecture-in-one-picture"></a>
 
@@ -453,7 +462,8 @@ tradução (com um controlo negativo para o validador) e seis formatos de frameb
 ```
 src/core/       núcleo portátil (C freestanding, sem libc): editor, Markdown, rasterizador TrueType,
                 kit de interface e gestor de janelas, exportações, MP3, i18n, teclados, temas
-src/platform/   uefi/  vídeo GOP/UGA, entrada, E/S FAT, HD Audio/AC'97 — diretamente sobre o firmware
+src/platform/   uefi/  vídeo GOP/UGA, entrada, E/S FAT, HD Audio/AC'97, controladores USB HID e PS/2 — sobre o firmware
+                bios/  setores de arranque + ponte BIOS→UEFI (VBE, PS/2, controlador FAT32 próprio) para PCs só com BIOS
                 win32/ simulador usado no desenvolvimento e nos testes automáticos
 tools/          efi_host (corre o BOOTX64.EFI no Windows), ferramenta de i18n, gerador de imagem, showcase
 assets/         tipos de letra, traduções (.po), esquemas de teclado, tema de exemplo
@@ -467,6 +477,7 @@ Um binário de ~600 KB controla a máquina inteira através de uma camada fina d
 
 ## Plano
 
+- [x] PCs só com BIOS (Legacy/CSM) e ARM64 (Raspberry Pi com firmware UEFI, portáteis ARM)
 - [x] Entrada em coreano (hangul de 2 conjuntos) e em kana japonês (romaji → hiragana/katakana)
 - [ ] Conversão para kanji (japonês) e entrada pinyin (chinês) (precisam de dicionários)
 - [ ] Composição de texto e escritas da direita para a esquerda (árabe, hebraico, devanágari…)

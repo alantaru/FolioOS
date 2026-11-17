@@ -57,6 +57,10 @@ int   str_find_i(const char *hay, int hlen, const char *needle, int nlen, int fr
 int   str_to_int(const char *s);
 int   fmt(char *buf, int cap, const char *f, ...);
 int   vfmt(char *buf, int cap, const char *f, va_list ap);
+/* registro de depuração pela porta serial (debug_serial=1 no CONFIG.INI; o laboratório QEMU grava num arquivo) */
+extern bool dbg_on;
+void  pal_log(const char *s);
+void  dbg(const char *f, ...);
 extern char fmt_decimal;              /* separador decimal de %f (do idioma) */
 const char *path_basename(const char *p);
 void  path_join(char *out, int cap, const char *dir, const char *name);

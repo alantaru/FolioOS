@@ -4,6 +4,40 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- **PCs with BIOS only (Legacy/CSM):** `FOLIO\BIOS.SYS` is a small BIOS-to-UEFI bridge that runs
+  the same `BOOTIA32.EFI` on PCs without UEFI — VESA/VBE video with the monitor's native mode
+  (EDID), PS/2 keyboard and mouse/touchpad with wheel (USB ones through the BIOS's legacy
+  emulation), its own FAT32 driver with writing over INT 13h, the CMOS clock, ACPI power-off and
+  HD Audio/AC'97. `FOLIO\TOOLS\biosboot.exe E:` (or `.\flash_usb.ps1 -DriveLetter E: -Bios`)
+  writes the boot code once; it only touches the MBR code and the FAT32 boot-sector code, never a
+  file, and the UEFI boot keeps working.
+- **ARM64:** `EFI\BOOT\BOOTAA64.EFI` for Raspberry Pi 3/4/5 with the community UEFI firmware and
+  ARM laptops (built with LLVM `clang`).
+- **Own pointer drivers** used when the firmware has none: USB HID (mouse, pen tablet, touch
+  screen — absolute and relative, with wheel) and PS/2 mouse/touchpad (IntelliMouse wheel).
+  Diagnostics mark them `[FolioOS USB HID driver]`.
+- **Hardware lab** `tools/qemu-lab.ps1`: boots the real binaries on 13 QEMU machines (UEFI x64,
+  IA32 and ARM64; BIOS-only from USB and IDE; 8 graphics cards; PS/2, USB mouse and tablet; HDA and
+  AC'97) and checks picture, keyboard, mouse click, sound, saving a document and the integrity of
+  the FAT32 volume on each. `tools/fatcat.c` reads files out of disk images and
+  `tools/fat32_test.c` stress-tests the FAT32 driver (run by `build.ps1`).
+- `debug_serial=1` in `CONFIG.INI` writes a debug log to the serial port.
+- Command palette: **Sound test (chime)**.
+
+### Fixed
+- **32-bit UEFI (`BOOTIA32.EFI`):** the memory allocator's block header was 8 bytes on 32-bit,
+  breaking the 16-byte alignment it relies on and corrupting memory.
+- **HD Audio:** playback stalled after the first answer from the codec on controllers that need
+  RINTCTL set and RIRBSTS cleared (QEMU's, among others).
+- A very quick click could be lost between two reads of the mouse.
+- `flash_usb.ps1` did not copy `FOLIO\FONTS\EXTRA` and `FOLIO\FONTS\_LANGUAGE` (Chinese, Japanese
+  and Korean fonts) nor `BOOTAA64.EFI`.
+- The plural index now also respects `nplurals` from the translation header.
+- An English diagnostics line said "subsistema".
+
 ## [4.2.0] — 2026-11-17
 
 ### Added

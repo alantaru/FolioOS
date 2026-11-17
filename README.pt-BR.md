@@ -70,6 +70,10 @@ compartilhar.
   `FolioOS.zip` continua sendo o recomendado: o resto do pen-drive fica livre para os seus arquivos.
 - **A partir do código no Windows:** `.\build.ps1` e depois `.\flash_usb.ps1 -DriveLetter E:` (instala ou
   atualiza um pen-drive sem apagar nada).
+- **PCs sem UEFI (só BIOS/Legacy):** rode `FOLIO\TOOLS\biosboot.exe E:` uma vez no Windows, como
+  administrador (`E:` é o pen-drive). Ele só grava o código de boot do BIOS: nenhum arquivo é tocado, o
+  pen-drive continua um FAT32 comum e o boot por UEFI continua funcionando. A partir do código-fonte:
+  `.\flash_usb.ps1 -DriveLetter E: -Bios`.
 - **Tudo incluído:** o `FolioOS.zip` já traz 11 fontes livres para escrever e ler e as fontes para chinês,
   japonês e coreano — todos os idiomas funcionam logo de saída.
 
@@ -341,11 +345,12 @@ e a sua escrita está lá.
 
 | | |
 |---|---|
-| **Firmware** | UEFI 2.x — 64 bits (`BOOTX64.EFI`) ou 32 bits (`BOOTIA32.EFI`, tablets e netbooks Atom). O Secure Boot precisa estar desligado. A maioria dos PCs e notebooks de 2012 em diante. |
-| **Vídeo** | Qualquer framebuffer UEFI GOP (RGB, BGR, máscara de bits, só Blt) ou UGA antigo. Resolução nativa, escala HiDPI automática, telas em retrato giradas automaticamente. |
-| **Entrada** | Teclado pelo firmware; mouse USB/PS/2, touchpad e tela de toque pelos protocolos de ponteiro do firmware. |
+| **Firmware** | UEFI 2.x — 64 bits (`BOOTX64.EFI`), 32 bits (`BOOTIA32.EFI`, tablets e netbooks Atom) ou ARM64 (`BOOTAA64.EFI`: Raspberry Pi 3/4/5 com o firmware UEFI da comunidade, notebooks ARM). **PCs só com BIOS** (Legacy/CSM) iniciam pela ponte BIOS própria do FolioOS depois de rodar `FOLIO\TOOLS\biosboot.exe` uma vez. O Secure Boot precisa estar desligado. |
+| **Vídeo** | Qualquer framebuffer UEFI GOP (RGB, BGR, máscara de bits, só Blt) ou UGA antigo; VESA/VBE em PCs com BIOS. Resolução nativa, escala HiDPI automática, telas em retrato giradas automaticamente. |
+| **Entrada** | Teclado pelo firmware (direto pelo PS/2 em PCs com BIOS). Mouse, touchpad, mesa digitalizadora e tela de toque pelo firmware — e, quando o firmware não tem driver para eles, pelos drivers USB HID e PS/2 próprios do FolioOS. |
 | **Som** | Intel HD Audio e AC'97 (só necessário para o player de música). |
-| **Sem suporte** | PCs só com BIOS/CSM, Secure Boot (por enquanto), Macs com Apple Silicon. Wi-Fi e Bluetooth ficam de fora de propósito. |
+| **Sem suporte** | Secure Boot (por enquanto), Macs com Apple Silicon. Wi-Fi e Bluetooth ficam de fora de propósito. |
+| **Testado em** | 13 máquinas emuladas a cada versão: UEFI x64, IA32 e ARM64, e PCs só com BIOS iniciando por USB e IDE; 8 placas de vídeo, mouses PS/2 e USB, mesa digitalizadora USB, HD Audio e AC'97. Em cada uma são conferidos imagem, teclado, mouse, som, salvamento e integridade do sistema de arquivos. |
 
 Cada boot grava o `FOLIO/DIAGNOSTICS.TXT` com o que o FolioOS encontrou. Compartilhe o seu num
 [relato de hardware](https://github.com/alantaru/FolioOS/issues/new/choose) — até "funcionou de primeira"
@@ -382,8 +387,9 @@ continue escrevendo no FolioOS.
 <summary><b>Por que o meu PC não mostra o pen-drive no menu de boot?</b></summary>
 
 Confira se o pen-drive está em FAT32, se você escolheu a opção que começa com "UEFI" e se o Secure Boot
-está desativado na configuração do firmware. PCs muito antigos que só iniciam em modo BIOS/CSM não são
-compatíveis.
+está desativado na configuração do firmware. PCs mais antigos que só iniciam em modo BIOS/Legacy precisam do
+código de boot do BIOS uma vez: rode `FOLIO\TOOLS\biosboot.exe E:` no Windows como administrador, e o
+pen-drive aparece como um disco USB comum.
 </details>
 
 <details>
@@ -426,12 +432,14 @@ pen-drive voltar a um computador normal.
 ## Compilar a partir do código
 
 Requisitos: Windows 10/11, PowerShell 5.1+ e o `gcc` do [MinGW-w64](https://winlibs.com) (qualquer versão
-x86_64 recente) no `PATH`. Nada mais.
+x86_64 recente) no `PATH`. As versões ARM64 e BIOS usam também o `clang` do [LLVM](https://llvm.org) e o
+`nasm`, e o laboratório de hardware usa o [QEMU](https://www.qemu.org) — os três se instalam com `winget`.
 
 ```powershell
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
-.\build.ps1                                  # UEFI x64 + IA32, simulador, pacotes — e todos os testes
+.\build.ps1                                  # UEFI x64 + IA32 + ARM64, BIOS, simulador, pacotes — e a bateria de testes
+.\tools\qemu-lab.ps1                         # inicia os binários reais em 13 máquinas emuladas e confere cada uma
 .\build\folio_sim.exe                        # roda o FolioOS numa janela
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # roda o binário UEFI de verdade numa janela
 .\flash_usb.ps1 -DriveLetter E:              # instala/atualiza um pen-drive FAT32, mantendo os arquivos
@@ -442,7 +450,8 @@ cd FolioOS
 
 A bateria de testes comanda o simulador e o `BOOTX64.EFI` de verdade (dentro de um pequeno hospedeiro UEFI)
 com teclas e eventos de mouse roteirizados, tira capturas de tela, valida cada exportação (ZIP + XML),
-cada tradução (com um controle negativo para o validador) e seis formatos de framebuffer.
+cada tradução (com um controle negativo para o validador), seis formatos de framebuffer e o driver FAT32 da
+ponte BIOS (milhares de operações aleatórias, conferidas byte a byte).
 
 <a id="architecture-in-one-picture"></a>
 
@@ -451,7 +460,8 @@ cada tradução (com um controle negativo para o validador) e seis formatos de f
 ```
 src/core/       núcleo portátil (C freestanding, sem libc): editor, Markdown, rasterizador TrueType,
                 kit de interface e gerenciador de janelas, exportações, MP3, i18n, teclados, temas
-src/platform/   uefi/  vídeo GOP/UGA, entrada, E/S FAT, HD Audio/AC'97 — direto sobre o firmware
+src/platform/   uefi/  vídeo GOP/UGA, entrada, E/S FAT, HD Audio/AC'97, drivers USB HID e PS/2 — sobre o firmware
+                bios/  setores de boot + ponte BIOS→UEFI (VBE, PS/2, driver FAT32 próprio) para PCs só com BIOS
                 win32/ simulador usado no desenvolvimento e nos testes automáticos
 tools/          efi_host (roda o BOOTX64.EFI no Windows), ferramenta de i18n, gerador de imagem, showcase
 assets/         fontes, traduções (.po), layouts de teclado, tema de exemplo
@@ -465,6 +475,7 @@ Um binário de ~600 KB controla a máquina inteira por uma camada fina de plataf
 
 ## Roteiro
 
+- [x] PCs só com BIOS (Legacy/CSM) e ARM64 (Raspberry Pi com firmware UEFI, notebooks ARM)
 - [x] Entrada em coreano (hangul de 2 conjuntos) e em kana japonês (romaji → hiragana/katakana)
 - [ ] Conversão para kanji (japonês) e entrada pinyin (chinês) (precisam de dicionários)
 - [ ] Composição de texto e escritas da direita para a esquerda (árabe, hebraico, devanágari…)

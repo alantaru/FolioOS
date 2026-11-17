@@ -44,6 +44,7 @@ void pal_set_video_mode(const char *pref) { (void)pref; }
 void pal_video_mode(int *w, int *h) { *w = screen.w; *h = screen.h; }
 int  pal_video_modes(int *ws, int *hs, int max) { if (max < 1) return 0; ws[0] = screen.w; hs[0] = screen.h; return 1; }
 float pal_display_dpi(void) { return 0; }
+void pal_log(const char *s) { fputs(s, stderr); }
 void pal_diag(Buf *o) { buf_printf(o, "Windows simulator (no direct hardware access)\r\nAudio: %s\r\n", pal_audio_info()); }
 int pal_mods(void) {
     int m = 0;

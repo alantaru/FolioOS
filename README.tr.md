@@ -70,6 +70,10 @@ dışa aktarın.
   `FolioOS.zip` dosyasını çıkarmak önerilir: belleğin geri kalanı dosyalarınıza boş kalır.
 - **Windows’ta kaynak koddan:** `.\build.ps1`, ardından `.\flash_usb.ps1 -DriveLetter E:` (hiçbir şey
   silmeden bir belleğe kurar veya günceller).
+- **UEFI olmayan bilgisayarlar (yalnızca BIOS/Legacy):** Windows’ta yönetici olarak bir kez
+  `FOLIO\TOOLS\biosboot.exe E:` çalıştırın (`E:` bellektir). Yalnızca BIOS önyükleme kodunu yazar: hiçbir
+  dosyaya dokunulmaz, bellek sıradan bir FAT32 bellek olarak kalır ve UEFI ile açılış çalışmaya devam eder.
+  Kaynak koddan: `.\flash_usb.ps1 -DriveLetter E: -Bios`.
 - **Her şey dahil:** `FolioOS.zip`, yazmak ve okumak için 11 özgür yazı tipini ve Çince, Japonca ve Korece
   yazı tiplerini zaten içerir — her dil hemen çalışır.
 
@@ -343,11 +347,12 @@ oradadır.
 
 | | |
 |---|---|
-| **Donanım yazılımı** | UEFI 2.x — 64 bit (`BOOTX64.EFI`) veya 32 bit (`BOOTIA32.EFI`, Atom tabletler ve netbook’lar). Secure Boot kapalı olmalıdır. Yaklaşık 2012 ve sonrasındaki bilgisayar ve dizüstülerin çoğu. |
-| **Ekran** | Herhangi bir UEFI GOP framebuffer (RGB, BGR, bit maskesi, yalnızca Blt) veya eski UGA. Doğal çözünürlük, otomatik HiDPI ölçekleme, dikey ekranlar otomatik döndürülür. |
-| **Giriş** | Klavye donanım yazılımı üzerinden; USB/PS/2 fare, dokunmatik yüzey ve dokunmatik ekran donanım yazılımının işaretçi protokolleri üzerinden. |
+| **Donanım yazılımı** | UEFI 2.x — 64 bit (`BOOTX64.EFI`), 32 bit (`BOOTIA32.EFI`, Atom tabletler ve netbook’lar) veya ARM64 (`BOOTAA64.EFI`: topluluk UEFI donanım yazılımıyla Raspberry Pi 3/4/5, ARM dizüstüler). **Yalnızca BIOS’lu bilgisayarlar** (Legacy/CSM), `FOLIO\TOOLS\biosboot.exe` bir kez çalıştırıldıktan sonra FolioOS’un kendi BIOS köprüsüyle açılır. Secure Boot kapalı olmalıdır. |
+| **Ekran** | Herhangi bir UEFI GOP framebuffer (RGB, BGR, bit maskesi, yalnızca Blt) veya eski UGA; BIOS’lu bilgisayarlarda VESA/VBE. Doğal çözünürlük, otomatik HiDPI ölçekleme, dikey ekranlar otomatik döndürülür. |
+| **Giriş** | Klavye donanım yazılımı üzerinden (BIOS’lu bilgisayarlarda doğrudan PS/2 ile). Fare, dokunmatik yüzey, çizim tableti ve dokunmatik ekran donanım yazılımı üzerinden — donanım yazılımında bunlar için sürücü yoksa FolioOS’un kendi USB HID ve PS/2 sürücüleriyle. |
 | **Ses** | Intel HD Audio ve AC'97 (yalnızca müzik çalar için gerekir). |
-| **Desteklenmeyenler** | Yalnızca BIOS/CSM bilgisayarlar, Secure Boot (şimdilik), Apple Silicon Mac’ler. Wi-Fi ve Bluetooth bilerek dışarıda bırakılmıştır. |
+| **Desteklenmeyenler** | Secure Boot (şimdilik), Apple Silicon Mac’ler. Wi-Fi ve Bluetooth bilerek dışarıda bırakılmıştır. |
+| **Test ortamı** | Her sürümde 13 öykünülmüş makine: UEFI x64, IA32 ve ARM64 ile USB ve IDE’den açılan yalnızca BIOS’lu bilgisayarlar; 8 ekran kartı, PS/2 ve USB fareler, USB tablet, HD Audio ve AC'97. Her birinde görüntü, klavye, fare, ses, kaydetme ve dosya sistemi bütünlüğü denetlenir. |
 
 Her açılış, FolioOS’un bulduklarını `FOLIO/DIAGNOSTICS.TXT` dosyasına yazar. Kendinizinkini bir
 [donanım raporunda](https://github.com/alantaru/FolioOS/issues/new/choose) paylaşın — "sorunsuz çalışıyor"
@@ -384,7 +389,9 @@ yazmaya devam edin.
 <summary><b>Bilgisayarım USB belleği neden önyükleme menüsünde göstermiyor?</b></summary>
 
 Belleğin FAT32 olduğunu, "UEFI" ile başlayan girişi seçtiğinizi ve donanım yazılımı ayarlarında Secure
-Boot’un kapalı olduğunu kontrol edin. Yalnızca BIOS/CSM modunda açılan çok eski bilgisayarlar desteklenmez.
+Boot’un kapalı olduğunu kontrol edin. Yalnızca BIOS/Legacy modunda açılan eski bilgisayarlar bir kez BIOS
+önyükleme koduna ihtiyaç duyar: Windows’ta yönetici olarak `FOLIO\TOOLS\biosboot.exe E:` çalıştırın; bellek
+sıradan bir USB disk olarak görünür.
 </details>
 
 <details>
@@ -427,12 +434,14 @@ her şeyle eşitleyebilirsiniz.
 ## Kaynak koddan derleme
 
 Gereksinimler: Windows 10/11, PowerShell 5.1+ ve `PATH` üzerinde [MinGW-w64](https://winlibs.com) `gcc`
-(herhangi bir güncel x86_64 sürümü). Başka bir şey gerekmez.
+(herhangi bir güncel x86_64 sürümü). ARM64 ve BIOS sürümleri ayrıca [LLVM](https://llvm.org) `clang` ve
+`nasm` kullanır, donanım laboratuvarı ise [QEMU](https://www.qemu.org) kullanır — üçü de `winget` ile kurulur.
 
 ```powershell
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
-.\build.ps1                                  # UEFI x64 + IA32, simülatör, paketler — ve tüm testler
+.\build.ps1                                  # UEFI x64 + IA32 + ARM64, BIOS, simülatör, paketler — ve test paketi
+.\tools\qemu-lab.ps1                         # gerçek ikili dosyaları 13 öykünülmüş makinede açar ve her birini denetler
 .\build\folio_sim.exe                        # FolioOS’u bir pencerede çalıştırır
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # gerçek UEFI programını bir pencerede çalıştırır
 .\flash_usb.ps1 -DriveLetter E:              # FAT32 belleğe kurar/günceller, dosyalar korunur
@@ -443,7 +452,8 @@ cd FolioOS
 
 Test paketi, simülatörü ve gerçek `BOOTX64.EFI` dosyasını (küçük bir UEFI barındırıcısı içinde) betikli
 tuş vuruşları ve fare olaylarıyla yönetir, ekran görüntüleri alır, her dışa aktarımı (ZIP + XML), her
-çeviriyi (doğrulayıcı için negatif bir denetimle) ve altı framebuffer biçimini doğrular.
+çeviriyi (doğrulayıcı için negatif bir denetimle), altı framebuffer biçimini ve BIOS köprüsünün FAT32
+sürücüsünü (bayt bayt denetlenen binlerce rastgele işlem) doğrular.
 
 <a id="architecture-in-one-picture"></a>
 
@@ -452,7 +462,8 @@ tuş vuruşları ve fare olaylarıyla yönetir, ekran görüntüleri alır, her 
 ```
 src/core/       taşınabilir çekirdek (freestanding C, libc yok): düzenleyici, Markdown, TrueType taramacı,
                 arayüz araç takımı ve pencere yöneticisi, dışa aktarma, MP3, i18n, klavyeler, temalar
-src/platform/   uefi/  GOP/UGA görüntü, giriş, FAT G/Ç, HD Audio/AC'97 — doğrudan donanım yazılımı üzerinde
+src/platform/   uefi/  GOP/UGA görüntü, giriş, FAT G/Ç, HD Audio/AC'97, USB HID ve PS/2 sürücüleri — donanım yazılımı üzerinde
+                bios/  önyükleme sektörleri + BIOS→UEFI köprüsü (VBE, PS/2, kendi FAT32 sürücüsü), yalnızca BIOS’lu bilgisayarlar için
                 win32/ geliştirme ve otomatik testler için simülatör
 tools/          efi_host (BOOTX64.EFI’yi Windows’ta çalıştırır), i18n aracı, disk görüntüsü oluşturucu, showcase
 assets/         yazı tipleri, çeviriler (.po), klavye düzenleri, örnek tema
@@ -466,6 +477,7 @@ tests/          betikli uçtan uca testler
 
 ## Yol haritası
 
+- [x] Yalnızca BIOS’lu bilgisayarlar (Legacy/CSM) ve ARM64 (UEFI donanım yazılımlı Raspberry Pi, ARM dizüstüler)
 - [x] Korece giriş (2 setli Hangıl) ve Japonca kana girişi (romaji → hiragana/katakana)
 - [ ] Japonca kanji dönüşümü ve Çince pinyin girişi (sözlük gerektirir)
 - [ ] Metin biçimlendirme ve sağdan sola yazılar (Arapça, İbranice, Devanagari…)

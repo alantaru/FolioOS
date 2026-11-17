@@ -65,6 +65,9 @@ macOS、Linux で開けます。共有が必要になったら Word、LibreOffic
   [balenaEtcher](https://etcher.balena.io)、`dd` 用の 256 MB のイメージが入っています。それでも `FolioOS.zip` を展開する方法を
   おすすめします。USB メモリの残りをあなたのファイルのために空けておけるからです。
 - **Windows でソースから：** `.\build.ps1` のあとに `.\flash_usb.ps1 -DriveLetter E:`（何も消さずに USB メモリへインストール／更新します）。
+- **UEFI のない PC（BIOS/Legacy のみ）：** Windows で管理者として `FOLIO\TOOLS\biosboot.exe E:` を一度実行します（`E:` は
+  USB メモリ）。書き込むのは BIOS の起動コードだけで、ファイルには一切触れず、USB メモリは普通の FAT32 のまま、UEFI からの起動も
+  これまでどおり使えます。ソースからは `.\flash_usb.ps1 -DriveLetter E: -Bios`。
 - **すべて同梱：** `FolioOS.zip` には執筆と読書のための 11 種類のフリーフォントと、中国語・日本語・韓国語のフォントが
   最初から入っています——どの言語もすぐに使えます。
 
@@ -323,11 +326,12 @@ USB メモリ（FAT32）
 
 | | |
 |---|---|
-| **ファームウェア** | UEFI 2.x——64 ビット（`BOOTX64.EFI`）または 32 ビット（`BOOTIA32.EFI`、Atom タブレットやネットブック）。Secure Boot はオフにする必要があります。2012 年ごろ以降のほとんどの PC とノートパソコン。 |
-| **画面** | あらゆる UEFI GOP フレームバッファー（RGB、BGR、ビットマスク、Blt のみ）または旧式の UGA。ネイティブ解像度、HiDPI の自動拡大、縦長の画面は自動で回転。 |
-| **入力** | キーボードはファームウェア経由。USB/PS/2 マウス、タッチパッド、タッチスクリーンはファームウェアのポインタープロトコル経由。 |
+| **ファームウェア** | UEFI 2.x——64 ビット（`BOOTX64.EFI`）、32 ビット（`BOOTIA32.EFI`、Atom タブレットやネットブック）または ARM64（`BOOTAA64.EFI`：コミュニティ製 UEFI ファームウェアを入れた Raspberry Pi 3/4/5、ARM ノートパソコン）。**BIOS のみの PC**（Legacy/CSM）は、`FOLIO\TOOLS\biosboot.exe` を一度実行すると FolioOS 独自の BIOS ブリッジで起動します。Secure Boot はオフにする必要があります。 |
+| **画面** | あらゆる UEFI GOP フレームバッファー（RGB、BGR、ビットマスク、Blt のみ）または旧式の UGA。BIOS の PC では VESA/VBE。ネイティブ解像度、HiDPI の自動拡大、縦長の画面は自動で回転。 |
+| **入力** | キーボードはファームウェア経由（BIOS の PC では PS/2 を直接）。マウス、タッチパッド、ペンタブレット、タッチスクリーンはファームウェア経由で、ファームウェアにドライバーがない場合は FolioOS 独自の USB HID と PS/2 のドライバーで動作。 |
 | **サウンド** | Intel HD Audio と AC'97（音楽プレーヤーにのみ必要）。 |
-| **非対応** | BIOS/CSM のみの PC、Secure Boot（現時点）、Apple シリコン搭載の Mac。Wi-Fi と Bluetooth は意図的に外しています。 |
+| **非対応** | Secure Boot（現時点）、Apple シリコン搭載の Mac。Wi-Fi と Bluetooth は意図的に外しています。 |
+| **テスト環境** | リリースごとに 13 台のエミュレートしたマシン：UEFI x64、IA32、ARM64、USB と IDE から起動する BIOS のみの PC。グラフィックカード 8 種、PS/2 と USB のマウス、USB タブレット、HD Audio と AC'97。それぞれで画面、キーボード、マウス、音、保存、ファイルシステムの整合性を確認します。 |
 
 起動のたびに、FolioOS は見つけたものを `FOLIO/DIAGNOSTICS.TXT` に書き込みます。
 [ハードウェア報告](https://github.com/alantaru/FolioOS/issues/new/choose)で共有してください——「問題なく動いた」だけでも、
@@ -362,7 +366,8 @@ TextEdit などの Markdown エディターで開き、そのあと USB メモ�
 <summary><b>起動メニューに USB メモリが表示されないのはなぜですか？</b></summary>
 
 USB メモリが FAT32 であること、「UEFI」で始まる項目を選んだこと、ファームウェア設定で Secure Boot がオフになっていることを
-確認してください。BIOS/CSM モードでしか起動しない非常に古い PC には対応していません。
+確認してください。BIOS/Legacy モードでしか起動しない古い PC では、BIOS の起動コードを一度書き込む必要があります。Windows で管理者として
+`FOLIO\TOOLS\biosboot.exe E:` を実行すると、USB メモリが普通の USB ディスクとして表示されます。
 </details>
 
 <details>
@@ -402,12 +407,14 @@ Intel の Mac は UEFI ドライブから起動できます（電源を入れる
 ## ソースからビルド
 
 必要なもの：Windows 10/11、PowerShell 5.1 以上、`PATH` 上の [MinGW-w64](https://winlibs.com) の `gcc`（最近の x86_64 版なら
-どれでも）。ほかには何も要りません。
+どれでも）。ARM64 版と BIOS 版には [LLVM](https://llvm.org) の `clang` と `nasm` も使い、ハードウェアラボには
+[QEMU](https://www.qemu.org) を使います。3 つとも `winget` で入ります。
 
 ```powershell
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
-.\build.ps1                                  # UEFI x64 + IA32、シミュレーター、パッケージ——とすべてのテスト
+.\build.ps1                                  # UEFI x64 + IA32 + ARM64、BIOS、シミュレーター、パッケージ——とテストスイート
+.\tools\qemu-lab.ps1                         # 本物のバイナリを 13 台のエミュレートしたマシンで起動し、1 台ずつ確認
 .\build\folio_sim.exe                        # FolioOS をウィンドウで実行
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # 本物の UEFI プログラムをウィンドウで実行
 .\flash_usb.ps1 -DriveLetter E:              # FAT32 の USB メモリにインストール／更新（ファイルは残す）
@@ -417,8 +424,8 @@ cd FolioOS
 ```
 
 テストスイートは、スクリプト化したキー入力とマウス操作でシミュレーターと本物の `BOOTX64.EFI`（小さな UEFI ホストの中）を
-動かし、画面を撮影し、すべての書き出し（ZIP + XML）、すべての翻訳（検証器の否定対照つき）、6 種類のフレームバッファー形式を
-検証します。
+動かし、画面を撮影し、すべての書き出し（ZIP + XML）、すべての翻訳（検証器の否定対照つき）、6 種類のフレームバッファー形式、
+そして BIOS ブリッジの FAT32 ドライバー（何千ものランダム操作を 1 バイトずつ照合）を検証します。
 
 <a id="architecture-in-one-picture"></a>
 
@@ -427,7 +434,8 @@ cd FolioOS
 ```
 src/core/       移植可能なコア（フリースタンディング C、libc なし）：エディター、Markdown、TrueType ラスタライザー、
                 UI ツールキットとウィンドウマネージャー、書き出し、MP3、i18n、キーボード配列、テーマ
-src/platform/   uefi/  GOP/UGA 表示、入力、FAT 入出力、HD Audio/AC'97——ファームウェアの上で直接動作
+src/platform/   uefi/  GOP/UGA 表示、入力、FAT 入出力、HD Audio/AC'97、USB HID と PS/2 のドライバー——ファームウェアの上で動作
+                bios/  起動セクター + BIOS→UEFI ブリッジ（VBE、PS/2、独自の FAT32 ドライバー）——BIOS のみの PC 用
                 win32/ 開発と自動テストに使うシミュレーター
 tools/          efi_host（Windows で BOOTX64.EFI を実行）、i18n ツール、ディスクイメージ作成、showcase
 assets/         フォント、翻訳（.po）、キーボード配列、テーマの例
@@ -441,6 +449,7 @@ tests/          スクリプトによるエンドツーエンドのテスト
 
 ## ロードマップ
 
+- [x] BIOS のみの PC（Legacy/CSM）と ARM64（UEFI ファームウェアの Raspberry Pi、ARM ノートパソコン）
 - [x] 韓国語入力（2 ボル式ハングル）と日本語のかな入力（ローマ字 → ひらがな／カタカナ）
 - [ ] 日本語の漢字変換と中国語のピンイン入力（辞書が必要）
 - [ ] 複雑な文字の組版と右から左に書く文字（アラビア文字、ヘブライ文字、デーヴァナーガリー…）

@@ -134,7 +134,7 @@ const char *LN(const char *one, const char *many, long n) {
     const Entry *e = find(one);
     if (!e) return n == 1 ? one : many;
     /* idiomas de forma única (chinês, japonês, coreano…): nplurals=1, plural=0 → sempre a 1ª */
-    int k = CLAMP(i18n_plural_index(plural_expr, n), 0, e->nstr - 1);
+    int k = CLAMP(i18n_plural_index(plural_expr, n), 0, MIN(e->nstr, nplurals) - 1);
     const char *s = e->str;
     for (int i = 0; i < k; i++) s += str_len(s) + 1;
     return s;

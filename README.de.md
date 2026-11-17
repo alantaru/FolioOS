@@ -71,6 +71,10 @@ HTML oder RTF, wann immer du etwas teilen willst.
   das Entpacken von `FolioOS.zip`: Der Rest des Sticks bleibt frei für deine Dateien.
 - **Aus dem Quellcode unter Windows:** `.\build.ps1`, dann `.\flash_usb.ps1 -DriveLetter E:` (installiert oder
   aktualisiert einen Stick, ohne etwas zu löschen).
+- **PCs ohne UEFI (nur BIOS/Legacy):** starte einmal unter Windows als Administrator
+  `FOLIO\TOOLS\biosboot.exe E:` (`E:` ist der Stick). Es schreibt nur den BIOS-Startcode: Keine Datei wird
+  angefasst, der Stick bleibt ein gewöhnlicher FAT32-Stick, und der UEFI-Start funktioniert weiter. Aus dem
+  Quellcode: `.\flash_usb.ps1 -DriveLetter E: -Bios`.
 - **Alles dabei:** `FolioOS.zip` bringt bereits 11 freie Schriften zum Schreiben und Lesen sowie die
   Schriften für Chinesisch, Japanisch und Koreanisch mit — jede Sprache funktioniert sofort.
 
@@ -346,11 +350,12 @@ Computer, und deine Texte sind da.
 
 | | |
 |---|---|
-| **Firmware** | UEFI 2.x — 64 Bit (`BOOTX64.EFI`) oder 32 Bit (`BOOTIA32.EFI`, Atom-Tablets und Netbooks). Secure Boot muss ausgeschaltet sein. Die meisten PCs und Laptops ab etwa 2012. |
-| **Anzeige** | Jeder UEFI-GOP-Framebuffer (RGB, BGR, Bitmaske, nur Blt) oder älteres UGA. Native Auflösung, automatische HiDPI-Skalierung, Hochkant-Bildschirme werden automatisch gedreht. |
-| **Eingabe** | Tastatur über die Firmware; USB-/PS/2-Maus, Touchpad und Touchscreen über die Zeigerprotokolle der Firmware. |
+| **Firmware** | UEFI 2.x — 64 Bit (`BOOTX64.EFI`), 32 Bit (`BOOTIA32.EFI`, Atom-Tablets und Netbooks) oder ARM64 (`BOOTAA64.EFI`: Raspberry Pi 3/4/5 mit der UEFI-Firmware der Community, ARM-Laptops). **PCs nur mit BIOS** (Legacy/CSM) starten über FolioOS’ eigene BIOS-Brücke, nachdem einmal `FOLIO\TOOLS\biosboot.exe` gelaufen ist. Secure Boot muss ausgeschaltet sein. |
+| **Anzeige** | Jeder UEFI-GOP-Framebuffer (RGB, BGR, Bitmaske, nur Blt) oder älteres UGA; VESA/VBE auf BIOS-PCs. Native Auflösung, automatische HiDPI-Skalierung, Hochkant-Bildschirme werden automatisch gedreht. |
+| **Eingabe** | Tastatur über die Firmware (auf BIOS-PCs direkt über PS/2). Maus, Touchpad, Grafiktablett und Touchscreen über die Firmware — und wenn die Firmware keinen Treiber dafür hat, über FolioOS’ eigene USB-HID- und PS/2-Treiber. |
 | **Ton** | Intel HD Audio und AC'97 (nur für den Musikplayer nötig). |
-| **Nicht unterstützt** | Reine BIOS/CSM-PCs, Secure Boot (vorerst), Macs mit Apple Silicon. WLAN und Bluetooth sind bewusst weggelassen. |
+| **Nicht unterstützt** | Secure Boot (vorerst), Macs mit Apple Silicon. WLAN und Bluetooth sind bewusst weggelassen. |
+| **Getestet auf** | 13 emulierten Maschinen bei jeder Version: UEFI x64, IA32 und ARM64 sowie reine BIOS-PCs mit Start von USB und IDE; 8 Grafikkarten, PS/2- und USB-Mäuse, USB-Tablett, HD Audio und AC'97. Bei jeder werden Bild, Tastatur, Maus, Ton, Speichern und die Unversehrtheit des Dateisystems geprüft. |
 
 Jeder Start schreibt `FOLIO/DIAGNOSTICS.TXT` mit dem, was FolioOS gefunden hat. Teile deine Datei in einem
 [Hardware-Bericht](https://github.com/alantaru/FolioOS/issues/new/choose) — selbst „läuft einfach“ hilft
@@ -387,8 +392,9 @@ schreib in FolioOS weiter.
 <summary><b>Warum zeigt mein PC den USB-Stick nicht im Bootmenü?</b></summary>
 
 Prüfe, dass der Stick FAT32 ist, dass du den Eintrag gewählt hast, der mit „UEFI“ beginnt, und dass Secure
-Boot im Firmware-Setup ausgeschaltet ist. Sehr alte PCs, die nur im BIOS/CSM-Modus starten, werden nicht
-unterstützt.
+Boot im Firmware-Setup ausgeschaltet ist. Ältere PCs, die nur im BIOS/Legacy-Modus starten, brauchen einmal
+den BIOS-Startcode: Starte unter Windows als Administrator `FOLIO\TOOLS\biosboot.exe E:`, dann erscheint der
+Stick als gewöhnliches USB-Laufwerk.
 </details>
 
 <details>
@@ -431,12 +437,15 @@ synchronisieren, sobald der Stick wieder an einem normalen Computer steckt.
 ## Aus dem Quellcode bauen
 
 Voraussetzungen: Windows 10/11, PowerShell 5.1+ und `gcc` von [MinGW-w64](https://winlibs.com) (jede aktuelle
-x86_64-Version) im `PATH`. Sonst nichts.
+x86_64-Version) im `PATH`. Die ARM64- und BIOS-Versionen brauchen außerdem `clang` von [LLVM](https://llvm.org)
+und `nasm`, das Hardware-Labor braucht [QEMU](https://www.qemu.org) — alle drei lassen sich mit `winget`
+installieren.
 
 ```powershell
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
-.\build.ps1                                  # UEFI x64 + IA32, Simulator, Pakete — und die ganze Testsuite
+.\build.ps1                                  # UEFI x64 + IA32 + ARM64, BIOS, Simulator, Pakete — und die Testsuite
+.\tools\qemu-lab.ps1                         # die echten Programme auf 13 emulierten Maschinen starten und jede prüfen
 .\build\folio_sim.exe                        # FolioOS in einem Fenster starten
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # das echte UEFI-Programm in einem Fenster starten
 .\flash_usb.ps1 -DriveLetter E:              # FAT32-Stick installieren/aktualisieren, Dateien bleiben
@@ -447,7 +456,8 @@ cd FolioOS
 
 Die Testsuite steuert den Simulator und das echte `BOOTX64.EFI` (in einem kleinen UEFI-Host) mit
 geskripteten Tastendrücken und Mausereignissen, macht Bildschirmfotos und prüft jeden Export (ZIP + XML),
-jede Übersetzung (mit einer Negativkontrolle für den Prüfer) und sechs Framebuffer-Formate.
+jede Übersetzung (mit einer Negativkontrolle für den Prüfer), sechs Framebuffer-Formate und den FAT32-Treiber
+der BIOS-Brücke (Tausende zufälliger Operationen, Byte für Byte geprüft).
 
 <a id="architecture-in-one-picture"></a>
 
@@ -456,7 +466,8 @@ jede Übersetzung (mit einer Negativkontrolle für den Prüfer) und sechs Frameb
 ```
 src/core/       portabler Kern (freistehendes C, ohne libc): Editor, Markdown, TrueType-Rasterizer,
                 UI-Toolkit und Fenstermanager, Exporte, MP3, i18n, Tastaturbelegungen, Themes
-src/platform/   uefi/  GOP/UGA-Grafik, Eingabe, FAT-E/A, HD Audio/AC'97 — direkt auf der Firmware
+src/platform/   uefi/  GOP/UGA-Grafik, Eingabe, FAT-E/A, HD Audio/AC'97, USB-HID- und PS/2-Treiber — auf der Firmware
+                bios/  Bootsektoren + BIOS→UEFI-Brücke (VBE, PS/2, eigener FAT32-Treiber) für reine BIOS-PCs
                 win32/ Simulator für Entwicklung und automatische Tests
 tools/          efi_host (startet BOOTX64.EFI unter Windows), i18n-Werkzeug, Disk-Image-Erzeuger, Showcase
 assets/         Schriften, Übersetzungen (.po), Tastaturbelegungen, Beispiel-Theme
@@ -468,6 +479,7 @@ Ein ~600 KB großes Programm steuert über eine dünne Plattformschicht die ganz
 
 ## Roadmap
 
+- [x] PCs nur mit BIOS (Legacy/CSM) und ARM64 (Raspberry Pi mit UEFI-Firmware, ARM-Laptops)
 - [x] Koreanische Eingabe (Hangul mit 2 Sätzen) und japanische Kana-Eingabe (Romaji → Hiragana/Katakana)
 - [ ] Japanische Kanji-Umwandlung und chinesische Pinyin-Eingabe (brauchen Wörterbücher)
 - [ ] Textshaping und Schriften von rechts nach links (Arabisch, Hebräisch, Devanagari…)

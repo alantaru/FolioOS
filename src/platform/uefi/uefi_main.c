@@ -19,8 +19,25 @@ static EFI_GUID fsinfo_guid = { 0x09576e93, 0x6d3f, 0x11d2, { 0x8e, 0x39, 0x00, 
 
 /* ------------------------------------------------------------ tempo */
 static u64 tsc_per_ms = 1000000, tsc0;
+#if FOLIO_X86
 static inline u64 rdtsc(void) { u32 lo, hi; __asm__ volatile("rdtsc" : "=a"(lo), "=d"(hi)); return ((u64)hi << 32) | lo; }
+#elif defined(__aarch64__)
+static inline u64 rdtsc(void) { u64 v; __asm__ volatile("isb; mrs %0, cntvct_el0" : "=r"(v)); return v; }   /* contador genérico do ARM */
+#else
+#error "arquitetura sem contador de tempo"
+#endif
 u64 pal_ms(void) { return (rdtsc() - tsc0) / tsc_per_ms; }
+/* porta serial do firmware (EFI_SERIAL_IO_PROTOCOL): só para o registro de depuração */
+typedef struct { UINT32 Revision; void *Reset, *SetAttributes, *SetControl, *GetControl;
+                 EFI_STATUS (EFIAPI *Write)(void *self, UINTN *size, void *buf); void *Read, *Mode; } SERIAL_IO;
+void pal_log(const char *s) {
+    static EFI_GUID guid = { 0xBB25CF6F, 0xF1D4, 0x11D2, { 0x9A, 0x0C, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0xFD } };
+    static SERIAL_IO *sio; static int state;
+    if (!state) state = EFI_ERROR(BS->LocateProtocol(&guid, 0, (void **)&sio)) || !sio ? -1 : 1;
+    if (state < 0) return;
+    UINTN n = (UINTN)str_len(s);
+    sio->Write(sio, &n, (void *)s);
+}
 void pal_now(DateTime *t) {
     EFI_TIME e; memset(&e, 0, sizeof e);
     if (EFI_ERROR(ST->RuntimeServices->GetTime(&e, 0))) { t->year = 2026; t->month = 1; t->day = 1; t->hour = t->min = t->sec = 0; return; }
@@ -28,8 +45,16 @@ void pal_now(DateTime *t) {
 }
 #if defined(__x86_64__)
 const char *pal_name(void) { return "UEFI x64"; }
+#elif defined(__aarch64__)
+const char *pal_name(void) { return "UEFI ARM64"; }
 #else
-const char *pal_name(void) { return "UEFI IA32"; }
+/* o mesmo BOOTIA32.EFI roda também nos PCs só com BIOS, pela ponte do FOLIO\BIOS.SYS */
+const char *pal_name(void) {
+    static const CHAR16 br[] = { 'F','o','l','i','o','O','S',' ','B','I','O','S' };
+    const CHAR16 *v = ST ? ST->FirmwareVendor : 0;
+    if (v) { int i = 0; while (i < 12 && v[i] == br[i]) i++; if (i == 12) return "BIOS (FolioOS bridge)"; }
+    return "UEFI IA32";
+}
 #endif
 void pal_power(int a) {
     pal_audio_stop();
@@ -186,7 +211,7 @@ static bool video_setup(void) {
     if (format != PixelBltOnly) {
         u64 need = (u64)stride * (u64)ph * (u64)fb_bpp;
         if (!base || stride < (u32)pw || (size && size < need)) format = PixelBltOnly;
-#if !defined(__x86_64__)
+#if __SIZEOF_POINTER__ == 4
         if (base + need > 0x100000000ull) format = PixelBltOnly;
 #endif
     }
@@ -230,6 +255,7 @@ float pal_display_dpi(void) {
  * barramento, e 8 MB por quadro levam dezenas de ms. Com um MTRR em write-combining (o que Linux e
  * Windows fazem) as escritas são agrupadas e ficam 10–50× mais rápidas. */
 static char wc_state[96] = "not attempted";
+#if FOLIO_X86
 static inline u64 rdmsr(u32 m) { u32 lo, hi; __asm__ volatile("rdmsr" : "=a"(lo), "=d"(hi) : "c"(m)); return ((u64)hi << 32) | lo; }
 static inline void wrmsr(u32 m, u64 v) { __asm__ volatile("wrmsr" : : "c"(m), "a"((u32)v), "d"((u32)(v >> 32)) : "memory"); }
 static inline void cpuid4(u32 leaf, u32 *a, u32 *b, u32 *c, u32 *d) { __asm__ volatile("cpuid" : "=a"(*a), "=b"(*b), "=c"(*c), "=d"(*d) : "a"(leaf), "c"(0)); }
@@ -239,6 +265,7 @@ static inline uintptr_t rd_cr4(void) { uintptr_t v; __asm__ volatile("mov %%cr4,
 static inline void wr_cr4(uintptr_t v) { __asm__ volatile("mov %0, %%cr4" : : "r"(v) : "memory"); }
 static inline uintptr_t rd_cr3(void) { uintptr_t v; __asm__ volatile("mov %%cr3, %0" : "=r"(v)); return v; }
 static inline void wr_cr3(uintptr_t v) { __asm__ volatile("mov %0, %%cr3" : : "r"(v) : "memory"); }
+#endif
 
 #if defined(__x86_64__)
 /* Write-combining pela tabela PAT (o método do Linux e do Windows): vale mesmo quando o firmware cobriu
@@ -317,8 +344,10 @@ static void fb_copy(u32 *d, const u32 *s, usize n) {
         : "+r"(d), "+r"(s), "+r"(m) : : "xmm0", "memory", "cc");
     n &= 3;
     while (n--) { *(volatile u32 *)d = *s; d++; s++; }
-#else
+#elif defined(__i386__)
     __asm__ volatile("rep movsl" : "+D"(d), "+S"(s), "+c"(n) : : "memory");
+#else
+    while (n--) { *(volatile u32 *)d = *s; d++; s++; }
 #endif
 }
 
@@ -337,6 +366,9 @@ static void wc_apply(void) {
         if (wc_s && b0 >= wc_b && b0 + s0 <= wc_b + wc_s) return;
         wc_b = b0; wc_s = s0;
     }
+#if !FOLIO_X86
+    str_copy(wc_state, "not applicable on this architecture (the firmware maps the framebuffer)", sizeof wc_state);
+#else
     u16 cs; __asm__ volatile("mov %%cs, %0" : "=r"(cs));
     if (cs & 3) { str_copy(wc_state, "not in ring 0 (emulator): unchanged", sizeof wc_state); return; }
     u32 a, b, c, d;
@@ -399,6 +431,7 @@ static void wc_apply(void) {
     wr_cr4(cr4);
     __asm__ volatile("push %0; popf" : : "r"(flags) : "memory", "cc");
     fmt(wc_state, sizeof wc_state, "on (%d MTRR, %d KB)", nb, (int)((pos - base) >> 10));
+#endif
 }
 
 /* envia ao vídeo apenas os trechos de cada linha que mudaram desde o último quadro */
@@ -548,6 +581,7 @@ static EFI_GUID dp_guid = { 0x09576e91, 0x6d3f, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0
  * é usado quando não existe nenhum dispositivo real. */
 typedef struct {
     EFI_HANDLE h; bool virt;
+    const char *own;               /* driver próprio do FolioOS (USB HID), não do firmware */
     EFI_SIMPLE_POINTER_PROTOCOL *sp; EFI_ABSOLUTE_POINTER_PROTOCOL *ap;
     u32 btn;
     bool have_last, touch, touch_seen; u64 lx, ly, t_down, t_last; float travel; int hover_moves; bool abs_now;
@@ -566,6 +600,8 @@ void pal_set_pointer_speed(float s) { speed = s; }
 void pal_set_touch_mode(int m) { touch_mode = m; }
 int pal_mods(void) { return last_mods; }
 
+int usbhid_scan(void **out_ifc, bool *out_abs, const char **out_kind, int cap);
+void *ps2mouse_start(void); const char *ps2mouse_info(void);
 static bool known_ptr(void *ifc) { for (int i = 0; i < nptrs; i++) if ((void *)ptrs[i].sp == ifc || (void *)ptrs[i].ap == ifc) return true; return false; }
 static void scan_pointers(void) {
     for (int kind = 0; kind < 2; kind++) {
@@ -582,6 +618,23 @@ static void scan_pointers(void) {
             if (kind) { p->ap = ifc; p->ap->Reset(p->ap, 0); } else { p->sp = ifc; p->sp->Reset(p->sp, 0); }
         }
         BS->FreePool(hs);
+    }
+    /* mouses, tablets e telas de toque USB que o firmware não transformou em ponteiro: driver próprio */
+    void *ifc[8]; bool abs_[8]; const char *kind[8];
+    int n = usbhid_scan(ifc, abs_, kind, 8);
+    for (int i = 0; i < n && nptrs < 16; i++) {
+        Ptr *p = &ptrs[nptrs++]; memset(p, 0, sizeof *p);
+        p->own = kind[i];
+        if (abs_[i]) p->ap = ifc[i]; else p->sp = ifc[i];
+    }
+    /* nenhum ponteiro de verdade: tenta o mouse/touchpad PS/2 (i8042) com o driver próprio, uma vez */
+    static bool ps2_tried;
+    bool real = false;
+    for (int i = 0; i < nptrs; i++) if (!ptrs[i].virt || ptrs[i].own) real = true;
+    if (!real && !ps2_tried && nptrs < 16) {
+        ps2_tried = true;
+        void *sp = ps2mouse_start();
+        if (sp) { Ptr *p = &ptrs[nptrs++]; memset(p, 0, sizeof *p); p->own = ps2mouse_info(); p->sp = sp; }
     }
 }
 
@@ -740,14 +793,14 @@ void pal_diag_input(Buf *o) {
         const char *use = real && p->virt ? "ignorado (agregador do firmware)" : "em uso";
         if (p->sp) buf_printf(o, "  %d. relative (SimplePointer)%s · resolution %d/%d/%d · buttons L%d R%d · %d reads · last dx=%d dy=%d · "
                                  "wheel: %d reads used, %d discarded, last raw Z %d, blocked by density %d, by motion %d%s · %s\r\n",
-                               i + 1, p->virt ? " [virtual]" : "", (int)p->sp->Mode->ResolutionX, (int)p->sp->Mode->ResolutionY, (int)p->sp->Mode->ResolutionZ,
+                               i + 1, p->own ? " [FolioOS USB HID driver]" : p->virt ? " [virtual]" : "", (int)p->sp->Mode->ResolutionX, (int)p->sp->Mode->ResolutionY, (int)p->sp->Mode->ResolutionZ,
                                (int)p->sp->Mode->LeftButton, (int)p->sp->Mode->RightButton, (int)p->events, (int)p->last_dx, (int)p->last_dy,
                                (int)p->z_used, (int)p->z_dropped, (int)p->z_raw, (int)p->z_blk_rate, (int)p->z_blk_xy,
                                p->z_block ? " (blocked now)" : "", use);
         else {
             EFI_ABSOLUTE_POINTER_MODE *m = p->ap->Mode;
             buf_printf(o, "  %d. absolute (AbsolutePointer)%s · X %d..%d · Y %d..%d · attributes %x · %d reads · touch seen %d · hover moves %d · buttons %x · treated as %s · %s\r\n",
-                       i + 1, p->virt ? " [virtual]" : "", (int)m->AbsoluteMinX, (int)m->AbsoluteMaxX, (int)m->AbsoluteMinY, (int)m->AbsoluteMaxY, (int)m->Attributes,
+                       i + 1, p->own ? " [FolioOS USB HID driver]" : p->virt ? " [virtual]" : "", (int)m->AbsoluteMinX, (int)m->AbsoluteMaxX, (int)m->AbsoluteMinY, (int)m->AbsoluteMaxY, (int)m->Attributes,
                        (int)p->events, (int)p->touch_seen, p->hover_moves, (int)p->last_raw_btn, p->abs_now ? "screen/tablet" : "touchpad", use);
         }
     }
@@ -1078,7 +1131,7 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE img, EFI_SYSTEM_TABLE *st) {
     EFI_PHYSICAL_ADDRESS hb = 0; UINTN hsz = 0;
     for (int i = 0; i < 6; i++) {
         UINTN pages = sizes_mb[i] * 256;
-#if !defined(__x86_64__)
+#if __SIZEOF_POINTER__ == 4
         if (sizes_mb[i] > 512) continue;
 #endif
         if (!EFI_ERROR(BS->AllocatePages(AllocateAnyPages, EfiLoaderData, pages, &hb))) { hsz = pages * 4096; break; }

@@ -63,6 +63,9 @@ share.
   `FolioOS.zip` is still recommended: it keeps the rest of the drive free for your files.
 - **From source on Windows:** `.\build.ps1` then `.\flash_usb.ps1 -DriveLetter E:` (installs or updates a
   drive without deleting anything).
+- **PCs without UEFI (BIOS/Legacy only):** run `FOLIO\TOOLS\biosboot.exe E:` once on Windows, as
+  administrator (`E:` is the drive). It only writes the BIOS boot code: no file is touched, the drive stays
+  an ordinary FAT32 drive and the UEFI boot keeps working. From source: `.\flash_usb.ps1 -DriveLetter E: -Bios`.
 - **Everything is included:** `FolioOS.zip` already brings 11 free fonts for writing and reading and the
   fonts for Chinese, Japanese and Korean — every language works out of the box.
 
@@ -295,11 +298,12 @@ is right there.
 
 | | |
 |---|---|
-| **Firmware** | UEFI 2.x — 64-bit (`BOOTX64.EFI`) or 32-bit (`BOOTIA32.EFI`, Atom tablets and netbooks). Secure Boot must be off. Most PCs and laptops from about 2012 onwards. |
-| **Display** | Any UEFI GOP framebuffer (RGB, BGR, bit-mask, Blt-only) or legacy UGA. Native resolution, automatic HiDPI scaling, portrait panels rotated automatically. |
-| **Input** | Keyboard through the firmware; USB/PS/2 mouse, touchpad and touch screen through the firmware's pointer protocols. |
+| **Firmware** | UEFI 2.x — 64-bit (`BOOTX64.EFI`), 32-bit (`BOOTIA32.EFI`, Atom tablets and netbooks) or ARM64 (`BOOTAA64.EFI`: Raspberry Pi 3/4/5 with the community UEFI firmware, ARM laptops). **PCs with BIOS only** (Legacy/CSM) start through FolioOS's own BIOS bridge after running `FOLIO\TOOLS\biosboot.exe` once. Secure Boot must be off. |
+| **Display** | Any UEFI GOP framebuffer (RGB, BGR, bit-mask, Blt-only) or legacy UGA; VESA/VBE on BIOS PCs. Native resolution, automatic HiDPI scaling, portrait panels rotated automatically. |
+| **Input** | Keyboard through the firmware (directly over PS/2 on BIOS PCs). Mouse, touchpad, pen tablet and touch screen through the firmware — and, when the firmware has no driver for them, through FolioOS's own USB HID and PS/2 drivers. |
 | **Sound** | Intel HD Audio and AC'97 (only needed for the music player). |
-| **Not supported** | BIOS/CSM-only PCs, Secure Boot (for now), Apple Silicon Macs. Wi-Fi and Bluetooth are left out by design. |
+| **Not supported** | Secure Boot (for now), Apple Silicon Macs. Wi-Fi and Bluetooth are left out by design. |
+| **Tested on** | 13 emulated machines on every release: UEFI x64, IA32 and ARM64, and BIOS-only PCs booting from USB and IDE; 8 graphics cards, PS/2 and USB mice, USB tablet, HD Audio and AC'97. Each one is checked for picture, keyboard, mouse, sound, saving and file-system integrity. |
 
 Every boot writes `FOLIO/DIAGNOSTICS.TXT` with what FolioOS found. Please share yours in a
 [hardware report](https://github.com/alantaru/FolioOS/issues/new/choose) — even "it just works" helps other
@@ -333,7 +337,8 @@ Notepad, TextEdit or any Markdown editor, then plug the drive back in and keep w
 <summary><b>Why does my PC not show the USB drive in the boot menu?</b></summary>
 
 Check that the drive is FAT32, that you picked the entry starting with "UEFI", and that Secure Boot is
-disabled in the firmware setup. Very old PCs that only boot in BIOS/CSM mode are not supported.
+disabled in the firmware setup. Older PCs that only boot in BIOS/Legacy mode need the BIOS boot code once:
+run `FOLIO\TOOLS\biosboot.exe E:` on Windows as administrator, and the drive shows up as an ordinary USB disk.
 </details>
 
 <details>
@@ -373,12 +378,14 @@ the files are plain Markdown, you can sync them with anything once the drive is 
 ## Build from source
 
 Requirements: Windows 10/11, PowerShell 5.1+, and [MinGW-w64](https://winlibs.com) `gcc` (any recent x86_64
-build) on `PATH`. Nothing else.
+build) on `PATH`. The ARM64 and BIOS builds also use [LLVM](https://llvm.org) `clang` and `nasm`, and the
+hardware lab uses [QEMU](https://www.qemu.org) — all three install with `winget`.
 
 ```powershell
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
-.\build.ps1                                  # UEFI x64 + IA32, simulator, packages — and the whole test suite
+.\build.ps1                                  # UEFI x64 + IA32 + ARM64, BIOS, simulator, packages — and the test suite
+.\tools\qemu-lab.ps1                         # boot the real binaries on 13 emulated machines and check each one
 .\build\folio_sim.exe                        # run FolioOS in a window
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # run the real UEFI binary in a window
 .\flash_usb.ps1 -DriveLetter E:              # install/update a FAT32 USB drive, keeping user files
@@ -389,14 +396,16 @@ cd FolioOS
 
 The test suite drives the simulator and the real `BOOTX64.EFI` (inside a small UEFI host) with scripted
 keystrokes and mouse events, captures screenshots, validates every export (ZIP + XML), every translation
-(with a negative control for the validator) and six framebuffer formats.
+(with a negative control for the validator), six framebuffer formats and the FAT32 driver of the BIOS
+bridge (thousands of random operations, checked byte by byte).
 
 ### Architecture in one picture
 
 ```
 src/core/       portable core (freestanding C, no libc): editor, Markdown, TrueType rasterizer,
                 UI toolkit and window manager, exports, MP3, i18n, keyboard layouts, themes
-src/platform/   uefi/  GOP/UGA video, input, FAT I/O, HD Audio/AC'97 — straight on the firmware
+src/platform/   uefi/  GOP/UGA video, input, FAT I/O, HD Audio/AC'97, USB HID and PS/2 drivers — on the firmware
+                bios/  boot sectors + BIOS-to-UEFI bridge (VBE, PS/2, own FAT32 driver) for BIOS-only PCs
                 win32/ simulator used for development and automated tests
 tools/          efi_host (runs BOOTX64.EFI on Windows), i18n tool, disk image builder, showcase
 assets/         fonts, translations (.po), keyboard layouts, example theme
@@ -408,6 +417,7 @@ A ~600 KB binary owns the whole machine through a thin platform layer. Details i
 
 ## Roadmap
 
+- [x] PCs with BIOS only (Legacy/CSM) and ARM64 (Raspberry Pi with UEFI firmware, ARM laptops)
 - [x] Korean input (2-set Hangul) and Japanese kana input (romaji → hiragana/katakana)
 - [ ] Japanese kanji conversion and Chinese pinyin input (need dictionaries)
 - [ ] Text shaping and right-to-left scripts (Arabic, Hebrew, Devanagari…)

@@ -66,6 +66,9 @@ FolioOS는 **부팅 가능한 글쓰기 환경**입니다. 단 한 가지 일, �
   권장합니다. 드라이브의 나머지 공간을 당신의 파일을 위해 비워 둘 수 있기 때문입니다.
 - **Windows에서 소스로:** `.\build.ps1`을 실행한 뒤 `.\flash_usb.ps1 -DriveLetter E:`(아무것도 지우지 않고 드라이브에
   설치하거나 업데이트합니다).
+- **UEFI가 없는 PC(BIOS/Legacy 전용):** Windows에서 관리자 권한으로 `FOLIO\TOOLS\biosboot.exe E:`를 한 번 실행하세요
+  (`E:`는 드라이브). BIOS 부팅 코드만 쓰기 때문에 어떤 파일도 건드리지 않고, 드라이브는 평범한 FAT32 그대로이며 UEFI 부팅도
+  그대로 됩니다. 소스에서는 `.\flash_usb.ps1 -DriveLetter E: -Bios`.
 - **모두 포함:** `FolioOS.zip`에는 글쓰기와 읽기를 위한 무료 글꼴 11종과 중국어, 일본어, 한국어 글꼴이 이미 들어 있습니다.
   모든 언어가 바로 작동합니다.
 
@@ -322,11 +325,12 @@ USB 드라이브(FAT32)
 
 | | |
 |---|---|
-| **펌웨어** | UEFI 2.x — 64비트(`BOOTX64.EFI`) 또는 32비트(`BOOTIA32.EFI`, Atom 태블릿과 넷북). Secure Boot는 꺼져 있어야 합니다. 2012년 무렵 이후의 PC와 노트북 대부분. |
-| **화면** | 모든 UEFI GOP 프레임 버퍼(RGB, BGR, 비트 마스크, Blt 전용) 또는 구형 UGA. 기본 해상도, 자동 HiDPI 배율, 세로 화면은 자동 회전. |
-| **입력** | 키보드는 펌웨어를 통해, USB/PS/2 마우스, 터치패드, 터치스크린은 펌웨어의 포인터 프로토콜을 통해. |
+| **펌웨어** | UEFI 2.x — 64비트(`BOOTX64.EFI`), 32비트(`BOOTIA32.EFI`, Atom 태블릿과 넷북) 또는 ARM64(`BOOTAA64.EFI`: 커뮤니티 UEFI 펌웨어를 올린 Raspberry Pi 3/4/5, ARM 노트북). **BIOS만 있는 PC**(Legacy/CSM)는 `FOLIO\TOOLS\biosboot.exe`를 한 번 실행하면 FolioOS 자체 BIOS 브리지로 부팅합니다. Secure Boot는 꺼져 있어야 합니다. |
+| **화면** | 모든 UEFI GOP 프레임 버퍼(RGB, BGR, 비트 마스크, Blt 전용) 또는 구형 UGA, BIOS PC에서는 VESA/VBE. 기본 해상도, 자동 HiDPI 배율, 세로 화면은 자동 회전. |
+| **입력** | 키보드는 펌웨어를 통해(BIOS PC에서는 PS/2로 직접). 마우스, 터치패드, 펜 태블릿, 터치스크린은 펌웨어를 통해, 펌웨어에 드라이버가 없으면 FolioOS 자체 USB HID 및 PS/2 드라이버로. |
 | **소리** | Intel HD Audio와 AC'97(음악 플레이어에만 필요). |
-| **지원하지 않음** | BIOS/CSM 전용 PC, Secure Boot(현재), Apple Silicon Mac. Wi-Fi와 블루투스는 일부러 넣지 않았습니다. |
+| **지원하지 않음** | Secure Boot(현재), Apple Silicon Mac. Wi-Fi와 블루투스는 일부러 넣지 않았습니다. |
+| **테스트 환경** | 릴리스마다 에뮬레이션한 기계 13대: UEFI x64, IA32, ARM64, 그리고 USB와 IDE로 부팅하는 BIOS 전용 PC. 그래픽 카드 8종, PS/2와 USB 마우스, USB 태블릿, HD Audio와 AC'97. 각각 화면, 키보드, 마우스, 소리, 저장, 파일 시스템 무결성을 확인합니다. |
 
 부팅할 때마다 FolioOS는 찾아낸 것을 `FOLIO/DIAGNOSTICS.TXT`에 기록합니다.
 [하드웨어 보고](https://github.com/alantaru/FolioOS/issues/new/choose)에 당신의 파일을 공유해 주세요. "그냥 잘 된다"는
@@ -360,8 +364,9 @@ Markdown 편집기로든 열고, 드라이브를 다시 꽂아 FolioOS에서 계
 <details>
 <summary><b>부팅 메뉴에 USB 드라이브가 보이지 않는 이유는 무엇인가요?</b></summary>
 
-드라이브가 FAT32인지, "UEFI"로 시작하는 항목을 골랐는지, 펌웨어 설정에서 Secure Boot가 꺼져 있는지 확인하세요. BIOS/CSM
-모드로만 부팅되는 아주 오래된 PC는 지원하지 않습니다.
+드라이브가 FAT32인지, "UEFI"로 시작하는 항목을 골랐는지, 펌웨어 설정에서 Secure Boot가 꺼져 있는지 확인하세요. BIOS/Legacy
+모드로만 부팅되는 오래된 PC에는 BIOS 부팅 코드가 한 번 필요합니다. Windows에서 관리자 권한으로 `FOLIO\TOOLS\biosboot.exe E:`를
+실행하면 드라이브가 평범한 USB 디스크로 나타납니다.
 </details>
 
 <details>
@@ -400,12 +405,14 @@ Intel Mac은 UEFI 드라이브로 부팅할 수 있지만(켤 때 <kbd>Option</k
 ## 소스에서 빌드
 
 필요한 것: Windows 10/11, PowerShell 5.1 이상, `PATH`에 있는 [MinGW-w64](https://winlibs.com) `gcc`(최근 x86_64 빌드면
-아무거나). 그 밖에는 필요 없습니다.
+아무거나). ARM64와 BIOS 버전은 [LLVM](https://llvm.org) `clang`과 `nasm`도 쓰고, 하드웨어 실험실은
+[QEMU](https://www.qemu.org)를 씁니다. 셋 다 `winget`으로 설치됩니다.
 
 ```powershell
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
-.\build.ps1                                  # UEFI x64 + IA32, 시뮬레이터, 패키지 — 그리고 모든 테스트
+.\build.ps1                                  # UEFI x64 + IA32 + ARM64, BIOS, 시뮬레이터, 패키지 — 그리고 테스트 모음
+.\tools\qemu-lab.ps1                         # 실제 바이너리를 에뮬레이션한 기계 13대에서 부팅하고 하나씩 확인
 .\build\folio_sim.exe                        # FolioOS를 창에서 실행
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # 실제 UEFI 프로그램을 창에서 실행
 .\flash_usb.ps1 -DriveLetter E:              # FAT32 USB 드라이브에 설치/업데이트, 파일은 유지
@@ -415,8 +422,8 @@ cd FolioOS
 ```
 
 테스트 모음은 스크립트로 만든 키 입력과 마우스 이벤트로 시뮬레이터와 실제 `BOOTX64.EFI`(작은 UEFI 호스트 안에서)를
-움직이고, 화면을 캡처하며, 모든 내보내기(ZIP + XML), 모든 번역(검증기에 대한 음성 대조 포함), 여섯 가지 프레임 버퍼 형식을
-검증합니다.
+움직이고, 화면을 캡처하며, 모든 내보내기(ZIP + XML), 모든 번역(검증기에 대한 음성 대조 포함), 여섯 가지 프레임 버퍼 형식,
+BIOS 브리지의 FAT32 드라이버(무작위 작업 수천 번을 바이트 단위로 대조)를 검증합니다.
 
 <a id="architecture-in-one-picture"></a>
 
@@ -425,7 +432,8 @@ cd FolioOS
 ```
 src/core/       이식 가능한 핵심(독립형 C, libc 없음): 편집기, Markdown, TrueType 래스터라이저,
                 UI 툴킷과 창 관리자, 내보내기, MP3, i18n, 키보드 배열, 테마
-src/platform/   uefi/  GOP/UGA 화면, 입력, FAT 입출력, HD Audio/AC'97 — 펌웨어 위에서 직접 동작
+src/platform/   uefi/  GOP/UGA 화면, 입력, FAT 입출력, HD Audio/AC'97, USB HID 및 PS/2 드라이버 — 펌웨어 위에서 동작
+                bios/  부트 섹터 + BIOS→UEFI 브리지(VBE, PS/2, 자체 FAT32 드라이버) — BIOS 전용 PC용
                 win32/ 개발과 자동 테스트에 쓰는 시뮬레이터
 tools/          efi_host(Windows에서 BOOTX64.EFI 실행), i18n 도구, 디스크 이미지 생성기, showcase
 assets/         글꼴, 번역(.po), 키보드 배열, 예제 테마
@@ -439,6 +447,7 @@ tests/          스크립트로 작성한 종단 간 테스트
 
 ## 로드맵
 
+- [x] BIOS 전용 PC(Legacy/CSM)와 ARM64(UEFI 펌웨어의 Raspberry Pi, ARM 노트북)
 - [x] 한국어 입력(두벌식 한글)과 일본어 가나 입력(로마자 → 히라가나/가타카나)
 - [ ] 일본어 한자 변환과 중국어 병음 입력(사전 필요)
 - [ ] 복잡한 문자 조판과 오른쪽에서 왼쪽으로 쓰는 문자(아랍 문자, 히브리 문자, 데바나가리…)

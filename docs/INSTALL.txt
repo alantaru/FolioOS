@@ -24,12 +24,19 @@ You do not need to write a disk image or erase the whole drive. FolioOS takes ab
    F9 HP, F8 Asus, Esc/F11 others) and pick the "UEFI" entry of the drive.
    If it does not show up, disable "Secure Boot" in the firmware setup (F2/Del).
 
+4) Only for PCs WITHOUT UEFI (BIOS/Legacy only, mostly from before ~2012): on Windows,
+   right-click PowerShell > "Run as administrator" and run, once:
+       E:\FOLIO\TOOLS\biosboot.exe E:
+   (E: is the drive's letter). It writes only the BIOS boot code: no file is touched,
+   the drive stays an ordinary FAT32 drive and the UEFI boot keeps working.
+
 EVERYTHING IS INCLUDED: FolioOS.zip already brings 11 free font families for
 writing and reading and the fonts for Chinese, Japanese and Korean. Every one of
 the 15 languages works out of the box; nothing else to download.
 
 UPDATING: unzip the new version on top and confirm "replace". Only the system
-(EFI\, FOLIO\FONTS\, FOLIO\LANGUAGES\, FOLIO\KEYBOARDS\), the README files and the
+(EFI\, FOLIO\FONTS\, FOLIO\LANGUAGES\, FOLIO\KEYBOARDS\, FOLIO\TOOLS\,
+FOLIO\BIOS.SYS), the README files and the
 example DOCUMENTS\Welcome.md are replaced; your texts, music and preferences
 (FOLIO\CONFIG.INI) stay.
 

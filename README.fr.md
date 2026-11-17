@@ -71,6 +71,10 @@ partager.
   `FolioOS.zip` reste recommandé : le reste de la clé reste libre pour vos fichiers.
 - **Depuis les sources sous Windows :** `.\build.ps1` puis `.\flash_usb.ps1 -DriveLetter E:` (installe ou
   met à jour une clé sans rien effacer).
+- **PC sans UEFI (BIOS/Legacy uniquement) :** lancez une fois `FOLIO\TOOLS\biosboot.exe E:` sous Windows, en
+  administrateur (`E:` est la clé). Il n’écrit que le code de démarrage BIOS : aucun fichier n’est touché, la
+  clé reste une clé FAT32 ordinaire et le démarrage UEFI continue de fonctionner. Depuis les sources :
+  `.\flash_usb.ps1 -DriveLetter E: -Bios`.
 - **Tout est inclus :** `FolioOS.zip` apporte déjà 11 polices libres pour écrire et lire, ainsi que les
   polices pour le chinois, le japonais et le coréen — toutes les langues fonctionnent dès le départ.
 
@@ -348,11 +352,12 @@ quel ordinateur et vos textes sont là.
 
 | | |
 |---|---|
-| **Firmware** | UEFI 2.x — 64 bits (`BOOTX64.EFI`) ou 32 bits (`BOOTIA32.EFI`, tablettes et netbooks Atom). Le Secure Boot doit être désactivé. La plupart des PC et portables à partir de 2012 environ. |
-| **Affichage** | Tout framebuffer UEFI GOP (RGB, BGR, masque de bits, Blt seul) ou UGA ancien. Résolution native, mise à l’échelle HiDPI automatique, écrans en portrait pivotés automatiquement. |
-| **Saisie** | Clavier via le firmware ; souris USB/PS/2, pavé tactile et écran tactile via les protocoles de pointeur du firmware. |
+| **Firmware** | UEFI 2.x — 64 bits (`BOOTX64.EFI`), 32 bits (`BOOTIA32.EFI`, tablettes et netbooks Atom) ou ARM64 (`BOOTAA64.EFI` : Raspberry Pi 3/4/5 avec le firmware UEFI communautaire, portables ARM). **Les PC uniquement BIOS** (Legacy/CSM) démarrent via le pont BIOS propre à FolioOS après avoir lancé une fois `FOLIO\TOOLS\biosboot.exe`. Le Secure Boot doit être désactivé. |
+| **Affichage** | Tout framebuffer UEFI GOP (RGB, BGR, masque de bits, Blt seul) ou UGA ancien ; VESA/VBE sur les PC BIOS. Résolution native, mise à l’échelle HiDPI automatique, écrans en portrait pivotés automatiquement. |
+| **Saisie** | Clavier via le firmware (directement en PS/2 sur les PC BIOS). Souris, pavé tactile, tablette graphique et écran tactile via le firmware — et, quand le firmware n’a pas de pilote pour eux, via les pilotes USB HID et PS/2 propres à FolioOS. |
 | **Son** | Intel HD Audio et AC'97 (nécessaire uniquement pour le lecteur de musique). |
-| **Non pris en charge** | PC uniquement BIOS/CSM, Secure Boot (pour l’instant), Mac Apple Silicon. Wi-Fi et Bluetooth sont exclus volontairement. |
+| **Non pris en charge** | Secure Boot (pour l’instant), Mac Apple Silicon. Wi-Fi et Bluetooth sont exclus volontairement. |
+| **Testé sur** | 13 machines émulées à chaque version : UEFI x64, IA32 et ARM64, et PC uniquement BIOS démarrant en USB et en IDE ; 8 cartes graphiques, souris PS/2 et USB, tablette USB, HD Audio et AC'97. Chacune est vérifiée pour l’image, le clavier, la souris, le son, l’enregistrement et l’intégrité du système de fichiers. |
 
 Chaque démarrage écrit `FOLIO/DIAGNOSTICS.TXT` avec ce que FolioOS a trouvé. Partagez le vôtre dans un
 [rapport matériel](https://github.com/alantaru/FolioOS/issues/new/choose) — même « ça marche » aide d’autres
@@ -387,8 +392,9 @@ VS Code, le Bloc-notes, TextEdit ou n’importe quel éditeur Markdown, puis reb
 <summary><b>Pourquoi mon PC n’affiche-t-il pas la clé dans le menu de démarrage ?</b></summary>
 
 Vérifiez que la clé est en FAT32, que vous avez choisi l’entrée qui commence par « UEFI » et que le Secure
-Boot est désactivé dans la configuration du firmware. Les très vieux PC qui ne démarrent qu’en mode BIOS/CSM
-ne sont pas pris en charge.
+Boot est désactivé dans la configuration du firmware. Les PC plus anciens qui ne démarrent qu’en mode
+BIOS/Legacy ont besoin une fois du code de démarrage BIOS : lancez `FOLIO\TOOLS\biosboot.exe E:` sous Windows
+en administrateur, et la clé apparaît comme un disque USB ordinaire.
 </details>
 
 <details>
@@ -431,12 +437,15 @@ avec n’importe quoi une fois la clé rebranchée sur un ordinateur habituel.
 ## Compiler depuis les sources
 
 Prérequis : Windows 10/11, PowerShell 5.1+ et le `gcc` de [MinGW-w64](https://winlibs.com) (n’importe quelle
-version x86_64 récente) dans le `PATH`. Rien d’autre.
+version x86_64 récente) dans le `PATH`. Les versions ARM64 et BIOS utilisent aussi `clang` de
+[LLVM](https://llvm.org) et `nasm`, et le laboratoire matériel utilise [QEMU](https://www.qemu.org) — les trois
+s’installent avec `winget`.
 
 ```powershell
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
-.\build.ps1                                  # UEFI x64 + IA32, simulateur, paquets — et toute la suite de tests
+.\build.ps1                                  # UEFI x64 + IA32 + ARM64, BIOS, simulateur, paquets — et la suite de tests
+.\tools\qemu-lab.ps1                         # démarre les vrais binaires sur 13 machines émulées et vérifie chacune
 .\build\folio_sim.exe                        # lance FolioOS dans une fenêtre
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # lance le vrai binaire UEFI dans une fenêtre
 .\flash_usb.ps1 -DriveLetter E:              # installe/met à jour une clé FAT32 en gardant les fichiers
@@ -447,7 +456,8 @@ cd FolioOS
 
 La suite de tests pilote le simulateur et le vrai `BOOTX64.EFI` (dans un petit hôte UEFI) avec des frappes et
 des événements de souris scriptés, prend des captures d’écran, valide chaque export (ZIP + XML), chaque
-traduction (avec un contrôle négatif du validateur) et six formats de framebuffer.
+traduction (avec un contrôle négatif du validateur), six formats de framebuffer et le pilote FAT32 du pont
+BIOS (des milliers d’opérations aléatoires, vérifiées octet par octet).
 
 <a id="architecture-in-one-picture"></a>
 
@@ -456,7 +466,8 @@ traduction (avec un contrôle négatif du validateur) et six formats de framebuf
 ```
 src/core/       cœur portable (C freestanding, sans libc) : éditeur, Markdown, rastériseur TrueType,
                 boîte à outils d’interface et gestionnaire de fenêtres, exports, MP3, i18n, claviers, thèmes
-src/platform/   uefi/  affichage GOP/UGA, saisie, E/S FAT, HD Audio/AC'97 — directement sur le firmware
+src/platform/   uefi/  affichage GOP/UGA, saisie, E/S FAT, HD Audio/AC'97, pilotes USB HID et PS/2 — sur le firmware
+                bios/  secteurs de démarrage + pont BIOS→UEFI (VBE, PS/2, pilote FAT32 propre) pour les PC uniquement BIOS
                 win32/ simulateur utilisé pour le développement et les tests automatiques
 tools/          efi_host (lance BOOTX64.EFI sous Windows), outil i18n, créateur d’image disque, showcase
 assets/         polices, traductions (.po), dispositions de clavier, thème d’exemple
@@ -470,6 +481,7 @@ Un binaire d’environ 600 Ko gère toute la machine à travers une fine couche 
 
 ## Feuille de route
 
+- [x] PC uniquement BIOS (Legacy/CSM) et ARM64 (Raspberry Pi avec firmware UEFI, portables ARM)
 - [x] Saisie du coréen (hangul 2 séries) et des kana japonais (romaji → hiragana/katakana)
 - [ ] Conversion en kanji (japonais) et saisie pinyin (chinois) (nécessitent des dictionnaires)
 - [ ] Mise en forme du texte et écritures de droite à gauche (arabe, hébreu, devanagari…)

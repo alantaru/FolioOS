@@ -13,457 +13,461 @@ msgstr ""
 "X-Date-Format: {yyyy}年{month}{d}日\n"
 "X-Decimal: .\n"
 
-#: src/core/app.c:32 src/core/app.c:54 src/core/app.c:257 src/core/filedlg.c:140 src/core/md.c:239
+#: src/core/app.c:31 src/core/app.c:53 src/core/app.c:256 src/core/filedlg.c:140 src/core/md.c:239
 msgid "Untitled"
 msgstr "無題"
 
-#: src/core/app.c:147
+#: src/core/app.c:146
 msgid "Could not open the file"
 msgstr "ファイルを開けませんでした"
 
-#: src/core/app.c:269 src/core/app.c:439
+#: src/core/app.c:268 src/core/app.c:438
 msgid "Limit of 16 tabs — close one (Ctrl+W)"
 msgstr "タブは最大 16 個です。1 つ閉じてください（Ctrl+W）"
 
-#: src/core/app.c:403
+#: src/core/app.c:402
 msgid "Picking up where you left off"
 msgstr "前回の続きから再開します"
 
-#: src/core/app.c:421
+#: src/core/app.c:420
 msgid "Close tab without saving?"
 msgstr "保存せずにタブを閉じますか？"
 
-#: src/core/app.c:421
+#: src/core/app.c:420
 msgid "Save changes?"
 msgstr "変更を保存しますか？"
 
-#: src/core/app.c:422
+#: src/core/app.c:421
 msgid "The current document has changes that have not been saved yet."
 msgstr "現在の文書には、まだ保存されていない変更があります。"
 
-#: src/core/app.c:422 src/core/app.c:740 src/core/app.c:870 src/core/filedlg.c:407
+#: src/core/app.c:421 src/core/app.c:739 src/core/app.c:870 src/core/filedlg.c:407
 msgid "Save"
 msgstr "保存"
 
-#: src/core/app.c:422
+#: src/core/app.c:421
 msgid "Don't save"
 msgstr "保存しない"
 
-#: src/core/app.c:429
+#: src/core/app.c:428
 msgid "This format is export-only. Open the matching .md file."
 msgstr "この形式は書き出し専用です。対応する .md ファイルを開いてください。"
 
-#: src/core/app.c:450
+#: src/core/app.c:449
 msgid "Failed to create the file"
 msgstr "ファイルを作成できませんでした"
 
-#: src/core/app.c:454
+#: src/core/app.c:453
 msgid "Write error — is the USB drive write-protected or full?"
 msgstr "書き込みエラー：USB メモリが書き込み禁止か、いっぱいではありませんか？"
 
-#: src/core/app.c:467 src/core/app.c:481
+#: src/core/app.c:466 src/core/app.c:480
 #, c-format
 msgid "Saved · %s"
 msgstr "保存しました · %s"
 
-#: src/core/app.c:483
+#: src/core/app.c:482
 #, c-format
 msgid "Exported · %s"
 msgstr "書き出しました · %s"
 
-#: src/core/app.c:531
+#: src/core/app.c:530
 msgid "Narrow"
 msgstr "狭い"
 
-#: src/core/app.c:531
+#: src/core/app.c:530
 msgid "Medium"
 msgstr "標準"
 
-#: src/core/app.c:531
+#: src/core/app.c:530
 msgid "Wide"
 msgstr "広い"
 
-#: src/core/app.c:531
+#: src/core/app.c:530
 msgid "Extra"
 msgstr "特大"
 
-#: src/core/app.c:535
+#: src/core/app.c:534
 msgid "Full screen: the text uses the full width"
 msgstr "全画面：テキストを横幅いっぱいに表示"
 
-#: src/core/app.c:535
+#: src/core/app.c:534
 msgid "Page: text in a column, like on a sheet of paper"
 msgstr "ページ：紙のように 1 段組みで表示"
 
-#: src/core/app.c:577
+#: src/core/app.c:576
 msgid "Settings"
 msgstr "設定"
 
-#: src/core/app.c:578 src/core/app.c:754 src/core/app.c:881 src/core/app.c:1579
+#: src/core/app.c:577 src/core/app.c:753 src/core/app.c:881 src/core/app.c:1579
 msgid "Find and replace"
 msgstr "検索と置換"
 
-#: src/core/app.c:579 src/core/app.c:881 src/core/app.c:1591
+#: src/core/app.c:578 src/core/app.c:881 src/core/app.c:1591
 msgid "Outline"
 msgstr "アウトライン"
 
-#: src/core/app.c:580 src/core/app.c:770 src/core/app.c:1592
+#: src/core/app.c:579 src/core/app.c:770 src/core/app.c:1592
 msgid "Session and goals"
 msgstr "セッションと目標"
 
-#: src/core/app.c:581 src/core/app.c:774 src/core/app.c:885
+#: src/core/app.c:580 src/core/app.c:774 src/core/app.c:885
 msgid "Keyboard shortcuts"
 msgstr "キーボードショートカット"
 
-#: src/core/app.c:582
+#: src/core/app.c:581
 msgid "Commands"
 msgstr "コマンド"
 
-#: src/core/app.c:583 src/core/app.c:1711
+#: src/core/app.c:582 src/core/app.c:1711
 msgid "Menu"
 msgstr "メニュー"
 
-#: src/core/app.c:585
+#: src/core/app.c:584
 msgid "Theme editor"
 msgstr "テーマエディター"
 
-#: src/core/app.c:604
+#: src/core/app.c:603
 #, c-format
 msgid "Tabs on · %d documents open (Ctrl+N new, Ctrl+W close)"
 msgstr "タブ オン · %d 個の文書を開いています（Ctrl+N 新規、Ctrl+W 閉じる）"
 
-#: src/core/app.c:604
+#: src/core/app.c:603
 msgid "Tabs on (Ctrl+N new tab, Ctrl+W close)"
 msgstr "タブ オン（Ctrl+N 新しいタブ、Ctrl+W 閉じる）"
 
-#: src/core/app.c:605
+#: src/core/app.c:604
 msgid "Tabs off — your tabs are kept for when you turn them back on"
 msgstr "タブ オフ：タブは次にオンにしたときのために保存されます"
 
-#: src/core/app.c:608
+#: src/core/app.c:607
 msgid "Turn tabs on to use Ctrl+W (Ctrl+K → Tabs, or the button at the top)"
 msgstr "Ctrl+W を使うにはタブをオンにしてください（Ctrl+K →「タブ」または上部のボタン）"
 
-#: src/core/app.c:620
+#: src/core/app.c:619
 msgid "Focus off"
 msgstr "フォーカス オフ"
 
-#: src/core/app.c:620
+#: src/core/app.c:619
 msgid "Focus on sentence"
 msgstr "文にフォーカス"
 
-#: src/core/app.c:620
+#: src/core/app.c:619
 msgid "Focus on paragraph"
 msgstr "段落にフォーカス"
 
-#: src/core/app.c:620
+#: src/core/app.c:619
 msgid "Focus on line"
 msgstr "行にフォーカス"
 
-#: src/core/app.c:623
+#: src/core/app.c:622
 msgid "Typewriter: current line always centered"
 msgstr "タイプライター：現在の行を常に中央に表示"
 
-#: src/core/app.c:623
+#: src/core/app.c:622
 msgid "Typewriter off"
 msgstr "タイプライター オフ"
 
-#: src/core/app.c:624
+#: src/core/app.c:623
 msgid "Zen mode — Esc or move the mouse to the top to leave"
 msgstr "禅モード：Esc を押すか、マウスを上端に動かすと終了します"
 
-#: src/core/app.c:624
+#: src/core/app.c:623
 msgid "Zen mode off"
 msgstr "禅モード オフ"
 
-#: src/core/app.c:645
+#: src/core/app.c:644
 #, c-format
 msgid "Theme: %s"
 msgstr "テーマ：%s"
 
-#: src/core/app.c:646
+#: src/core/app.c:645
 #, c-format
 msgid "Font: %s"
 msgstr "フォント：%s"
 
-#: src/core/app.c:659
+#: src/core/app.c:658
 msgid "Sprint stopped"
 msgstr "スプリントを中断しました"
 
-#: src/core/app.c:662
+#: src/core/app.c:661
 #, c-format
 msgid "%d-minute sprint started. Happy writing!"
 msgstr "%d 分間のスプリントを開始しました。良い執筆を！"
 
-#: src/core/app.c:665
+#: src/core/app.c:664
 msgid "Hemingway mode: deleting is disabled"
 msgstr "ヘミングウェイ モード：削除は無効です"
 
-#: src/core/app.c:665
+#: src/core/app.c:664
 msgid "Hemingway mode off"
 msgstr "ヘミングウェイ モード オフ"
 
-#: src/core/app.c:666
+#: src/core/app.c:665
 msgid "Markup hidden outside the current paragraph"
 msgstr "現在の段落以外のマークアップを非表示"
 
-#: src/core/app.c:666
+#: src/core/app.c:665
 msgid "Markup always visible"
 msgstr "マークアップを常に表示"
 
-#: src/core/app.c:667
+#: src/core/app.c:666
 msgid "Smart typography on (— “ ” …)"
 msgstr "スマート組版 オン（— “ ” …）"
 
-#: src/core/app.c:667
+#: src/core/app.c:666
 msgid "Smart typography off"
 msgstr "スマート組版 オフ"
 
-#: src/core/app.c:679
+#: src/core/app.c:678
 #, c-format
 msgid "Page %s"
 msgstr "ページ：%s"
 
-#: src/core/app.c:687 src/core/editor.c:711 src/core/preview.c:251
+#: src/core/app.c:686 src/core/editor.c:708 src/core/preview.c:251
 msgid "This is the last chapter"
 msgstr "これが最後の章です"
 
-#: src/core/app.c:704
+#: src/core/app.c:703
 msgid "Mouse and touchpad off: keyboard only (Ctrl+K → Mouse turns them back on)"
 msgstr "マウスとタッチパッドはオフ：キーボードのみ（Ctrl+K →「マウス」で再びオン）"
 
-#: src/core/app.c:704
+#: src/core/app.c:703
 msgid "Mouse and touchpad on"
 msgstr "マウスとタッチパッドはオン"
 
-#: src/core/app.c:715
+#: src/core/app.c:714
 msgid "Could not read the language file"
 msgstr "言語ファイルを読み込めませんでした"
 
-#: src/core/app.c:719
+#: src/core/app.c:718
 #, c-format
 msgid "This language needs fonts (%s) that are missing from %s. Copy FolioOS.zip to the USB drive again."
 msgstr "この言語に必要なフォント（%s）が %s にありません。FolioOS.zip をもう一度 USB メモリにコピーしてください。"
 
-#: src/core/app.c:732
+#: src/core/app.c:731
 msgid "New document"
 msgstr "新しい文書"
 
-#: src/core/app.c:732 src/core/app.c:869
+#: src/core/app.c:731 src/core/app.c:869
 msgid "Ctrl+N"
 msgstr "Ctrl+N"
 
-#: src/core/app.c:733
+#: src/core/app.c:732
 msgid "Tabs: several documents (on/off)"
 msgstr "タブ：複数の文書（オン/オフ）"
 
-#: src/core/app.c:734
+#: src/core/app.c:733
 msgid "Close tab"
 msgstr "タブを閉じる"
 
-#: src/core/app.c:734
+#: src/core/app.c:733
 msgid "Ctrl+W"
 msgstr "Ctrl+W"
 
-#: src/core/app.c:735
+#: src/core/app.c:734
 msgid "Next tab"
 msgstr "次のタブ"
 
-#: src/core/app.c:735
+#: src/core/app.c:734
 msgid "Ctrl+Tab"
 msgstr "Ctrl+Tab"
 
-#: src/core/app.c:736
+#: src/core/app.c:735
 msgid "Previous tab"
 msgstr "前のタブ"
 
-#: src/core/app.c:736
+#: src/core/app.c:735
 msgid "Ctrl+Shift+Tab"
 msgstr "Ctrl+Shift+Tab"
 
-#: src/core/app.c:737
+#: src/core/app.c:736
 msgid "Create a custom theme (colors and fonts)"
 msgstr "カスタムテーマを作成（色とフォント）"
 
-#: src/core/app.c:738
+#: src/core/app.c:737
 msgid "Edit the current theme"
 msgstr "現在のテーマを編集"
 
-#: src/core/app.c:739 src/core/app.c:869
+#: src/core/app.c:738 src/core/app.c:869
 msgid "Open…"
 msgstr "開く…"
 
-#: src/core/app.c:739 src/core/app.c:869
+#: src/core/app.c:738 src/core/app.c:869
 msgid "Ctrl+O"
 msgstr "Ctrl+O"
 
-#: src/core/app.c:740 src/core/app.c:870
+#: src/core/app.c:739 src/core/app.c:870
 msgid "Ctrl+S"
 msgstr "Ctrl+S"
 
-#: src/core/app.c:741 src/core/app.c:870
+#: src/core/app.c:740 src/core/app.c:870
 msgid "Save as / Export…"
 msgstr "名前を付けて保存 / 書き出し…"
 
-#: src/core/app.c:741 src/core/app.c:870 src/core/app.c:1576
+#: src/core/app.c:740 src/core/app.c:870 src/core/app.c:1576
 msgid "Ctrl+Shift+S"
 msgstr "Ctrl+Shift+S"
 
-#: src/core/app.c:742
+#: src/core/app.c:741
 msgid "Reading mode (formatted Markdown)"
 msgstr "閲覧モード（書式付き Markdown）"
 
-#: src/core/app.c:742 src/core/app.c:1578
+#: src/core/app.c:741 src/core/app.c:1578
 msgid "Ctrl+P"
 msgstr "Ctrl+P"
 
-#: src/core/app.c:743
+#: src/core/app.c:742
 msgid "Reading auto-scroll (on/off)"
 msgstr "閲覧時の自動スクロール（オン/オフ）"
 
-#: src/core/app.c:743 src/core/app.c:1585
+#: src/core/app.c:742 src/core/app.c:1585
 msgid "Enter (reading)"
 msgstr "Enter（閲覧）"
 
-#: src/core/app.c:744
+#: src/core/app.c:743
 msgid "Next chapter"
 msgstr "次の章"
 
-#: src/core/app.c:744
+#: src/core/app.c:743
 msgid "Ctrl+PgDn"
 msgstr "Ctrl+PgDn"
 
-#: src/core/app.c:745
+#: src/core/app.c:744
 msgid "Previous chapter"
 msgstr "前の章"
 
-#: src/core/app.c:745
+#: src/core/app.c:744
 msgid "Ctrl+PgUp"
 msgstr "Ctrl+PgUp"
 
-#: src/core/app.c:746
+#: src/core/app.c:745
 msgid "Go to the last edit"
 msgstr "最後の編集箇所へ移動"
 
-#: src/core/app.c:746 src/core/app.c:1583
+#: src/core/app.c:745 src/core/app.c:1583
 msgid "Ctrl+J"
 msgstr "Ctrl+J"
 
-#: src/core/app.c:747 src/core/app.c:1582
+#: src/core/app.c:746 src/core/app.c:1582
 msgid "Duplicate paragraph"
 msgstr "段落を複製"
 
-#: src/core/app.c:747 src/core/app.c:1582
+#: src/core/app.c:746 src/core/app.c:1582
 msgid "Ctrl+D"
 msgstr "Ctrl+D"
 
-#: src/core/app.c:748 src/core/app.c:1582
+#: src/core/app.c:747 src/core/app.c:1582
 msgid "Delete paragraph"
 msgstr "段落を削除"
 
-#: src/core/app.c:748 src/core/app.c:1582
+#: src/core/app.c:747 src/core/app.c:1582
 msgid "Ctrl+Shift+K"
 msgstr "Ctrl+Shift+K"
 
-#: src/core/app.c:749
+#: src/core/app.c:748
 msgid "Change case"
 msgstr "大文字 / 小文字"
 
-#: src/core/app.c:749 src/core/app.c:1584
+#: src/core/app.c:748 src/core/app.c:1584
 msgid "Shift+F3"
 msgstr "Shift+F3"
 
-#: src/core/app.c:750
+#: src/core/app.c:749
 msgid "Insert today's date"
 msgstr "今日の日付を挿入"
 
-#: src/core/app.c:751
+#: src/core/app.c:750
 msgid "Focus mode (sentence / paragraph / line)"
 msgstr "フォーカスモード（文 / 段落 / 行）"
 
-#: src/core/app.c:752
+#: src/core/app.c:751
 msgid "Typewriter (centered line)"
 msgstr "タイプライター（行を中央に）"
 
-#: src/core/app.c:753
+#: src/core/app.c:752
 msgid "Zen mode (no bars)"
 msgstr "禅モード（バーなし）"
 
-#: src/core/app.c:754 src/core/app.c:881 src/core/app.c:1579
+#: src/core/app.c:753 src/core/app.c:881 src/core/app.c:1579
 msgid "Ctrl+F"
 msgstr "Ctrl+F"
 
-#: src/core/app.c:755
+#: src/core/app.c:754
 msgid "Document outline"
 msgstr "文書のアウトライン"
 
-#: src/core/app.c:756
+#: src/core/app.c:755
 msgid "Appearance: themes and typography"
 msgstr "外観：テーマと組版"
 
-#: src/core/app.c:757 src/core/app.c:1588
+#: src/core/app.c:756 src/core/app.c:1588
 msgid "Next theme"
 msgstr "次のテーマ"
 
-#: src/core/app.c:757 src/core/app.c:1588
+#: src/core/app.c:756 src/core/app.c:1588
 msgid "Ctrl+T"
 msgstr "Ctrl+T"
 
-#: src/core/app.c:758
+#: src/core/app.c:757
 msgid "Next font"
 msgstr "次のフォント"
 
-#: src/core/app.c:758
+#: src/core/app.c:757
 msgid "Ctrl+Shift+T"
 msgstr "Ctrl+Shift+T"
 
-#: src/core/app.c:759
+#: src/core/app.c:758
 msgid "Larger text"
 msgstr "文字を大きく"
 
-#: src/core/app.c:759
+#: src/core/app.c:758
 msgid "Ctrl+="
 msgstr "Ctrl+="
 
-#: src/core/app.c:760
+#: src/core/app.c:759
 msgid "Smaller text"
 msgstr "文字を小さく"
 
-#: src/core/app.c:760
+#: src/core/app.c:759
 msgid "Ctrl+-"
 msgstr "Ctrl+-"
 
-#: src/core/app.c:761
+#: src/core/app.c:760
 msgid "Page or full screen (text width)"
 msgstr "ページまたは全画面（テキストの幅）"
 
-#: src/core/app.c:762
+#: src/core/app.c:761
 msgid "Page size: narrow · medium · wide · extra"
 msgstr "ページサイズ：狭い · 標準 · 広い · 特大"
 
-#: src/core/app.c:763
+#: src/core/app.c:762
 msgid "Paper sheet (show/hide)"
 msgstr "用紙（表示/非表示）"
 
-#: src/core/app.c:764 src/core/app.c:884
+#: src/core/app.c:763 src/core/app.c:884
 msgid "Writing settings"
 msgstr "執筆の設定"
 
-#: src/core/app.c:765
+#: src/core/app.c:764
 msgid "Music: play / pause"
 msgstr "音楽：再生 / 一時停止"
 
-#: src/core/app.c:766
+#: src/core/app.c:765
 msgid "Music: next track"
 msgstr "音楽：次の曲"
 
-#: src/core/app.c:767
+#: src/core/app.c:766
 msgid "Music: previous track"
 msgstr "音楽：前の曲"
 
-#: src/core/app.c:768 src/core/app.c:1591
+#: src/core/app.c:767 src/core/app.c:1591
 msgid "Music player"
 msgstr "音楽プレーヤー"
+
+#: src/core/app.c:768
+msgid "Sound test (chime)"
+msgstr "サウンドテスト（チャイム）"
 
 #: src/core/app.c:769
 msgid "Start / stop writing sprint"
@@ -1609,23 +1613,23 @@ msgid "Sprint finished: %d word. Breathe and stretch."
 msgid_plural "Sprint finished: %d words. Breathe and stretch."
 msgstr[0] "スプリント終了：%d 語。深呼吸して、体を伸ばしましょう。"
 
-#: src/core/editor.c:322
+#: src/core/editor.c:320
 msgid "Cut"
 msgstr "切り取りました"
 
-#: src/core/editor.c:322
+#: src/core/editor.c:320
 msgid "Copied"
 msgstr "コピーしました"
 
-#: src/core/editor.c:516
+#: src/core/editor.c:513
 msgid "There are no edits in this document yet"
 msgstr "この文書にはまだ編集履歴がありません"
 
-#: src/core/editor.c:542 src/core/editor.c:659 src/core/editor.c:672
+#: src/core/editor.c:539 src/core/editor.c:656 src/core/editor.c:669
 msgid "Hemingway mode: keep going, no deleting"
 msgstr "ヘミングウェイ モード：消さずに書き進めましょう"
 
-#: src/core/editor.c:552
+#: src/core/editor.c:549
 msgid "Paragraph deleted — Ctrl+Z undoes it"
 msgstr "段落を削除しました（Ctrl+Z で元に戻せます）"
 

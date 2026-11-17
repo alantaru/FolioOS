@@ -8,6 +8,12 @@ This drive works in two ways:
      Asus, Esc/F11 on others). Pick the "UEFI" entry of this USB drive.
    - If it does not show up: enter the firmware setup (F10/F2/Del) and DISABLE
      "Secure Boot".
+   - PC without UEFI (BIOS/Legacy only, mostly from before ~2012): on Windows,
+     run FOLIO\TOOLS\biosboot.exe E: once, as administrator (E: = this drive).
+     It writes only the boot code - no file is touched - and from then on the
+     drive also starts on those PCs, as an ordinary USB disk in the boot menu.
+   - Raspberry Pi 3/4/5 and ARM laptops start EFI\BOOT\BOOTAA64.EFI through
+     their UEFI firmware (on a Pi: the community UEFI firmware).
 
 2) AS AN ORDINARY USB DRIVE, on any Windows, Linux or macOS computer
    Every folder is open, plain FAT32 — no proprietary format:
@@ -76,8 +82,8 @@ DISPLAY
    resolution and rotate the screen. Ctrl+Alt+arrows rotate; Ctrl+Alt+Home goes
    back to automatic. In CONFIG.INI: resolution=auto (or 1920x1080, or max),
    rotation=auto (or 0, 90, 180, 270), fast_video=0 if the picture glitches.
-   If the PC shows nothing: very old graphics cards (before ~2012) only work in
-   BIOS/CSM mode, which FolioOS does not use.
+   If the PC shows nothing: very old graphics cards (before ~2012) may only work
+   in BIOS mode - make the drive start in BIOS mode as explained in 1).
 
 IF SOMETHING DOES NOT WORK (sound, display, mouse)
    FolioOS writes FOLIO\DIAGNOSTICS.TXT on every start (and in Settings > System >

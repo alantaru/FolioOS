@@ -70,6 +70,10 @@ condividere.
   estrarre `FolioOS.zip`: il resto della chiavetta rimane libero per i tuoi file.
 - **Dal codice sorgente su Windows:** `.\build.ps1` e poi `.\flash_usb.ps1 -DriveLetter E:` (installa o
   aggiorna una chiavetta senza cancellare nulla).
+- **PC senza UEFI (solo BIOS/Legacy):** esegui una volta `FOLIO\TOOLS\biosboot.exe E:` su Windows, come
+  amministratore (`E:` è la chiavetta). Scrive solo il codice di avvio BIOS: nessun file viene toccato, la
+  chiavetta resta una normale chiavetta FAT32 e l’avvio UEFI continua a funzionare. Dal sorgente:
+  `.\flash_usb.ps1 -DriveLetter E: -Bios`.
 - **Tutto incluso:** `FolioOS.zip` porta già 11 font liberi per scrivere e leggere e i font per cinese,
   giapponese e coreano — tutte le lingue funzionano subito.
 
@@ -345,11 +349,12 @@ computer e i tuoi testi sono lì.
 
 | | |
 |---|---|
-| **Firmware** | UEFI 2.x — 64 bit (`BOOTX64.EFI`) o 32 bit (`BOOTIA32.EFI`, tablet e netbook Atom). Il Secure Boot deve essere disattivato. La maggior parte dei PC e portatili dal 2012 circa in poi. |
-| **Schermo** | Qualsiasi framebuffer UEFI GOP (RGB, BGR, maschera di bit, solo Blt) o UGA datato. Risoluzione nativa, scala HiDPI automatica, schermi verticali ruotati in automatico. |
-| **Input** | Tastiera tramite il firmware; mouse USB/PS/2, touchpad e touch screen tramite i protocolli di puntamento del firmware. |
+| **Firmware** | UEFI 2.x — 64 bit (`BOOTX64.EFI`), 32 bit (`BOOTIA32.EFI`, tablet e netbook Atom) o ARM64 (`BOOTAA64.EFI`: Raspberry Pi 3/4/5 con il firmware UEFI della comunità, portatili ARM). **I PC solo BIOS** (Legacy/CSM) si avviano tramite il ponte BIOS di FolioOS dopo aver eseguito una volta `FOLIO\TOOLS\biosboot.exe`. Il Secure Boot deve essere disattivato. |
+| **Schermo** | Qualsiasi framebuffer UEFI GOP (RGB, BGR, maschera di bit, solo Blt) o UGA datato; VESA/VBE sui PC BIOS. Risoluzione nativa, scala HiDPI automatica, schermi verticali ruotati in automatico. |
+| **Input** | Tastiera tramite il firmware (direttamente via PS/2 sui PC BIOS). Mouse, touchpad, tavoletta grafica e touch screen tramite il firmware — e, quando il firmware non ha un driver per loro, tramite i driver USB HID e PS/2 di FolioOS. |
 | **Audio** | Intel HD Audio e AC'97 (serve solo per il lettore musicale). |
-| **Non supportati** | PC solo BIOS/CSM, Secure Boot (per ora), Mac con Apple Silicon. Wi-Fi e Bluetooth sono esclusi di proposito. |
+| **Non supportati** | Secure Boot (per ora), Mac con Apple Silicon. Wi-Fi e Bluetooth sono esclusi di proposito. |
+| **Provato su** | 13 macchine emulate a ogni versione: UEFI x64, IA32 e ARM64, e PC solo BIOS avviati da USB e IDE; 8 schede video, mouse PS/2 e USB, tavoletta USB, HD Audio e AC'97. Su ognuna si verificano immagine, tastiera, mouse, audio, salvataggio e integrità del file system. |
 
 Ogni avvio scrive `FOLIO/DIAGNOSTICS.TXT` con ciò che FolioOS ha trovato. Condividi il tuo in una
 [segnalazione hardware](https://github.com/alantaru/FolioOS/issues/new/choose) — anche «funziona e basta»
@@ -386,8 +391,9 @@ FolioOS.
 <summary><b>Perché il mio PC non mostra la chiavetta nel menu di avvio?</b></summary>
 
 Controlla che la chiavetta sia in FAT32, di aver scelto la voce che inizia con "UEFI" e che il Secure Boot
-sia disattivato nella configurazione del firmware. I PC molto vecchi che si avviano solo in modalità
-BIOS/CSM non sono supportati.
+sia disattivato nella configurazione del firmware. I PC più vecchi che si avviano solo in modalità
+BIOS/Legacy hanno bisogno una volta del codice di avvio BIOS: esegui `FOLIO\TOOLS\biosboot.exe E:` su Windows
+come amministratore e la chiavetta comparirà come un normale disco USB.
 </details>
 
 <details>
@@ -430,12 +436,14 @@ una volta che la chiavetta torna su un computer normale.
 ## Compilare dal codice sorgente
 
 Requisiti: Windows 10/11, PowerShell 5.1+ e il `gcc` di [MinGW-w64](https://winlibs.com) (qualsiasi build
-x86_64 recente) nel `PATH`. Nient’altro.
+x86_64 recente) nel `PATH`. Le versioni ARM64 e BIOS usano anche `clang` di [LLVM](https://llvm.org) e
+`nasm`, e il laboratorio hardware usa [QEMU](https://www.qemu.org): tutti e tre si installano con `winget`.
 
 ```powershell
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
-.\build.ps1                                  # UEFI x64 + IA32, simulatore, pacchetti — e tutti i test
+.\build.ps1                                  # UEFI x64 + IA32 + ARM64, BIOS, simulatore, pacchetti — e la suite di test
+.\tools\qemu-lab.ps1                         # avvia i veri binari su 13 macchine emulate e le verifica una per una
 .\build\folio_sim.exe                        # esegue FolioOS in una finestra
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # esegue il vero binario UEFI in una finestra
 .\flash_usb.ps1 -DriveLetter E:              # installa/aggiorna una chiavetta FAT32 conservando i file
@@ -446,7 +454,8 @@ cd FolioOS
 
 La suite di test guida il simulatore e il vero `BOOTX64.EFI` (dentro un piccolo host UEFI) con tasti ed
 eventi del mouse programmati, cattura schermate e verifica ogni esportazione (ZIP + XML), ogni traduzione
-(con un controllo negativo per il validatore) e sei formati di framebuffer.
+(con un controllo negativo per il validatore), sei formati di framebuffer e il driver FAT32 del ponte BIOS
+(migliaia di operazioni casuali, verificate byte per byte).
 
 <a id="architecture-in-one-picture"></a>
 
@@ -455,7 +464,8 @@ eventi del mouse programmati, cattura schermate e verifica ogni esportazione (ZI
 ```
 src/core/       nucleo portabile (C freestanding, senza libc): editor, Markdown, rasterizzatore TrueType,
                 toolkit dell’interfaccia e gestore di finestre, esportazioni, MP3, i18n, tastiere, temi
-src/platform/   uefi/  video GOP/UGA, input, I/O FAT, HD Audio/AC'97 — direttamente sul firmware
+src/platform/   uefi/  video GOP/UGA, input, I/O FAT, HD Audio/AC'97, driver USB HID e PS/2 — sul firmware
+                bios/  settori di avvio + ponte BIOS→UEFI (VBE, PS/2, driver FAT32 proprio) per i PC solo BIOS
                 win32/ simulatore usato per lo sviluppo e i test automatici
 tools/          efi_host (esegue BOOTX64.EFI su Windows), strumento i18n, creatore di immagini disco, showcase
 assets/         font, traduzioni (.po), layout di tastiera, tema di esempio
@@ -467,6 +477,7 @@ Dettagli in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Roadmap
 
+- [x] PC solo BIOS (Legacy/CSM) e ARM64 (Raspberry Pi con firmware UEFI, portatili ARM)
 - [x] Input coreano (hangul a 2 set) e input kana giapponese (romaji → hiragana/katakana)
 - [ ] Conversione in kanji (giapponese) e input pinyin (cinese) (richiedono dizionari)
 - [ ] Composizione del testo e scritture da destra a sinistra (arabo, ebraico, devanagari…)

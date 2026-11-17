@@ -12,7 +12,6 @@ static Surface desk;
 static int   cur_mods;
 static u64   last_autosave;
 static float last_scale;
-static int   sprint_words_done = -1;
 
 extern int  kbd_translate(Event *e, u32 out[2]);
 extern u32  kbd_pending(void);
@@ -766,6 +765,7 @@ static const Cmd cmds[] = {
     { N_("Music: next track"), "F9", c_next, IC_NEXT },
     { N_("Music: previous track"), "F7", c_prev, IC_PREV },
     { N_("Music player"), "F6", c_music, IC_MUSIC },
+    { N_("Sound test (chime)"), "", music_chime, IC_VOLUME },
     { N_("Start / stop writing sprint"), "F4", c_sprint, IC_TIMER },
     { N_("Session and goals"), "F10", c_stats, IC_CHART },
     { N_("Hemingway mode (no deleting)"), "", c_hemingway, IC_TYPEWRITER },
@@ -2150,7 +2150,6 @@ bool app_frame(void) {
         int done = MAX(0, doc_words(&app.doc) - (int)sprint_start_words);
         char m[120]; fmt(m, sizeof m, LN("Sprint finished: %d word. Breathe and stretch.", "Sprint finished: %d words. Breathe and stretch.", done), done);
         ui_toast(m); music_chime();
-        sprint_words_done = done;
     }
     if (sprint_end && (now / 1000) != ((now - (u64)(in->dt * 1000)) / 1000)) ui.redraw = true;
 

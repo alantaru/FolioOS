@@ -13,7 +13,6 @@ static char  *clip;
 static char  find_needle[128];
 static float caret_dx = -1, caret_dy, caret_dh;
 static u64   caret_moved_ms;
-static bool  free_scroll;                    /* rolagem manual no modo máquina de escrever */
 static int   last_caret_para = -1;
 static bool  layout_ok;
 
@@ -265,7 +264,6 @@ void editor_scroll_to_caret(bool center) {
         if (cy + h + margin > scroll_target + area_h) scroll_target = cy + h + margin - area_h;
     }
     scroll_target = CLAMP(scroll_target, 0.0f, max_scroll());
-    free_scroll = false;
     ui.redraw = true;
 }
 static Pos   last_edit = { -1, 0 }, jump_back = { -1, 0 };   /* Ctrl+J: ir e voltar da última alteração */
@@ -509,7 +507,6 @@ bool editor_chapter(int dir) {
     /* o título fica no alto da tela, com o capítulo à mostra embaixo */
     float x, y, h; pos_xy(app.caret, &x, &y, &h);
     scroll_target = CLAMP(top_pad + y - area_h * 0.18f, 0.0f, max_scroll());
-    free_scroll = prefs.typewriter;
     return true;
 }
 void editor_jump_last_edit(void) {
@@ -794,7 +791,7 @@ void editor_mouse(Rect area) {
     if (rect_has(area, in->mx, in->my) && rect_has(text_area, in->mx, in->my) && in->my >= ui.block_top && in->my < ui.H - ui.block_bottom) ui.cursor = 1;
     if (in->wheel && rect_has(area, in->mx, in->my)) {
         scroll_target = CLAMP(scroll_target - in->wheel * base_lh() * 3, 0.0f, max_scroll());
-        free_scroll = true; ui.redraw = true;
+        ui.redraw = true;
     }
     if (!layout_ok) ensure_layout();
     float dx = (float)(in->mx - col_x), dy = (float)(in->my - area_y) + scroll_y - top_pad;
@@ -870,7 +867,7 @@ static void scrollbar_input(Rect area, float chrome_a) {
         if (!in->down) { ui.active = 0; return; }
         float t = (in->my - sb_track.y - th / 2) / MAX(1.0f, sb_track.h - th);
         scroll_target = scroll_y = CLAMP(t, 0.0f, 1.0f) * maxs;
-        free_scroll = true; ui.redraw = true;
+        ui.redraw = true;
     }
 }
 static void scrollbar_draw(void) {

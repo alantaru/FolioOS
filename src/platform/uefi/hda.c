@@ -38,12 +38,21 @@ static void HLOG(const char *f, ...) {
 }
 
 /* ------------------------------------------------------------ portas */
+#if FOLIO_X86
 static inline void outb(u16 p, u8 v) { __asm__ volatile("outb %0, %1" : : "a"(v), "Nd"(p)); }
 static inline void outw(u16 p, u16 v) { __asm__ volatile("outw %0, %1" : : "a"(v), "Nd"(p)); }
 static inline void outl(u16 p, u32 v) { __asm__ volatile("outl %0, %1" : : "a"(v), "Nd"(p)); }
 static inline u8  inb(u16 p) { u8 v; __asm__ volatile("inb %1, %0" : "=a"(v) : "Nd"(p)); return v; }
 static inline u16 inw(u16 p) { u16 v; __asm__ volatile("inw %1, %0" : "=a"(v) : "Nd"(p)); return v; }
 static inline u32 inl(u16 p) { u32 v; __asm__ volatile("inl %1, %0" : "=a"(v) : "Nd"(p)); return v; }
+#else   /* sem portas de E/S: tudo passa pelo EFI_PCI_IO_PROTOCOL do firmware */
+static inline void outb(u16 p, u8 v) { (void)p; (void)v; }
+static inline void outw(u16 p, u16 v) { (void)p; (void)v; }
+static inline void outl(u16 p, u32 v) { (void)p; (void)v; }
+static inline u8  inb(u16 p) { (void)p; return 0xFF; }
+static inline u16 inw(u16 p) { (void)p; return 0xFFFF; }
+static inline u32 inl(u16 p) { (void)p; return 0xFFFFFFFF; }
+#endif
 
 /* ------------------------------------------------------------ PCI */
 enum { K_NONE, K_HDA, K_AC97 };
@@ -187,15 +196,24 @@ static bool dma_alloc(usize bytes, Dma *d) {
 /* coerência de cache: alguns chipsets leem a RAM sem consultar o cache da CPU */
 static bool has_clflush;
 static void cpu_features(void) {
+#if FOLIO_X86
     u32 a = 1, b, c, d;
     __asm__ volatile("cpuid" : "+a"(a), "=b"(b), "=c"(c), "=d"(d));
     has_clflush = (d >> 19) & 1;
+#else
+    has_clflush = true;           /* ARM: limpeza por linha de cache (dc civac) sempre existe */
+#endif
 }
 static void flush(const void *p, usize n) {
     if (!has_clflush || !n) return;
     uintptr_t s = (uintptr_t)p & ~(uintptr_t)63, e = (uintptr_t)p + n;
+#if FOLIO_X86
     for (; s < e; s += 64) __asm__ volatile("clflush (%0)" : : "r"(s) : "memory");
     __asm__ volatile("mfence" ::: "memory");
+#elif defined(__aarch64__)
+    for (; s < e; s += 64) __asm__ volatile("dc civac, %0" : : "r"(s) : "memory");
+    __asm__ volatile("dsb sy" ::: "memory");
+#endif
 }
 
 /* ------------------------------------------------------------ estado comum */
@@ -244,6 +262,7 @@ static u32 cmd(int cad, int nid, u32 verb, u32 payload) {
     if (verb >= 0x100) v |= (verb << 8) | (payload & 0xFF);     /* verbo de 12 bits + 8 bits */
     else v |= (verb << 16) | (payload & 0xFFFF);                 /* verbo de 4 bits + 16 bits */
     if (use_imm) return cmd_imm(v);
+    w8(0x5D, 0x05);                 /* limpa RINTFL/RIRBOIS: algumas controladoras (e o QEMU) param de responder até isso */
     u16 wp = (u16)((r16(0x48) + 1) & 0xFF);
     corb[wp] = v;
     flush(&corb[wp], 4);
@@ -253,6 +272,7 @@ static u32 cmd(int cad, int nid, u32 verb, u32 payload) {
         if (hw != rirb_rp) {
             rirb_rp = (rirb_rp + 1) & 0xFF;
             flush(&rirb[rirb_rp * 2], 8);
+            w8(0x5D, 0x05);
             return rirb[rirb_rp * 2];
         }
         pal_stall_us(5);
@@ -342,7 +362,7 @@ static bool setup_codec(int cad) {
     for (int i = 0; i < 50 && ((cmd(codec, afg, 0xF05, 0) >> 4) & 0xF) != 0; i++) pal_stall_us(2000);
     u32 ssid = cmd(codec, afg, 0xF20, 0);
     u32 gp = param(afg, 0x11); int ngpio = (int)(gp & 0xFF);
-    HLOG(" · AFG %d · subsistema %08x · %d GPIO\r\n", afg, (int)ssid, ngpio);
+    HLOG(" · AFG %d · subsystem %08x · %d GPIO\r\n", afg, (int)ssid, ngpio);
     if (ngpio > 0 && gpio_mode) {
         u32 mask = ngpio >= 8 ? 0xFF : (1u << ngpio) - 1;
         cmd(codec, afg, 0x716, mask); cmd(codec, afg, 0x717, mask); cmd(codec, afg, 0x715, mask);
@@ -503,7 +523,10 @@ static bool init_controller(void) {
     u8 rs = r8(0x5E); w8(0x5E, (u8)((rs & 0xFC) | ((rs & 0x40) ? 2 : (rs & 0x20) ? 1 : 0)));
     w16(0x58, 0x8000); pal_stall_us(100);
     w16(0x5A, 1);
-    w8(0x4C, 2); w8(0x5C, 2);
+    /* RIRB: DMA + RINTCTL. Com INTCTL=0 nenhuma interrupção chega à CPU, mas o contador de respostas
+     * (RINTCNT) só recomeça quando RINTFL é sinalizado e limpo; sem RINTCTL, algumas controladoras
+     * (e o QEMU) respondem ao primeiro comando e param */
+    w8(0x4C, 2); w8(0x5C, 3);
     pal_stall_us(1000);
     rirb_rp = r16(0x58) & 0xFF;
     use_imm = false;
@@ -519,7 +542,7 @@ static bool init_controller(void) {
             if (bad(vid) && !use_imm) {                     /* CORB não respondeu: tenta comandos imediatos */
                 w8(0x4C, 0); w8(0x5C, 0); use_imm = true;
                 vid = param(0, 0);
-                if (bad(vid)) { use_imm = false; w8(0x4C, 2); w8(0x5C, 2); pal_stall_us(500); rirb_rp = r16(0x58) & 0xFF; }
+                if (bad(vid)) { use_imm = false; w8(0x4C, 2); w8(0x5C, 3); pal_stall_us(500); rirb_rp = r16(0x58) & 0xFF; }
                 else if (pass == 0) HLOG("  CORB/RIRB not responding: using immediate commands\r\n");
             }
             if (bad(vid)) { if (pass == 0 && !guessed) HLOG("  codec %d not responding\r\n", c); continue; }

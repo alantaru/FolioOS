@@ -70,6 +70,10 @@ delen.
   `FolioOS.zip` blijft aanbevolen: de rest van de stick blijft vrij voor je bestanden.
 - **Vanuit de broncode op Windows:** `.\build.ps1` en daarna `.\flash_usb.ps1 -DriveLetter E:` (installeert of
   werkt een stick bij zonder iets te wissen).
+- **Pc’s zonder UEFI (alleen BIOS/Legacy):** voer eenmalig `FOLIO\TOOLS\biosboot.exe E:` uit in Windows, als
+  beheerder (`E:` is de stick). Het schrijft alleen de BIOS-opstartcode: er wordt geen bestand aangeraakt, de
+  stick blijft een gewone FAT32-stick en opstarten via UEFI blijft werken. Vanuit de broncode:
+  `.\flash_usb.ps1 -DriveLetter E: -Bios`.
 - **Alles inbegrepen:** `FolioOS.zip` bevat al 11 vrije lettertypen om te schrijven en te lezen en de
   lettertypen voor Chinees, Japans en Koreaans — elke taal werkt meteen.
 
@@ -344,11 +348,12 @@ tekst staat er gewoon.
 
 | | |
 |---|---|
-| **Firmware** | UEFI 2.x — 64-bits (`BOOTX64.EFI`) of 32-bits (`BOOTIA32.EFI`, Atom-tablets en netbooks). Secure Boot moet uit staan. De meeste pc’s en laptops vanaf ongeveer 2012. |
-| **Beeld** | Elke UEFI GOP-framebuffer (RGB, BGR, bitmasker, alleen Blt) of oudere UGA. Eigen resolutie, automatische HiDPI-schaling, staande schermen worden automatisch gedraaid. |
-| **Invoer** | Toetsenbord via de firmware; USB/PS/2-muis, touchpad en touchscreen via de aanwijsprotocollen van de firmware. |
+| **Firmware** | UEFI 2.x — 64-bits (`BOOTX64.EFI`), 32-bits (`BOOTIA32.EFI`, Atom-tablets en netbooks) of ARM64 (`BOOTAA64.EFI`: Raspberry Pi 3/4/5 met de UEFI-firmware van de community, ARM-laptops). **Pc’s met alleen BIOS** (Legacy/CSM) starten via de eigen BIOS-brug van FolioOS nadat `FOLIO\TOOLS\biosboot.exe` één keer is uitgevoerd. Secure Boot moet uit staan. |
+| **Beeld** | Elke UEFI GOP-framebuffer (RGB, BGR, bitmasker, alleen Blt) of oudere UGA; VESA/VBE op BIOS-pc’s. Eigen resolutie, automatische HiDPI-schaling, staande schermen worden automatisch gedraaid. |
+| **Invoer** | Toetsenbord via de firmware (op BIOS-pc’s rechtstreeks via PS/2). Muis, touchpad, tekentablet en touchscreen via de firmware — en als de firmware er geen driver voor heeft, via de eigen USB HID- en PS/2-drivers van FolioOS. |
 | **Geluid** | Intel HD Audio en AC'97 (alleen nodig voor de muziekspeler). |
-| **Niet ondersteund** | Pc’s met alleen BIOS/CSM, Secure Boot (voorlopig), Macs met Apple Silicon. Wifi en Bluetooth zijn bewust weggelaten. |
+| **Niet ondersteund** | Secure Boot (voorlopig), Macs met Apple Silicon. Wifi en Bluetooth zijn bewust weggelaten. |
+| **Getest op** | 13 geëmuleerde machines bij elke versie: UEFI x64, IA32 en ARM64, en pc’s met alleen BIOS die opstarten via USB en IDE; 8 grafische kaarten, PS/2- en USB-muizen, USB-tablet, HD Audio en AC'97. Op elke machine worden beeld, toetsenbord, muis, geluid, opslaan en de integriteit van het bestandssysteem gecontroleerd. |
 
 Elke start schrijft `FOLIO/DIAGNOSTICS.TXT` met wat FolioOS heeft gevonden. Deel het jouwe in een
 [hardwaremelding](https://github.com/alantaru/FolioOS/issues/new/choose) — zelfs "het werkt gewoon" helpt
@@ -384,8 +389,9 @@ Kladblok, TextEdit of een andere Markdown-editor, steek de stick daarna weer in 
 <summary><b>Waarom toont mijn pc de USB-stick niet in het opstartmenu?</b></summary>
 
 Controleer of de stick FAT32 is, of je de optie hebt gekozen die met "UEFI" begint en of Secure Boot is
-uitgeschakeld in de firmware-instellingen. Heel oude pc’s die alleen in BIOS/CSM-modus opstarten, worden niet
-ondersteund.
+uitgeschakeld in de firmware-instellingen. Oudere pc’s die alleen in BIOS/Legacy-modus opstarten, hebben
+eenmalig de BIOS-opstartcode nodig: voer in Windows als beheerder `FOLIO\TOOLS\biosboot.exe E:` uit, en de
+stick verschijnt als een gewone USB-schijf.
 </details>
 
 <details>
@@ -428,12 +434,14 @@ stick weer in een gewone computer zit.
 ## Zelf compileren
 
 Vereisten: Windows 10/11, PowerShell 5.1+ en `gcc` van [MinGW-w64](https://winlibs.com) (elke recente
-x86_64-versie) in het `PATH`. Verder niets.
+x86_64-versie) in het `PATH`. De ARM64- en BIOS-versies gebruiken ook `clang` van [LLVM](https://llvm.org) en
+`nasm`, en het hardwarelab gebruikt [QEMU](https://www.qemu.org) — alle drie installeer je met `winget`.
 
 ```powershell
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
-.\build.ps1                                  # UEFI x64 + IA32, simulator, pakketten — en alle tests
+.\build.ps1                                  # UEFI x64 + IA32 + ARM64, BIOS, simulator, pakketten — en de testsuite
+.\tools\qemu-lab.ps1                         # de echte programma’s op 13 geëmuleerde machines starten en elk controleren
 .\build\folio_sim.exe                        # FolioOS in een venster draaien
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # het echte UEFI-programma in een venster draaien
 .\flash_usb.ps1 -DriveLetter E:              # FAT32-stick installeren/bijwerken, bestanden blijven staan
@@ -444,7 +452,8 @@ cd FolioOS
 
 De testsuite bestuurt de simulator en het echte `BOOTX64.EFI` (in een kleine UEFI-host) met gescripte
 toetsaanslagen en muisgebeurtenissen, maakt schermafbeeldingen en controleert elke export (ZIP + XML), elke
-vertaling (met een negatieve controle voor de validator) en zes framebufferformaten.
+vertaling (met een negatieve controle voor de validator), zes framebufferformaten en de FAT32-driver van de
+BIOS-brug (duizenden willekeurige bewerkingen, byte voor byte gecontroleerd).
 
 <a id="architecture-in-one-picture"></a>
 
@@ -453,7 +462,8 @@ vertaling (met een negatieve controle voor de validator) en zes framebufferforma
 ```
 src/core/       draagbare kern (freestanding C, zonder libc): editor, Markdown, TrueType-rasterizer,
                 UI-toolkit en vensterbeheer, exports, MP3, i18n, toetsenborden, thema’s
-src/platform/   uefi/  GOP/UGA-beeld, invoer, FAT-I/O, HD Audio/AC'97 — rechtstreeks op de firmware
+src/platform/   uefi/  GOP/UGA-beeld, invoer, FAT-I/O, HD Audio/AC'97, USB HID- en PS/2-drivers — op de firmware
+                bios/  opstartsectoren + BIOS→UEFI-brug (VBE, PS/2, eigen FAT32-driver) voor pc’s met alleen BIOS
                 win32/ simulator voor ontwikkeling en automatische tests
 tools/          efi_host (draait BOOTX64.EFI op Windows), i18n-hulpmiddel, schijfkopiemaker, showcase
 assets/         lettertypen, vertalingen (.po), toetsenbordindelingen, voorbeeldthema
@@ -467,6 +477,7 @@ Een programma van ~600 KB bestuurt de hele machine via een dunne platformlaag. D
 
 ## Planning
 
+- [x] Pc’s met alleen BIOS (Legacy/CSM) en ARM64 (Raspberry Pi met UEFI-firmware, ARM-laptops)
 - [x] Koreaanse invoer (Hangul met 2 sets) en Japanse kana-invoer (romaji → hiragana/katakana)
 - [ ] Japanse kanji-omzetting en Chinese pinyin-invoer (hebben woordenboeken nodig)
 - [ ] Tekstvormgeving en schriften van rechts naar links (Arabisch, Hebreeuws, Devanagari…)
