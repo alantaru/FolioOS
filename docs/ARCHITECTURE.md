@@ -23,6 +23,9 @@ no libc and no driver model: the UEFI firmware provides the hardware access it n
                        ├────────────────────────────────────────────────────────────┤
                        │ src/platform/win32       simulator: GDI window, folders as │
                        │   win32_main.c           volumes, scripted tests           │
+                       ├────────────────────────────────────────────────────────────┤
+                       │ src/platform/macos       simulator: AppKit window, folders │
+                       │   macos_main.m           as volumes, scripted tests        │
                        └────────────────────────────────────────────────────────────┘
 ```
 
@@ -53,6 +56,7 @@ no libc and no driver model: the UEFI firmware provides the hardware access it n
 `folio_sim.exe` — plus `efi_host.exe`, a tiny UEFI implementation for Windows that loads and runs
 the real `BOOTX64.EFI`. Scripts in `tests/` type, click, switch languages and keyboards,
 export files and take screenshots; the build checks exports (valid ZIP/XML), translations
-(placeholders, with a negative control) and several framebuffer formats.
+(placeholders, with a negative control) and several framebuffer formats. On macOS,
+`build_macos.sh --test` builds the AppKit simulator and runs the same simulator scripts headless.
 
 Detailed developer notes (in Portuguese) live in [dev/HANDOFF.pt-BR.md](dev/HANDOFF.pt-BR.md).

@@ -21,6 +21,14 @@ All notable changes to this project are documented here. The format follows
 - End-to-end test `tests/teclado.txt` that turns the mouse off and drives every window with keys.
 - README in all 15 interface languages, generated from one template by `tools/readmes.pl`, with a
   language bar on every page.
+- Native macOS simulator (`src/platform/macos`, `build_macos.sh`): an AppKit port of the
+  Windows simulator with Retina support, Cmd as Ctrl for shortcuts, folders as volumes, audio
+  and the same headless scripted tests (`./build_macos.sh --test`). Needs only the Xcode
+  Command Line Tools; UEFI binaries, packages and disk images are still built on Windows.
+  Option keeps typing characters; Option+M is Alt+M and Cmd+Option+1…9 is Alt+1…9.
+
+### Changed
+- `src/core/embed.c` is portable to Mach-O (Apple clang).
 
 ### Fixed
 - Alt+letter shortcuts (Alt+1…9) now reach the app in the Windows simulator and ignore the active
