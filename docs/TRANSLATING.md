@@ -145,3 +145,10 @@ covers Latin, Greek and Cyrillic, and CJK interfaces with the fonts from
 (Arabic, Hebrew, Devanagari, Thai…) need a text-shaping engine first — see the roadmap in
 the README. Translations for them are welcome anyway: they will light up as soon as the
 engine lands.
+
+## 8. The README in your language
+
+The short READMEs (`README.<code>.md`) are generated from one template so they stay identical
+in structure. Edit or add your language's table in `tools/readmes.pl`, then run
+`perl tools/readmes.pl`: it rewrites every `README.<code>.md` and the language bar at the top
+of `README.md`. Do not edit the generated files by hand.

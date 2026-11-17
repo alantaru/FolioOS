@@ -4,6 +4,37 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- **Full keyboard operation:** every window can be used without a mouse. A window opened by its
+  shortcut receives the keyboard; Tab/Shift+Tab and unused arrow keys move between controls,
+  Enter/Space press them, Left/Right adjust sliders, segmented options, steppers and the music
+  position. A focus ring (shown only after keyboard use) marks the active control, and tooltips
+  appear for it too.
+- **Ctrl+F6** moves the keyboard between the text and the open windows; **Alt+M** opens the menu
+  (recent documents included), also reachable from the command palette.
+- **Option to switch the mouse and touchpad off** (Settings › System, Ctrl+K › Mouse, or
+  `use_mouse=0` in `CONFIG.INI`).
+- **Enter** toggles auto-scroll in reading mode; **Alt+↑** goes to the parent folder in the file
+  manager (the shortcut was advertised but did not work).
+- End-to-end test `tests/teclado.txt` that turns the mouse off and drives every window with keys.
+- README in all 15 interface languages, generated from one template by `tools/readmes.pl`, with a
+  language bar on every page.
+
+### Fixed
+- Alt+letter shortcuts (Alt+1…9) now reach the app in the Windows simulator and ignore the active
+  keyboard layout (they were translated, so Alt+1 failed on AZERTY).
+- The music volume slider was labelled "Drive".
+- F12 now behaves like F5, F6 and F10: it opens Settings, gives them the keyboard, and closes them.
+- The menu showed "Ctrl+⇧+S" while the palette and help said "Ctrl+Shift+S".
+- The Ctrl+W hint pointed only to a mouse button; it now also names the palette command.
+- Unbound Alt+letter combinations no longer type the letter (they behave like unbound Ctrl+letter).
+- Help: the reading-mode entries named only mouse actions (margin click, middle button, double click);
+  they now list the keyboard equivalents.
+- The danger style of confirm buttons depended on a Portuguese word.
+- `tools/i18n update` dropped source references and translator comments from `.po` files.
+
 ## [4.1.0] — 2026-11-16
 
 First public, open-source release as **FolioOS**.

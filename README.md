@@ -18,8 +18,11 @@ No Windows. No Linux. No internet. No notifications. Just you and the text.
 [Languages](#13-15-languages-and-counting) ·
 [FAQ](#faq) ·
 [Build](#build-from-source) ·
-[Contribute](CONTRIBUTING.md) ·
-[Português](README.pt-BR.md)
+[Contribute](CONTRIBUTING.md)
+
+<!-- languages -->
+<sub>**English** · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Italiano](README.it.md) · [Português (Brasil)](README.pt-BR.md) · [Português (Portugal)](README.pt-PT.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Türkçe](README.tr.md) · [Русский](README.ru.md) · [Українська](README.uk.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)</sub>
+<!-- /languages -->
 
 <img src="docs/screenshots/hero.png" alt="FolioOS writing screen: a short story on a cream paper sheet, with only a word count and a clock around it" width="900">
 
@@ -118,8 +121,8 @@ the top edge. **Hemingway mode** disables deleting, to keep you moving forward.
 
 **Ctrl+P** turns your Markdown into a typeset page, like a book. Turn pages with the arrow keys, the space
 bar or a click on the margins. The bottom bar shows how much you have read and how long the chapter and
-the whole text will take; **auto-scroll** moves the text at your reading speed (in words per minute), and
-the middle mouse button starts it or drags the text. **Esc** goes back to writing *at the paragraph you
+the whole text will take; **auto-scroll** moves the text at your reading speed (in words per minute):
+**Enter** or the middle mouse button starts it, **+** and **−** change the speed. **Esc** goes back to writing *at the paragraph you
 were reading*.
 
 ### 5. Chapters and outline
@@ -179,6 +182,26 @@ today are counted across documents and reboots.
 **Ctrl+K** finds any command by typing a few letters — in your language. **F1** lists every shortcut:
 
 <img src="docs/screenshots/shortcuts.png" alt="Keyboard shortcuts window" width="900">
+
+#### No mouse needed
+
+Everything in FolioOS works from the keyboard alone, and the mouse and touchpad can be switched off
+completely (*Settings › System › Use the mouse and touchpad*, **Ctrl+K › Mouse**, or `use_mouse=0` in
+`CONFIG.INI`) — handy on laptops with a jumpy touchpad.
+
+| Keys | What they do |
+|---|---|
+| Shortcut of a window (F12, F5, F6, F10, Ctrl+O…) | Opens it with the keyboard inside it |
+| **Tab** / **Shift+Tab**, **↑ ↓** | Move between the buttons, switches, sliders and lists of a window |
+| **Enter** or **Space** | Press the highlighted button, switch or item |
+| **← →** | Adjust the highlighted slider, option or value |
+| **Esc** | Close the window and go back to the text; with nothing open, show the hidden bars |
+| **Ctrl+F6** | Move the keyboard between the text and the open windows |
+| **Alt+M** | Menu with the recent documents (also in Ctrl+K) |
+
+A highlight shows which control has the keyboard; it only appears once you use the keys, so nothing
+changes for mouse users. Typing letters in a side window (outline, music, settings) sends them straight
+back to your text.
 
 ### 11. Themes and typography
 
@@ -323,6 +346,14 @@ reports are welcome. Apple Silicon Macs are not supported.
 
 The interface is fully translated, but typing CJK text needs an input method, which is on the roadmap.
 Latin, Greek and Cyrillic scripts can be typed today with the included keyboard layouts.
+</details>
+
+<details>
+<summary><b>Can I use it without a mouse?</b></summary>
+
+Yes. Every window, button and setting is reachable from the keyboard (Tab, arrows, Enter, Space, Esc),
+and you can switch the mouse and touchpad off entirely in *Settings › System*. See
+[No mouse needed](#no-mouse-needed).
 </details>
 
 <details>
