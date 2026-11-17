@@ -9,7 +9,7 @@
 [English](README.md) · [**Baixar**](https://github.com/alantaru/FolioOS/releases/latest) ·
 [Traduzir](docs/TRANSLATING.md) · [Contribuir](CONTRIBUTING.md)
 
-<img src="docs/screenshots/editor.png" alt="Editor do FolioOS" width="860">
+<img src="docs/screenshots/hero.png" alt="Editor do FolioOS" width="860">
 
 </div>
 
