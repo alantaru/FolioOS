@@ -192,6 +192,11 @@ if (-not $NoTests) {
     Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\i18n_legacy.txt", "--out", "build\shots") | Out-Null
     if (-not (Select-String -Quiet -Path "$t\FOLIO\CONFIG.INI" -Pattern "^theme=Papyrus")) { throw "old Portuguese CONFIG.INI was not migrated to the new keys" }
     Ok "languages: English default, 14 translations, plurals (ru/pl), keyboards, CJK fonts, old installs stay in Portuguese - OK"
+    # no mouse at all: the mouse is turned off and every window is used with Tab, arrows, Enter and Space
+    Fresh; Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\teclado.txt", "--out", "build\shots") | Out-Null
+    if (-not (Select-String -Quiet -Path "$t\FOLIO\CONFIG.INI" -Pattern "^use_mouse=0")) { throw "turning the mouse off was not saved in CONFIG.INI" }
+    if (-not (Select-String -Quiet -Path "$t\FOLIO\CONFIG.INI" -Pattern "^typewriter=1")) { throw "a setting changed with the keyboard was not saved" }
+    Ok "keyboard only: mouse off, menu, files, settings, themes, outline, Ctrl+F6, dialogs, reading - OK"
     # universal video: pixel formats, Blt only, padded stride, UGA (no GOP), portrait panel with EDID
     $vs = "build\test_video.txt"; Set-Content -Encoding ascii $vs "wait 1200`nshot v.png`nquit"
     foreach ($g in @(@("--gop", "rgb"), @("--gop", "mask16"), @("--gop", "blt"), @("--gop", "pad"), @("--gop", "uga"), @("--size", "800x1280", "--edid"))) {

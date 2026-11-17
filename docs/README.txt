@@ -39,6 +39,15 @@ Inside FolioOS, Ctrl+Shift+S exports to Word (.docx), LibreOffice (.odt), e-book
 Main shortcuts: F1 help · Ctrl+K commands · F2 focus · F3 typewriter ·
 F11 zen mode · F12 appearance · Ctrl+Q shut down.
 
+WITHOUT A MOUSE
+   Everything works from the keyboard. A window opened by its shortcut gets the
+   keyboard: Tab / Shift+Tab and the arrows move between its controls, Enter or
+   Space press them, Left/Right adjust sliders and options, Esc closes. Ctrl+F6
+   moves the keyboard between the text and the open windows; Alt+M opens the menu
+   with the recent documents. To switch the mouse and touchpad off completely:
+   Settings > System > "Use the mouse and touchpad", Ctrl+K > "Mouse", or
+   use_mouse=0 in FOLIO\CONFIG.INI.
+
 LANGUAGES
    On first boot FolioOS follows the language of the firmware setup, when a
    translation exists; otherwise it starts in English. Change it any time in

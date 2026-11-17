@@ -113,6 +113,7 @@ void prefs_load(void) {
         else if (str_eq(k, "scale")) prefs.ui_scale = CLAMP(fv, 0.0f, 3.0f);
         else if (str_eq(k, "pointer_speed")) prefs.pointer_speed = CLAMP(fv, 0.2f, 4.0f);
         else if (str_eq(k, "touch")) prefs.touch_mode = CLAMP(iv, 0, 2);
+        else if (str_eq(k, "use_mouse")) prefs.no_mouse = !bv;
         else if (str_eq(k, "audio_gpio")) prefs.audio_gpio = bv;
         else if (str_eq(k, "fast_video")) prefs.video_fast = bv;
         else if (str_eq(k, "rotation")) prefs.rotation = str_ieq(v, "auto") ? 0 : iv == 0 && v[0] == '0' ? 1 : iv == 90 ? 2 : iv == 180 ? 3 : iv == 270 ? 4 : 0;
@@ -174,6 +175,7 @@ void prefs_save(void) {
     put_dec(&b, "pointer_speed", prefs.pointer_speed);
     buf_printf(&b, "shuffle=%d\r\nrepeat=%d\r\n", prefs.shuffle, prefs.repeat);
     buf_printf(&b, "touch=%d\r\naudio_gpio=%d\r\nfast_video=%d\r\n", prefs.touch_mode, prefs.audio_gpio, prefs.video_fast);
+    buf_printf(&b, "use_mouse=%d\r\n", !prefs.no_mouse);
     {
         static const char *rn[5] = { "auto", "0", "90", "180", "270" };
         buf_printf(&b, "rotation=%s\r\nresolution=%s\r\n", rn[CLAMP(prefs.rotation, 0, 4)], prefs.video_mode[0] ? prefs.video_mode : "auto");

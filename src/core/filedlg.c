@@ -2,7 +2,7 @@
 #include "folio.h"
 
 static void files_body(Window *w, Rect r);
-Window win_files = { N_("Files"), IC_FOLDER, {0, 0, 900, 580}, false, true, true, true, false, 0, 640, 420, files_body, 0, 0, false };
+Window win_files = { N_("Files"), IC_FOLDER, {0, 0, 900, 580}, false, true, true, true, false, 0, 640, 420, files_body, 0, 0, false, -1, 0, 0, 0 };
 
 static int   mode, vol, sel = -1, sort_key, fmt_sel;
 static bool  sort_desc, show_all;
@@ -17,8 +17,8 @@ static ConfirmFn dlg_cfn; static PromptFn dlg_pfn;
 static void confirm_body(Window *w, Rect r);
 static void prompt_body(Window *w, Rect r);
 static void confirm_closed(Window *w);
-static Window win_confirm = { dlg_title, IC_HELP, {0, 0, 480, 210}, false, true, true, false, false, 0, 300, 160, confirm_body, confirm_closed, 0, false };
-static Window win_prompt = { dlg_title, IC_EDIT, {0, 0, 460, 200}, false, true, true, false, false, 0, 300, 160, prompt_body, 0, 0, false };
+static Window win_confirm = { dlg_title, IC_HELP, {0, 0, 480, 210}, false, true, true, false, false, 0, 300, 160, confirm_body, confirm_closed, 0, false, -1, 0, 0, 0 };
+static Window win_prompt = { dlg_title, IC_EDIT, {0, 0, 460, 200}, false, true, true, false, false, 0, 300, 160, prompt_body, 0, 0, false, -1, 0, 0, 0 };
 
 void dialog_confirm(const char *title, const char *msg, const char *yes, const char *alt, ConfirmFn fn) {
     str_copy(dlg_title, title, sizeof dlg_title); str_copy(dlg_msg, msg, sizeof dlg_msg);
@@ -54,7 +54,7 @@ static void confirm_body(Window *w, Rect r) {
     ConfirmFn fn = dlg_cfn;
     /* resposta dada: o fechamento não conta como "Cancelar" */
 #define ANSWER(c) do { dlg_cfn = 0; wm_close(w); if (fn) fn(c); } while (0)
-    if (ui_button(rect(x, by, bw, bh), dlg_yes, str_starts(dlg_yes, "Excluir") ? BTN_DANGER : BTN_PRIMARY) || ui_key(KEY_ENTER)) { ANSWER(1); return; }
+    if (ui_button(rect(x, by, bw, bh), dlg_yes, str_eq(dlg_yes, L("Delete")) ? BTN_DANGER : BTN_PRIMARY) || ui_key(KEY_ENTER)) { ANSWER(1); return; }
     x -= bw + SI(10);
     if (dlg_alt[0]) { if (ui_button(rect(x, by, bw, bh), dlg_alt, BTN_GHOST)) { ANSWER(2); return; } x -= bw + SI(10); }
     if (ui_button(rect(x, by, bw, bh), L("Cancel"), BTN_SUBTLE)) { ANSWER(0); }
@@ -232,12 +232,12 @@ static void files_body(Window *w, Rect r) {
         if (vi.boot) fmt(lab, sizeof lab, "%s", vi.label[0] ? vi.label : L("FolioOS USB drive"));
         else fmt(lab, sizeof lab, "%s", vi.label[0] ? vi.label : L("Drive"));
         Rect it = rect(cur.x - SI(6), cur.y, cur.w + SI(12), SI(34));
+        bool fire = ui_item(it);
         bool on = v == vol, hv = ui_hover(it);
         if (on) gfx_rrect(it, S(8), col_alpha(T->accent, 0.14f)); else if (hv) gfx_rrect(it, S(8), col_alpha(T->text, 0.06f));
         icon_draw(IC_DRIVE, it.x + S(18), it.y + it.h * 0.5f, S(18), on ? T->accent : col_alpha(T->panel_text, 0.7f));
         draw_text_ellipsis(f, px, it.x + S(36), it.y + it.h * 0.5f + face_ascent(f, px) * 0.36f, it.w - S(42), lab, T->panel_text);
-        if (hv) ui.cursor = 2;
-        if (ui.in.pressed && hv) go(v, "/");
+        if (fire) go(v, "/");
         cur.y += SI(36);
     }
     cur.y += SI(10);
@@ -245,12 +245,12 @@ static void files_body(Window *w, Rect r) {
     struct { const char *n, *p; int ic; } places[] = { { L("Documents"), paths_dir(DIR_DOCS), IC_DOC }, { L("Music"), paths_dir(DIR_MUSIC), IC_MUSIC }, { L("Root"), "/", IC_HOME } };
     for (int i = 0; i < 3; i++) {
         Rect it = rect(cur.x - SI(6), cur.y, cur.w + SI(12), SI(34));
+        bool fire = ui_item(it);
         bool on = vol == app_boot_vol() && str_ieq(cwd, places[i].p), hv = ui_hover(it);
         if (on) gfx_rrect(it, S(8), col_alpha(T->accent, 0.14f)); else if (hv) gfx_rrect(it, S(8), col_alpha(T->text, 0.06f));
         icon_draw(places[i].ic, it.x + S(18), it.y + it.h * 0.5f, S(18), on ? T->accent : col_alpha(T->panel_text, 0.7f));
         draw_text(f, px, it.x + S(36), it.y + it.h * 0.5f + face_ascent(f, px) * 0.36f, places[i].n, -1, T->panel_text);
-        if (hv) ui.cursor = 2;
-        if (ui.in.pressed && hv) {
+        if (fire) {
             bool d; if (!pal_exists(app_boot_vol(), places[i].p, &d) && i < 2) pal_mkdir(app_boot_vol(), places[i].p);
             go(app_boot_vol(), places[i].p);
         }
@@ -265,7 +265,12 @@ static void files_body(Window *w, Rect r) {
     /* --- barra de navegação --- */
     int mx = r.x + side + SI(16), mw = r.w - side - SI(32);
     int ty = r.y + SI(12), th = SI(36);
-    if (ui_icon_btn(rect(mx, ty, th, th), IC_UP, false, L("Parent folder (Alt+↑)")) || ui_key(KEY_F5 + 100)) {
+    bool alt_up = false;
+    for (int i = 0; i < ui.in.nkeys && ui.key_win == &win_files; i++) {
+        Event *k = &ui.in.keys[i];
+        if (k->type == EV_KEY && k->key == KEY_UP && (k->mods & MOD_ALT)) { k->type = EV_NONE; alt_up = true; }
+    }
+    if (ui_icon_btn(rect(mx, ty, th, th), IC_UP, false, L("Parent folder (Alt+↑)")) || alt_up) {
         char p[512]; str_copy(p, cwd, sizeof p); path_parent(p); go(vol, p);
     }
     /* breadcrumb */
@@ -286,10 +291,11 @@ static void files_body(Window *w, Rect r) {
             float wv = text_width(k == ns - 1 ? fb : f, px, lab, -1);
             if (bx + wv > limit) { draw_text(f, px, bx, base, "…", -1, T->muted); break; }
             Rect hr = rect((int)bx - SI(6), ty + SI(4), (int)wv + SI(12), th - SI(8));
+            bool fire = k < ns - 1 && ui_item(hr);
             bool hv = ui_hover(hr);
             if (hv && k < ns - 1) { gfx_rrect(hr, S(6), col_alpha(T->text, 0.07f)); ui.cursor = 2; }
             draw_text(k == ns - 1 ? fb : f, px, bx, base, lab, -1, k == ns - 1 ? T->panel_text : col_alpha(T->panel_text, 0.65f));
-            if (ui.in.pressed && hv && k < ns - 1) {
+            if (fire) {
                 char p[512] = "/";
                 for (int q = 0; q <= k; q++) { str_cat(p, segs[q], sizeof p); if (q < k) str_cat(p, "/", sizeof p); }
                 go(vol, p); return;
@@ -320,12 +326,12 @@ static void files_body(Window *w, Rect r) {
     int hx[3] = { c1, c2, c3 };
     for (int k = 0; k < 3; k++) {
         Rect hr = rect(hx[k] - SI(6), list.y, (k == 0 ? c2 - c1 : SI(104)), hh);
+        bool fire = ui_item(hr);
         bool hv = ui_hover(hr);
         Color hc = sort_key == k ? T->accent : col_alpha(T->panel_text, hv ? 0.85f : 0.55f);
         float tw = draw_text(ui_font(true), S(12.5f), hx[k], list.y + hh * 0.62f, heads[k], -1, hc);
         if (sort_key == k) icon_draw(sort_desc ? IC_CHEVRON : IC_UP, tw + S(10), list.y + hh * 0.5f, S(11), hc);
-        if (hv) ui.cursor = 2;
-        if (ui.in.pressed && hv) { if (sort_key == k) sort_desc = !sort_desc; else { sort_key = k; sort_desc = k == 2; } refresh(); }
+        if (fire) { if (sort_key == k) sort_desc = !sort_desc; else { sort_key = k; sort_desc = k == 2; } refresh(); }
     }
     gfx_rect(rect(list.x, list.y + hh, list.w, 1), col_alpha(T->border, 0.7f));
     Rect rows = rect(list.x, list.y + hh + SI(2), list.w, list.h - hh - SI(2));
@@ -333,6 +339,7 @@ static void files_body(Window *w, Rect r) {
     float content = (float)nents * rh;
     if (ui_hover(rows) && ui.in.wheel) scroll -= ui.in.wheel * rh * 3;
     scroll = CLAMP(scroll, 0.0f, MAX(0.0f, content - rows.h));
+    ui_nav(rows, NAV_LIST);
     /* teclado */
     Event e;
     while (true) {
@@ -407,11 +414,12 @@ static void files_body(Window *w, Rect r) {
             char lab[32]; fmt(lab, sizeof lab, "%s", fi->ext);
             float wv = text_width(fb, S(13), lab, -1) + S(24);
             Rect cr = rect((int)x, cy, (int)wv, SI(30));
+            bool fire = ui_item(cr);
             bool on = fmt_sel == k, hv = ui_hover(cr);
             gfx_rrect(cr, S(15), on ? T->accent : col_alpha(T->text, hv ? 0.12f : 0.06f));
             draw_text_c(fb, S(13), cr, lab, on ? (col_luma(T->accent) > 0.6f ? 0xFF1A1A1A : 0xFFFFFFFF) : T->panel_text);
-            if (hv) { ui.cursor = 2; ui_tooltip(fi, cr, L(fi->name)); }
-            if (ui.in.pressed && hv) {
+            ui_tooltip(fi, cr, L(fi->name));
+            if (fire) {
                 fmt_sel = k;
                 /* troca a extensão digitada, se houver */
                 int ff = format_from_path(fname);

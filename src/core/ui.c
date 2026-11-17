@@ -15,7 +15,7 @@ static int zcounter;
 void wm_raise(Window *w) { w->z = ++zcounter; }
 void wm_open(Window *w) {
     wm_add(w);
-    if (!w->open) { w->open = true; if (w->anim <= 0.01f) w->anim = 0.0f; }
+    if (!w->open) { w->open = true; w->nav = -1; w->nav_kind = NAV_ITEM; if (w->anim <= 0.01f) w->anim = 0.0f; }
     if (!w->centered_once || w->modal) {
         if (w->r.w > ui.W - SI(24)) w->r.w = ui.W - SI(24);
         if (w->r.h > ui.H - SI(24)) w->r.h = ui.H - SI(24);
@@ -46,6 +46,28 @@ void wm_close(Window *w) {
 }
 void wm_toggle(Window *w) { if (w->open) wm_close(w); else wm_open(w); }
 
+/* foco de teclado: uma janela (painéis como Ajustes também, para quem não usa mouse) ou o texto (0) */
+void wm_focus(Window *w) {
+    if (w && !w->open) return;
+    if (ui.key_win != w) { ui.key_win = w; ui.focus = 0; }
+    if (w) wm_raise(w);
+    ui.nav_show = true; ui.redraw = true;
+}
+/* Ctrl+F6: texto → janelas abertas (na ordem em que foram criadas, estável) → texto */
+void wm_cycle_focus(void) {
+    if (wm_any_modal()) return;
+    Window *seq[33]; int m = 0, cur = 0;
+    seq[m++] = 0;
+    for (int i = 0; i < ui.nwins; i++) if (ui.wins[i]->open) seq[m++] = ui.wins[i];
+    for (int k = 0; k < m; k++) if (seq[k] == ui.key_win) cur = k;
+    Window *nx = seq[(cur + 1) % m];
+    wm_focus(nx);
+    char t[160];
+    if (nx) fmt(t, sizeof t, L("Keyboard: %s (Tab moves, Esc closes)"), L(nx->title));
+    else str_copy(t, L("Keyboard: text"), sizeof t);
+    ui_toast(t);
+}
+
 static void sorted(Window **out, int *n) {
     *n = 0;
     for (int i = 0; i < ui.nwins; i++) if (ui.wins[i]->open || ui.wins[i]->anim > 0.01f) out[(*n)++] = ui.wins[i];
@@ -71,6 +93,7 @@ void wm_hit_test(void) {
         if (w->modal) { ui.modal_block = true; break; }
     }
     if (!ui.hot_win) for (int i = 0; i < n; i++) if (list[i]->open && list[i]->modal) ui.modal_block = true;
+    if (ui.in.pressed) ui.nav_show = false;          /* clicou: o contorno de foco do teclado some */
     if (ui.in.pressed && !ui.drag_win) {
         if (ui.hot_win) {
             wm_raise(ui.hot_win);
@@ -128,6 +151,72 @@ static bool take_matching(int key, int mods, Event *out) {
 }
 bool ui_key(int key) { return take_matching(key, -1, 0); }
 
+/* ------------------------------------------------------------ navegação sem mouse
+ * Cada widget de uma janela se registra como item (ui_nav), na ordem em que é desenhado.
+ * Na janela com foco de teclado: Tab/Shift+Tab e as setas que a janela não usou andam entre os
+ * itens; Enter/Espaço acionam o item; ←/→ ajustam deslizantes e opções. O contorno de foco só
+ * aparece depois de usar o teclado, e nada muda no desenho para quem usa mouse. */
+static bool plain_key(const Event *e) { return e->type == EV_KEY && !(e->mods & (MOD_CTRL | MOD_ALT)); }
+static bool is_tab(const Event *e) { return e->key == KEY_TAB || (e->ch == 9 && !e->key); }
+static void nav_move(Window *w, int d) {
+    int n = w->nav_n;
+    if (n <= 0) return;
+    w->nav = w->nav < 0 ? (d > 0 ? 0 : n - 1) : (w->nav + d + n) % n;
+    w->nav_kind = NAV_ITEM;          /* até o item se registrar de novo no próximo quadro */
+    ui.nav_show = true; ui.nav_reveal = true; ui.focus = 0; ui.redraw = true;
+}
+/* antes do corpo da janela: Tab, e Enter/Espaço/←/→ quando são do item focado */
+static void nav_pre(Window *w) {
+    for (int i = 0; i < ui.in.nkeys; i++) {
+        Event *e = &ui.in.keys[i];
+        if (!plain_key(e)) continue;
+        if (is_tab(e)) { e->type = EV_NONE; nav_move(w, (e->mods & MOD_SHIFT) ? -1 : 1); continue; }
+        if (w->nav < 0 || !ui.nav_show) continue;
+        int k = w->nav_kind;
+        if ((k == NAV_ITEM || k == NAV_ADJ) && !ui.nav_fire && (e->key == KEY_ENTER || (e->ch == ' ' && !e->key))) { e->type = EV_NONE; ui.nav_fire = true; continue; }
+        if (k == NAV_ADJ && !ui.nav_adj && (e->key == KEY_LEFT || e->key == KEY_RIGHT)) { e->type = EV_NONE; ui.nav_adj = e->key == KEY_LEFT ? -1 : 1; continue; }
+    }
+}
+/* depois do corpo: as setas que a janela não usou (listas usam ↑/↓) passam de um item ao outro */
+static void nav_post(Window *w) {
+    w->nav_n = w->nav_cnt;
+    if (w->nav >= w->nav_n) w->nav = w->nav_n - 1;
+    ui.nav_reveal = false;
+    for (int i = 0; i < ui.in.nkeys; i++) {
+        Event *e = &ui.in.keys[i];
+        if (!plain_key(e)) continue;
+        int d = e->key == KEY_UP || e->key == KEY_LEFT ? -1 : e->key == KEY_DOWN || e->key == KEY_RIGHT ? 1 : 0;
+        if (!d) continue;
+        e->type = EV_NONE;
+        nav_move(w, d);
+    }
+}
+bool ui_nav(Rect r, int kind) {
+    Window *w = ui.cur_win;
+    if (!w || ui.nav_skip) return false;
+    int idx = w->nav_cnt++;
+    if (ui.in.pressed && ui_hover(r)) { w->nav = idx; w->nav_kind = kind; }   /* o clique leva o foco junto */
+    if (w != ui.key_win || idx != w->nav) return false;
+    w->nav_kind = kind;
+    ui.nav_found = true; ui.nav_r = r;
+    if (ui.nav_show) gfx_rrect_line(rect(r.x - SI(7), r.y - SI(3), r.w + SI(14), r.h + SI(6)), S(10), S(2), T->accent);
+    return true;
+}
+bool ui_item(Rect r) {
+    bool f = ui_nav(r, NAV_ITEM), hv = ui_hover(r);
+    if (hv) ui.cursor = 2;
+    return (ui.in.pressed && hv) || (f && ui.nav_fire);
+}
+void ui_reveal(float *scroll, Rect view) {
+    if (!ui.nav_reveal || !ui.nav_found || !ui.cur_win || ui.cur_win != ui.key_win) return;
+    Rect r = ui.nav_r; int pad = SI(14);
+    float d = 0;
+    if (r.y < view.y + pad || r.h > view.h - 2 * pad) d = (float)(r.y - view.y - pad);
+    else if (r.y + r.h > view.y + view.h - pad) d = (float)(r.y + r.h - (view.y + view.h - pad));
+    if (d != 0) { *scroll = MAX(0.0f, *scroll + d); ui.redraw = true; }
+    ui.nav_reveal = false;
+}
+
 /* ------------------------------------------------------------ desenho de janela */
 static void draw_window(Window *w) {
     float a = ease_out(w->anim);
@@ -140,7 +229,8 @@ static void draw_window(Window *w) {
     gfx_shadow(rect(r.x, r.y + SI(10), r.w, r.h), rad, S(34), T->dark ? 0x80000000 : 0x2A3A2A1A);
     gfx_shadow(rect(r.x, r.y + SI(1), r.w, r.h), rad, S(4), T->dark ? 0x50000000 : 0x14000000);
     gfx_rrect(r, rad, T->panel);
-    gfx_rrect_line(r, rad, S(1), col_alpha(T->border, T->dark ? 0.9f : 0.8f));
+    bool kf = w == ui.key_win && ui.nav_show && !w->modal;   /* janela com o teclado: borda na cor de destaque */
+    gfx_rrect_line(r, rad, kf ? S(1.5f) : S(1), kf ? T->accent : col_alpha(T->border, T->dark ? 0.9f : 0.8f));
     int th = w->no_titlebar ? 0 : SI(46);
     if (!w->no_titlebar) {
         Face *fb = ui_font(true);
@@ -169,7 +259,12 @@ static void draw_window(Window *w) {
     }
     Rect body = rect(r.x, r.y + th, r.w, r.h - th);
     gfx_push_clip(rect_inset(body, 1));
+    w->nav_cnt = 0; ui.nav_fire = false; ui.nav_adj = 0; ui.nav_found = false;
+    bool keys = w == ui.key_win && w->open;
+    if (keys) nav_pre(w);
     if (w->body) w->body(w, body);
+    if (keys && ui.key_win == w) nav_post(w); else w->nav_n = w->nav_cnt;
+    ui.nav_fire = false; ui.nav_adj = 0;
     gfx_pop_clip();
     gfx_set_opacity(1);
     ui.cur_win = 0;
@@ -205,7 +300,9 @@ void wm_draw_all(void) {
 
 /* ------------------------------------------------------------ tooltips / toasts */
 void ui_tooltip(const void *id, Rect r, const char *text) {
-    if (!ui_hover(r)) return;
+    /* também no item com o foco do teclado, para quem não passa o mouse por cima */
+    bool nf = ui.nav_show && ui.nav_found && ui.cur_win && ui.cur_win == ui.key_win && r.x == ui.nav_r.x && r.y == ui.nav_r.y && r.w == ui.nav_r.w && r.h == ui.nav_r.h;
+    if (!ui_hover(r) && !nf) return;
     if (ui.tip_id != id) { ui.tip_id = id; ui.tip_since = ui.in.now; }
     ui.tip = text; ui.tip_r = r;
 }
@@ -261,6 +358,7 @@ void ui_label(float x, float y, const char *s, Color c, float px, bool bold) {
 void ui_panel(Rect r) { gfx_rrect(r, S(10), col_alpha(T->text, T->dark ? 0.05f : 0.035f)); }
 
 bool ui_button(Rect r, const char *label, int style) {
+    bool nf = ui_nav(r, NAV_ITEM);
     bool hv = ui_hover(r), dn = hv && ui.in.down;
     Color bg, fg;
     switch (style) {
@@ -273,10 +371,11 @@ bool ui_button(Rect r, const char *label, int style) {
     if (bg) gfx_rrect(r, S(8), bg);
     draw_text_c(ui_font(style == BTN_PRIMARY), S(14), r, label, fg);
     if (hv) ui.cursor = 2;
-    return ui.in.pressed && hv;
+    return (ui.in.pressed && hv) || (nf && ui.nav_fire);
 }
 
 bool ui_icon_btn(Rect r, int icon, bool active, const char *tip) {
+    bool nf = ui_nav(r, NAV_ITEM);
     bool hv = ui_hover(r);
     if (active) gfx_rrect(r, S(8), col_alpha(T->accent, 0.16f));
     else if (hv) gfx_rrect(r, S(8), col_alpha(T->chrome_text, 0.10f));
@@ -284,10 +383,11 @@ bool ui_icon_btn(Rect r, int icon, bool active, const char *tip) {
     icon_draw(icon, r.x + r.w * 0.5f, r.y + r.h * 0.5f, S(19), c);
     if (hv) ui.cursor = 2;
     if (tip) ui_tooltip(tip, r, tip);
-    return ui.in.pressed && hv;
+    return (ui.in.pressed && hv) || (nf && ui.nav_fire);
 }
 
 bool ui_toggle(Rect r, const char *label, bool *v) {
+    bool nf = ui_nav(r, NAV_ITEM);
     bool hv = ui_hover(r);
     Face *f = ui_font(false); float px = S(14);
     draw_text(f, px, r.x, r.y + r.h * 0.5f + face_ascent(f, px) * 0.36f, label, -1, T->panel_text);
@@ -297,7 +397,7 @@ bool ui_toggle(Rect r, const char *label, bool *v) {
     float kx = *v ? s.x + sw - sh / 2 : s.x + sh / 2;
     gfx_circle(kx, s.y + sh / 2, sh / 2 - S(3), 0xFFFFFFFF);
     if (hv) ui.cursor = 2;
-    if (ui.in.pressed && hv) { *v = !*v; ui.redraw = true; return true; }
+    if ((ui.in.pressed && hv) || (nf && ui.nav_fire)) { *v = !*v; ui.redraw = true; return true; }
     return false;
 }
 
@@ -307,13 +407,17 @@ bool ui_slider(Rect r, float *v, float lo, float hi, const char *label, const ch
     if (label) draw_text(f, px, r.x, base, label, -1, T->panel_text);
     if (valtxt) { float w = text_width(f, px, valtxt, -1); draw_text(f, px, r.x + r.w - w, base, valtxt, -1, col_alpha(T->panel_text, 0.6f)); }
     Rect tr = rect(r.x, r.y + SI(30), r.w, SI(18));
+    bool changed = false;
+    if (ui_nav(r, NAV_ADJ) && ui.nav_adj) {          /* ←/→: um vigésimo da faixa por toque */
+        float nv = CLAMP(*v + ui.nav_adj * (hi - lo) / 20.0f, lo, hi);
+        if (nv != *v) { *v = nv; changed = true; ui.redraw = true; }
+    }
     float t = (*v - lo) / (hi - lo); t = CLAMP(t, 0.0f, 1.0f);
     float ty = tr.y + tr.h * 0.5f;
     gfx_rrect(rect(tr.x, (int)(ty - S(2)), tr.w, SI(4)), S(2), col_alpha(T->text, 0.14f));
     gfx_rrect(rect(tr.x, (int)(ty - S(2)), (int)(tr.w * t), SI(4)), S(2), T->accent);
     bool hv = ui_hover(tr);
     if (ui.in.pressed && hv) ui.active = v;
-    bool changed = false;
     if (ui.active == v) {
         if (!ui.in.down) ui.active = 0;
         else {
@@ -331,9 +435,13 @@ bool ui_slider(Rect r, float *v, float lo, float hi, const char *label, const ch
 }
 
 bool ui_segmented(Rect r, const char **items, int n, int *sel) {
+    bool changed = false;
+    if (ui_nav(r, NAV_ADJ) && (ui.nav_adj || ui.nav_fire)) {   /* ←/→ escolhem; Enter/Espaço avançam */
+        int ns = ui.nav_adj ? CLAMP(*sel + ui.nav_adj, 0, n - 1) : (*sel + 1) % n;
+        if (ns != *sel) { *sel = ns; changed = true; ui.redraw = true; }
+    }
     gfx_rrect(r, S(9), col_alpha(T->text, T->dark ? 0.08f : 0.06f));
     float w = (float)r.w / n;
-    bool changed = false;
     Face *f = ui_font(false);
     for (int i = 0; i < n; i++) {
         Rect c = rect(r.x + (int)(w * i) + SI(3), r.y + SI(3), (int)w - SI(6), r.h - SI(6));
@@ -375,8 +483,9 @@ void ui_scrollbar(Rect track, float *scroll, float content, float view) {
 static int prev_cp(const char *s, int i) { return utf8_prev(s, i); }
 bool ui_textfield(Rect r, char *buf, int cap, const char *ph, bool autofocus) {
     bool hv = ui_hover(r);
+    if (ui_nav(r, NAV_TEXT) && ui.nav_show && ui.focus != buf) { ui.focus = buf; ui.focus_caret = str_len(buf); ui.focus_sel = buf[0] ? 1 : 0; }
     bool focused = ui.focus == buf;
-    if (autofocus && !ui.focus && keys_allowed()) { ui.focus = buf; ui.focus_caret = str_len(buf); ui.focus_sel = buf[0] ? 1 : 0; focused = true; }
+    if (autofocus && !ui.focus && keys_allowed() && (!ui.cur_win || ui.cur_win->nav < 0)) { ui.focus = buf; ui.focus_caret = str_len(buf); ui.focus_sel = buf[0] ? 1 : 0; focused = true; }
     Face *f = ui_font(false); float px = S(15);
     int len = str_len(buf);
     if (ui.in.pressed && hv) {
@@ -463,6 +572,7 @@ bool ui_textfield(Rect r, char *buf, int cap, const char *ph, bool autofocus) {
 
 /* ------------------------------------------------------------ quadro */
 void ui_begin_frame(void) {
+    ui.nav_found = false; ui.nav_r = rect(0, 0, 0, 0);
     ui.cursor = 0;
     ui.wake_ms = 0;
     ui.tip = 0;

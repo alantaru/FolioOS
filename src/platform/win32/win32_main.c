@@ -288,6 +288,10 @@ static LRESULT CALLBACK wndproc(HWND h, UINT m, WPARAM wp, LPARAM lp) {
         bool altgr = (mods & MOD_CTRL) && (mods & MOD_ALT);
         int k = map_vk(wp);
         if (k) { e.type = EV_KEY; e.key = k; e.mods = mods; push(&e); return 0; }
+        /* Alt+letra/número (Alt+M menu, Alt+1…9 abas): o Windows manda WM_SYSCHAR, que é ignorado */
+        if ((mods & MOD_ALT) && !(mods & MOD_CTRL) && ((wp >= 'A' && wp <= 'Z') || (wp >= '0' && wp <= '9'))) {
+            e.type = EV_KEY; e.ch = (u32)(wp >= 'A' && wp <= 'Z' ? wp - 'A' + 'a' : wp); e.mods = mods; push(&e); return 0;
+        }
         if ((mods & MOD_CTRL) && !altgr) {
             u32 ch = 0;
             if (wp >= 'A' && wp <= 'Z') ch = (u32)(wp - 'A' + 'a');
@@ -367,6 +371,7 @@ static int parse_key(const char *s, int *mods) {
         { "f7", KEY_F7 }, { "f8", KEY_F8 }, { "f9", KEY_F9 }, { "f10", KEY_F10 }, { "f11", KEY_F11 }, { "f12", KEY_F12 },
     };
     for (size_t i = 0; i < sizeof t / sizeof t[0]; i++) if (!_stricmp(s, t[i].n)) return t[i].k;
+    if (!_stricmp(s, "space")) return -(int)' ';
     return -(int)(unsigned char)s[0];   /* letra com modificador */
 }
 static int run_script(const char *file, const char *outdir) {
@@ -518,6 +523,10 @@ static int run_script(const char *file, const char *outdir) {
             Window *w = wm_top();
             if (w) { fprintf(stderr, "FALHA: janela ainda aberta: %s\n", w->title); return 2; }
             printf("ok: nenhuma janela aberta\n");
+        } else if (!strcmp(line, "assert_keywin")) {     /* quem recebe o teclado: "text" ou o título (msgid) da janela */
+            const char *got = ui.key_win ? ui.key_win->title : "text";
+            if (strcmp(got, arg)) { fprintf(stderr, "FALHA: teclado em \"%s\" (esperado \"%s\")\n", got, arg); return 2; }
+            printf("ok: teclado em %s\n", arg);
         } else if (!strcmp(line, "assert_para")) {
             int a = 0, b = -1; if (sscanf(arg, "%d %d", &a, &b) < 2) b = a;
             int p = preview_active() ? preview_top_para() : app.caret.p;

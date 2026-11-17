@@ -41,7 +41,7 @@ msgstr "Зберегти зміни?"
 msgid "The current document has changes that have not been saved yet."
 msgstr "Поточний документ має незбережені зміни."
 
-#: src/core/app.c:422 src/core/app.c:730 src/core/app.c:848 src/core/filedlg.c:400
+#: src/core/app.c:422 src/core/app.c:740 src/core/app.c:869 src/core/filedlg.c:407
 msgid "Save"
 msgstr "Зберегти"
 
@@ -99,19 +99,19 @@ msgstr "Сторінка: текст у колонці, як на аркуші �
 msgid "Settings"
 msgstr "Налаштування"
 
-#: src/core/app.c:578 src/core/app.c:744 src/core/app.c:859 src/core/app.c:1542
+#: src/core/app.c:578 src/core/app.c:754 src/core/app.c:880 src/core/app.c:1578
 msgid "Find and replace"
 msgstr "Знайти й замінити"
 
-#: src/core/app.c:579 src/core/app.c:859 src/core/app.c:1554
+#: src/core/app.c:579 src/core/app.c:880 src/core/app.c:1590
 msgid "Outline"
 msgstr "Структура"
 
-#: src/core/app.c:580 src/core/app.c:760 src/core/app.c:1555
+#: src/core/app.c:580 src/core/app.c:770 src/core/app.c:1591
 msgid "Session and goals"
 msgstr "Сеанс і цілі"
 
-#: src/core/app.c:581 src/core/app.c:764 src/core/app.c:863
+#: src/core/app.c:581 src/core/app.c:774 src/core/app.c:884
 msgid "Keyboard shortcuts"
 msgstr "Клавіатурні скорочення"
 
@@ -119,7 +119,7 @@ msgstr "Клавіатурні скорочення"
 msgid "Commands"
 msgstr "Команди"
 
-#: src/core/app.c:583 src/core/app.c:1671
+#: src/core/app.c:583 src/core/app.c:1709
 msgid "Menu"
 msgstr "Меню"
 
@@ -141,8 +141,8 @@ msgid "Tabs off — your tabs are kept for when you turn them back on"
 msgstr "Вкладки вимкнено — вони збережуться до наступного ввімкнення"
 
 #: src/core/app.c:608
-msgid "Turn tabs on with the button at the top to use Ctrl+W"
-msgstr "Увімкніть вкладки кнопкою вгорі, щоб користуватися Ctrl+W"
+msgid "Turn tabs on to use Ctrl+W (Ctrl+K → Tabs, or the button at the top)"
+msgstr "Увімкніть вкладки, щоб користуватися Ctrl+W (Ctrl+K → Вкладки або кнопка вгорі)"
 
 #: src/core/app.c:620
 msgid "Focus off"
@@ -224,498 +224,522 @@ msgstr "Розумна типографіка вимкнена"
 msgid "Page %s"
 msgstr "Сторінка: %s"
 
-#: src/core/app.c:687 src/core/editor.c:695 src/core/preview.c:251
+#: src/core/app.c:687 src/core/editor.c:696 src/core/preview.c:251
 msgid "This is the last chapter"
 msgstr "Це останній розділ"
 
-#: src/core/app.c:705
+#: src/core/app.c:704
+msgid "Mouse and touchpad off: keyboard only (Ctrl+K → Mouse turns them back on)"
+msgstr "Мишу й тачпад вимкнено: лише клавіатура (Ctrl+K → Миша вмикає їх знову)"
+
+#: src/core/app.c:704
+msgid "Mouse and touchpad on"
+msgstr "Мишу й тачпад увімкнено"
+
+#: src/core/app.c:715
 msgid "Could not read the language file"
 msgstr "Не вдалося прочитати файл мови"
 
-#: src/core/app.c:709
+#: src/core/app.c:719
 #, c-format
 msgid "This language needs extra fonts (%s) in %s. Install the matching font pack."
 msgstr "Для цієї мови потрібні додаткові шрифти (%s) у %s. Установіть відповідний пакет шрифтів."
 
-#: src/core/app.c:722
+#: src/core/app.c:732
 msgid "New document"
 msgstr "Новий документ"
 
-#: src/core/app.c:722 src/core/app.c:847
+#: src/core/app.c:732 src/core/app.c:868
 msgid "Ctrl+N"
 msgstr "Ctrl+N"
 
-#: src/core/app.c:723
+#: src/core/app.c:733
 msgid "Tabs: several documents (on/off)"
 msgstr "Вкладки: кілька документів (увімк./вимк.)"
 
-#: src/core/app.c:724
+#: src/core/app.c:734
 msgid "Close tab"
 msgstr "Закрити вкладку"
 
-#: src/core/app.c:724
+#: src/core/app.c:734
 msgid "Ctrl+W"
 msgstr "Ctrl+W"
 
-#: src/core/app.c:725
+#: src/core/app.c:735
 msgid "Next tab"
 msgstr "Наступна вкладка"
 
-#: src/core/app.c:725
+#: src/core/app.c:735
 msgid "Ctrl+Tab"
 msgstr "Ctrl+Tab"
 
-#: src/core/app.c:726
+#: src/core/app.c:736
 msgid "Previous tab"
 msgstr "Попередня вкладка"
 
-#: src/core/app.c:726
+#: src/core/app.c:736
 msgid "Ctrl+Shift+Tab"
 msgstr "Ctrl+Shift+Tab"
 
-#: src/core/app.c:727
+#: src/core/app.c:737
 msgid "Create a custom theme (colors and fonts)"
 msgstr "Створити власну тему (кольори й шрифти)"
 
-#: src/core/app.c:728
+#: src/core/app.c:738
 msgid "Edit the current theme"
 msgstr "Змінити поточну тему"
 
-#: src/core/app.c:729 src/core/app.c:847
+#: src/core/app.c:739 src/core/app.c:868
 msgid "Open…"
 msgstr "Відкрити…"
 
-#: src/core/app.c:729 src/core/app.c:847
+#: src/core/app.c:739 src/core/app.c:868
 msgid "Ctrl+O"
 msgstr "Ctrl+O"
 
-#: src/core/app.c:730 src/core/app.c:848
+#: src/core/app.c:740 src/core/app.c:869
 msgid "Ctrl+S"
 msgstr "Ctrl+S"
 
-#: src/core/app.c:731 src/core/app.c:848
+#: src/core/app.c:741 src/core/app.c:869
 msgid "Save as / Export…"
 msgstr "Зберегти як / Експорт…"
 
-#: src/core/app.c:731 src/core/app.c:1539
+#: src/core/app.c:741 src/core/app.c:869 src/core/app.c:1575
 msgid "Ctrl+Shift+S"
 msgstr "Ctrl+Shift+S"
 
-#: src/core/app.c:732
+#: src/core/app.c:742
 msgid "Reading mode (formatted Markdown)"
 msgstr "Режим читання (форматований Markdown)"
 
-#: src/core/app.c:732 src/core/app.c:1541
+#: src/core/app.c:742 src/core/app.c:1577
 msgid "Ctrl+P"
 msgstr "Ctrl+P"
 
-#: src/core/app.c:733
+#: src/core/app.c:743
 msgid "Reading auto-scroll (on/off)"
 msgstr "Автопрокручування під час читання (увімк./вимк.)"
 
-#: src/core/app.c:733 src/core/app.c:1549
-msgid "Middle button"
-msgstr "Середня кнопка"
+#: src/core/app.c:743 src/core/app.c:1584
+msgid "Enter (reading)"
+msgstr "Enter (читання)"
 
-#: src/core/app.c:734
+#: src/core/app.c:744
 msgid "Next chapter"
 msgstr "Наступний розділ"
 
-#: src/core/app.c:734
+#: src/core/app.c:744
 msgid "Ctrl+PgDn"
 msgstr "Ctrl+PgDn"
 
-#: src/core/app.c:735
+#: src/core/app.c:745
 msgid "Previous chapter"
 msgstr "Попередній розділ"
 
-#: src/core/app.c:735
+#: src/core/app.c:745
 msgid "Ctrl+PgUp"
 msgstr "Ctrl+PgUp"
 
-#: src/core/app.c:736
+#: src/core/app.c:746
 msgid "Go to the last edit"
 msgstr "До останнього редагування"
 
-#: src/core/app.c:736 src/core/app.c:1546
+#: src/core/app.c:746 src/core/app.c:1582
 msgid "Ctrl+J"
 msgstr "Ctrl+J"
 
-#: src/core/app.c:737 src/core/app.c:1545
+#: src/core/app.c:747 src/core/app.c:1581
 msgid "Duplicate paragraph"
 msgstr "Дублювати абзац"
 
-#: src/core/app.c:737 src/core/app.c:1545
+#: src/core/app.c:747 src/core/app.c:1581
 msgid "Ctrl+D"
 msgstr "Ctrl+D"
 
-#: src/core/app.c:738 src/core/app.c:1545
+#: src/core/app.c:748 src/core/app.c:1581
 msgid "Delete paragraph"
 msgstr "Видалити абзац"
 
-#: src/core/app.c:738 src/core/app.c:1545
+#: src/core/app.c:748 src/core/app.c:1581
 msgid "Ctrl+Shift+K"
 msgstr "Ctrl+Shift+K"
 
-#: src/core/app.c:739
+#: src/core/app.c:749
 msgid "Change case"
 msgstr "Регістр літер"
 
-#: src/core/app.c:739 src/core/app.c:1547
+#: src/core/app.c:749 src/core/app.c:1583
 msgid "Shift+F3"
 msgstr "Shift+F3"
 
-#: src/core/app.c:740
+#: src/core/app.c:750
 msgid "Insert today's date"
 msgstr "Вставити сьогоднішню дату"
 
-#: src/core/app.c:741
+#: src/core/app.c:751
 msgid "Focus mode (sentence / paragraph / line)"
 msgstr "Режим фокусу (речення / абзац / рядок)"
 
-#: src/core/app.c:742
+#: src/core/app.c:752
 msgid "Typewriter (centered line)"
 msgstr "Друкарська машинка (рядок посередині)"
 
-#: src/core/app.c:743
+#: src/core/app.c:753
 msgid "Zen mode (no bars)"
 msgstr "Режим дзен (без панелей)"
 
-#: src/core/app.c:744 src/core/app.c:859 src/core/app.c:1542
+#: src/core/app.c:754 src/core/app.c:880 src/core/app.c:1578
 msgid "Ctrl+F"
 msgstr "Ctrl+F"
 
-#: src/core/app.c:745
+#: src/core/app.c:755
 msgid "Document outline"
 msgstr "Структура документа"
 
-#: src/core/app.c:746
+#: src/core/app.c:756
 msgid "Appearance: themes and typography"
 msgstr "Вигляд: теми й типографіка"
 
-#: src/core/app.c:747 src/core/app.c:1551
+#: src/core/app.c:757 src/core/app.c:1587
 msgid "Next theme"
 msgstr "Наступна тема"
 
-#: src/core/app.c:747 src/core/app.c:1551
+#: src/core/app.c:757 src/core/app.c:1587
 msgid "Ctrl+T"
 msgstr "Ctrl+T"
 
-#: src/core/app.c:748
+#: src/core/app.c:758
 msgid "Next font"
 msgstr "Наступний шрифт"
 
-#: src/core/app.c:748
+#: src/core/app.c:758
 msgid "Ctrl+Shift+T"
 msgstr "Ctrl+Shift+T"
 
-#: src/core/app.c:749
+#: src/core/app.c:759
 msgid "Larger text"
 msgstr "Більший текст"
 
-#: src/core/app.c:749
+#: src/core/app.c:759
 msgid "Ctrl+="
 msgstr "Ctrl+="
 
-#: src/core/app.c:750
+#: src/core/app.c:760
 msgid "Smaller text"
 msgstr "Менший текст"
 
-#: src/core/app.c:750
+#: src/core/app.c:760
 msgid "Ctrl+-"
 msgstr "Ctrl+-"
 
-#: src/core/app.c:751
+#: src/core/app.c:761
 msgid "Page or full screen (text width)"
 msgstr "Сторінка або весь екран (ширина тексту)"
 
-#: src/core/app.c:752
+#: src/core/app.c:762
 msgid "Page size: narrow · medium · wide · extra"
 msgstr "Розмір сторінки: вузька · середня · широка · дуже широка"
 
-#: src/core/app.c:753
+#: src/core/app.c:763
 msgid "Paper sheet (show/hide)"
 msgstr "Аркуш паперу (показати/сховати)"
 
-#: src/core/app.c:754 src/core/app.c:862
+#: src/core/app.c:764 src/core/app.c:883
 msgid "Writing settings"
 msgstr "Налаштування письма"
 
-#: src/core/app.c:755
+#: src/core/app.c:765
 msgid "Music: play / pause"
 msgstr "Музика: грати / пауза"
 
-#: src/core/app.c:756
+#: src/core/app.c:766
 msgid "Music: next track"
 msgstr "Музика: наступний трек"
 
-#: src/core/app.c:757
+#: src/core/app.c:767
 msgid "Music: previous track"
 msgstr "Музика: попередній трек"
 
-#: src/core/app.c:758 src/core/app.c:1554
+#: src/core/app.c:768 src/core/app.c:1590
 msgid "Music player"
 msgstr "Музичний програвач"
 
-#: src/core/app.c:759
+#: src/core/app.c:769
 msgid "Start / stop writing sprint"
 msgstr "Почати / зупинити спринт"
 
-#: src/core/app.c:761
+#: src/core/app.c:771
 msgid "Hemingway mode (no deleting)"
 msgstr "Режим Гемінґвея (без видалення)"
 
-#: src/core/app.c:762
+#: src/core/app.c:772
 msgid "Hide markup outside the paragraph"
 msgstr "Приховувати розмітку поза абзацом"
 
-#: src/core/app.c:763
+#: src/core/app.c:773
 msgid "Smart typography (— “ ” …)"
 msgstr "Розумна типографіка (— « » …)"
 
-#: src/core/app.c:765
+#: src/core/app.c:775 src/core/app.c:1585
+msgid "Menu and recent documents"
+msgstr "Меню та нещодавні документи"
+
+#: src/core/app.c:775 src/core/app.c:1585
+msgid "Alt+M"
+msgstr "Alt+M"
+
+#: src/core/app.c:776
+msgid "Keyboard focus: text or the next window"
+msgstr "Фокус клавіатури: текст або наступне вікно"
+
+#: src/core/app.c:776 src/core/app.c:1595
+msgid "Ctrl+F6"
+msgstr "Ctrl+F6"
+
+#: src/core/app.c:777
+msgid "Mouse and touchpad (on/off)"
+msgstr "Миша й тачпад (увімк./вимк.)"
+
+#: src/core/app.c:778
 msgid "Language and keyboard"
 msgstr "Мова й клавіатура"
 
-#: src/core/app.c:766
+#: src/core/app.c:779
 msgid "Restart the computer"
 msgstr "Перезавантажити комп’ютер"
 
-#: src/core/app.c:767
+#: src/core/app.c:780
 msgid "Shut down the computer"
 msgstr "Вимкнути комп’ютер"
 
-#: src/core/app.c:767 src/core/app.c:865 src/core/app.c:1557
+#: src/core/app.c:780 src/core/app.c:886 src/core/app.c:1593
 msgid "Ctrl+Q"
 msgstr "Ctrl+Q"
 
-#: src/core/app.c:789
+#: src/core/app.c:802
 msgid "Type a command…"
 msgstr "Введіть команду…"
 
-#: src/core/app.c:820
+#: src/core/app.c:833
 msgid "No command found"
 msgstr "Команду не знайдено"
 
-#: src/core/app.c:838
+#: src/core/app.c:859
 msgid "File not found (a different USB drive?)"
 msgstr "Файл не знайдено (інша флешка?)"
 
-#: src/core/app.c:846
+#: src/core/app.c:867
 msgid "DOCUMENT"
 msgstr "ДОКУМЕНТ"
 
-#: src/core/app.c:847
+#: src/core/app.c:868
 msgid "New"
 msgstr "Новий"
 
-#: src/core/app.c:848
-msgid "Ctrl+⇧+S"
-msgstr "Ctrl+⇧+S"
-
-#: src/core/app.c:854
+#: src/core/app.c:875
 msgid "RECENT"
 msgstr "НЕЩОДАВНІ"
 
-#: src/core/app.c:858
+#: src/core/app.c:879
 msgid "WRITING"
 msgstr "ПИСЬМО"
 
-#: src/core/app.c:860
+#: src/core/app.c:881
 msgid "Session, goals and sprint"
 msgstr "Сеанс, цілі й спринт"
 
-#: src/core/app.c:861
+#: src/core/app.c:882
 msgid "PREFERENCES"
 msgstr "НАЛАШТУВАННЯ"
 
-#: src/core/app.c:862 src/core/app.c:943 src/core/app.c:1556
+#: src/core/app.c:883 src/core/app.c:966 src/core/app.c:1592
 msgid "Appearance"
 msgstr "Вигляд"
 
-#: src/core/app.c:865 src/core/app.c:1140 src/core/app.c:1557
+#: src/core/app.c:886 src/core/app.c:1166 src/core/app.c:1593
 msgid "Shut down"
 msgstr "Вимкнути"
 
-#: src/core/app.c:927
+#: src/core/app.c:950
 #, c-format
 msgid "Diagnostics saved to %s"
 msgstr "Діагностику збережено в %s"
 
-#: src/core/app.c:927
+#: src/core/app.c:950
 msgid "Could not save the diagnostics"
 msgstr "Не вдалося зберегти діагностику"
 
-#: src/core/app.c:937
+#: src/core/app.c:960
 msgid "Display restored: automatic resolution and rotation"
 msgstr "Екран відновлено: автоматична роздільність і поворот"
 
-#: src/core/app.c:943
+#: src/core/app.c:966
 msgid "Writing"
 msgstr "Письмо"
 
-#: src/core/app.c:943
+#: src/core/app.c:966
 msgid "System"
 msgstr "Система"
 
-#: src/core/app.c:953
+#: src/core/app.c:976
 msgid "THEMES"
 msgstr "ТЕМИ"
 
-#: src/core/app.c:960
+#: src/core/app.c:983
 msgid "+  Create my theme"
 msgstr "+  Створити свою тему"
 
-#: src/core/app.c:961
+#: src/core/app.c:984
 msgid "Edit this theme"
 msgstr "Змінити цю тему"
 
-#: src/core/app.c:963
+#: src/core/app.c:986
 #, c-format
 msgid "Mix colors and fonts; themes are saved in %s (editable .INI files)."
 msgstr "Поєднуйте кольори й шрифти; теми зберігаються в %s (редаговані файли .INI)."
 
-#: src/core/app.c:965
+#: src/core/app.c:988
 msgid "TEXT FONT"
 msgstr "ШРИФТ ТЕКСТУ"
 
-#: src/core/app.c:973
+#: src/core/app.c:997
 msgid "The quick brown fox jumps — “Hello!”"
 msgstr "Чуєш їх, доцю, га? Кумедна ж ти, прощайся без ґольфів! — «Привіт!»"
 
-#: src/core/app.c:980
+#: src/core/app.c:1003
 #, c-format
 msgid "Add .ttf fonts to %s (subfolders work too) and restart."
 msgstr "Додайте шрифти .ttf до %s (підпапки теж підходять) і перезавантажтеся."
 
-#: src/core/app.c:981
+#: src/core/app.c:1004
 msgid "Ready-made pack: FOLIO-FONTS-EXTRA.zip — unzip it at the root of the USB drive."
 msgstr "Готовий пакет: FOLIO-FONTS-EXTRA.zip — розпакуйте його в корінь флешки."
 
-#: src/core/app.c:983
+#: src/core/app.c:1006
 msgid "TYPOGRAPHY"
 msgstr "ТИПОГРАФІКА"
 
-#: src/core/app.c:984
+#: src/core/app.c:1007
 #, c-format
 msgid "%d px"
 msgstr "%d пікс."
 
-#: src/core/app.c:985
+#: src/core/app.c:1008
 msgid "Text size"
 msgstr "Розмір тексту"
 
-#: src/core/app.c:988
+#: src/core/app.c:1011
 msgid "Line spacing"
 msgstr "Міжрядковий інтервал"
 
-#: src/core/app.c:990
+#: src/core/app.c:1013
 #, c-format
 msgid "%.2f lines"
 msgstr "%.2f рядка"
 
-#: src/core/app.c:991
+#: src/core/app.c:1014
 msgid "Space between paragraphs"
 msgstr "Відступ між абзацами"
 
-#: src/core/app.c:993
+#: src/core/app.c:1016
 msgid "First-line indent for paragraphs (book style)"
 msgstr "Відступ першого рядка абзацу (як у книжці)"
 
-#: src/core/app.c:995
+#: src/core/app.c:1018
 msgid "PAGE"
 msgstr "СТОРІНКА"
 
-#: src/core/app.c:997
+#: src/core/app.c:1020
 msgid "Page"
 msgstr "Сторінка"
 
-#: src/core/app.c:997
+#: src/core/app.c:1020
 msgid "Full screen"
 msgstr "Весь екран"
 
-#: src/core/app.c:1006
+#: src/core/app.c:1029
 #, c-format
 msgid "%d px (~%d characters per line)"
 msgstr "%d пікс. (~%d знаків у рядку)"
 
-#: src/core/app.c:1007
+#: src/core/app.c:1030
 msgid "Page width"
 msgstr "Ширина сторінки"
 
-#: src/core/app.c:1009
+#: src/core/app.c:1032
 msgid "Paper sheet on the desk (light themes)"
 msgstr "Аркуш паперу на столі (світлі теми)"
 
-#: src/core/app.c:1012
+#: src/core/app.c:1035
 msgid "The text fills the whole screen width, with no sheet."
 msgstr "Текст займає всю ширину екрана, без аркуша."
 
-#: src/core/app.c:1016
+#: src/core/app.c:1039
 msgid "FOCUS MODE"
 msgstr "РЕЖИМ ФОКУСУ"
 
-#: src/core/app.c:1017
+#: src/core/app.c:1040
 msgid "Off"
 msgstr "Вимк."
 
-#: src/core/app.c:1017
+#: src/core/app.c:1040
 msgid "Sentence"
 msgstr "Речення"
 
-#: src/core/app.c:1017
+#: src/core/app.c:1040
 msgid "Paragraph"
 msgstr "Абзац"
 
-#: src/core/app.c:1017
+#: src/core/app.c:1040
 msgid "Line"
 msgstr "Рядок"
 
-#: src/core/app.c:1020
+#: src/core/app.c:1043
 msgid "EDITOR"
 msgstr "РЕДАКТОР"
 
-#: src/core/app.c:1022
+#: src/core/app.c:1045
 msgid "Typewriter — current line in the center"
 msgstr "Друкарська машинка — поточний рядок посередині"
 
-#: src/core/app.c:1023
+#: src/core/app.c:1046
 msgid "Live Markdown (headings, bold, lists)"
 msgstr "Markdown наживо (заголовки, жирний, списки)"
 
-#: src/core/app.c:1024
+#: src/core/app.c:1047
 msgid "Hide markup outside the current paragraph"
 msgstr "Приховувати розмітку поза поточним абзацом"
 
-#: src/core/app.c:1025
+#: src/core/app.c:1048
 msgid "Smart typography:  --  →  —   \"\"  →  “”   ...  →  …"
 msgstr "Розумна типографіка:  --  →  —   \"\"  →  «»   ...  →  …"
 
-#: src/core/app.c:1026
+#: src/core/app.c:1049
 msgid "Hemingway mode — deleting is not allowed"
 msgstr "Режим Гемінґвея — видаляти не можна"
 
-#: src/core/app.c:1027
+#: src/core/app.c:1050
 msgid "Hide the bars while writing"
 msgstr "Приховувати панелі під час письма"
 
-#: src/core/app.c:1028
+#: src/core/app.c:1051
 msgid "Blinking cursor"
 msgstr "Блимаючий курсор"
 
-#: src/core/app.c:1029
+#: src/core/app.c:1052
 msgid "Smooth cursor movement"
 msgstr "Плавний рух курсора"
 
-#: src/core/app.c:1036
+#: src/core/app.c:1059
 msgid "Tabs — several open documents, remembered after a restart"
 msgstr "Вкладки — кілька відкритих документів, запам’ятовуються після перезавантаження"
 
-#: src/core/app.c:1039
+#: src/core/app.c:1062
 msgid "GOALS AND SAVING"
 msgstr "ЦІЛІ Й ЗБЕРЕЖЕННЯ"
 
-#: src/core/app.c:1040 src/core/app.c:1499 src/core/app.c:1748
+#: src/core/app.c:1063 src/core/app.c:1535 src/core/app.c:1786
 #, c-format
 msgid "%d word"
 msgid_plural "%d words"
@@ -723,373 +747,377 @@ msgstr[0] "%d слово"
 msgstr[1] "%d слова"
 msgstr[2] "%d слів"
 
-#: src/core/app.c:1041
+#: src/core/app.c:1064
 msgid "Session goal"
 msgstr "Ціль сеансу"
 
-#: src/core/app.c:1043 src/core/app.c:1501 src/core/app.c:1713
+#: src/core/app.c:1066 src/core/app.c:1537 src/core/app.c:1751
 #, c-format
 msgid "%d min"
 msgstr "%d хв"
 
-#: src/core/app.c:1044
+#: src/core/app.c:1067
 msgid "Sprint length"
 msgstr "Тривалість спринту"
 
-#: src/core/app.c:1046
+#: src/core/app.c:1069
 #, c-format
 msgid "every %d s"
 msgstr "кожні %d с"
 
-#: src/core/app.c:1047
+#: src/core/app.c:1070
 msgid "Autosave"
 msgstr "Автозбереження"
 
-#: src/core/app.c:1050
+#: src/core/app.c:1073
 msgid "LANGUAGE AND KEYBOARD"
 msgstr "МОВА Й КЛАВІАТУРА"
 
-#: src/core/app.c:1053
+#: src/core/app.c:1076
 msgid "Language"
 msgstr "Мова"
 
-#: src/core/app.c:1058
+#: src/core/app.c:1081
 msgid "Keyboard"
 msgstr "Клавіатура"
 
-#: src/core/app.c:1067
+#: src/core/app.c:1090
 #, c-format
 msgid "Languages: %s · keyboards: %s (text files anyone can add)"
 msgstr "Мови: %s · клавіатури: %s (текстові файли, які може додати будь-хто)"
 
-#: src/core/app.c:1071
+#: src/core/app.c:1094
 msgid "DISPLAY AND POINTER"
 msgstr "ЕКРАН І ВКАЗІВНИК"
 
-#: src/core/app.c:1072
+#: src/core/app.c:1095
 msgid "Auto"
 msgstr "Авто"
 
-#: src/core/app.c:1077
+#: src/core/app.c:1100
 msgid "Rotate: auto"
 msgstr "Поворот: авто"
 
-#: src/core/app.c:1085
+#: src/core/app.c:1108
 #, c-format
 msgid "Resolution: %dx%d"
 msgstr "Роздільність: %dx%d"
 
-#: src/core/app.c:1086
+#: src/core/app.c:1109
 #, c-format
 msgid "Resolution: automatic (%dx%d)"
 msgstr "Роздільність: автоматично (%dx%d)"
 
-#: src/core/app.c:1096
+#: src/core/app.c:1119
 msgid "Restore display"
 msgstr "Відновити екран"
 
-#: src/core/app.c:1098
+#: src/core/app.c:1121
 msgid "If the picture looks wrong or goes black: Ctrl+Alt+Home restores it; Ctrl+Alt+arrows rotate the screen."
 msgstr "Якщо зображення неправильне чи чорне: Ctrl+Alt+Home відновлює його; Ctrl+Alt+стрілки повертають екран."
 
-#: src/core/app.c:1102
+#: src/core/app.c:1125
 msgid "Mouse / touchpad speed"
 msgstr "Швидкість миші / тачпада"
 
-#: src/core/app.c:1104
+#: src/core/app.c:1127
 msgid "Automatic"
 msgstr "Автоматично"
 
-#: src/core/app.c:1104
+#: src/core/app.c:1127
 msgid "Touchpad"
 msgstr "Тачпад"
 
-#: src/core/app.c:1104
+#: src/core/app.c:1127
 msgid "Touch screen"
 msgstr "Сенсорний екран"
 
-#: src/core/app.c:1107
+#: src/core/app.c:1130
 msgid "If the pointer jumps to the corners when you use the touchpad, choose Touchpad."
 msgstr "Якщо вказівник стрибає в кути під час роботи з тачпадом, виберіть «Тачпад»."
 
-#: src/core/app.c:1109
+#: src/core/app.c:1133
+msgid "Use the mouse and touchpad (off = keyboard only)"
+msgstr "Використовувати мишу й тачпад (вимк. = лише клавіатура)"
+
+#: src/core/app.c:1135
 msgid "SOUND"
 msgstr "ЗВУК"
 
-#: src/core/app.c:1110
+#: src/core/app.c:1136
 msgid "Turn on the amplifier through GPIO (some laptops; applies after a restart)"
 msgstr "Вмикати підсилювач через GPIO (деякі ноутбуки; діє після перезавантаження)"
 
-#: src/core/app.c:1112
+#: src/core/app.c:1138
 msgid "Test sound"
 msgstr "Перевірити звук"
 
-#: src/core/app.c:1113
+#: src/core/app.c:1139
 msgid "Save diagnostics"
 msgstr "Зберегти діагностику"
 
-#: src/core/app.c:1115
+#: src/core/app.c:1141
 #, c-format
 msgid "The diagnostics go to %s on the USB drive (it opens on any computer)."
 msgstr "Діагностика зберігається в %s на флешці (відкривається на будь-якому комп’ютері)."
 
-#: src/core/app.c:1117
+#: src/core/app.c:1143
 msgid "STARTUP"
 msgstr "ЗАПУСК"
 
-#: src/core/app.c:1118
+#: src/core/app.c:1144
 msgid "FolioOS splash screen"
 msgstr "Заставка FolioOS"
 
-#: src/core/app.c:1123
+#: src/core/app.c:1149
 msgid "Splash duration (any key skips it)"
 msgstr "Тривалість заставки (будь-яка клавіша пропускає її)"
 
-#: src/core/app.c:1129
+#: src/core/app.c:1155
 msgid "ABOUT"
 msgstr "ПРО ПРОГРАМУ"
 
-#: src/core/app.c:1132
+#: src/core/app.c:1158
 #, c-format
 msgid "FolioOS %s · %s · %dx%d"
 msgstr "FolioOS %s · %s · %dx%d"
 
-#: src/core/app.c:1133
+#: src/core/app.c:1159
 #, c-format
 msgid "Memory: %d MB used of %d MB · %d fonts · %d themes"
 msgstr "Пам’ять: використано %d МБ з %d МБ · шрифтів: %d · тем: %d"
 
-#: src/core/app.c:1134
+#: src/core/app.c:1160
 #, c-format
 msgid "Audio: %s"
 msgstr "Звук: %s"
 
-#: src/core/app.c:1139
+#: src/core/app.c:1165
 msgid "Restart"
 msgstr "Перезавантажити"
 
-#: src/core/app.c:1158
+#: src/core/app.c:1185
 msgid "Desk (background)"
 msgstr "Стіл (тло)"
 
-#: src/core/app.c:1158
+#: src/core/app.c:1185
 msgid "Paper"
 msgstr "Папір"
 
-#: src/core/app.c:1158 src/core/app.c:1354
+#: src/core/app.c:1185 src/core/app.c:1386
 msgid "Text"
 msgstr "Текст"
 
-#: src/core/app.c:1158
+#: src/core/app.c:1185
 msgid "Faded text"
 msgstr "Приглушений текст"
 
-#: src/core/app.c:1158
+#: src/core/app.c:1185
 msgid "Subtle lines"
 msgstr "Тонкі лінії"
 
-#: src/core/app.c:1158
+#: src/core/app.c:1185
 msgid "Accent"
 msgstr "Акцент"
 
-#: src/core/app.c:1158
+#: src/core/app.c:1185
 msgid "Selection"
 msgstr "Виділення"
 
-#: src/core/app.c:1158
+#: src/core/app.c:1185
 msgid "Cursor"
 msgstr "Курсор"
 
-#: src/core/app.c:1159
+#: src/core/app.c:1186
 msgid "Bars"
 msgstr "Панелі"
 
-#: src/core/app.c:1159
+#: src/core/app.c:1186
 msgid "Bar text"
 msgstr "Текст панелей"
 
-#: src/core/app.c:1159
+#: src/core/app.c:1186
 msgid "Borders"
 msgstr "Рамки"
 
-#: src/core/app.c:1159
+#: src/core/app.c:1186
 msgid "Panels"
 msgstr "Вікна"
 
-#: src/core/app.c:1159
+#: src/core/app.c:1186
 msgid "Panel text"
 msgstr "Текст вікон"
 
-#: src/core/app.c:1159
+#: src/core/app.c:1186
 msgid "Headings"
 msgstr "Заголовки"
 
-#: src/core/app.c:1159
+#: src/core/app.c:1186
 msgid "Code background"
 msgstr "Тло коду"
 
-#: src/core/app.c:1159
+#: src/core/app.c:1186
 msgid "Highlighter"
 msgstr "Маркер"
 
-#: src/core/app.c:1193
+#: src/core/app.c:1220
 msgid "My theme"
 msgstr "Моя тема"
 
-#: src/core/app.c:1194
+#: src/core/app.c:1221
 #, c-format
 msgid "My theme %d"
 msgstr "Моя тема %d"
 
-#: src/core/app.c:1217
+#: src/core/app.c:1244
 msgid "Give the theme a name"
 msgstr "Дайте темі назву"
 
-#: src/core/app.c:1219
+#: src/core/app.c:1246
 msgid "That name belongs to a built-in theme — choose another"
 msgstr "Це назва вбудованої теми — виберіть іншу"
 
-#: src/core/app.c:1220
+#: src/core/app.c:1247
 msgid "You already have a theme with that name"
 msgstr "У вас уже є тема з такою назвою"
 
-#: src/core/app.c:1223
+#: src/core/app.c:1250
 #, c-format
 msgid "Could not write to %s (is the USB drive write-protected or full?)"
 msgstr "Не вдалося записати в %s (флешка захищена від запису чи заповнена?)"
 
-#: src/core/app.c:1228
+#: src/core/app.c:1255
 #, c-format
 msgid "Theme “%s” saved to %s"
 msgstr "Тему «%s» збережено в %s"
 
-#: src/core/app.c:1240
+#: src/core/app.c:1267
 msgid "Theme deleted"
 msgstr "Тему видалено"
 
-#: src/core/app.c:1268
+#: src/core/app.c:1298
 msgid "THEME NAME"
 msgstr "НАЗВА ТЕМИ"
 
-#: src/core/app.c:1269
+#: src/core/app.c:1299
 msgid "Theme name"
 msgstr "Назва теми"
 
-#: src/core/app.c:1272
+#: src/core/app.c:1302
 msgid "STARTING POINT"
 msgstr "ВИХІДНА ТОЧКА"
 
-#: src/core/app.c:1275
+#: src/core/app.c:1305
 msgid "Colors from"
 msgstr "Кольори з"
 
-#: src/core/app.c:1277
+#: src/core/app.c:1307
 msgid "Use all"
 msgstr "Узяти всі"
 
-#: src/core/app.c:1284
+#: src/core/app.c:1314
 msgid "Or mix: pick a color below and take it from any built-in theme."
 msgstr "Або змішуйте: виберіть колір нижче й візьміть його з будь-якої вбудованої теми."
 
-#: src/core/app.c:1288
+#: src/core/app.c:1318
 msgid "COLORS"
 msgstr "КОЛЬОРИ"
 
-#: src/core/app.c:1317
+#: src/core/app.c:1347
 msgid "hex code"
 msgstr "шістнадцятковий код"
 
-#: src/core/app.c:1321
+#: src/core/app.c:1351
 msgid "Hue"
 msgstr "Тон"
 
-#: src/core/app.c:1324
+#: src/core/app.c:1354
 msgid "Saturation"
 msgstr "Насиченість"
 
-#: src/core/app.c:1327
+#: src/core/app.c:1357
 msgid "Lightness"
 msgstr "Світлість"
 
-#: src/core/app.c:1331
+#: src/core/app.c:1361
 msgid "Take from a built-in theme:"
 msgstr "Узяти з вбудованої теми:"
 
-#: src/core/app.c:1352
+#: src/core/app.c:1384
 msgid "THEME FONTS"
 msgstr "ШРИФТИ ТЕМИ"
 
-#: src/core/app.c:1359
+#: src/core/app.c:1391
 #, c-format
 msgid "Default (%s)"
 msgstr "Типовий (%s)"
 
-#: src/core/app.c:1360
+#: src/core/app.c:1392
 msgid "Interface"
 msgstr "Інтерфейс"
 
-#: src/core/app.c:1368
+#: src/core/app.c:1400
 msgid "Interface = bars, menus and windows. More fonts: FOLIO-FONTS-EXTRA.zip."
 msgstr "Інтерфейс = панелі, меню й вікна. Більше шрифтів: FOLIO-FONTS-EXTRA.zip."
 
-#: src/core/app.c:1372
+#: src/core/app.c:1404
 msgid "DESK AND PAPER"
 msgstr "СТІЛ І ПАПІР"
 
-#: src/core/app.c:1373
+#: src/core/app.c:1405
 msgid "Paper sheet on the desk"
 msgstr "Аркуш паперу на столі"
 
-#: src/core/app.c:1377
+#: src/core/app.c:1409
 msgid "Vignette at the desk edges"
 msgstr "Віньєтка по краях столу"
 
-#: src/core/app.c:1387
+#: src/core/app.c:1420
 msgid "Save theme"
 msgstr "Зберегти тему"
 
-#: src/core/app.c:1388 src/core/filedlg.c:60 src/core/filedlg.c:73 src/core/filedlg.c:401 src/core/filedlg.c:431
+#: src/core/app.c:1421 src/core/filedlg.c:60 src/core/filedlg.c:73 src/core/filedlg.c:408 src/core/filedlg.c:439
 msgid "Cancel"
 msgstr "Скасувати"
 
-#: src/core/app.c:1389 src/core/app.c:1390 src/core/filedlg.c:307 src/core/filedlg.c:310 src/core/filedlg.c:310
+#: src/core/app.c:1422 src/core/app.c:1423 src/core/filedlg.c:57 src/core/filedlg.c:313 src/core/filedlg.c:316 src/core/filedlg.c:316
 msgid "Delete"
 msgstr "Видалити"
 
-#: src/core/app.c:1390
+#: src/core/app.c:1423
 msgid "Delete theme?"
 msgstr "Видалити тему?"
 
-#: src/core/app.c:1390
+#: src/core/app.c:1423
 #, c-format
 msgid "The theme file in %s will be deleted."
 msgstr "Файл теми в %s буде видалено."
 
-#: src/core/app.c:1397
+#: src/core/app.c:1430
 msgid "Find"
 msgstr "Знайти"
 
-#: src/core/app.c:1398
+#: src/core/app.c:1431
 msgid "Previous (Shift+Enter)"
 msgstr "Назад (Shift+Enter)"
 
-#: src/core/app.c:1399
+#: src/core/app.c:1432
 msgid "Next (Enter)"
 msgstr "Далі (Enter)"
 
-#: src/core/app.c:1400
+#: src/core/app.c:1433
 msgid "Replace with"
 msgstr "Замінити на"
 
-#: src/core/app.c:1402 src/core/filedlg.c:203
+#: src/core/app.c:1435 src/core/filedlg.c:203
 msgid "Replace"
 msgstr "Замінити"
 
-#: src/core/app.c:1403
+#: src/core/app.c:1436
 msgid "Replace all"
 msgstr "Замінити все"
 
-#: src/core/app.c:1405
+#: src/core/app.c:1438
 #, c-format
 msgid "%d replacement"
 msgid_plural "%d replacements"
@@ -1097,11 +1125,11 @@ msgstr[0] "%d заміна"
 msgstr[1] "%d заміни"
 msgstr[2] "%d замін"
 
-#: src/core/app.c:1412
+#: src/core/app.c:1445
 msgid "Nothing found"
 msgstr "Нічого не знайдено"
 
-#: src/core/app.c:1419
+#: src/core/app.c:1452
 #, c-format
 msgid "%d match"
 msgid_plural "%d matches"
@@ -1109,79 +1137,79 @@ msgstr[0] "%d збіг"
 msgstr[1] "%d збіги"
 msgstr[2] "%d збігів"
 
-#: src/core/app.c:1453
+#: src/core/app.c:1490
 msgid "(untitled)"
 msgstr "(без назви)"
 
-#: src/core/app.c:1463
+#: src/core/app.c:1499
 msgid "No headings yet."
 msgstr "Заголовків поки немає."
 
-#: src/core/app.c:1464
+#: src/core/app.c:1500
 msgid "Start a line with # to create chapters."
 msgstr "Почніть рядок із #, щоб створити розділи."
 
-#: src/core/app.c:1493
+#: src/core/app.c:1529
 #, c-format
 msgid "goal of %d reached"
 msgstr "ціль у %d досягнуто"
 
-#: src/core/app.c:1493
+#: src/core/app.c:1529
 #, c-format
 msgid "of %d words today"
 msgstr "із %d слів сьогодні"
 
-#: src/core/app.c:1494
+#: src/core/app.c:1530
 msgid "words today"
 msgstr "слів сьогодні"
 
-#: src/core/app.c:1499
+#: src/core/app.c:1535
 msgid "This document"
 msgstr "Цей документ"
 
-#: src/core/app.c:1500
+#: src/core/app.c:1536
 msgid "This session"
 msgstr "Цей сеанс"
 
-#: src/core/app.c:1500
+#: src/core/app.c:1536
 #, c-format
 msgid "+%d in %dh%02d"
 msgstr "+%d за %d год %02d хв"
 
-#: src/core/app.c:1501
+#: src/core/app.c:1537
 msgid "Estimated reading"
 msgstr "Час читання"
 
-#: src/core/app.c:1502
+#: src/core/app.c:1538
 msgid "Pace"
 msgstr "Темп"
 
-#: src/core/app.c:1502
+#: src/core/app.c:1538
 #, c-format
 msgid "%d words/h"
 msgstr "%d слів/год"
 
-#: src/core/app.c:1513
+#: src/core/app.c:1549
 msgid "15 min"
 msgstr "15 хв"
 
-#: src/core/app.c:1513
+#: src/core/app.c:1549
 msgid "25 min"
 msgstr "25 хв"
 
-#: src/core/app.c:1513
+#: src/core/app.c:1549
 msgid "45 min"
 msgstr "45 хв"
 
-#: src/core/app.c:1513
+#: src/core/app.c:1549
 msgid "60 min"
 msgstr "60 хв"
 
-#: src/core/app.c:1518
+#: src/core/app.c:1554
 msgid "Start sprint"
 msgstr "Почати спринт"
 
-#: src/core/app.c:1524
+#: src/core/app.c:1560
 #, c-format
 msgid "+%d word in this sprint"
 msgid_plural "+%d words in this sprint"
@@ -1189,310 +1217,322 @@ msgstr[0] "+%d слово за спринт"
 msgstr[1] "+%d слова за спринт"
 msgstr[2] "+%d слів за спринт"
 
-#: src/core/app.c:1527
+#: src/core/app.c:1563
 msgid "Stop sprint"
 msgstr "Зупинити спринт"
 
-#: src/core/app.c:1539
+#: src/core/app.c:1575
 msgid "Ctrl+N / O / S"
 msgstr "Ctrl+N / O / S"
 
-#: src/core/app.c:1539
+#: src/core/app.c:1575
 msgid "New · Open · Save"
 msgstr "Новий · Відкрити · Зберегти"
 
-#: src/core/app.c:1539 src/core/filedlg.c:123
+#: src/core/app.c:1575 src/core/filedlg.c:123
 msgid "Save as / Export"
 msgstr "Зберегти як / Експорт"
 
-#: src/core/app.c:1540
+#: src/core/app.c:1576
 msgid "Ctrl+W · Ctrl+Tab"
 msgstr "Ctrl+W · Ctrl+Tab"
 
-#: src/core/app.c:1540
+#: src/core/app.c:1576
 msgid "Tabs: close · next"
 msgstr "Вкладки: закрити · наступна"
 
-#: src/core/app.c:1540
+#: src/core/app.c:1576
 msgid "Alt+1…9"
 msgstr "Alt+1…9"
 
-#: src/core/app.c:1540
+#: src/core/app.c:1576
 msgid "Go to tab 1…9"
 msgstr "Перейти до вкладки 1…9"
 
-#: src/core/app.c:1541
+#: src/core/app.c:1577
 msgid "Ctrl+K"
 msgstr "Ctrl+K"
 
-#: src/core/app.c:1541
+#: src/core/app.c:1577
 msgid "Command palette"
 msgstr "Палітра команд"
 
-#: src/core/app.c:1541
+#: src/core/app.c:1577
 msgid "Reading (formatted Markdown)"
 msgstr "Читання (форматований Markdown)"
 
-#: src/core/app.c:1542
+#: src/core/app.c:1578
 msgid "Ctrl+Z / Y"
 msgstr "Ctrl+Z / Y"
 
-#: src/core/app.c:1542
+#: src/core/app.c:1578
 msgid "Undo · Redo"
 msgstr "Скасувати · Повторити"
 
-#: src/core/app.c:1543
+#: src/core/app.c:1579
 msgid "Ctrl+B / I"
 msgstr "Ctrl+B / I"
 
-#: src/core/app.c:1543
+#: src/core/app.c:1579
 msgid "Bold · Italic"
 msgstr "Жирний · Курсив"
 
-#: src/core/app.c:1543
+#: src/core/app.c:1579
 msgid "Ctrl+1…6 / 0"
 msgstr "Ctrl+1…6 / 0"
 
-#: src/core/app.c:1543
+#: src/core/app.c:1579
 msgid "Heading level 1–6 · Text"
 msgstr "Заголовок рівня 1–6 · Текст"
 
-#: src/core/app.c:1544
+#: src/core/app.c:1580
 msgid "Alt+↑ / ↓"
 msgstr "Alt+↑ / ↓"
 
-#: src/core/app.c:1544
+#: src/core/app.c:1580
 msgid "Move paragraph"
 msgstr "Перемістити абзац"
 
-#: src/core/app.c:1544
+#: src/core/app.c:1580
 msgid "Tab / Shift+Tab"
 msgstr "Tab / Shift+Tab"
 
-#: src/core/app.c:1544
+#: src/core/app.c:1580
 msgid "Indent list item"
 msgstr "Відступ елемента списку"
 
-#: src/core/app.c:1546
+#: src/core/app.c:1582
 msgid "Ctrl+PgUp / PgDn"
 msgstr "Ctrl+PgUp / PgDn"
 
-#: src/core/app.c:1546
+#: src/core/app.c:1582
 msgid "Previous · next chapter"
 msgstr "Попередній · наступний розділ"
 
-#: src/core/app.c:1546
+#: src/core/app.c:1582
 msgid "Jump to and back from the last edit"
 msgstr "До останнього редагування й назад"
 
-#: src/core/app.c:1547
+#: src/core/app.c:1583
 msgid "lowercase → Title Case → UPPERCASE"
 msgstr "малі → З Великої → ВЕЛИКІ"
 
-#: src/core/app.c:1547
+#: src/core/app.c:1583
 msgid "Select and type ( \" *"
 msgstr "Виділіть і введіть ( \" *"
 
-#: src/core/app.c:1547
+#: src/core/app.c:1583
 msgid "Wraps the selection"
 msgstr "Обрамлює виділення"
 
-#: src/core/app.c:1548
-msgid "← / → (reading)"
-msgstr "← / → (читання)"
+#: src/core/app.c:1584
+msgid "← / → · Space (reading)"
+msgstr "← / → · Пробіл (читання)"
 
-#: src/core/app.c:1548
+#: src/core/app.c:1584
 msgid "Previous · next page"
 msgstr "Попередня · наступна сторінка"
 
-#: src/core/app.c:1548
-msgid "Click the margins"
-msgstr "Клацання по полях"
+#: src/core/app.c:1584
+msgid "Auto-scroll on/off"
+msgstr "Автопрокручування увімк./вимк."
 
-#: src/core/app.c:1548
-msgid "Turns the page while reading"
-msgstr "Перегортає сторінку під час читання"
-
-#: src/core/app.c:1549
-msgid "Auto-scroll (reading)"
-msgstr "Автопрокручування (читання)"
-
-#: src/core/app.c:1549
+#: src/core/app.c:1585
 msgid "+ / − (reading)"
 msgstr "+ / − (читання)"
 
-#: src/core/app.c:1549
+#: src/core/app.c:1585
 msgid "Auto-scroll speed"
 msgstr "Швидкість автопрокручування"
 
-#: src/core/app.c:1550
+#: src/core/app.c:1586
 msgid "Ctrl+← / →"
 msgstr "Ctrl+← / →"
 
-#: src/core/app.c:1550
+#: src/core/app.c:1586
 msgid "Previous / next word"
 msgstr "Попереднє / наступне слово"
 
-#: src/core/app.c:1550
+#: src/core/app.c:1586
 msgid "Ctrl+Home / End"
 msgstr "Ctrl+Home / End"
 
-#: src/core/app.c:1550
+#: src/core/app.c:1586
 msgid "Start · end of the text"
 msgstr "Початок · кінець тексту"
 
-#: src/core/app.c:1551
+#: src/core/app.c:1587
 msgid "Ctrl+= / -"
 msgstr "Ctrl+= / -"
 
-#: src/core/app.c:1551
+#: src/core/app.c:1587
 msgid "Larger · smaller text"
 msgstr "Більший · менший текст"
 
-#: src/core/app.c:1552
+#: src/core/app.c:1588
 msgid "This help"
 msgstr "Ця довідка"
 
-#: src/core/app.c:1552
+#: src/core/app.c:1588
 msgid "Focus mode (sentence/paragraph/line)"
 msgstr "Режим фокусу (речення/абзац/рядок)"
 
-#: src/core/app.c:1553
+#: src/core/app.c:1589
 msgid "Typewriter"
 msgstr "Друкарська машинка"
 
-#: src/core/app.c:1553
+#: src/core/app.c:1589
 msgid "Writing sprint"
 msgstr "Спринт письма"
 
-#: src/core/app.c:1555
+#: src/core/app.c:1591
 msgid "F7 / F8 / F9"
 msgstr "F7 / F8 / F9"
 
-#: src/core/app.c:1555
+#: src/core/app.c:1591
 msgid "Previous track · Play/pause · Next"
 msgstr "Попередній трек · Грати/пауза · Наступний"
 
-#: src/core/app.c:1556
+#: src/core/app.c:1592
 msgid "Zen mode"
 msgstr "Режим дзен"
 
-#: src/core/app.c:1557
+#: src/core/app.c:1593
 msgid "Esc"
 msgstr "Esc"
 
-#: src/core/app.c:1557
+#: src/core/app.c:1593
 msgid "Close window · leave zen/reading"
 msgstr "Закрити вікно · вийти з дзену/читання"
 
-#: src/core/app.c:1558
+#: src/core/app.c:1594
+msgid "Tab · ↑ ↓ (windows)"
+msgstr "Tab · ↑ ↓ (вікна)"
+
+#: src/core/app.c:1594
+msgid "Move between buttons and options"
+msgstr "Перехід між кнопками й параметрами"
+
+#: src/core/app.c:1594
+msgid "Enter · Space · ← →"
+msgstr "Enter · Пробіл · ← →"
+
+#: src/core/app.c:1594
+msgid "Press · adjust the focused option"
+msgstr "Натиснути · змінити вибраний параметр"
+
+#: src/core/app.c:1595
+msgid "Keyboard between the text and the windows"
+msgstr "Клавіатура: між текстом і вікнами"
+
+#: src/core/app.c:1595
+msgid "Ctrl+Shift+← / →"
+msgstr "Ctrl+Shift+← / →"
+
+#: src/core/app.c:1595
+msgid "Select word by word"
+msgstr "Виділення по словах"
+
+#: src/core/app.c:1596
 msgid "Become — and … (smart typography)"
 msgstr "Перетворюються на — і … (розумна типографіка)"
 
-#: src/core/app.c:1558
-msgid "Double/triple click"
-msgstr "Подвійне/потрійне клацання"
-
-#: src/core/app.c:1558
-msgid "Selects word · paragraph"
-msgstr "Виділяє слово · абзац"
-
-#: src/core/app.c:1634
+#: src/core/app.c:1672
 #, c-format
 msgid "Untitled — kept in %s until you save it"
 msgstr "Без назви — зберігається в %s, доки ви не збережете"
 
-#: src/core/app.c:1641
+#: src/core/app.c:1679
 msgid "New tab (Ctrl+N)"
 msgstr "Нова вкладка (Ctrl+N)"
 
-#: src/core/app.c:1660
+#: src/core/app.c:1698
 msgid "Not saved yet (Ctrl+S)"
 msgstr "Ще не збережено (Ctrl+S)"
 
-#: src/core/app.c:1675
+#: src/core/app.c:1713
 #, c-format
 msgid "Playing: %s (F6)"
 msgstr "Грає: %s (F6)"
 
-#: src/core/app.c:1676
+#: src/core/app.c:1714
 msgid "Music (F6)"
 msgstr "Музика (F6)"
 
-#: src/core/app.c:1676
+#: src/core/app.c:1714
 #, c-format
 msgid "Music (F6) — put MP3 files in the %s folder"
 msgstr "Музика (F6) — покладіть файли MP3 у папку %s"
 
-#: src/core/app.c:1678
+#: src/core/app.c:1716
 msgid "Tabs on — click to turn off"
 msgstr "Вкладки ввімкнено — клацніть, щоб вимкнути"
 
-#: src/core/app.c:1678
+#: src/core/app.c:1716
 msgid "Tabs: open several documents (like in Sublime Text)"
 msgstr "Вкладки: кілька документів одночасно (як у Sublime Text)"
 
-#: src/core/app.c:1679
+#: src/core/app.c:1717
 msgid "Zen mode (F11)"
 msgstr "Режим дзен (F11)"
 
-#: src/core/app.c:1680
+#: src/core/app.c:1718
 msgid "Typewriter (F3)"
 msgstr "Друкарська машинка (F3)"
 
-#: src/core/app.c:1681
+#: src/core/app.c:1719
 msgid "Reading (Ctrl+P)"
 msgstr "Читання (Ctrl+P)"
 
-#: src/core/app.c:1683
+#: src/core/app.c:1721
 msgid "Appearance (F12)"
 msgstr "Вигляд (F12)"
 
-#: src/core/app.c:1684
+#: src/core/app.c:1722
 msgid "Commands (Ctrl+K)"
 msgstr "Команди (Ctrl+K)"
 
-#: src/core/app.c:1696
+#: src/core/app.c:1734
 msgid "Next track (F9)"
 msgstr "Наступний трек (F9)"
 
-#: src/core/app.c:1698
+#: src/core/app.c:1736
 msgid "Pause (F8)"
 msgstr "Пауза (F8)"
 
-#: src/core/app.c:1698
+#: src/core/app.c:1736
 msgid "Play (F8)"
 msgstr "Грати (F8)"
 
-#: src/core/app.c:1700
+#: src/core/app.c:1738
 msgid "Previous track (F7)"
 msgstr "Попередній трек (F7)"
 
-#: src/core/app.c:1713
+#: src/core/app.c:1751
 #, c-format
 msgid "%d h %02d min"
 msgstr "%d год %02d хв"
 
-#: src/core/app.c:1741
+#: src/core/app.c:1779
 msgid " · end of the text"
 msgstr " · кінець тексту"
 
-#: src/core/app.c:1742
+#: src/core/app.c:1780
 #, c-format
 msgid " · %s · %s to the end of the chapter · %s in total"
 msgstr " · %s · %s до кінця розділу · усього %s"
 
-#: src/core/app.c:1743
+#: src/core/app.c:1781
 #, c-format
 msgid " · %s · %s of reading left"
 msgstr " · %s · залишилося читати %s"
 
-#: src/core/app.c:1744
+#: src/core/app.c:1782
 #, c-format
 msgid " · %s of reading left"
 msgstr " · залишилося читати %s"
 
-#: src/core/app.c:1747
+#: src/core/app.c:1785
 #, c-format
 msgid "%d of %d word"
 msgid_plural "%d of %d words"
@@ -1500,16 +1540,16 @@ msgstr[0] "%d з %d слова"
 msgstr[1] "%d з %d слів"
 msgstr[2] "%d з %d слів"
 
-#: src/core/app.c:1753
+#: src/core/app.c:1791
 #, c-format
 msgid "Today: %d words · %d min reading"
 msgstr "Сьогодні: слів — %d · читання %d хв"
 
-#: src/core/app.c:1954 src/core/app.c:1959
+#: src/core/app.c:2004 src/core/app.c:2009
 msgid "Welcome back. Picking up where you left off."
 msgstr "З поверненням. Продовжуємо з того місця, де ви зупинилися."
 
-#: src/core/app.c:1954
+#: src/core/app.c:2004
 #, c-format
 msgid "Welcome back: %d tab reopened."
 msgid_plural "Welcome back: %d tabs reopened."
@@ -1517,15 +1557,15 @@ msgstr[0] "З поверненням: відкрито %d вкладку."
 msgstr[1] "З поверненням: відкрито %d вкладки."
 msgstr[2] "З поверненням: відкрито %d вкладок."
 
-#: src/core/app.c:1958
+#: src/core/app.c:2008
 msgid "Welcome back. Reading continues where you left off."
 msgstr "З поверненням. Читання продовжується з того місця, де ви зупинилися."
 
-#: src/core/app.c:1963
+#: src/core/app.c:2013
 msgid "Unsaved draft recovered"
 msgstr "Відновлено незбережену чернетку"
 
-#: src/core/app.c:1968
+#: src/core/app.c:2018
 msgid ""
 "# Welcome to FolioOS\n"
 "\n"
@@ -1559,7 +1599,7 @@ msgstr ""
 "\n"
 "Видаліть цей текст (Ctrl+A) і почніть свою історію.\n"
 
-#: src/core/app.c:2074
+#: src/core/app.c:2145
 #, c-format
 msgid "Sprint finished: %d word. Breathe and stretch."
 msgid_plural "Sprint finished: %d words. Breathe and stretch."
@@ -1579,7 +1619,7 @@ msgstr "Скопійовано"
 msgid "There are no edits in this document yet"
 msgstr "У цьому документі ще немає редагувань"
 
-#: src/core/editor.c:531 src/core/editor.c:643 src/core/editor.c:656
+#: src/core/editor.c:531 src/core/editor.c:644 src/core/editor.c:657
 msgid "Hemingway mode: keep going, no deleting"
 msgstr "Режим Гемінґвея: пишіть далі, без видалення"
 
@@ -1655,7 +1695,7 @@ msgstr "Файли"
 msgid "OK"
 msgstr "ОК"
 
-#: src/core/filedlg.c:67 src/core/filedlg.c:319
+#: src/core/filedlg.c:67 src/core/filedlg.c:325
 msgid "Name"
 msgstr "Ім’я"
 
@@ -1731,7 +1771,7 @@ msgstr "ДИСКИ"
 msgid "FolioOS USB drive"
 msgstr "Флешка FolioOS"
 
-#: src/core/filedlg.c:233 src/core/filedlg.c:282 src/core/music.c:374
+#: src/core/filedlg.c:233 src/core/filedlg.c:287
 msgid "Drive"
 msgstr "Диск"
 
@@ -1755,65 +1795,65 @@ msgstr "Корінь"
 msgid "All files"
 msgstr "Усі файли"
 
-#: src/core/filedlg.c:268
+#: src/core/filedlg.c:273
 msgid "Parent folder (Alt+↑)"
 msgstr "Папка вище (Alt+↑)"
 
-#: src/core/filedlg.c:302 src/core/filedlg.c:302 src/core/filedlg.c:302
+#: src/core/filedlg.c:308 src/core/filedlg.c:308 src/core/filedlg.c:308
 msgid "New folder"
 msgstr "Нова папка"
 
-#: src/core/filedlg.c:304
+#: src/core/filedlg.c:310
 msgid "Rename (F2)"
 msgstr "Перейменувати (F2)"
 
-#: src/core/filedlg.c:305
+#: src/core/filedlg.c:311
 msgid "Rename"
 msgstr "Перейменувати"
 
-#: src/core/filedlg.c:305 src/core/filedlg.c:311
+#: src/core/filedlg.c:311 src/core/filedlg.c:317
 msgid "Select an item"
 msgstr "Виберіть елемент"
 
-#: src/core/filedlg.c:309
+#: src/core/filedlg.c:315
 #, c-format
 msgid "Delete the folder \"%s\" and everything in it? This cannot be undone."
 msgstr "Видалити папку «%s» з усім вмістом? Цю дію не можна скасувати."
 
-#: src/core/filedlg.c:309
+#: src/core/filedlg.c:315
 #, c-format
 msgid "Delete \"%s\"? This cannot be undone."
 msgstr "Видалити «%s»? Цю дію не можна скасувати."
 
-#: src/core/filedlg.c:319
+#: src/core/filedlg.c:325
 msgid "Size"
 msgstr "Розмір"
 
-#: src/core/filedlg.c:319
+#: src/core/filedlg.c:325
 msgid "Modified"
 msgstr "Змінено"
 
-#: src/core/filedlg.c:359
+#: src/core/filedlg.c:366
 msgid "No .md or .txt documents here"
 msgstr "Тут немає документів .md або .txt"
 
-#: src/core/filedlg.c:359
+#: src/core/filedlg.c:366
 msgid "Empty folder"
 msgstr "Порожня папка"
 
-#: src/core/filedlg.c:399
+#: src/core/filedlg.c:406
 msgid "File name"
 msgstr "Ім’я файлу"
 
-#: src/core/filedlg.c:400
+#: src/core/filedlg.c:407
 msgid "Export"
 msgstr "Експортувати"
 
-#: src/core/filedlg.c:424
+#: src/core/filedlg.c:432
 msgid ". The document stays open as .md."
 msgstr ". Документ лишається відкритим як .md."
 
-#: src/core/filedlg.c:428
+#: src/core/filedlg.c:436
 #, c-format
 msgid "%d item"
 msgid_plural "%d items"
@@ -1821,55 +1861,55 @@ msgstr[0] "%d елемент"
 msgstr[1] "%d елементи"
 msgstr[2] "%d елементів"
 
-#: src/core/filedlg.c:430
+#: src/core/filedlg.c:438
 msgid "Open"
 msgstr "Відкрити"
 
-#: src/core/i18n.c:421
+#: src/core/i18n.c:435
 msgid "January"
 msgstr "січня"
 
-#: src/core/i18n.c:421
+#: src/core/i18n.c:435
 msgid "February"
 msgstr "лютого"
 
-#: src/core/i18n.c:421
+#: src/core/i18n.c:435
 msgid "March"
 msgstr "березня"
 
-#: src/core/i18n.c:421
+#: src/core/i18n.c:435
 msgid "April"
 msgstr "квітня"
 
-#: src/core/i18n.c:421
+#: src/core/i18n.c:435
 msgid "May"
 msgstr "травня"
 
-#: src/core/i18n.c:421
+#: src/core/i18n.c:435
 msgid "June"
 msgstr "червня"
 
-#: src/core/i18n.c:422
+#: src/core/i18n.c:436
 msgid "July"
 msgstr "липня"
 
-#: src/core/i18n.c:422
+#: src/core/i18n.c:436
 msgid "August"
 msgstr "серпня"
 
-#: src/core/i18n.c:422
+#: src/core/i18n.c:436
 msgid "September"
 msgstr "вересня"
 
-#: src/core/i18n.c:422
+#: src/core/i18n.c:436
 msgid "October"
 msgstr "жовтня"
 
-#: src/core/i18n.c:422
+#: src/core/i18n.c:436
 msgid "November"
 msgstr "листопада"
 
-#: src/core/i18n.c:422
+#: src/core/i18n.c:436
 msgid "December"
 msgstr "грудня"
 
@@ -1913,23 +1953,27 @@ msgstr "Флешка · %s"
 msgid "Pick a track or press F8"
 msgstr "Виберіть трек або натисніть F8"
 
-#: src/core/music.c:358
+#: src/core/music.c:362
 msgid "Shuffle"
 msgstr "Перемішати"
 
-#: src/core/music.c:359
+#: src/core/music.c:363
 msgid "Previous (F7)"
 msgstr "Назад (F7)"
 
-#: src/core/music.c:367
+#: src/core/music.c:371
 msgid "Next (F9)"
 msgstr "Далі (F9)"
 
-#: src/core/music.c:368
+#: src/core/music.c:372
 msgid "Repeat list"
 msgstr "Повторювати список"
 
-#: src/core/music.c:400
+#: src/core/music.c:378
+msgid "Volume"
+msgstr "Гучність"
+
+#: src/core/music.c:410
 #, c-format
 msgid "%d track · %s"
 msgid_plural "%d tracks · %s"
@@ -1937,7 +1981,7 @@ msgstr[0] "%d трек · %s"
 msgstr[1] "%d треки · %s"
 msgstr[2] "%d треків · %s"
 
-#: src/core/preview.c:46 src/core/preview.c:470
+#: src/core/preview.c:46 src/core/preview.c:471
 msgid "The whole text already fits on the screen"
 msgstr "Увесь текст уже вміщується на екрані"
 
@@ -1945,45 +1989,45 @@ msgstr "Увесь текст уже вміщується на екрані"
 msgid "Already at the end of the text"
 msgstr "Ви вже в кінці тексту"
 
-#: src/core/preview.c:258
+#: src/core/preview.c:259
 #, c-format
 msgid "Reading: %d words per minute"
 msgstr "Читання: %d слів за хвилину"
 
-#: src/core/preview.c:362
+#: src/core/preview.c:363
 msgid "Previous page (←)"
 msgstr "Попередня сторінка (←)"
 
-#: src/core/preview.c:364
-msgid "Stop auto-scroll (middle button)"
-msgstr "Зупинити автопрокручування (середня кнопка)"
-
-#: src/core/preview.c:364
-msgid "Auto-scroll (middle button)"
-msgstr "Автопрокручування (середня кнопка)"
+#: src/core/preview.c:365
+msgid "Stop auto-scroll (Enter or middle button)"
+msgstr "Зупинити автопрокручування (Enter або середня кнопка)"
 
 #: src/core/preview.c:365
+msgid "Auto-scroll (Enter or middle button)"
+msgstr "Автопрокручування (Enter або середня кнопка)"
+
+#: src/core/preview.c:366
 msgid "Slower (−)"
 msgstr "Повільніше (−)"
 
-#: src/core/preview.c:367
+#: src/core/preview.c:368
 #, c-format
 msgid "%d wpm"
 msgstr "%d сл./хв"
 
-#: src/core/preview.c:369
+#: src/core/preview.c:370
 msgid "Reading speed in words per minute (the mouse wheel adjusts it here)"
 msgstr "Швидкість читання в словах за хвилину (тут її змінює коліщатко миші)"
 
-#: src/core/preview.c:370
+#: src/core/preview.c:371
 msgid "Faster (+)"
 msgstr "Швидше (+)"
 
-#: src/core/preview.c:371
+#: src/core/preview.c:372
 msgid "Next page (→ or space)"
 msgstr "Наступна сторінка (→ або пробіл)"
 
-#: src/core/preview.c:471
+#: src/core/preview.c:472
 msgid "End of the text"
 msgstr "Кінець тексту"
 
@@ -2076,7 +2120,16 @@ msgstr "Туман"
 msgid "Wine"
 msgstr "Вино"
 
-#: src/core/ui.c:156
+#: src/core/ui.c:66
+#, c-format
+msgid "Keyboard: %s (Tab moves, Esc closes)"
+msgstr "Клавіатура: %s (Tab — перехід, Esc — закрити)"
+
+#: src/core/ui.c:67
+msgid "Keyboard: text"
+msgstr "Клавіатура: текст"
+
+#: src/core/ui.c:246
 msgid "Close (Esc)"
 msgstr "Закрити (Esc)"
 

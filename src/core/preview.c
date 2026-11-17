@@ -251,6 +251,7 @@ void preview_key(Event *e) {
     case KEY_PGDN: if (ctrl) { if (!preview_chapter(1)) ui_toast(L("This is the last chapter")); return; } target += page; break;
     case KEY_HOME: target = 0; break;
     case KEY_END: target = total_h; break;
+    case KEY_ENTER: preview_toggle_auto(); return;     /* rolagem automática sem o botão do meio */
     default:
         if (e->ch == ' ') target += (e->mods & MOD_SHIFT) ? -page : page;
         else if (e->ch == '+' || e->ch == '=' || e->ch == '-') {     /* velocidade da rolagem automática */
@@ -361,7 +362,7 @@ void preview_draw_bar(float a) {
         gfx_rrect(r, r.h * 0.5f, T->panel | 0xFF000000);
         if (ui_icon_btn(bar_btn[BAR_PREV], IC_BACK, false, L("Previous page (\xE2\x86\x90)"))) { target -= view_h * 0.85f; ui.redraw = true; }
         if (ui_icon_btn(bar_btn[BAR_PLAY], auto_on ? IC_PAUSE : IC_PLAY, auto_on,
-                        auto_on ? L("Stop auto-scroll (middle button)") : L("Auto-scroll (middle button)"))) preview_toggle_auto();
+                        auto_on ? L("Stop auto-scroll (Enter or middle button)") : L("Auto-scroll (Enter or middle button)"))) preview_toggle_auto();
         if (small_btn(bar_btn[BAR_SLOWER], "\xE2\x88\x92", L("Slower (\xE2\x88\x92)"))) wpm_step(-1);
         Rect lr = bar_btn[BAR_SPEED];
         char s[32]; fmt(s, sizeof s, L("%d wpm"), prefs.read_wpm);
@@ -458,7 +459,7 @@ void preview_draw(Rect area, float chrome_a) {
      * com o teclado (busca) ou o arrasto da barra de rolagem. Janelas comuns (música, sumário,
      * ajustes) não pausam: ler com o player aberto é um uso normal. */
     middle_input(area);
-    bool hold = wm_any_modal() || ui.key_win != 0 || ui.active == (void *)&target || pend_src >= 0;
+    bool hold = wm_any_modal() || (ui.key_win && ui.key_win->wants_keys) || ui.active == (void *)&target || pend_src >= 0;
     float want = auto_on && !hold ? auto_speed() : 0;
     /* partida em ~0,3 s (suave); parada em ~0,1 s (para quase onde foi pedido) */
     auto_v += (want - auto_v) * MIN(1.0f, in->dt * (want > auto_v ? 3.5f : 10.0f));

@@ -1,0 +1,123 @@
+# FolioOS só pelo teclado: o mouse é desligado e cada janela é usada com Tab, setas, Enter e Espaço
+wait 300
+key esc
+wait 200
+# desligar o mouse pela paleta de comandos
+key ctrl+k
+type Mouse and touch
+key enter
+wait 200
+assert_nowin
+assert_keywin text
+# um clique no botão do menu não faz mais nada
+click 30 28
+wait 100
+assert_nowin
+# texto com dois capítulos
+key ctrl+a
+type # One¶first part¶# Two¶second part
+assert_text # Two
+# Alt+M: menu pelo teclado; ↓ = "Open…", Enter abre o gerenciador de arquivos, que recebe o teclado
+key alt+m
+wait 200
+assert_keywin Menu
+key down
+key enter
+wait 300
+assert_keywin Open document
+# Shift+Tab a partir do nada = último item (Cancelar); Enter aciona
+key shift+tab
+key enter
+wait 300
+assert_nowin
+assert_keywin text
+# F12: Ajustes recebem o teclado; Tab → abas de Ajustes, → = "Writing"; Tab → modo foco, → = frase;
+# Tab → "Typewriter", Espaço liga
+key f12
+wait 300
+assert_keywin Settings
+key tab
+key right
+wait 100
+key tab
+key right
+wait 100
+key tab
+key space
+wait 200
+shot k01_ajustes_teclado.png
+key esc
+wait 300
+assert_nowin
+# tema pelo teclado: Ajustes → Tab, Tab → primeiro cartão (Papyrus), → = Snow, Enter aplica
+key f12
+wait 300
+key tab
+key left
+key left
+wait 100
+key tab
+key right
+key enter
+wait 200
+assert_theme Snow
+key esc
+wait 300
+# sumário (F5): ↓ = primeiro título, Enter vai até ele e devolve o teclado ao texto (o sumário fica aberto)
+key f5
+wait 300
+assert_keywin Outline
+key down
+key enter
+wait 200
+assert_keywin text
+assert_para 0
+type !
+assert_text # One!
+# F5 com o sumário aberto sem o teclado: o teclado volta para ele; Esc fecha
+key f5
+wait 200
+assert_keywin Outline
+key esc
+wait 300
+assert_nowin
+# Ctrl+F6: texto → janela aberta → texto; voltar a digitar num painel devolve o teclado ao texto
+key f10
+wait 300
+assert_keywin Session and goals
+key ctrl+f6
+wait 100
+assert_keywin text
+key ctrl+f6
+wait 100
+assert_keywin Session and goals
+type ?
+wait 100
+assert_keywin text
+assert_text # One!?
+key esc
+wait 300
+assert_nowin
+# diálogo "Salvar alterações?": Shift+Tab = Cancelar; nada se perde
+key ctrl+n
+wait 300
+key shift+tab
+key enter
+wait 300
+assert_nowin
+assert_text second part
+# leitura: Enter liga e desliga a rolagem automática (texto longo, para haver o que rolar)
+key ctrl+end
+type ¶Paragraph 1 of a long text, several screens.¶Paragraph 2 of a long text, several screens.¶Paragraph 3 of a long text, several screens.¶Paragraph 4 of a long text, several screens.¶Paragraph 5 of a long text, several screens.¶Paragraph 6 of a long text, several screens.¶Paragraph 7 of a long text, several screens.¶Paragraph 8 of a long text, several screens.¶Paragraph 9 of a long text, several screens.¶Paragraph 10 of a long text, several screens.¶Paragraph 11 of a long text, several screens.¶Paragraph 12 of a long text, several screens.¶Paragraph 13 of a long text, several screens.¶Paragraph 14 of a long text, several screens.¶Paragraph 15 of a long text, several screens.¶Paragraph 16 of a long text, several screens.¶Paragraph 17 of a long text, several screens.¶Paragraph 18 of a long text, several screens.¶Paragraph 19 of a long text, several screens.¶Paragraph 20 of a long text, several screens.¶Paragraph 21 of a long text, several screens.¶Paragraph 22 of a long text, several screens.¶Paragraph 23 of a long text, several screens.¶Paragraph 24 of a long text, several screens.¶Paragraph 25 of a long text, several screens.¶Paragraph 26 of a long text, several screens.¶Paragraph 27 of a long text, several screens.¶Paragraph 28 of a long text, several screens.¶Paragraph 29 of a long text, several screens.¶Paragraph 30 of a long text, several screens.¶Paragraph 31 of a long text, several screens.¶Paragraph 32 of a long text, several screens.¶Paragraph 33 of a long text, several screens.¶Paragraph 34 of a long text, several screens.¶Paragraph 35 of a long text, several screens.¶Paragraph 36 of a long text, several screens.¶Paragraph 37 of a long text, several screens.¶Paragraph 38 of a long text, several screens.¶Paragraph 39 of a long text, several screens.¶Paragraph 40 of a long text, several screens.
+key ctrl+p
+wait 400
+key home
+wait 300
+key enter
+wait 200
+assert_auto 1
+key enter
+wait 200
+assert_auto 0
+key esc
+wait 300

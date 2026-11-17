@@ -623,6 +623,7 @@ void editor_key(Event *e) {
         default: return;
         }
     }
+    if (e->ch && alt && !ctrl && !(e->mods & MOD_ALTGR)) return;   /* Alt+letra sem atalho não digita (como Ctrl+letra) */
     if (e->ch && !ctrl) {
         if (e->ch == 9) { Event t2 = *e; t2.ch = 0; t2.key = KEY_TAB; editor_key(&t2); return; }
         if (e->ch < 32) return;

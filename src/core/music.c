@@ -23,7 +23,7 @@ static int  chime_pos = -1;
 static int  fail_count;
 
 static void music_body(Window *w, Rect r);
-Window win_music = { N_("Music"), IC_MUSIC, {0, 0, 440, 600}, false, false, false, true, false, 0, 360, 380, music_body, 0, 0, false };
+Window win_music = { N_("Music"), IC_MUSIC, {0, 0, 440, 600}, false, false, false, true, false, 0, 360, 380, music_body, 0, 0, false, -1, 0, 0, 0 };
 
 bool music_available(void) { return ntracks > 0; }
 bool music_playing(void) { return playing; }
@@ -348,6 +348,10 @@ static void music_body(Window *w, Rect r) {
     float cy = pb.y + pb.h * 0.5f;
     gfx_rrect(rect(pb.x, (int)(cy - S(2)), pb.w, SI(4)), S(2), col_alpha(T->text, 0.12f));
     gfx_rrect(rect(pb.x, (int)(cy - S(2)), (int)(pb.w * frac), SI(4)), S(2), T->accent);
+    if (ui_nav(pb, NAV_ADJ)) {          /* teclado: ←/→ voltam/avançam 5 segundos */
+        gfx_circle(pb.x + pb.w * frac, cy, S(6), T->accent);
+        if (ui.nav_adj && duration > 0) seek_frac(CLAMP((el + ui.nav_adj * 5.0f) / duration, 0.0f, 0.999f));
+    }
     if (ui_hover(pb)) { gfx_circle(pb.x + pb.w * frac, cy, S(6), T->accent); ui.cursor = 2; if (ui.in.pressed) seek_frac((float)(ui.in.mx - pb.x) / pb.w); }
     char a[16], b[16]; fmt_time(el, a, sizeof a); fmt_time(duration, b, sizeof b);
     draw_text(f, S(12), x, y + S(34), a, -1, col_alpha(T->panel_text, 0.55f));
@@ -358,12 +362,12 @@ static void music_body(Window *w, Rect r) {
     if (ui_icon_btn(rect(cxm - big / 2 - SI(14) - bs * 2 - SI(10), y + (big - bs) / 2, bs, bs), IC_SHUFFLE, prefs.shuffle, L("Shuffle"))) { prefs.shuffle = !prefs.shuffle; shuffle_order(); prefs_save(); }
     if (ui_icon_btn(rect(cxm - big / 2 - SI(14) - bs, y + (big - bs) / 2, bs, bs), IC_PREV, false, L("Previous (F7)"))) music_next(-1);
     Rect pp = rect(cxm - big / 2, y, big, big);
+    bool fire = ui_item(pp);
     bool hv = ui_hover(pp);
     gfx_shadow(rect(pp.x, pp.y + SI(3), pp.w, pp.h), big * 0.5f, S(10), col_alpha(T->accent, 0.35f));
     gfx_circle(cxm, y + big * 0.5f, big * 0.5f, hv ? col_lum_shift(T->accent, 0.08f) : T->accent);
     icon_draw(playing ? IC_PAUSE : IC_PLAY, cxm + (playing ? 0 : S(1.5f)), y + big * 0.5f, S(24), col_luma(T->accent) > 0.6f ? 0xFF1A1A1A : 0xFFFFFFFF);
-    if (hv) ui.cursor = 2;
-    if (ui.in.pressed && hv) music_toggle();
+    if (fire) music_toggle();
     if (ui_icon_btn(rect(cxm + big / 2 + SI(14), y + (big - bs) / 2, bs, bs), IC_NEXT, false, L("Next (F9)"))) music_next(1);
     if (ui_icon_btn(rect(cxm + big / 2 + SI(24) + bs, y + (big - bs) / 2, bs, bs), IC_REPEAT, prefs.repeat, L("Repeat list"))) { prefs.repeat = !prefs.repeat; prefs_save(); }
     y += big + SI(14);
@@ -371,7 +375,7 @@ static void music_body(Window *w, Rect r) {
     float v = (float)prefs.volume;
     icon_draw(IC_VOLUME, x + S(10), y + S(39), S(18), col_alpha(T->panel_text, 0.6f));
     char vt[16]; fmt(vt, sizeof vt, "%d%%", prefs.volume);
-    if (ui_slider(rect(x + SI(30), y, wd - SI(30), SI(50)), &v, 0, 100, L("Drive"), vt)) { prefs.volume = (int)(v + 0.5f); }
+    if (ui_slider(rect(x + SI(30), y, wd - SI(30), SI(50)), &v, 0, 100, L("Volume"), vt)) { prefs.volume = (int)(v + 0.5f); }
     if (ui.active == 0 && mvol != prefs.volume) { mvol = prefs.volume; prefs_save(); }
     y += SI(62);
     gfx_rect(rect(r.x + SI(1), y, r.w - SI(2), 1), col_alpha(T->border, 0.6f));
@@ -382,10 +386,15 @@ static void music_body(Window *w, Rect r) {
     if (ui_hover(lr) && ui.in.wheel) list_scroll -= ui.in.wheel * rh * 3;
     list_scroll = CLAMP(list_scroll, 0.0f, MAX(0.0f, content - lr.h));
     gfx_push_clip(lr);
-    for (int i = (int)(list_scroll / rh); i < ntracks; i++) {
+    bool track_focus = false;
+    for (int i = 0; i < ntracks; i++) {    /* todas as faixas contam como itens; só as visíveis são desenhadas */
         int ry = lr.y + i * rh - (int)list_scroll;
-        if (ry > lr.y + lr.h) break;
         Rect it = rect(lr.x, ry, lr.w - SI(10), rh - SI(2));
+        bool vis = ry + rh > lr.y && ry < lr.y + lr.h;
+        bool nf = ui_nav(it, NAV_ITEM);
+        if (nf) track_focus = true;
+        if (nf && ui.nav_fire) { if (start_track(i)) fail_count = 0; }
+        if (!vis) continue;
         bool h2 = ui_hover(it) && ui_hover(lr), on = i == cur;
         if (on) gfx_rrect(it, S(8), col_alpha(T->accent, 0.14f)); else if (h2) gfx_rrect(it, S(8), col_alpha(T->text, 0.05f));
         char num[8]; fmt(num, sizeof num, "%d", i + 1);
@@ -395,6 +404,7 @@ static void music_body(Window *w, Rect r) {
         if (h2) ui.cursor = 2;
         if (ui.in.pressed && h2) { if (start_track(i)) fail_count = 0; }
     }
+    if (track_focus) ui_reveal(&list_scroll, lr);
     gfx_pop_clip();
     ui_scrollbar(rect(lr.x + lr.w - SI(6), lr.y, SI(5), lr.h), &list_scroll, content, (float)lr.h);
     char info[160]; fmt(info, sizeof info, LN("%d track · %s", "%d tracks · %s", ntracks), ntracks, pal_audio_info());

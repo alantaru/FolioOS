@@ -409,6 +409,9 @@ struct Window {
     void  (*on_close)(Window *w);
     int    z;
     bool   centered_once;
+    /* navegação por teclado: item com foco (-1 = nenhum), itens contados no último quadro e
+     * o tipo do item focado (decide se Enter/Espaço/setas são dele ou do campo/lista) */
+    int    nav, nav_n, nav_cnt, nav_kind;
 };
 
 typedef struct {
@@ -443,6 +446,14 @@ typedef struct {
     int    block_top, block_bottom;   /* faixas das barras visíveis (não repassam clique ao editor) */
     float  menu_anim;
     Window *sticky;            /* janela que não fecha ao clicar fora (editor de temas: mexer no texto para ver o tema) */
+    /* navegação sem mouse */
+    bool   nav_show;           /* contorno de foco visível (usou o teclado; some ao clicar) */
+    bool   nav_fire;           /* Enter/Espaço para o item focado neste quadro */
+    int    nav_adj;            /* ←/→ para o item focado neste quadro (-1, 0, +1) */
+    bool   nav_skip;           /* widgets internos de um item composto não contam como itens */
+    bool   nav_reveal;         /* o foco mudou: a janela rola até o item */
+    bool   nav_found;          /* o item focado foi desenhado neste quadro (nav_r vale) */
+    Rect   nav_r;
 } UI;
 extern UI ui;
 
@@ -469,6 +480,13 @@ const char *editor_clipboard(void);
 int    app_mods(void);
 u16    face_gid_fb(Face **f, u32 cp);
 void   ui_tooltip(const void *id, Rect r, const char *text);
+/* navegação por teclado (Tab/Shift+Tab, setas, Enter/Espaço) nas janelas */
+enum { NAV_ITEM, NAV_ADJ, NAV_TEXT, NAV_LIST };
+bool   ui_nav(Rect r, int kind);           /* registra um item; true = é o item com foco */
+bool   ui_item(Rect r);                     /* item clicável genérico: clique ou Enter/Espaço */
+void   ui_reveal(float *scroll, Rect view); /* rola para mostrar o item focado (depois de desenhar) */
+void   wm_focus(Window *w);                 /* foco de teclado para a janela (0 = texto) */
+void   wm_cycle_focus(void);                /* Ctrl+F6: texto → janelas abertas → texto */
 
 enum { BTN_GHOST, BTN_PRIMARY, BTN_DANGER, BTN_SUBTLE };
 bool   ui_button(Rect r, const char *label, int style);
@@ -570,6 +588,7 @@ typedef struct {
     bool  splash;                   /* tela de abertura FolioOS */
     int   splash_secs;              /* duração da abertura, em segundos (abertura_segundos=) */
     char  lang[16];                 /* idioma=: código (pt-BR, en, es…) ou "auto" */
+    bool  no_mouse;                 /* mouse=0: mouse e touchpad desligados, só teclado */
 } Prefs;
 extern Prefs prefs;
 

@@ -163,14 +163,14 @@ static int read_po(const char *path, Cat *c) {
     char *p = src;
     if ((unsigned char)p[0] == 0xEF && (unsigned char)p[1] == 0xBB && (unsigned char)p[2] == 0xBF) p += 3;
     Str id = {0}, pl = {0}, cur[8] = {{0}}; int nstr = 0, state = 0, fuzzy = 0, have = 0;
-    Str comments = {0};
+    Str comments = {0}, refs = {0};
     sput(&id, 0); id.n = 0;
 #define FLUSH() do { if (have) { if (!id.n) { c->header = xstrdup(cur[0].s ? cur[0].s : ""); } else { \
         Entry *e = cat_add(c, id.s); e->plural = pl.n || state == 4 ? xstrdup(pl.s ? pl.s : "") : 0; if (!pl.n && e->plural && !*e->plural) { free(e->plural); e->plural = 0; } \
         e->nstr = nstr; e->strs = malloc(sizeof(char *) * 8); for (int k = 0; k < nstr; k++) e->strs[k] = xstrdup(cur[k].s ? cur[k].s : ""); \
-        e->fuzzy = fuzzy; e->comments = comments.n ? xstrdup(comments.s) : 0; } } \
+        e->fuzzy = fuzzy; e->comments = comments.n ? xstrdup(comments.s) : 0; e->refs = refs.n ? xstrdup(refs.s) : 0; } } \
         id.n = 0; if (id.s) id.s[0] = 0; pl.n = 0; if (pl.s) pl.s[0] = 0; for (int k = 0; k < 8; k++) { cur[k].n = 0; if (cur[k].s) cur[k].s[0] = 0; } \
-        nstr = 0; fuzzy = 0; have = 0; comments.n = 0; if (comments.s) comments.s[0] = 0; } while (0)
+        nstr = 0; fuzzy = 0; have = 0; comments.n = 0; if (comments.s) comments.s[0] = 0; refs.n = 0; if (refs.s) refs.s[0] = 0; state = 0; } while (0)
     while (*p) {
         char *ls = p; while (*p && *p != '\n') p++;
         char save = *p; *p = 0;
@@ -179,7 +179,11 @@ static int read_po(const char *path, Cat *c) {
         if (l[0] == '#') {
             if (l[1] == '~') { /* obsoleta: descarta */ }
             else if (l[1] == ',' && strstr(l, "fuzzy")) { if (state == 3) FLUSH(); fuzzy = 1; }
-            else if (l[1] == ':' ) { if (state == 3) FLUSH(); }
+            else if (l[1] == ':') {          /* referências (arquivo:linha): o .pot as leva para cada .po */
+                if (state == 3) FLUSH();
+                if (refs.n) sput(&refs, ' ');
+                for (char *q = l + 2; *q; q++) if (!(q == l + 2 && *q == ' ')) sput(&refs, *q);
+            }
             else { if (state == 3) FLUSH(); if (l[1] != ',') { for (char *q = l; *q; q++) sput(&comments, *q); sput(&comments, '\n'); } }
         } else if (!strncmp(l, "msgid_plural", 12)) { state = 4; po_unescape(l + 12, &pl); }
         else if (!strncmp(l, "msgid", 5)) { if (state == 3) FLUSH(); state = 1; have = 1; po_unescape(l + 5, &id); }

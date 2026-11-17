@@ -574,15 +574,15 @@ static void help_body(Window *w, Rect r);
 static void palette_body(Window *w, Rect r);
 static void menu_body(Window *w, Rect r);
 
-static Window win_settings = { N_("Settings"), IC_SETTINGS, {0, 0, 640, 640}, false, false, false, true, false, 0, 520, 420, settings_body, 0, 0, false };
-static Window win_find     = { N_("Find and replace"), IC_SEARCH, {0, 0, 520, 236}, false, false, true, false, false, 0, 420, 200, find_body, 0, 0, false };
-static Window win_outline  = { N_("Outline"), IC_LIST, {0, 0, 340, 520}, false, false, false, true, false, 0, 260, 240, outline_body, 0, 0, false };
-static Window win_stats    = { N_("Session and goals"), IC_CHART, {0, 0, 440, 540}, false, false, false, false, false, 0, 400, 400, stats_body, 0, 0, false };
-static Window win_help     = { N_("Keyboard shortcuts"), IC_HELP, {0, 0, 760, 600}, false, false, false, true, false, 0, 560, 400, help_body, 0, 0, false };
-static Window win_palette  = { N_("Commands"), IC_COMMAND, {0, 0, 600, 440}, false, true, true, false, true, 0, 400, 300, palette_body, 0, 0, false };
-static Window win_menu     = { N_("Menu"), -1, {0, 0, 300, 400}, false, false, false, false, true, 0, 200, 200, menu_body, 0, 0, false };
+static Window win_settings = { N_("Settings"), IC_SETTINGS, {0, 0, 640, 640}, false, false, false, true, false, 0, 520, 420, settings_body, 0, 0, false, -1, 0, 0, 0 };
+static Window win_find     = { N_("Find and replace"), IC_SEARCH, {0, 0, 520, 236}, false, false, true, false, false, 0, 420, 200, find_body, 0, 0, false, -1, 0, 0, 0 };
+static Window win_outline  = { N_("Outline"), IC_LIST, {0, 0, 340, 520}, false, false, false, true, false, 0, 260, 240, outline_body, 0, 0, false, -1, 0, 0, 0 };
+static Window win_stats    = { N_("Session and goals"), IC_CHART, {0, 0, 440, 540}, false, false, false, false, false, 0, 400, 400, stats_body, 0, 0, false, -1, 0, 0, 0 };
+static Window win_help     = { N_("Keyboard shortcuts"), IC_HELP, {0, 0, 760, 600}, false, false, false, true, false, 0, 560, 400, help_body, 0, 0, false, -1, 0, 0, 0 };
+static Window win_palette  = { N_("Commands"), IC_COMMAND, {0, 0, 600, 440}, false, true, true, false, true, 0, 400, 300, palette_body, 0, 0, false, -1, 0, 0, 0 };
+static Window win_menu     = { N_("Menu"), -1, {0, 0, 300, 400}, false, false, false, false, true, 0, 200, 200, menu_body, 0, 0, false, -1, 0, 0, 0 };
 static void theme_ed_body(Window *w, Rect r);
-static Window win_theme_ed = { N_("Theme editor"), IC_PALETTE, {0, 0, 700, 680}, false, false, true, true, false, 0, 520, 420, theme_ed_body, 0, 0, false };
+static Window win_theme_ed = { N_("Theme editor"), IC_PALETTE, {0, 0, 700, 680}, false, false, true, true, false, 0, 520, 420, theme_ed_body, 0, 0, false, -1, 0, 0, 0 };
 
 static int settings_tab;
 static char find_text[128], repl_text[128];
@@ -605,7 +605,7 @@ static void c_tabs(void) {
     else str_copy(m, L("Tabs off — your tabs are kept for when you turn them back on"), sizeof m);
     ui_toast(m); prefs_save();
 }
-static void c_tab_close(void) { if (prefs.tabs) app_tab_close(cur_tab); else ui_toast(L("Turn tabs on with the button at the top to use Ctrl+W")); }
+static void c_tab_close(void) { if (prefs.tabs) app_tab_close(cur_tab); else ui_toast(L("Turn tabs on to use Ctrl+W (Ctrl+K → Tabs, or the button at the top)")); }
 static void c_tab_next(void) { if (prefs.tabs && ntabs > 1) app_tab_switch((cur_tab + 1) % ntabs); }
 static void c_tab_prev(void) { if (prefs.tabs && ntabs > 1) app_tab_switch((cur_tab + ntabs - 1) % ntabs); }
 static void open_theme_editor(bool edit);
@@ -697,6 +697,16 @@ static void c_date(void) {
     editor_insert_text(s, str_len(s));
 }
 static int ed_stepper(Rect r, const char *label, const char *value, Face *vf);
+/* mouse e touchpad desligados: tudo pelo teclado (Ajustes → Sistema, Ctrl+K → Mouse, CONFIG.INI use_mouse=0) */
+static void c_mouse(void) {
+    prefs.no_mouse = !prefs.no_mouse;
+    prefs_save();
+    ui_toast(prefs.no_mouse ? L("Mouse and touchpad off: keyboard only (Ctrl+K → Mouse turns them back on)") : L("Mouse and touchpad on"));
+}
+static void c_focus_cycle(void) { wm_cycle_focus(); }
+/* abriu uma janela pelo teclado (atalho, paleta, menu): o teclado vai junto para ela */
+static int top_z(void) { Window *t = wm_top(); return t ? t->z : 0; }
+static void focus_new_top(int z0) { Window *t = wm_top(); if (t && t->z > z0) wm_focus(t); }
 
 /* troca o idioma da interface; se o idioma pede fontes que não estão no pen-drive (ex.: chinês
  * sem o pacote de fontes), volta ao anterior e avisa, para a tela nunca ficar ilegível */
@@ -730,7 +740,7 @@ static const Cmd cmds[] = {
     { N_("Save"), N_("Ctrl+S"), c_save, IC_SAVE },
     { N_("Save as / Export…"), N_("Ctrl+Shift+S"), c_saveas, IC_EXPORT },
     { N_("Reading mode (formatted Markdown)"), N_("Ctrl+P"), c_preview, IC_EYE },
-    { N_("Reading auto-scroll (on/off)"), N_("Middle button"), c_autoscroll, IC_PLAY },
+    { N_("Reading auto-scroll (on/off)"), N_("Enter (reading)"), c_autoscroll, IC_PLAY },
     { N_("Next chapter"), N_("Ctrl+PgDn"), c_chapter_next, IC_LIST },
     { N_("Previous chapter"), N_("Ctrl+PgUp"), c_chapter_prev, IC_LIST },
     { N_("Go to the last edit"), N_("Ctrl+J"), c_last_edit, IC_EDIT },
@@ -762,6 +772,9 @@ static const Cmd cmds[] = {
     { N_("Hide markup outside the paragraph"), "", c_markup, IC_EYE },
     { N_("Smart typography (— “ ” …)"), "", c_smart, IC_EDIT },
     { N_("Keyboard shortcuts"), "F1", c_help, IC_HELP },
+    { N_("Menu and recent documents"), N_("Alt+M"), 0, IC_MENU },
+    { N_("Keyboard focus: text or the next window"), N_("Ctrl+F6"), c_focus_cycle, IC_COMMAND },
+    { N_("Mouse and touchpad (on/off)"), "", c_mouse, IC_SETTINGS },
     { N_("Language and keyboard"), "", c_language, IC_SETTINGS },
     { N_("Restart the computer"), "", c_reboot, IC_POWER },
     { N_("Shut down the computer"), N_("Ctrl+Q"), c_shutdown, IC_POWER },
@@ -820,7 +833,14 @@ static void palette_body(Window *w, Rect r) {
     if (!pal_n) draw_text_c(f, S(14), rect(r.x, r.y + SI(80), r.w, SI(30)), L("No command found"), col_alpha(T->panel_text, 0.45f));
     int want = SI(74) + MAX(1, MIN(pal_n, 9)) * rh + SI(14);
     if (w->r.h != want + SI(2)) { w->r.h = want + SI(2); ui.redraw = true; }
-    if (run && pal_n) { wm_close(w); cmds[pal_idx[pal_sel]].fn(); }
+    if (run && pal_n) {
+        bool kb = !ui.in.pressed;
+        wm_close(w);
+        int z0 = top_z();
+        void (*fn)(void) = cmds[pal_idx[pal_sel]].fn;
+        if (fn) fn(); else c_menu();
+        if (kb) focus_new_top(z0);
+    }
 }
 
 /* ------------------------------------------------------------ menu */
@@ -828,6 +848,7 @@ static void c_menu(void) {
     win_menu.r = rect(SI(12), SI(52), SI(320), SI(200));
     win_menu.centered_once = true;
     wm_toggle(&win_menu);
+    win_menu.nav = 0;            /* pelo teclado (Alt+M): ↑/↓ e Enter já funcionam */
 }
 static void open_recent(int i) {
     const char *r = prefs.recent[i];
@@ -845,7 +866,7 @@ static void menu_body(Window *w, Rect r) {
 #define ITM(t, k, f, ic) items[n++] = (It){ t, k, f, ic, -1 }
     SEC(L("DOCUMENT"));
     ITM(L("New"), L("Ctrl+N"), c_new, IC_FILE); ITM(L("Open…"), L("Ctrl+O"), c_open, IC_FOLDER);
-    ITM(L("Save"), L("Ctrl+S"), c_save, IC_SAVE); ITM(L("Save as / Export…"), L("Ctrl+⇧+S"), c_saveas, IC_EXPORT);
+    ITM(L("Save"), L("Ctrl+S"), c_save, IC_SAVE); ITM(L("Save as / Export…"), L("Ctrl+Shift+S"), c_saveas, IC_EXPORT);
     int nrec = 0;
     for (int i = 0; i < 6 && nrec < 4; i++) {
         if (!prefs.recent[i][0]) continue;
@@ -875,15 +896,17 @@ static void menu_body(Window *w, Rect r) {
             y += SI(28); continue;
         }
         Rect it = rect(r.x + SI(6), y, r.w - SI(12), SI(34));
-        bool hv = ui_hover(it);
+        bool fire = ui_item(it), hv = ui_hover(it);
         if (hv) gfx_rrect(it, S(8), col_alpha(T->accent, 0.12f));
         icon_draw(t->ic, it.x + S(18), it.y + it.h * 0.5f, S(16), hv ? T->accent : col_alpha(T->panel_text, 0.55f));
         draw_text_ellipsis(f, S(14), it.x + S(38), it.y + it.h * 0.5f + face_ascent(f, S(14)) * 0.36f, it.w - S(110), t->n, T->panel_text);
         if (t->k && t->k[0]) { float kw = text_width(f, S(12), t->k, -1); draw_text(f, S(12), it.x + it.w - kw - S(12), it.y + it.h * 0.5f + S(4.3f), t->k, -1, col_alpha(T->panel_text, 0.4f)); }
-        if (hv) ui.cursor = 2;
-        if (ui.in.pressed && hv) {
+        if (fire) {
+            bool kb = !ui.in.pressed;
             wm_close(w);
+            int z0 = top_z();
             if (t->recent >= 0) open_recent(t->recent); else t->fn();
+            if (kb) focus_new_top(z0);
             return;
         }
         y += SI(35);
@@ -894,6 +917,7 @@ static void menu_body(Window *w, Rect r) {
 /* ------------------------------------------------------------ ajustes */
 static void theme_card(Rect c, int ti) {
     const Theme *t = theme_get(ti);
+    bool fire = ui_item(c);
     bool on = ti == prefs.theme, hv = ui_hover(c);
     if (on) gfx_rrect(rect(c.x - SI(3), c.y - SI(3), c.w + SI(6), c.h + SI(6)), S(12), T->accent);
     else if (hv) gfx_rrect(rect(c.x - SI(2), c.y - SI(2), c.w + SI(4), c.h + SI(4)), S(11), col_alpha(T->text, 0.18f));
@@ -908,8 +932,7 @@ static void theme_card(Rect c, int ti) {
     if (t->custom) icon_draw(IC_STAR, c.x + S(12), c.y + S(12), S(12), t->accent);   /* tema do usuário */
     Face *f = ui_font(on);
     draw_text_c(f, S(12), rect(c.x, c.y + c.h - SI(22), c.w, SI(20)), L(t->name), t->dark ? 0xFFEDEDED : 0xFF222222);
-    if (hv) ui.cursor = 2;
-    if (ui.in.pressed && hv && !on) { app_set_theme(ti); prefs_save(); }
+    if (fire && !on) { app_set_theme(ti); prefs_save(); }
 }
 
 /* FOLIO\DIAGNOSTICO.TXT: o que o firmware e o hardware informaram (mouse, touchpad, som).
@@ -966,6 +989,7 @@ static void settings_body(Window *w, Rect r) {
         for (int i = 0; i < font_count(); i++) {
             Family *fam = font_get(i);
             Rect it = rect(cur.x, cur.y, wd, SI(44));
+            bool fire = ui_item(it);
             bool on = i == prefs.font, hv = ui_hover(it);
             if (on) gfx_rrect(it, S(9), col_alpha(T->accent, 0.13f)); else if (hv) gfx_rrect(it, S(9), col_alpha(T->text, 0.05f));
             Face *ff = fam_face(fam, 0);
@@ -973,8 +997,7 @@ static void settings_body(Window *w, Rect r) {
             const char *sample = L("The quick brown fox jumps — “Hello!”");
             float sw = text_width(ff, S(15), sample, -1);
             draw_text(ff, S(15), it.x + it.w - sw - S(14), it.y + it.h * 0.5f + face_ascent(ff, S(15)) * 0.34f, sample, -1, col_alpha(T->panel_text, 0.55f));
-            if (hv) ui.cursor = 2;
-            if (ui.in.pressed && hv && !on) { prefs.font = i; app_apply_font(); prefs_save(); }
+            if (fire && !on) { prefs.font = i; app_apply_font(); prefs_save(); }
             cur.y += SI(48);
         }
         draw_text(f, S(12), cur.x, cur.y + S(14), pathfmt(L("Add .ttf fonts to %s (subfolders work too) and restart."), DIR_FONTS), -1, col_alpha(T->panel_text, 0.45f));
@@ -1041,7 +1064,7 @@ static void settings_body(Window *w, Rect r) {
         if (ui_slider(rect(cur.x, cur.y, wd, SI(52)), &g, 0, 5000, L("Session goal"), vt)) prefs.goal = ((int)g / 50) * 50;
         cur.y += SI(58);
         float sp = (float)prefs.sprint_min; fmt(vt, sizeof vt, L("%d min"), prefs.sprint_min);
-        if (ui_slider(rect(cur.x, cur.y, wd, SI(52)), &sp, 5, 90, L("Sprint length"), vt)) prefs.sprint_min = ((int)sp / 5) * 5;
+        if (ui_slider(rect(cur.x, cur.y, wd, SI(52)), &sp, 5, 90, L("Sprint length"), vt)) prefs.sprint_min = ((int)(sp + 2.5f) / 5) * 5;
         cur.y += SI(58);
         float as = (float)prefs.autosave_s; fmt(vt, sizeof vt, L("every %d s"), prefs.autosave_s);
         if (ui_slider(rect(cur.x, cur.y, wd, SI(52)), &as, 5, 120, L("Autosave"), vt)) prefs.autosave_s = (int)as;
@@ -1106,6 +1129,9 @@ static void settings_body(Window *w, Rect r) {
         cur.y += SI(46);
         draw_text(f, S(12.5f), cur.x, cur.y + S(12), L("If the pointer jumps to the corners when you use the touchpad, choose Touchpad."), -1, col_alpha(T->panel_text, 0.5f));
         cur.y += SI(34);
+        { bool um = !prefs.no_mouse;
+          if (ui_toggle(rect(cur.x, cur.y, wd, SI(36)), L("Use the mouse and touchpad (off = keyboard only)"), &um)) c_mouse();
+          cur.y += SI(46); }
         ui_section(&cur, L("SOUND"));
         if (ui_toggle(rect(cur.x, cur.y, wd, SI(36)), L("Turn on the amplifier through GPIO (some laptops; applies after a restart)"), &prefs.audio_gpio)) prefs_save();
         cur.y += SI(46);
@@ -1141,9 +1167,10 @@ static void settings_body(Window *w, Rect r) {
         cur.y += SI(56);
     }
     float content = cur.y + set_scroll - area.y;
+    ui_reveal(&set_scroll, area);
     gfx_pop_clip();
     ui_scrollbar(rect(r.x + r.w - SI(8), area.y + SI(4), SI(5), area.h - SI(8)), &set_scroll, content, (float)area.h);
-    if (ui.active == 0 && ui.in.released) prefs_save();
+    if (ui.active == 0 && (ui.in.released || ui.nav_adj)) prefs_save();
 }
 
 /* ------------------------------------------------------------ editor de temas
@@ -1245,6 +1272,8 @@ static int ed_stepper(Rect r, const char *label, const char *value, Face *vf) {
     draw_text(f, S(14), r.x, r.y + r.h * 0.5f + face_ascent(f, S(14)) * 0.36f, label, -1, T->panel_text);
     int bw = SI(36), vx = r.x + SI(150), vw = r.w - SI(150) - 2 * bw - SI(8);
     int d = 0;
+    if (ui_nav(r, NAV_ADJ)) d = ui.nav_adj ? ui.nav_adj : ui.nav_fire ? 1 : 0;   /* teclado: ←/→, Enter avança */
+    ui.nav_skip = true;
     if (ui_icon_btn(rect(vx, r.y, bw, r.h), IC_BACK, false, 0)) d = -1;
     Rect vr = rect(vx + bw + SI(4), r.y, vw, r.h);
     gfx_rrect(vr, S(8), col_alpha(T->text, 0.06f));
@@ -1253,6 +1282,7 @@ static int ed_stepper(Rect r, const char *label, const char *value, Face *vf) {
     draw_text(vf, S(16), vr.x + MAX(S(10), (vr.w - tw) * 0.5f), vr.y + vr.h * 0.5f + face_ascent(vf, S(16)) * 0.34f, value, -1, T->panel_text);
     gfx_pop_clip();
     if (ui_icon_btn(rect(vr.x + vr.w + SI(4), r.y, bw, r.h), IC_FWD, false, 0)) d = 1;
+    ui.nav_skip = false;
     return d;
 }
 static void theme_ed_body(Window *w, Rect r) {
@@ -1292,14 +1322,14 @@ static void theme_ed_body(Window *w, Rect r) {
         for (int k = 0; k < THEME_NCOLORS; k++) {
             int c = k / rows, rr = k % rows;
             Rect it = rect(x + c * (cw + gap), cur.y + rr * rh, cw, rh - SI(4));
+            bool fire = ui_item(it);
             bool hv = ui_hover(it), on = k == ed_sel;
             if (on) gfx_rrect(it, S(8), col_alpha(T->accent, 0.16f)); else if (hv) gfx_rrect(it, S(8), col_alpha(T->text, 0.05f));
             Rect sw = rect(it.x + SI(8), it.y + (it.h - SI(20)) / 2, SI(28), SI(20));
             gfx_rrect(sw, S(5), *theme_color(&ed_th, k));
             gfx_rrect_line(sw, S(5), S(1), col_alpha(T->panel_text, 0.25f));
             draw_text((on ? fb : f), S(13.5f), it.x + SI(46), it.y + it.h * 0.5f + face_ascent(f, S(13.5f)) * 0.36f, L(ed_labels[k]), -1, T->panel_text);
-            if (hv) ui.cursor = 2;
-            if (ui.in.pressed && hv && !on) { ed_sel = k; ed_sync_picker(); ui.focus = 0; }
+            if (fire && !on) { ed_sel = k; ed_sync_picker(); if (ui.in.pressed) ui.focus = 0; }
         }
         cur.y += rows * rh + SI(12);
     }
@@ -1340,10 +1370,12 @@ static void theme_ed_body(Window *w, Rect r) {
             seen[n++] = c;
             if (gx + d > x + wd) { gx = x; cur.y += d + SI(8); }
             Rect sr = rect(gx, cur.y, d, d);
+            bool fire = ui_item(sr);
             bool hv = ui_hover(sr);
             gfx_circle(sr.x + d * 0.5f, sr.y + d * 0.5f, d * 0.5f, col_alpha(T->panel_text, hv ? 0.6f : 0.2f));
             gfx_circle(sr.x + d * 0.5f, sr.y + d * 0.5f, d * 0.5f - S(1.5f), c);
-            if (hv) { ui.cursor = 2; ui_tooltip(th, sr, L(th->name)); if (ui.in.pressed) { ui.focus = 0; ed_set_color(c, true, true); } }
+            ui_tooltip(th, sr, L(th->name));
+            if (fire) { if (ui.in.pressed) ui.focus = 0; ed_set_color(c, true, true); }
             gx += d + SI(8);
         }
         cur.y += d + SI(18);
@@ -1378,6 +1410,7 @@ static void theme_ed_body(Window *w, Rect r) {
         cur.y += SI(64);
     }
     float content = cur.y + ed_scroll - r.y;
+    ui_reveal(&ed_scroll, area);
     gfx_pop_clip();
     ui_scrollbar(rect(r.x + r.w - SI(8), r.y + SI(4), SI(5), area.h - SI(8)), &ed_scroll, content, (float)area.h);
 
@@ -1444,6 +1477,10 @@ static void outline_body(Window *w, Rect r) {
         if (k.kind != LK_H) continue;
         count++;
         Rect it = rect(r.x + SI(8), y, r.w - SI(16), rh);
+        bool vis = y + rh > r.y && y < r.y + r.h;   /* fora da vista: só o teclado chega nele */
+        bool fire = vis ? ui_item(it) : (ui_nav(it, NAV_ITEM) && ui.nav_fire), kb = fire && !ui.in.pressed;
+        if (fire) { if (preview_active()) preview_goto_para(i, true); else editor_goto((Pos){ i, p->len }); }
+        if (kb) wm_focus(0);
         if (y + rh > r.y && y < r.y + r.h) {
             bool hv = ui_hover(it), on = i == cur_h;
             if (on) gfx_rrect(it, S(7), col_alpha(T->accent, 0.14f)); else if (hv) gfx_rrect(it, S(7), col_alpha(T->text, 0.05f));
@@ -1452,12 +1489,11 @@ static void outline_body(Window *w, Rect r) {
             str_copy(t, pt, MIN((int)sizeof t, pl + 1)); mem_free(pt);
             if (!t[0]) str_copy(t, L("(untitled)"), sizeof t);
             draw_text_ellipsis(k.level == 1 ? fb : f, S(k.level == 1 ? 14.5f : 13.5f), ix, it.y + it.h * 0.5f + S(5), it.x + it.w - ix - S(6), t, on ? T->accent : T->panel_text);
-            if (hv) ui.cursor = 2;
-            if (ui.in.pressed && hv) { if (preview_active()) preview_goto_para(i, true); else editor_goto((Pos){ i, p->len }); }
         }
         y += rh;
     }
     float content = (float)count * rh + SI(16);
+    ui_reveal(&out_scroll, r);
     out_scroll = CLAMP(out_scroll, 0.0f, MAX(0.0f, content - r.h));
     if (!count) {
         draw_text_c(f, S(14), rect(r.x, r.y + SI(30), r.w, SI(24)), L("No headings yet."), col_alpha(T->panel_text, 0.55f));
@@ -1545,8 +1581,8 @@ static void help_body(Window *w, Rect r) {
         { N_("Ctrl+D"), N_("Duplicate paragraph") }, { N_("Ctrl+Shift+K"), N_("Delete paragraph") },
         { N_("Ctrl+PgUp / PgDn"), N_("Previous · next chapter") }, { N_("Ctrl+J"), N_("Jump to and back from the last edit") },
         { N_("Shift+F3"), N_("lowercase → Title Case → UPPERCASE") }, { N_("Select and type ( \" *"), N_("Wraps the selection") },
-        { N_("← / → (reading)"), N_("Previous · next page") }, { N_("Click the margins"), N_("Turns the page while reading") },
-        { N_("Middle button"), N_("Auto-scroll (reading)") }, { N_("+ / − (reading)"), N_("Auto-scroll speed") },
+        { N_("← / → · Space (reading)"), N_("Previous · next page") }, { N_("Enter (reading)"), N_("Auto-scroll on/off") },
+        { N_("+ / − (reading)"), N_("Auto-scroll speed") }, { N_("Alt+M"), N_("Menu and recent documents") },
         { N_("Ctrl+← / →"), N_("Previous / next word") }, { N_("Ctrl+Home / End"), N_("Start · end of the text") },
         { N_("Ctrl+= / -"), N_("Larger · smaller text") }, { N_("Ctrl+T"), N_("Next theme") },
         { "F1", N_("This help") }, { "F2", N_("Focus mode (sentence/paragraph/line)") },
@@ -1555,7 +1591,9 @@ static void help_body(Window *w, Rect r) {
         { N_("F7 / F8 / F9"), N_("Previous track · Play/pause · Next") }, { "F10", N_("Session and goals") },
         { "F11", N_("Zen mode") }, { "F12", N_("Appearance") },
         { N_("Esc"), N_("Close window · leave zen/reading") }, { N_("Ctrl+Q"), N_("Shut down") },
-        { "-- ...", N_("Become — and … (smart typography)") }, { N_("Double/triple click"), N_("Selects word · paragraph") },
+        { N_("Tab · ↑ ↓ (windows)"), N_("Move between buttons and options") }, { N_("Enter · Space · ← →"), N_("Press · adjust the focused option") },
+        { N_("Ctrl+F6"), N_("Keyboard between the text and the windows") }, { N_("Ctrl+Shift+← / →"), N_("Select word by word") },
+        { "-- ...", N_("Become — and … (smart typography)") },
     };
     Face *f = ui_font(false), *fb = ui_font(true);
     int cols = r.w > SI(640) ? 2 : 1;
@@ -1779,6 +1817,8 @@ static void draw_statusbar(float a) {
  * ====================================================================== */
 void app_event(Event *e) {
     Input *in = &ui.in;
+    /* mouse desligado (só teclado): movimentos, cliques e roda são ignorados */
+    if (prefs.no_mouse && (e->type == EV_MOVE || e->type == EV_DOWN || e->type == EV_UP || e->type == EV_WHEEL)) return;
     switch (e->type) {
     case EV_MOVE:
         if (e->x != in->mx || e->y != in->my) { in->moved = true; last_mouse_ms = pal_ms(); }
@@ -1807,7 +1847,8 @@ void app_event(Event *e) {
     case EV_KEY: {
         cur_mods = e->mods;
         Event k = *e;
-        if (e->us_raw && e->ch && !e->key) {
+        /* Alt+letra/número são atalhos (Alt+M, Alt+1…9): a tecla física, sem passar pelo layout */
+        if (e->us_raw && e->ch && !e->key && !((e->mods & MOD_ALT) && !(e->mods & (MOD_CTRL | MOD_ALTGR)))) {
             u32 out[2]; int n = kbd_translate(e, out);
             for (int i = 0; i < n && in->nkeys < 64; i++) { k.ch = out[i]; k.us_raw = false; in->keys[in->nkeys++] = k; }
             ui.redraw = true;
@@ -1820,17 +1861,25 @@ void app_event(Event *e) {
     ui.redraw = true;
 }
 
+/* atalho de um painel (F5, F6, F10, F12): aberto sem o teclado, recebe o teclado; senão, abre/fecha */
+static bool panel_key(Window *w) {
+    if (w->open && ui.key_win != w && !wm_any_modal()) { wm_focus(w); return true; }
+    return false;
+}
 static bool global_key(Event *e) {
     bool ctrl = (e->mods & MOD_CTRL) != 0, sh = (e->mods & MOD_SHIFT) != 0;
-    bool win_keys = ui.key_win != 0;
+    /* janela que digita (campos de texto) ou modal: as teclas são dela; painéis (Ajustes, Sumário…) deixam passar os atalhos */
+    bool win_keys = ui.key_win != 0 && (ui.key_win->wants_keys || ui.key_win->modal);
     if (e->key == KEY_ESC) {
-        Window *top = wm_top();
+        Window *top = ui.key_win && ui.key_win->open ? ui.key_win : wm_top();
         if (top) { wm_close(top); return true; }
         if (preview_stop_motion()) return true;      /* Esc primeiro só para o que está rolando (nunca liga) */
         if (preview_active()) { preview_leave(); return true; }
         if (zen) { zen = false; return true; }
         last_mouse_ms = ui.in.now; return true;
     }
+    if (ctrl && !(e->mods & MOD_ALT) && e->key == KEY_F6) { wm_cycle_focus(); return true; }   /* teclado: texto ↔ janelas */
+    if ((e->mods & MOD_ALT) && !ctrl && (e->ch == 'm' || e->ch == 'M') && !wm_any_modal()) { if (!win_menu.open || ui.key_win == &win_menu) c_menu(); else wm_focus(&win_menu); return true; }
     if (ctrl && (e->mods & MOD_ALT) && !e->ch) {          /* Ctrl+Alt+setas: girar a tela; Ctrl+Alt+Home: restaurar */
         int r = e->key == KEY_UP ? 1 : e->key == KEY_RIGHT ? 2 : e->key == KEY_DOWN ? 3 : e->key == KEY_LEFT ? 4 : 0;
         if (r) { prefs.rotation = r; pal_set_rotation(r); prefs_save(); return true; }
@@ -1866,18 +1915,18 @@ static bool global_key(Event *e) {
     }
     if (win_keys && e->key != KEY_F1) return false;
     switch (e->key) {
-    case KEY_F1: c_help(); return true;
+    case KEY_F1: if (!panel_key(&win_help)) c_help(); return true;
     case KEY_F2: c_focus(); return true;
     case KEY_F3: if (sh) { if (!preview_active()) editor_cycle_case(); } else c_typewriter(); return true;
     case KEY_F4: c_sprint(); return true;
-    case KEY_F5: c_outline(); return true;
-    case KEY_F6: c_music(); return true;
+    case KEY_F5: if (!panel_key(&win_outline)) c_outline(); return true;
+    case KEY_F6: if (!panel_key(&win_music)) c_music(); return true;
     case KEY_F7: c_prev(); return true;
     case KEY_F8: c_play(); return true;
     case KEY_F9: c_next(); return true;
-    case KEY_F10: c_stats(); return true;
+    case KEY_F10: if (!panel_key(&win_stats)) c_stats(); return true;
     case KEY_F11: c_zen(); return true;
-    case KEY_F12: c_appearance(); return true;
+    case KEY_F12: if (!panel_key(&win_settings)) { if (win_settings.open) wm_close(&win_settings); else c_appearance(); } return true;   /* como F5/F6/F10: abre, dá o teclado, fecha */
     default: return false;
     }
 }
@@ -2015,13 +2064,15 @@ bool app_frame(void) {
         if (in->pressed) { in->pressed = in->dbl = in->triple = false; }
     }
 
+    if (prefs.no_mouse) { in->mx = in->my = -100000; in->pressed = in->down = in->dbl = in->triple = false; in->wheel = 0; }
     ui_begin_frame();
 
-    /* atalhos globais e teclado do editor */
+    /* atalhos globais e teclado do editor; a janela aberta por um atalho recebe o teclado */
     for (int i = 0; i < in->nkeys; i++) {
         Event *e = &in->keys[i];
         if (e->type != EV_KEY) continue;
-        if (global_key(e)) e->type = EV_NONE;
+        int z0 = top_z();
+        if (global_key(e)) { e->type = EV_NONE; focus_new_top(z0); }
     }
     if (!ui.key_win && !wm_any_modal()) {
         for (int i = 0; i < in->nkeys; i++) {
@@ -2035,7 +2086,7 @@ bool app_frame(void) {
     /* barras: aparecem com o mouse, somem ao digitar */
     /* digitou depois do último movimento do mouse: as barras só voltam quando o mouse se mexe */
     bool typing_recent = app.last_edit_ms > last_mouse_ms;
-    bool near_edge = in->my < SI(70) || in->my > ui.H - SI(52);
+    bool near_edge = !prefs.no_mouse && (in->my < SI(70) || in->my > ui.H - SI(52));
     /* rolagem automática com o mouse parado: some tudo, como se estivesse digitando
      * (só se o usuário deixou "ocultar barras" ligado; desligado, as barras ficam) */
     bool auto_idle = prefs.autohide && preview_auto_idle(now - last_mouse_ms);
@@ -2044,7 +2095,7 @@ bool app_frame(void) {
         /* zen: as barras aparecem ao tocar a borda de cima (ou a de baixo, na leitura, onde fica a
          * barra de leitura) e continuam enquanto o mouse estiver sobre elas; antes, descer o mouse
          * até a barra de baixo a fazia sumir e ela ficava inalcançável */
-        bool edge = in->my < SI(8) || (preview_active() && in->my >= ui.H - SI(8));
+        bool edge = !prefs.no_mouse && (in->my < SI(8) || (preview_active() && in->my >= ui.H - SI(8)));
         bool on_bars = chrome_a > 0.3f && (in->my < SI(56) || in->my >= ui.H - SI(44));
         want = (edge && now - last_mouse_ms < 1500) || on_bars;
     }
@@ -2065,6 +2116,25 @@ bool app_frame(void) {
     draw_statusbar(chrome_a);
     preview_draw_bar(chrome_a);
     wm_draw_all();
+    /* painel com o teclado (Ajustes, Sumário, Música…) e a pessoa voltou a digitar: o texto vai
+     * para o documento, como antes de o painel ter o foco */
+    if (ui.key_win && !ui.key_win->modal && !ui.key_win->wants_keys) {
+        int first = -1;
+        for (int i = 0; i < in->nkeys && first < 0; i++) {
+            Event *e = &in->keys[i];
+            if (e->type == EV_KEY && e->ch >= 32 && !(e->mods & (MOD_CTRL | MOD_ALT))) first = i;
+        }
+        if (first >= 0) {
+            if (ui.key_win == &win_menu) wm_close(&win_menu);
+            wm_focus(0);
+            for (int i = first; i < in->nkeys; i++) {
+                Event *e = &in->keys[i];
+                if (e->type != EV_KEY) continue;
+                if (preview_active()) preview_key(e); else editor_key(e);
+                e->type = EV_NONE;
+            }
+        }
+    }
     if (win_menu.open && in->pressed && !rect_has(win_menu.r, in->mx, in->my) && !(in->mx < SI(50) && in->my < SI(52))) wm_close(&win_menu);
     ui_draw_toasts();
 
@@ -2081,7 +2151,7 @@ bool app_frame(void) {
     autosave();
 
     /* ponteiro: escondido enquanto se digita */
-    bool show_ptr = (now - last_mouse_ms < 3000 || !typing_recent || wm_top()) && !auto_idle;
+    bool show_ptr = (now - last_mouse_ms < 3000 || !typing_recent || wm_top()) && !auto_idle && !prefs.no_mouse;
     if (splash_active()) { splash_draw(); ui.redraw = true; }
     if (show_ptr) cursor_draw(ui.cursor, in->mx, in->my, ui.scale);
 
