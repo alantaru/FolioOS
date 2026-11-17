@@ -17,7 +17,7 @@ Este pen-drive funciona de dois jeitos:
    MUSIC\           coloque seus .mp3 aqui; o FolioOS toca (F8) enquanto você
                     escreve. Subpastas também valem.
    FOLIO\FONTS\     fontes .ttf usadas pelo editor. Pode acrescentar as suas
-                    (subpastas valem). Pacote pronto: FOLIO-FONTS-EXTRA.zip.
+                    (subpastas valem). 11 fontes de escrita já vêm em EXTRA.
    FOLIO\THEMES\    seus temas (.INI de texto: cores #RRGGBB e fontes).
    FOLIO\LANGUAGES\ traduções da interface (arquivos .po). Veja IDIOMAS.
    FOLIO\KEYBOARDS\ layouts de teclado (texto simples). Copie um para criar o seu.
@@ -34,8 +34,8 @@ IDIOMAS E TECLADOS
    Na primeira vez, o FolioOS segue o idioma do setup do firmware, se houver
    tradução; senão, começa em inglês. Troque quando quiser em Ajustes > Sistema >
    IDIOMA E TECLADO (ou Ctrl+K > "Idioma"). Pen-drives já em uso continuam em
-   português. São 15 idiomas; chinês, japonês e coreano pedem o pacote
-   FOLIO-FONTS-CJK.zip (descompacte na raiz). Para acrescentar ou corrigir um
+   português. São 15 idiomas, todos prontos para usar: as fontes de
+   chinês, japonês e coreano já vêm no FolioOS. Para acrescentar ou corrigir um
    idioma, edite FOLIO\LANGUAGES\<código>.po (Poedit ou qualquer editor) e
    reinicie. Os teclados (ABNT2, Portugal, EUA, internacional, Reino Unido,
    Espanha, América Latina, AZERTY, QWERTZ, italiano, polonês, turco, russo,
@@ -98,9 +98,9 @@ TEMAS E FONTES
    qualquer tema pronto), a fonte do texto e a da interface. Tudo muda na hora
    enquanto você edita; Cancelar (ou Esc) desfaz. Os temas ficam em
    FOLIO\THEMES como arquivos .INI que dá para editar e trocar com amigos
-   ("Blue Ink.INI" é um exemplo). Fontes: descompacte FOLIO-FONTS-EXTRA.zip
-   na raiz do pen-drive (11 famílias livres para escrita) ou ponha qualquer .ttf
-   em FOLIO\FONTS, e reinicie.
+   ("Blue Ink.INI" é um exemplo). Fontes: 11 famílias livres para escrita já vêm em
+   FOLIO\FONTS\EXTRA; para usar outras, ponha qualquer .ttf em FOLIO\FONTS e
+   reinicie.
 
 ABERTURA
    Ao ligar, a tela FolioOS aparece por 10 s (ajustável de 1 a 60 s em Ajustes >

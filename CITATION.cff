@@ -4,8 +4,8 @@ title: "FolioOS: a distraction-free writing machine that boots from a USB drive"
 type: software
 license: GPL-3.0-only
 repository-code: "https://github.com/alantaru/FolioOS"
-version: "4.1.0"
-date-released: "2026-11-16"
+version: "4.2.0"
+date-released: 2026-11-17
 keywords: [writing, distraction-free, UEFI, bootable USB, Markdown, typewriter, writerdeck]
 authors:
   - name: "FolioOS contributors"

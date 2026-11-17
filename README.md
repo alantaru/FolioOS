@@ -63,8 +63,8 @@ share.
   `FolioOS.zip` is still recommended: it keeps the rest of the drive free for your files.
 - **From source on Windows:** `.\build.ps1` then `.\flash_usb.ps1 -DriveLetter E:` (installs or updates a
   drive without deleting anything).
-- **Optional packs** (unzip at the drive root too): `FOLIO-FONTS-EXTRA.zip` — 11 free fonts for writing and
-  reading; `FOLIO-FONTS-CJK.zip` — fonts for the Chinese, Japanese and Korean interface.
+- **Everything is included:** `FolioOS.zip` already brings 11 free fonts for writing and reading and the
+  fonts for Chinese, Japanese and Korean — every language works out of the box.
 
 </details>
 
@@ -198,6 +198,7 @@ completely (*Settings › System › Use the mouse and touchpad*, **Ctrl+K › M
 | **Esc** | Close the window and go back to the text; with nothing open, show the hidden bars |
 | **Ctrl+F6** | Move the keyboard between the text and the open windows |
 | **Alt+M** | Menu with the recent documents (also in Ctrl+K) |
+| **Alt+F7** / **Alt+F8** | Move / resize the window with the arrows (Shift = small steps), Enter confirms, Esc undoes |
 
 A highlight shows which control has the keyboard; it only appears once you use the keys, so nothing
 changes for mouse users. Typing letters in a side window (outline, music, settings) sends them straight
@@ -222,8 +223,8 @@ and anti-aliasing, crisp from small netbook screens to 4K.
 
 **Make your own:** the theme editor lets you pick each of the 16 colors (or borrow them from any built-in
 theme), choose a font for the text and another for the interface, and see the result live. Themes are small
-`.INI` text files in `FOLIO/THEMES` — easy to share. Drop any `.ttf` font into `FOLIO/FONTS` to use it; the
-optional pack adds Literata, Lora, EB Garamond, iA Writer Quattro/Duo/Mono, Special Elite and more.
+`.INI` text files in `FOLIO/THEMES` — easy to share. Drop any `.ttf` font into `FOLIO/FONTS` to use it; FolioOS
+already comes with Literata, Lora, EB Garamond, iA Writer Quattro/Duo/Mono, Special Elite and more.
 
 <br clear="right">
 
@@ -249,7 +250,8 @@ Nothing about language is hard-coded. Each translation is a standard **gettext `
 `FOLIO/LANGUAGES` that also defines its plural rules, smart quotes, date format, decimal separator,
 default keyboard and fonts — **adding a language is dropping a file on the drive**. Keyboard layouts are
 plain-text files too: US, US-International, UK, ABNT2, Portugal, Spain, Latin America, French AZERTY,
-German QWERTZ, Italian, Polish, Turkish Q, Russian and Ukrainian.
+German QWERTZ, Italian, Polish, Turkish Q, Russian, Ukrainian, Korean (2-set Hangul input) and Japanese
+(romaji → kana input).
 
 Want FolioOS in your language? Read **[docs/TRANSLATING.md](docs/TRANSLATING.md)** — it works with Poedit,
 Weblate, Crowdin or any text editor.
@@ -344,8 +346,13 @@ reports are welcome. Apple Silicon Macs are not supported.
 <details>
 <summary><b>Can I type in Chinese, Japanese or Korean?</b></summary>
 
-The interface is fully translated, but typing CJK text needs an input method, which is on the roadmap.
-Latin, Greek and Cyrillic scripts can be typed today with the included keyboard layouts.
+**Korean and Japanese, yes.** Choose the *한국어 (두벌식)* or *日本語 (ローマ字かな)* keyboard in
+*Settings › System*: Korean uses the standard 2-set layout and builds the syllables as you type
+(Backspace removes one jamo at a time); Japanese turns romaji into hiragana or katakana (`nihongo` →
+にほんご). **Ctrl+Space** switches between the input method and Latin letters. The fonts
+come with FolioOS, and the right one loads by itself whenever the text contains these scripts.
+Kanji conversion and Chinese pinyin need dictionaries and are still on the roadmap. Latin, Greek and
+Cyrillic scripts are typed with the included keyboard layouts.
 </details>
 
 <details>
@@ -376,7 +383,7 @@ cd FolioOS
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # run the real UEFI binary in a window
 .\flash_usb.ps1 -DriveLetter E:              # install/update a FAT32 USB drive, keeping user files
 .\build.ps1 -Image -ImageMB 256              # optional: raw disk image for Rufus / Etcher / dd
-.\tools\fetch-cjk-fonts.ps1                  # optional: fonts for FOLIO-FONTS-CJK.zip
+.\tools\fetch-cjk-fonts.ps1                  # downloads the CJK fonts once (build.ps1 runs it when needed)
 .\tools\showcase.ps1                         # regenerate the screenshots in this README
 ```
 
@@ -401,7 +408,8 @@ A ~600 KB binary owns the whole machine through a thin platform layer. Details i
 
 ## Roadmap
 
-- [ ] Input methods for Chinese, Japanese and Korean
+- [x] Korean input (2-set Hangul) and Japanese kana input (romaji → hiragana/katakana)
+- [ ] Japanese kanji conversion and Chinese pinyin input (need dictionaries)
 - [ ] Text shaping and right-to-left scripts (Arabic, Hebrew, Devanagari…)
 - [ ] Spell checking with Hunspell-compatible dictionaries
 - [ ] Secure Boot support (signed shim)

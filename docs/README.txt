@@ -17,7 +17,7 @@ This drive works in two ways:
    MUSIC\              put your .mp3 files here; FolioOS plays them (F8) while
                        you write. Subfolders work too.
    FOLIO\FONTS\        .ttf fonts used by the editor. Add your own (subfolders
-                       work). Ready-made pack: FOLIO-FONTS-EXTRA.zip.
+                       work). 11 writing fonts are already in FONTS\EXTRA.
    FOLIO\THEMES\       your themes (plain-text .INI: #RRGGBB colors and fonts).
    FOLIO\LANGUAGES\    interface translations (.po files — add a language by
                        dropping a file here). See "LANGUAGES" below.
@@ -44,7 +44,8 @@ WITHOUT A MOUSE
    keyboard: Tab / Shift+Tab and the arrows move between its controls, Enter or
    Space press them, Left/Right adjust sliders and options, Esc closes. Ctrl+F6
    moves the keyboard between the text and the open windows; Alt+M opens the menu
-   with the recent documents. To switch the mouse and touchpad off completely:
+   with the recent documents; Alt+F7 / Alt+F8 move / resize a window with the
+   arrows (Enter confirms, Esc undoes). To switch the mouse and touchpad off completely:
    Settings > System > "Use the mouse and touchpad", Ctrl+K > "Mouse", or
    use_mouse=0 in FOLIO\CONFIG.INI.
 
@@ -55,16 +56,19 @@ LANGUAGES
    Included: English, Español, Français, Deutsch, Italiano, Português (Brasil),
    Português (Portugal), Nederlands, Polski, Türkçe, Русский, Українська,
    简体中文, 日本語, 한국어.
-   Chinese, Japanese and Korean need their fonts: unzip FOLIO-FONTS-CJK.zip at the
-   root of this drive first (the interface is translated; typing CJK text needs an
-   input method that FolioOS does not have yet).
+   The fonts for Chinese, Japanese and Korean are included (FOLIO\FONTS\_LANGUAGE),
+   so every language works out of the box. Korean and Japanese can be typed with the keyboards
+   "한국어 (두벌식)" (Hangul syllables) and "日本語 (ローマ字かな)" (romaji to kana);
+   Ctrl+Space switches the input method on and off. Kanji conversion and Chinese
+   pinyin are not available yet.
    To add or fix a language, edit or create FOLIO\LANGUAGES\<code>.po with Poedit
    or any text editor, and restart. Guide: docs/TRANSLATING.md in the project.
 
 KEYBOARD
    Settings > System > Keyboard. Layouts are text files in FOLIO\KEYBOARDS:
    US, US-International, UK, ABNT2 (Brazil), Portugal, Spain, Latin America,
-   French AZERTY, German QWERTZ, Italian, Polish, Turkish Q, Russian, Ukrainian.
+   French AZERTY, German QWERTZ, Italian, Polish, Turkish Q, Russian, Ukrainian,
+   Korean (2-set Hangul input) and Japanese (romaji to kana).
 
 DISPLAY
    FolioOS uses the native resolution of the screen and rotates the picture on

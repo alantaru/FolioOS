@@ -140,15 +140,24 @@ with `_` are not listed (they are included by other layouts).
 ## 7. Scripts and fonts
 
 FolioOS draws text with its own TrueType rasterizer, glyph by glyph, left to right. That
-covers Latin, Greek and Cyrillic, and CJK interfaces with the fonts from
-`FOLIO-FONTS-CJK.zip`. Scripts that need contextual shaping or right-to-left layout
+covers Latin, Greek and Cyrillic, and Chinese, Japanese and Korean with the Noto fonts that ship in
+`FOLIO/FONTS/_LANGUAGE` (loaded only when needed). Scripts that need contextual shaping or right-to-left layout
 (Arabic, Hebrew, Devanagari, Thai…) need a text-shaping engine first — see the roadmap in
 the README. Translations for them are welcome anyway: they will light up as soon as the
 engine lands.
 
 ## 8. The README in your language
 
-The short READMEs (`README.<code>.md`) are generated from one template so they stay identical
-in structure. Edit or add your language's table in `tools/readmes.pl`, then run
-`perl tools/readmes.pl`: it rewrites every `README.<code>.md` and the language bar at the top
-of `README.md`. Do not edit the generated files by hand.
+Every `README.<code>.md` has exactly the same content as the English `README.md`. The English
+file is split into blocks (paragraphs, headings, lists, tables, code blocks), and each language
+keeps the translation of every block in `docs/i18n/README.<code>.po` — the same gettext format as
+the interface, so Poedit and Weblate work here too. Keep Markdown, links, image paths and `#anchors`
+exactly as they are; translate the words (in code blocks, only the comments and descriptions).
+
+- `perl tools/readmes.pl` updates every `.po` (new and changed blocks appear empty or marked
+  *fuzzy*) and regenerates every `README.<code>.md` plus the language bar of `README.md`.
+- `perl tools/readmes.pl --check` lists languages with blocks still in English (the build runs it).
+- A block without a translation shows up in English, so the page is always complete.
+- Adding a language: add it to the list at the top of `tools/readmes.pl` and run it.
+
+Never edit `README.<code>.md` by hand — the next run would overwrite it.
