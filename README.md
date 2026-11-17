@@ -399,6 +399,24 @@ keystrokes and mouse events, captures screenshots, validates every export (ZIP +
 (with a negative control for the validator), six framebuffer formats and the FAT32 driver of the BIOS
 bridge (thousands of random operations, checked byte by byte).
 
+### macOS simulator
+
+On a Mac you can build and run the simulator natively (AppKit, Retina, Cmd works as Ctrl for shortcuts).
+Requirements: the Xcode Command Line Tools (`xcode-select --install`) — just `clang`, full Xcode is not needed.
+
+```bash
+./build_macos.sh                             # simulator, "FolioOS Simulator.app" and the drive folder
+./build_macos.sh --test                      # same, plus the scripted simulator tests (headless)
+./build/macos/folio_sim                      # run FolioOS in a window
+open "build/macos/FolioOS Simulator.app"     # or launch the app bundle
+```
+
+Option is the Mac's AltGr, so it keeps typing characters (`@ # | [ ] { }` on many layouts): in the
+simulator **Option+M** opens the menu (Alt+M) and **Cmd+Option+1…9** switch tabs (Alt+1…9).
+
+The macOS script builds only the simulator: the UEFI binaries, packages, disk images and the tests
+that run the real `BOOTX64.EFI` inside `efi_host` still need the Windows build (`build.ps1`).
+
 ### Architecture in one picture
 
 ```
@@ -407,6 +425,7 @@ src/core/       portable core (freestanding C, no libc): editor, Markdown, TrueT
 src/platform/   uefi/  GOP/UGA video, input, FAT I/O, HD Audio/AC'97, USB HID and PS/2 drivers — on the firmware
                 bios/  boot sectors + BIOS-to-UEFI bridge (VBE, PS/2, own FAT32 driver) for BIOS-only PCs
                 win32/ simulator used for development and automated tests
+                macos/ simulator for macOS (AppKit), same scripted tests
 tools/          efi_host (runs BOOTX64.EFI on Windows), i18n tool, disk image builder, showcase
 assets/         fonts, translations (.po), keyboard layouts, example theme
 tests/          scripted end-to-end tests

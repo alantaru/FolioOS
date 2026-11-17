@@ -24,6 +24,12 @@ All notable changes to this project are documented here. The format follows
   AC'97) and checks picture, keyboard, mouse click, sound, saving a document and the integrity of
   the FAT32 volume on each. `tools/fatcat.c` reads files out of disk images and
   `tools/fat32_test.c` stress-tests the FAT32 driver (run by `build.ps1`).
+- **Native macOS simulator** (`src/platform/macos`, `build_macos.sh`), contributed by
+  @jagalindo in #4: an AppKit port of the Windows simulator with Retina support, Cmd as Ctrl for
+  shortcuts, folders as volumes, audio and the same headless scripted tests
+  (`./build_macos.sh --test`). Needs only the Xcode Command Line Tools; UEFI binaries, packages and
+  disk images are still built on Windows. Option keeps typing characters; Option+M is Alt+M and
+  Cmd+Option+1…9 is Alt+1…9. `src/core/embed.c` is portable to Mach-O (Apple clang).
 - `debug_serial=1` in `CONFIG.INI` writes a debug log to the serial port.
 - Command palette: **Sound test (chime)**.
 

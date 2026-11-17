@@ -30,6 +30,9 @@ no libc and no driver model: the UEFI firmware provides the hardware access it n
                        ├────────────────────────────────────────────────────────────┤
                        │ src/platform/win32       simulator: GDI window, folders as │
                        │   win32_main.c           volumes, scripted tests           │
+                       ├────────────────────────────────────────────────────────────┤
+                       │ src/platform/macos       simulator: AppKit window, folders │
+                       │   macos_main.m           as volumes, scripted tests        │
                        └────────────────────────────────────────────────────────────┘
 ```
 
@@ -74,5 +77,6 @@ and tablet; HDA and AC'97; USB and IDE disks) and drives each one over QMP: boot
 mouse click, sound (captured to WAV), typing and saving a document, and afterwards reads the
 disk image back to check the saved text, `DIAGNOSTICS.TXT` and the consistency of the volume.
 `debug_serial=1` in `CONFIG.INI` sends a debug log to the serial port (captured by the lab).
+On macOS, `build_macos.sh --test` builds the AppKit simulator and runs the same simulator scripts headless.
 
 Detailed developer notes (in Portuguese) live in [dev/HANDOFF.pt-BR.md](dev/HANDOFF.pt-BR.md).
