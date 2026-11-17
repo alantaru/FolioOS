@@ -26,6 +26,12 @@ All notable changes to this project are documented here. The format follows
   and the same headless scripted tests (`./build_macos.sh --test`). Needs only the Xcode
   Command Line Tools; UEFI binaries, packages and disk images are still built on Windows.
   Option keeps typing characters; Option+M is Alt+M and Cmd+Option+1…9 is Alt+1…9.
+- **LaTeX source editing:** `.tex`, `.bib`, `.sty` and `.cls` files are listed, opened, saved,
+  autosaved, versioned and reopened like Markdown documents, shown as plain source in the
+  monospaced font with per-line highlighting (commands, braces, `%` comments, inline math) and real
+  tab stops. Typing stays literal (no Markdown styling, list continuation or smart typography);
+  `{`, `[` and `$` close themselves and wrap a selection. CRLF files are written back as CRLF.
+  Reading mode and exports remain Markdown-only and say so.
 
 ### Changed
 - `src/core/embed.c` is portable to Mach-O (Apple clang).
@@ -42,6 +48,8 @@ All notable changes to this project are documented here. The format follows
   they now list the keyboard equivalents.
 - The danger style of confirm buttons depended on a Portuguese word.
 - `tools/i18n update` dropped source references and translator comments from `.po` files.
+- A `.tex` file opened with "All files" was styled as Markdown, got smart quotes, and was never
+  autosaved or saved on tab switch or shutdown; "Save as" `name.tex` produced `name.tex.md`.
 
 ## [4.1.0] — 2026-11-16
 

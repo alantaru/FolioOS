@@ -357,6 +357,13 @@ typedef struct { const char *s; int len; u8 sty; const char *url; int url_len; }
 int  md_runs(const char *s, int len, MdRun *runs, int max);   /* remove marcação */
 char *md_plain(const char *s, int len, int *outlen);
 
+/* tex.c — fontes LaTeX (.tex .bib .sty .cls): editadas como texto, com realce por linha */
+enum { SYN_MD, SYN_TEX };                      /* sintaxe do documento (AppDoc.syntax) */
+enum { ST_TEX = 128, TX_CMD = 1, TX_BRACE = 2, TX_COMMENT = 3, TX_CLASS = 7, TX_MATH = 8 };   /* p->sty no modo TEX: ST_TEX | classe | TX_MATH */
+int   doc_syntax_from_path(const char *path);  /* .tex .bib .sty .cls -> SYN_TEX; o resto (e sem nome) -> SYN_MD */
+bool  path_editable(const char *path);         /* abre/grava como texto: .md .txt (e sinônimos) e fontes LaTeX */
+void  tex_line(const char *s, int len, u8 *sty);   /* uma passada, sem alocar, estado só da linha */
+
 /* ======================================================================
  * export.c / zip.c
  * ====================================================================== */
@@ -602,6 +609,8 @@ typedef struct {
     u64   last_save_ms, last_edit_ms;
     int   session_start_words;
     u64   session_start_ms;
+    u8    syntax;        /* SYN_MD / SYN_TEX, pelo nome do arquivo */
+    bool  crlf;          /* o arquivo usava \r\n (mantido ao gravar fontes LaTeX) */
 } AppDoc;
 extern AppDoc app;
 
@@ -615,6 +624,7 @@ void app_apply_font(void);
 void app_open_path(int vol, const char *path);
 bool app_save(void);
 void app_save_as_done(int vol, const char *path, int fmt);
+void app_sync_syntax(void);            /* depois de trocar app.path: sintaxe do documento pelo nome */
 void app_new_doc(void);
 void app_status(const char *msg);
 int  app_boot_vol(void);

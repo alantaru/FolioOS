@@ -66,6 +66,10 @@ msgstr "쓰기 오류 — USB 메모리가 쓰기 금지되었거나 가득 찼�
 msgid "Saved · %s"
 msgstr "저장됨 · %s"
 
+#: src/core/app.c:497 src/core/filedlg.c:197
+msgid "Export is not available for LaTeX files"
+msgstr "LaTeX 파일은 내보낼 수 없습니다"
+
 #: src/core/app.c:483
 #, c-format
 msgid "Exported · %s"
@@ -1970,6 +1974,10 @@ msgstr "텍스트 전체가 이미 화면에 들어갑니다"
 #: src/core/preview.c:47
 msgid "Already at the end of the text"
 msgstr "이미 텍스트 끝입니다"
+
+#: src/core/preview.c:182
+msgid "Reading mode is not available for LaTeX files"
+msgstr "LaTeX 파일에서는 읽기 모드를 사용할 수 없습니다"
 
 #: src/core/preview.c:259
 #, c-format

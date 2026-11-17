@@ -66,6 +66,10 @@ msgstr "Błąd zapisu — czy pendrive jest zabezpieczony lub pełny?"
 msgid "Saved · %s"
 msgstr "Zapisano · %s"
 
+#: src/core/app.c:497 src/core/filedlg.c:197
+msgid "Export is not available for LaTeX files"
+msgstr "Eksport jest niedostępny dla plików LaTeX"
+
 #: src/core/app.c:483
 #, c-format
 msgid "Exported · %s"
@@ -1988,6 +1992,10 @@ msgstr "Cały tekst mieści się już na ekranie"
 #: src/core/preview.c:47
 msgid "Already at the end of the text"
 msgstr "To już koniec tekstu"
+
+#: src/core/preview.c:182
+msgid "Reading mode is not available for LaTeX files"
+msgstr "Tryb czytania jest niedostępny dla plików LaTeX"
 
 #: src/core/preview.c:259
 #, c-format

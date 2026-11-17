@@ -23,10 +23,15 @@ void editor_invalidate(void) { lay_gen++; layout_ok = false; ui.redraw = true; }
 const char *editor_clipboard(void) { return clip; }
 static float base_px(void) { return prefs.font_size * ui.scale; }
 static float base_lh(void) { return base_px() * prefs.line_height; }
+/* sintaxe do documento: Markdown ao vivo só em documentos Markdown; fontes LaTeX são texto puro em monoespaçada */
+static bool tex_mode(void) { return app.syntax == SYN_TEX; }
+static bool md_on(void) { return prefs.md_live && app.syntax == SYN_MD; }
+static Family *text_fam(void) { return tex_mode() ? font_mono() : font_get(prefs.font); }
 
 /* ------------------------------------------------------------ estilo por byte */
 static bool para_is_code(Para *p) { return p->kind == LK_CODE || p->kind == LK_FENCE; }
 static Face *sty_face(Para *p, u8 st) {
+    if (tex_mode()) return fam_face(font_mono(), (st & TX_CLASS) == TX_COMMENT ? FS_ITALIC : FS_REG);
     bool code = (st & ST_CODE) || para_is_code(p);
     Family *fam = code ? font_mono() : font_get(prefs.font);
     int s = 0;
@@ -35,6 +40,7 @@ static Face *sty_face(Para *p, u8 st) {
     return fam_face(fam, s);
 }
 static float sty_px(Para *p, u8 st) {
+    if (st & ST_TEX) return p->size;
     if (para_is_code(p)) return p->size * 0.86f;
     if (st & ST_CODE) return p->size * 0.88f;
     return p->size;
@@ -48,7 +54,7 @@ extern u16 face_gid_fb(Face **f, u32 cp);
 static void git_init(GIt *g, Para *p, int start, int end, float x0) {
     g->p = p; g->i = start; g->end = end; g->x = x0; g->prev = 0; g->pf = 0; g->ppx = 0;
     g->bullet = -1;
-    if (prefs.md_live && p->kind == LK_ULIST) { int k = 0; while (k < p->len && (p->s[k] == ' ' || p->s[k] == '\t')) k++; g->bullet = k; }
+    if (md_on() && p->kind == LK_ULIST) { int k = 0; while (k < p->len && (p->s[k] == ' ' || p->s[k] == '\t')) k++; g->bullet = k; }
 }
 static bool git_next(GIt *g, GOut *o) {
     Para *p = g->p;
@@ -66,6 +72,8 @@ static bool git_next(GIt *g, GOut *o) {
     u16 gid = face_gid_fb(&f, cp);
     if (g->prev && g->pf == f && g->ppx == px) g->x += face_kern(f, g->prev, gid, px);
     o->x = g->x; o->adv = face_adv(f, gid, px) * (tab ? 4 : 1);
+    /* LaTeX: tabulação até a próxima parada (a cada 4 colunas da monoespaçada) */
+    if (tab && o->adv > 0 && tex_mode()) o->adv = (f_floor(g->x / o->adv + 0.01f) + 1) * o->adv - g->x;
     o->f = f; o->px = px; o->gid = gid;
     g->x += o->adv; g->prev = gid; g->pf = f; g->ppx = px;
     return true;
@@ -88,11 +96,13 @@ static void layout_para(int pi, bool in_code, bool caret_here) {
     u32 key = lay_gen * 4 + (in_code ? 2 : 0) + (caret_here ? 1 : 0);
     if (p->lay_key == key) return;
     p->lay_key = key;
-    LineKind k = prefs.md_live ? md_line(p->s, p->len, in_code) : (LineKind){ p->len ? LK_PARA : LK_BLANK, 0, 0, false, 0, 0 };
+    bool tex = tex_mode(), md = md_on();
+    LineKind k = md ? md_line(p->s, p->len, in_code) : (LineKind){ p->len ? LK_PARA : LK_BLANK, 0, 0, false, 0, 0 };
     p->kind = k.kind; p->level = k.level; p->in_code = in_code;
     if (p->scap < p->len + 1) { p->scap = p->len + 16; p->sty = mem_realloc(p->sty, (usize)p->scap); }
     memset(p->sty, 0, (usize)p->len + 1);
-    if (prefs.md_live) {
+    if (tex) tex_line(p->s, p->len, p->sty);
+    else if (md) {
         if (k.kind == LK_FENCE) for (int i = 0; i < p->len; i++) p->sty[i] = ST_MARK | ST_CODE;
         else if (k.kind == LK_CODE) for (int i = 0; i < p->len; i++) p->sty[i] = ST_CODE;
         else if (k.kind == LK_HR) for (int i = 0; i < p->len; i++) p->sty[i] = ST_MARK;
@@ -126,7 +136,7 @@ static void layout_para(int pi, bool in_code, bool caret_here) {
         p->hang_w = MAX(0.0f, (float)k.indent * iw - lead);
         p->indent = p->hang_w + pre_w;
     } else if (k.kind == LK_QUOTE) { p->hang_w = 0; p->indent = pre_w; }
-    else if (k.kind == LK_PARA && prefs.first_indent) { p->hang_w = bpx * 1.6f; p->indent = 0; }
+    else if (k.kind == LK_PARA && prefs.first_indent && !tex) { p->hang_w = bpx * 1.6f; p->indent = 0; }
     /* quebra de linha */
     p->nlines = 0;
     float maxw = col_w;
@@ -158,26 +168,26 @@ static void layout_para(int pi, bool in_code, bool caret_here) {
     }
     if (p->nlines == 0) add_line(p, 0, 0, 0);
     float h = pad_top(p) + p->nlines * p->lh;
-    if (k.kind == LK_BLANK) h = base_lh() * 0.6f;
+    if (k.kind == LK_BLANK) h = tex ? p->lh : base_lh() * 0.6f;   /* LaTeX: linha vazia ocupa uma linha */
     p->height = h;
 }
 
 static bool is_list(Para *p) { return p->kind == LK_ULIST || p->kind == LK_OLIST || p->kind == LK_TASK; }
 static void ensure_layout(void) {
     if (D->n + 1 > pycap) { pycap = D->n + 256; py = mem_realloc(py, sizeof(float) * (usize)pycap); }
-    bool in_code = false;
+    bool in_code = false, md = md_on();
     /* 1) layout de cada parágrafo (estado de bloco de código é sequencial) */
     for (int i = 0; i < D->n; i++) {
         Para *p = &D->p[i];
         bool caret_here = prefs.hide_markup && i == app.caret.p;
-        if (prefs.md_live) {
+        if (md) {
             LineKind k = md_line(p->s, p->len, in_code);
             layout_para(i, in_code, caret_here);
             if (k.kind == LK_FENCE) in_code = !in_code;
         } else layout_para(i, false, caret_here);
     }
     /* 2) posições verticais com espaçamento contextual */
-    float y = 0, sp = prefs.para_space * base_lh();
+    float y = 0, sp = tex_mode() ? 0 : prefs.para_space * base_lh();
     for (int i = 0; i < D->n; i++) {
         Para *p = &D->p[i];
         py[i] = y;
@@ -323,16 +333,19 @@ static u32 char_before(Pos p) {
 }
 
 static void wrap_sel(const char *mk);
-/* com texto selecionado, ( [ " * _ ` envolvem a seleção em vez de substituí-la */
+/* com texto selecionado, ( [ " * _ ` envolvem a seleção em vez de substituí-la (LaTeX: ( [ { $ ", sem marcas Markdown) */
 static bool wrap_pair(u32 cp) {
     u32 o = 0, c = 0;
+    bool tex = tex_mode(), smart = prefs.smart_typo && !tex;
     switch (cp) {
-    case '*': wrap_sel("*"); return true;
-    case '_': wrap_sel("_"); return true;
-    case '`': wrap_sel("`"); return true;
+    case '*': if (tex) return false; wrap_sel("*"); return true;
+    case '_': if (tex) return false; wrap_sel("_"); return true;
+    case '`': if (tex) return false; wrap_sel("`"); return true;
     case '(': o = '('; c = ')'; break;
     case '[': o = '['; c = ']'; break;
-    case '"': o = prefs.smart_typo ? i18n_quote(0) : '"'; c = prefs.smart_typo ? i18n_quote(1) : '"'; break;
+    case '{': if (!tex) return false; o = '{'; c = '}'; break;
+    case '$': if (!tex) return false; o = c = '$'; break;
+    case '"': o = smart ? i18n_quote(0) : '"'; c = smart ? i18n_quote(1) : '"'; break;
     case 0x201C: o = 0x201C; c = 0x201D; break;
     case 0x201E: o = 0x201E; c = 0x201C; break;
     case 0xAB: o = 0xAB; c = 0xBB; break;
@@ -349,8 +362,37 @@ static bool wrap_pair(u32 cp) {
     return true;
 }
 
+/* LaTeX: dentro de $..$ nesta linha? (conta os $ não escapados antes do cursor) */
+static bool tex_in_math(Para *p, int o) {
+    int n = 0;
+    for (int i = 0; i < o; i++) { if (p->s[i] == '\\') i++; else if (p->s[i] == '$') n++; }
+    return n & 1;
+}
+/* LaTeX: { [ $ fecham sozinhos (não antes de letra/número nem depois de \); digitar o fecho que já está
+ * logo adiante só passa por ele. Nada de tipografia automática: o texto fica como foi digitado. */
+static void tex_type(u32 cp) {
+    Para *p = &D->p[app.caret.p];
+    int o = app.caret.o;
+    u32 prev = char_before(app.caret), next = 0;
+    if (o < p->len) utf8_decode(p->s, p->len, o, &next);
+    if (prev != '\\' && !has_sel()) {
+        if ((cp == '}' || cp == ']' || cp == '$') && next == cp) { app.caret.o++; app.anchor = app.caret; caret_changed(false); return; }
+        if ((cp == '{' || cp == '[' || (cp == '$' && !tex_in_math(p, o))) && !cp_is_word(next)) {
+            char t[2] = { (char)cp, cp == '{' ? '}' : cp == '[' ? ']' : '$' };
+            doc_undo_break(D);
+            editor_insert_text(t, 2);
+            app.caret.o--; app.anchor = app.caret;
+            doc_undo_break(D);
+            return;
+        }
+    }
+    char t[4]; int n = utf8_encode(cp, t);
+    editor_insert_text(t, n);
+}
+
 static void type_char(u32 cp) {
     if (has_sel() && wrap_pair(cp)) return;
+    if (tex_mode()) { tex_type(cp); return; }
     Para *p = &D->p[app.caret.p];
     bool code = p->in_code || p->kind == LK_CODE || p->kind == LK_TABLE || (p->len > 0 && p->s[0] == '|') || (p->sty && app.caret.o > 0 && app.caret.o <= p->len && (p->sty[app.caret.o - 1] & ST_CODE));
     if (prefs.smart_typo && !code && !has_sel()) {
@@ -384,7 +426,7 @@ static void do_enter(void) {
     doc_undo_break(D);
     Para *p = &D->p[app.caret.p];
     LineKind k = md_line(p->s, p->len, p->in_code);
-    if (prefs.md_live && !has_sel() && (k.kind == LK_ULIST || k.kind == LK_OLIST || k.kind == LK_TASK || k.kind == LK_QUOTE) && app.caret.o >= k.prefix) {
+    if (md_on() && !has_sel() && (k.kind == LK_ULIST || k.kind == LK_OLIST || k.kind == LK_TASK || k.kind == LK_QUOTE) && app.caret.o >= k.prefix) {
         if (p->len <= k.prefix) {    /* item vazio encerra a lista */
             Pos a = { app.caret.p, 0 }, b = { app.caret.p, p->len };
             doc_delete(D, a, b, true); app.caret = app.anchor = a;
@@ -614,9 +656,10 @@ void editor_key(Event *e) {
         case 'v': editor_paste(); return;
         case 'z': if (sh) goto redo; if (doc_undo(D, &app.caret)) { app.anchor = app.caret; touched(); caret_changed(false); } return;
         case 'y': redo: if (doc_redo(D, &app.caret)) { app.anchor = app.caret; touched(); caret_changed(false); } return;
-        case 'b': wrap_sel("**"); return;
-        case 'i': wrap_sel("*"); return;
-        case '0': case '1': case '2': case '3': case '4': case '5': case '6': set_heading((int)(e->ch - '0')); return;
+        /* negrito, itálico e títulos são marcas Markdown: em fontes LaTeX não fazem nada */
+        case 'b': if (!tex_mode()) wrap_sel("**"); return;
+        case 'i': if (!tex_mode()) wrap_sel("*"); return;
+        case '0': case '1': case '2': case '3': case '4': case '5': case '6': if (!tex_mode()) set_heading((int)(e->ch - '0')); return;
         case 'd': editor_dup_para(); return;
         case 'j': editor_jump_last_edit(); return;
         case 'k': if (sh) editor_del_para(); return;
@@ -637,7 +680,7 @@ void editor_key(Event *e) {
     case KEY_ENTER: if (has_sel() && prefs.hemingway) return; do_enter(); return;
     case KEY_TAB: {
         LineKind k = md_line(p->s, p->len, p->in_code);
-        if (k.kind == LK_ULIST || k.kind == LK_OLIST || k.kind == LK_TASK) indent_list(sh);
+        if (!tex_mode() && (k.kind == LK_ULIST || k.kind == LK_OLIST || k.kind == LK_TASK)) indent_list(sh);
         else if (!sh) { doc_undo_break(D); editor_insert_text("    ", 4); }
         return; }
     case KEY_BACKSPACE:
@@ -648,9 +691,15 @@ void editor_key(Event *e) {
             Pos a = ctrl ? doc_word_left(D, app.caret) : doc_left(D, app.caret);
             /* backspace no início de item de lista vazio remove o marcador */
             LineKind k = md_line(p->s, p->len, p->in_code);
-            if (!ctrl && prefs.md_live && (k.kind == LK_ULIST || k.kind == LK_OLIST || k.kind == LK_TASK) && app.caret.o == k.prefix && k.prefix > 0)
+            if (!ctrl && md_on() && (k.kind == LK_ULIST || k.kind == LK_OLIST || k.kind == LK_TASK) && app.caret.o == k.prefix && k.prefix > 0)
                 a = (Pos){ app.caret.p, 0 };
-            doc_delete(D, a, app.caret, true); app.caret = app.anchor = a;
+            /* LaTeX: apagar a abertura de um par vazio ({} [] $$) leva o fecho junto */
+            Pos b = app.caret; int o = b.o;
+            if (!ctrl && tex_mode() && o > 0 && o < p->len && (o < 2 || p->s[o - 2] != '\\')) {
+                char x = p->s[o - 1], y = p->s[o];
+                if ((x == '{' && y == '}') || (x == '[' && y == ']') || (x == '$' && y == '$')) b.o++;
+            }
+            doc_delete(D, a, b, true); app.caret = app.anchor = a;
         }
         touched(); caret_changed(false); return;
     case KEY_DELETE:
@@ -837,6 +886,16 @@ static void sentence_bounds(Para *p, int o, int *s0, int *s1) {
     *s0 = a; *s1 = b;
 }
 
+/* cores do realce LaTeX, só com campos do tema (claros e escuros); a matemática ganha o fundo de código */
+static Color tex_color(u8 st) {
+    switch (st & TX_CLASS) {
+    case TX_CMD:     return T->accent;
+    case TX_BRACE:   return col_mix(T->text, T->muted, 0.6f);
+    case TX_COMMENT: return T->muted;
+    default:         return (st & TX_MATH) ? T->heading : T->text;
+    }
+}
+
 /* barra de rolagem fina à direita, com marcas dos capítulos; aparece junto com as barras */
 static Rect  sb_track; static float sb_alpha, sb_content;
 static void scrollbar_input(Rect area, float chrome_a) {
@@ -908,6 +967,7 @@ void editor_draw(Rect area, float chrome_a) {
     if (prefs.focus_mode == FOCUS_SENTENCE) sentence_bounds(cp_, app.caret.o, &cs0, &cs1);
     if (prefs.focus_mode == FOCUS_LINE) cline = line_of(cp_, app.caret.o);
     int nl_needle = str_len(find_needle);
+    bool md = md_on(), tex = tex_mode();
 
     for (int pi = first; pi < D->n; pi++) {
         Para *p = &D->p[pi];
@@ -915,21 +975,21 @@ void editor_draw(Rect area, float chrome_a) {
         if (ptop > area.y + area.h + S(40)) break;
         float yy = ptop + pad_top(p);
         bool code = para_is_code(p);
-        if (code && prefs.md_live) {
+        if (code && md) {
             float bottom = ptop + p->height;
             if (pi + 1 < D->n && para_is_code(&D->p[pi + 1]) && p->kind != LK_FENCE) bottom = y0 + py[pi + 1];
             if (p->kind == LK_FENCE && !p->in_code && pi + 1 < D->n) bottom = y0 + py[pi + 1];
             gfx_rect(rect(col_x - SI(14), (int)ptop, (int)col_w + SI(28), (int)(bottom - ptop + 0.99f)), T->code_bg);
         }
-        if (p->kind == LK_QUOTE && prefs.md_live) {
+        if (p->kind == LK_QUOTE && md) {
             gfx_rrect(rect(col_x - SI(16), (int)yy + SI(4), SI(3), (int)(p->nlines * p->lh) - SI(8)), S(1.5f), col_alpha(T->accent, 0.55f));
         }
-        if (p->kind == LK_HR && prefs.md_live) {
+        if (p->kind == LK_HR && md) {
             float cy = yy + p->lh * 0.5f;
             gfx_rect(rect(col_x + (int)(col_w * 0.3f), (int)cy, (int)(col_w * 0.4f), MAX(1, SI(1))), col_alpha(T->muted, 0.6f));
         }
-        float asc = face_ascent(fam_face(font_get(prefs.font), 0), p->size);
-        float dsc = face_descent(fam_face(font_get(prefs.font), 0), p->size);
+        float asc = face_ascent(fam_face(text_fam(), 0), p->size);
+        float dsc = face_descent(fam_face(text_fam(), 0), p->size);
         /* foco: parágrafo inteiro apagado? */
         bool dim_para = false;
         if (prefs.focus_mode != FOCUS_OFF && pi != app.caret.p) dim_para = true;
@@ -966,19 +1026,21 @@ void editor_draw(Rect area, float chrome_a) {
             while (git_next(&g, &o)) {
                 if (o.hid) continue;
                 Color c = (p->kind == LK_H) ? T->heading : T->text;
-                if (o.st & ST_MARK) c = T->muted;
-                if (o.cp == 0x2022) c = T->accent;
-                if (o.st & ST_LINK) c = T->accent;
+                u8 st = o.st;
+                if (st & ST_TEX) { c = tex_color(st); st = (st & TX_MATH) ? ST_CODE : 0; }   /* LaTeX: só cor (e o fundo da matemática), nada dos estilos Markdown */
+                if (st & ST_MARK) c = T->muted;
+                if (o.cp == 0x2022 && !tex) c = T->accent;
+                if (st & ST_LINK) c = T->accent;
                 bool dim = dim_line;
                 if (!dim && prefs.focus_mode == FOCUS_SENTENCE && pi == app.caret.p && (o.b < cs0 || o.b >= cs1)) dim = true;
                 if (dim) c = col_mix(c, app_sheet_on() ? T->paper : T->desk, T->dark ? 0.72f : 0.68f);
                 float gx = col_x + o.x;
-                if ((o.st & ST_CODE) && !code && !(o.st & ST_MARK)) {
+                if ((st & ST_CODE) && !code && !(st & ST_MARK)) {
                     if (code_x0 < 0) code_x0 = gx;
                 } else if (code_x0 >= 0 && !code) {
                     code_x0 = -1;
                 }
-                if ((o.st & ST_CODE) && !code) {
+                if ((st & ST_CODE) && !code) {
                     gfx_rect(rect((int)gx, (int)(base - asc * 0.82f), (int)(o.adv + 0.99f), (int)(asc * 0.82f + dsc * 0.9f)), col_alpha(T->code_bg, 1));
                 }
                 if (o.cp != ' ' && o.cp != '\t') {
@@ -986,8 +1048,8 @@ void editor_draw(Rect area, float chrome_a) {
                     const Glyph *gl = face_glyph(o.f, o.gid, o.px, sub);
                     if (gl && gl->bmp) gfx_mask((int)fx + gl->ox, (int)f_round(base) + gl->oy, gl->bmp, gl->w, gl->h, gl->w, c);
                 }
-                if (o.st & ST_STRIKE) gfx_rect(rect((int)gx, (int)(base - face_xheight(o.f, o.px) * 0.5f), (int)(o.adv + 0.99f), MAX(1, SI(1.2f))), c);
-                if ((o.st & ST_LINK) && !(o.st & ST_MARK)) gfx_rect(rect((int)gx, (int)(base + S(2.5f)), (int)(o.adv + 0.99f), MAX(1, SI(1))), col_alpha(c, 0.5f));
+                if (st & ST_STRIKE) gfx_rect(rect((int)gx, (int)(base - face_xheight(o.f, o.px) * 0.5f), (int)(o.adv + 0.99f), MAX(1, SI(1.2f))), c);
+                if ((st & ST_LINK) && !(st & ST_MARK)) gfx_rect(rect((int)gx, (int)(base + S(2.5f)), (int)(o.adv + 0.99f), MAX(1, SI(1))), col_alpha(c, 0.5f));
             }
         }
     }
@@ -996,7 +1058,7 @@ void editor_draw(Rect area, float chrome_a) {
     {
         float x, y, h; pos_xy(app.caret, &x, &y, &h);
         Para *p = &D->p[app.caret.p];
-        float asc = face_ascent(fam_face(font_get(prefs.font), 0), p->size), dsc = face_descent(fam_face(font_get(prefs.font), 0), p->size);
+        float asc = face_ascent(fam_face(text_fam(), 0), p->size), dsc = face_descent(fam_face(text_fam(), 0), p->size);
         float ch = MIN(h, (asc + dsc) * 1.12f);
         float tx = col_x + x, ty = y0 + y + (h - ch) * 0.5f;
         if (caret_dx < 0 || !prefs.smooth_caret || f_abs(tx - caret_dx) > S(400) || f_abs(ty - caret_dy) > S(300)) { caret_dx = tx; caret_dy = ty; caret_dh = ch; }

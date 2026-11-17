@@ -165,6 +165,17 @@ if [ "$TEST" = 1 ]; then
     cp -R "assets/fonts-extras/Lora" "assets/fonts-extras/iA Writer Quattro" "$t/FOLIO/FONTS/EXTRA/"
     if sim temas; then pass "temas (user themes, theme editor, splash)"; else fail temas "folio_sim exited with an error"; fi
 
+    # LaTeX sources: the fixture is CRLF (tests/*.txt are always CRLF, see .gitattributes); after the
+    # script the autosaved file must match tests/latex_expected.txt byte for byte
+    Fresh; cp tests/latex_doc.txt "$t/DOCUMENTS/artigo.tex"
+    if ! sim latex; then fail latex "folio_sim exited with an error"
+    elif ! cmp -s "$t/DOCUMENTS/artigo.tex" tests/latex_expected.txt; then fail latex "autosaved DOCUMENTS/artigo.tex differs from tests/latex_expected.txt"
+    elif [ ! -f "$t/DOCUMENTS/novo.tex" ] || [ -e "$t/DOCUMENTS/novo.tex.md" ]; then fail latex "saving as novo.tex did not keep the extension"
+    elif grep -q $'\r' "$t/DOCUMENTS/novo.tex"; then fail latex "a new .tex must be written with LF line endings"
+    elif [ -e "$t/DOCUMENTS/artigo.html" ]; then fail latex "a LaTeX source was exported through the Markdown converter"
+    elif ! ls "$t"/FOLIO/VERSIONS/*.tex >/dev/null 2>&1; then fail latex "no automatic version of the .tex file"
+    else pass "latex (LaTeX sources: raw text, highlighting, CRLF kept on autosave, save as .tex, no reading/export)"; fi
+
     for x in efi_boot efi_roda "video formats (rgb, mask16, blt, pad, uga, edid)"; do
         skip "$x" "needs build/efi/BOOTX64.EFI and efi_host.exe (Windows build only)"
     done

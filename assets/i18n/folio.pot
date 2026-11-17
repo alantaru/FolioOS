@@ -17,1553 +17,1557 @@ msgstr ""
 "X-Fonts: \n"
 "X-Date-Format: {month} {d}, {yyyy}\n"
 
-#: src/core/app.c:32 src/core/app.c:54 src/core/app.c:257 src/core/filedlg.c:140 src/core/md.c:239
+#: src/core/app.c:32 src/core/app.c:54 src/core/app.c:274 src/core/filedlg.c:139 src/core/md.c:239
 msgid "Untitled"
 msgstr ""
 
-#: src/core/app.c:147
+#: src/core/app.c:162
 msgid "Could not open the file"
 msgstr ""
 
-#: src/core/app.c:269 src/core/app.c:439
+#: src/core/app.c:286 src/core/app.c:457
 msgid "Limit of 16 tabs — close one (Ctrl+W)"
 msgstr ""
 
-#: src/core/app.c:403
+#: src/core/app.c:421
 msgid "Picking up where you left off"
 msgstr ""
 
-#: src/core/app.c:421
+#: src/core/app.c:439
 msgid "Close tab without saving?"
 msgstr ""
 
-#: src/core/app.c:421
+#: src/core/app.c:439
 msgid "Save changes?"
 msgstr ""
 
-#: src/core/app.c:422
+#: src/core/app.c:440
 msgid "The current document has changes that have not been saved yet."
 msgstr ""
 
-#: src/core/app.c:422 src/core/app.c:740 src/core/app.c:869 src/core/filedlg.c:407
+#: src/core/app.c:440 src/core/app.c:767 src/core/app.c:896 src/core/filedlg.c:409
 msgid "Save"
 msgstr ""
 
-#: src/core/app.c:422
+#: src/core/app.c:440
 msgid "Don't save"
 msgstr ""
 
-#: src/core/app.c:429
+#: src/core/app.c:447
 msgid "This format is export-only. Open the matching .md file."
 msgstr ""
 
-#: src/core/app.c:450
+#: src/core/app.c:468
 msgid "Failed to create the file"
 msgstr ""
 
-#: src/core/app.c:454
+#: src/core/app.c:479
 msgid "Write error — is the USB drive write-protected or full?"
 msgstr ""
 
-#: src/core/app.c:467 src/core/app.c:481
+#: src/core/app.c:492 src/core/app.c:508
 #, c-format
 msgid "Saved · %s"
 msgstr ""
 
-#: src/core/app.c:483
+#: src/core/app.c:497 src/core/filedlg.c:197
+msgid "Export is not available for LaTeX files"
+msgstr ""
+
+#: src/core/app.c:510
 #, c-format
 msgid "Exported · %s"
 msgstr ""
 
-#: src/core/app.c:531
+#: src/core/app.c:558
 msgid "Narrow"
 msgstr ""
 
-#: src/core/app.c:531
+#: src/core/app.c:558
 msgid "Medium"
 msgstr ""
 
-#: src/core/app.c:531
+#: src/core/app.c:558
 msgid "Wide"
 msgstr ""
 
-#: src/core/app.c:531
+#: src/core/app.c:558
 msgid "Extra"
 msgstr ""
 
-#: src/core/app.c:535
+#: src/core/app.c:562
 msgid "Full screen: the text uses the full width"
 msgstr ""
 
-#: src/core/app.c:535
+#: src/core/app.c:562
 msgid "Page: text in a column, like on a sheet of paper"
 msgstr ""
 
-#: src/core/app.c:577
+#: src/core/app.c:604
 msgid "Settings"
 msgstr ""
 
-#: src/core/app.c:578 src/core/app.c:754 src/core/app.c:880 src/core/app.c:1578
+#: src/core/app.c:605 src/core/app.c:781 src/core/app.c:907 src/core/app.c:1605
 msgid "Find and replace"
 msgstr ""
 
-#: src/core/app.c:579 src/core/app.c:880 src/core/app.c:1590
+#: src/core/app.c:606 src/core/app.c:907 src/core/app.c:1617
 msgid "Outline"
 msgstr ""
 
-#: src/core/app.c:580 src/core/app.c:770 src/core/app.c:1591
+#: src/core/app.c:607 src/core/app.c:797 src/core/app.c:1618
 msgid "Session and goals"
 msgstr ""
 
-#: src/core/app.c:581 src/core/app.c:774 src/core/app.c:884
+#: src/core/app.c:608 src/core/app.c:801 src/core/app.c:911
 msgid "Keyboard shortcuts"
 msgstr ""
 
-#: src/core/app.c:582
+#: src/core/app.c:609
 msgid "Commands"
 msgstr ""
 
-#: src/core/app.c:583 src/core/app.c:1709
+#: src/core/app.c:610 src/core/app.c:1736
 msgid "Menu"
 msgstr ""
 
-#: src/core/app.c:585
+#: src/core/app.c:612
 msgid "Theme editor"
 msgstr ""
 
-#: src/core/app.c:604
+#: src/core/app.c:631
 #, c-format
 msgid "Tabs on · %d documents open (Ctrl+N new, Ctrl+W close)"
 msgstr ""
 
-#: src/core/app.c:604
+#: src/core/app.c:631
 msgid "Tabs on (Ctrl+N new tab, Ctrl+W close)"
 msgstr ""
 
-#: src/core/app.c:605
+#: src/core/app.c:632
 msgid "Tabs off — your tabs are kept for when you turn them back on"
 msgstr ""
 
-#: src/core/app.c:608
+#: src/core/app.c:635
 msgid "Turn tabs on to use Ctrl+W (Ctrl+K → Tabs, or the button at the top)"
 msgstr ""
 
-#: src/core/app.c:620
+#: src/core/app.c:647
 msgid "Focus off"
 msgstr ""
 
-#: src/core/app.c:620
+#: src/core/app.c:647
 msgid "Focus on sentence"
 msgstr ""
 
-#: src/core/app.c:620
+#: src/core/app.c:647
 msgid "Focus on paragraph"
 msgstr ""
 
-#: src/core/app.c:620
+#: src/core/app.c:647
 msgid "Focus on line"
 msgstr ""
 
-#: src/core/app.c:623
+#: src/core/app.c:650
 msgid "Typewriter: current line always centered"
 msgstr ""
 
-#: src/core/app.c:623
+#: src/core/app.c:650
 msgid "Typewriter off"
 msgstr ""
 
-#: src/core/app.c:624
+#: src/core/app.c:651
 msgid "Zen mode — Esc or move the mouse to the top to leave"
 msgstr ""
 
-#: src/core/app.c:624
+#: src/core/app.c:651
 msgid "Zen mode off"
 msgstr ""
 
-#: src/core/app.c:645
+#: src/core/app.c:672
 #, c-format
 msgid "Theme: %s"
 msgstr ""
 
-#: src/core/app.c:646
+#: src/core/app.c:673
 #, c-format
 msgid "Font: %s"
 msgstr ""
 
-#: src/core/app.c:659
+#: src/core/app.c:686
 msgid "Sprint stopped"
 msgstr ""
 
-#: src/core/app.c:662
+#: src/core/app.c:689
 #, c-format
 msgid "%d-minute sprint started. Happy writing!"
 msgstr ""
 
-#: src/core/app.c:665
+#: src/core/app.c:692
 msgid "Hemingway mode: deleting is disabled"
 msgstr ""
 
-#: src/core/app.c:665
+#: src/core/app.c:692
 msgid "Hemingway mode off"
 msgstr ""
 
-#: src/core/app.c:666
+#: src/core/app.c:693
 msgid "Markup hidden outside the current paragraph"
 msgstr ""
 
-#: src/core/app.c:666
+#: src/core/app.c:693
 msgid "Markup always visible"
 msgstr ""
 
-#: src/core/app.c:667
+#: src/core/app.c:694
 msgid "Smart typography on (— “ ” …)"
 msgstr ""
 
-#: src/core/app.c:667
+#: src/core/app.c:694
 msgid "Smart typography off"
 msgstr ""
 
-#: src/core/app.c:679
+#: src/core/app.c:706
 #, c-format
 msgid "Page %s"
 msgstr ""
 
-#: src/core/app.c:687 src/core/editor.c:696 src/core/preview.c:251
+#: src/core/app.c:714 src/core/editor.c:745 src/core/preview.c:252
 msgid "This is the last chapter"
 msgstr ""
 
-#: src/core/app.c:704
+#: src/core/app.c:731
 msgid "Mouse and touchpad off: keyboard only (Ctrl+K → Mouse turns them back on)"
 msgstr ""
 
-#: src/core/app.c:704
+#: src/core/app.c:731
 msgid "Mouse and touchpad on"
 msgstr ""
 
-#: src/core/app.c:715
+#: src/core/app.c:742
 msgid "Could not read the language file"
 msgstr ""
 
-#: src/core/app.c:719
+#: src/core/app.c:746
 #, c-format
 msgid "This language needs extra fonts (%s) in %s. Install the matching font pack."
 msgstr ""
 
-#: src/core/app.c:732
+#: src/core/app.c:759
 msgid "New document"
 msgstr ""
 
-#: src/core/app.c:732 src/core/app.c:868
+#: src/core/app.c:759 src/core/app.c:895
 msgid "Ctrl+N"
 msgstr ""
 
-#: src/core/app.c:733
+#: src/core/app.c:760
 msgid "Tabs: several documents (on/off)"
 msgstr ""
 
-#: src/core/app.c:734
+#: src/core/app.c:761
 msgid "Close tab"
 msgstr ""
 
-#: src/core/app.c:734
+#: src/core/app.c:761
 msgid "Ctrl+W"
 msgstr ""
 
-#: src/core/app.c:735
+#: src/core/app.c:762
 msgid "Next tab"
 msgstr ""
 
-#: src/core/app.c:735
+#: src/core/app.c:762
 msgid "Ctrl+Tab"
 msgstr ""
 
-#: src/core/app.c:736
+#: src/core/app.c:763
 msgid "Previous tab"
 msgstr ""
 
-#: src/core/app.c:736
+#: src/core/app.c:763
 msgid "Ctrl+Shift+Tab"
 msgstr ""
 
-#: src/core/app.c:737
+#: src/core/app.c:764
 msgid "Create a custom theme (colors and fonts)"
 msgstr ""
 
-#: src/core/app.c:738
+#: src/core/app.c:765
 msgid "Edit the current theme"
 msgstr ""
 
-#: src/core/app.c:739 src/core/app.c:868
+#: src/core/app.c:766 src/core/app.c:895
 msgid "Open…"
 msgstr ""
 
-#: src/core/app.c:739 src/core/app.c:868
+#: src/core/app.c:766 src/core/app.c:895
 msgid "Ctrl+O"
 msgstr ""
 
-#: src/core/app.c:740 src/core/app.c:869
+#: src/core/app.c:767 src/core/app.c:896
 msgid "Ctrl+S"
 msgstr ""
 
-#: src/core/app.c:741 src/core/app.c:869
+#: src/core/app.c:768 src/core/app.c:896
 msgid "Save as / Export…"
 msgstr ""
 
-#: src/core/app.c:741 src/core/app.c:869 src/core/app.c:1575
+#: src/core/app.c:768 src/core/app.c:896 src/core/app.c:1602
 msgid "Ctrl+Shift+S"
 msgstr ""
 
-#: src/core/app.c:742
+#: src/core/app.c:769
 msgid "Reading mode (formatted Markdown)"
 msgstr ""
 
-#: src/core/app.c:742 src/core/app.c:1577
+#: src/core/app.c:769 src/core/app.c:1604
 msgid "Ctrl+P"
 msgstr ""
 
-#: src/core/app.c:743
+#: src/core/app.c:770
 msgid "Reading auto-scroll (on/off)"
 msgstr ""
 
-#: src/core/app.c:743 src/core/app.c:1584
+#: src/core/app.c:770 src/core/app.c:1611
 msgid "Enter (reading)"
 msgstr ""
 
-#: src/core/app.c:744
+#: src/core/app.c:771
 msgid "Next chapter"
 msgstr ""
 
-#: src/core/app.c:744
+#: src/core/app.c:771
 msgid "Ctrl+PgDn"
 msgstr ""
 
-#: src/core/app.c:745
+#: src/core/app.c:772
 msgid "Previous chapter"
 msgstr ""
 
-#: src/core/app.c:745
+#: src/core/app.c:772
 msgid "Ctrl+PgUp"
 msgstr ""
 
-#: src/core/app.c:746
+#: src/core/app.c:773
 msgid "Go to the last edit"
 msgstr ""
 
-#: src/core/app.c:746 src/core/app.c:1582
+#: src/core/app.c:773 src/core/app.c:1609
 msgid "Ctrl+J"
 msgstr ""
 
-#: src/core/app.c:747 src/core/app.c:1581
+#: src/core/app.c:774 src/core/app.c:1608
 msgid "Duplicate paragraph"
 msgstr ""
 
-#: src/core/app.c:747 src/core/app.c:1581
+#: src/core/app.c:774 src/core/app.c:1608
 msgid "Ctrl+D"
 msgstr ""
 
-#: src/core/app.c:748 src/core/app.c:1581
+#: src/core/app.c:775 src/core/app.c:1608
 msgid "Delete paragraph"
 msgstr ""
 
-#: src/core/app.c:748 src/core/app.c:1581
+#: src/core/app.c:775 src/core/app.c:1608
 msgid "Ctrl+Shift+K"
 msgstr ""
 
-#: src/core/app.c:749
+#: src/core/app.c:776
 msgid "Change case"
 msgstr ""
 
-#: src/core/app.c:749 src/core/app.c:1583
+#: src/core/app.c:776 src/core/app.c:1610
 msgid "Shift+F3"
 msgstr ""
 
-#: src/core/app.c:750
+#: src/core/app.c:777
 msgid "Insert today's date"
 msgstr ""
 
-#: src/core/app.c:751
+#: src/core/app.c:778
 msgid "Focus mode (sentence / paragraph / line)"
 msgstr ""
 
-#: src/core/app.c:752
+#: src/core/app.c:779
 msgid "Typewriter (centered line)"
 msgstr ""
 
-#: src/core/app.c:753
+#: src/core/app.c:780
 msgid "Zen mode (no bars)"
 msgstr ""
 
-#: src/core/app.c:754 src/core/app.c:880 src/core/app.c:1578
+#: src/core/app.c:781 src/core/app.c:907 src/core/app.c:1605
 msgid "Ctrl+F"
 msgstr ""
 
-#: src/core/app.c:755
+#: src/core/app.c:782
 msgid "Document outline"
 msgstr ""
 
-#: src/core/app.c:756
+#: src/core/app.c:783
 msgid "Appearance: themes and typography"
 msgstr ""
 
-#: src/core/app.c:757 src/core/app.c:1587
+#: src/core/app.c:784 src/core/app.c:1614
 msgid "Next theme"
 msgstr ""
 
-#: src/core/app.c:757 src/core/app.c:1587
+#: src/core/app.c:784 src/core/app.c:1614
 msgid "Ctrl+T"
 msgstr ""
 
-#: src/core/app.c:758
+#: src/core/app.c:785
 msgid "Next font"
 msgstr ""
 
-#: src/core/app.c:758
+#: src/core/app.c:785
 msgid "Ctrl+Shift+T"
 msgstr ""
 
-#: src/core/app.c:759
+#: src/core/app.c:786
 msgid "Larger text"
 msgstr ""
 
-#: src/core/app.c:759
+#: src/core/app.c:786
 msgid "Ctrl+="
 msgstr ""
 
-#: src/core/app.c:760
+#: src/core/app.c:787
 msgid "Smaller text"
 msgstr ""
 
-#: src/core/app.c:760
+#: src/core/app.c:787
 msgid "Ctrl+-"
 msgstr ""
 
-#: src/core/app.c:761
+#: src/core/app.c:788
 msgid "Page or full screen (text width)"
 msgstr ""
 
-#: src/core/app.c:762
+#: src/core/app.c:789
 msgid "Page size: narrow · medium · wide · extra"
 msgstr ""
 
-#: src/core/app.c:763
+#: src/core/app.c:790
 msgid "Paper sheet (show/hide)"
 msgstr ""
 
-#: src/core/app.c:764 src/core/app.c:883
+#: src/core/app.c:791 src/core/app.c:910
 msgid "Writing settings"
 msgstr ""
 
-#: src/core/app.c:765
+#: src/core/app.c:792
 msgid "Music: play / pause"
 msgstr ""
 
-#: src/core/app.c:766
+#: src/core/app.c:793
 msgid "Music: next track"
 msgstr ""
 
-#: src/core/app.c:767
+#: src/core/app.c:794
 msgid "Music: previous track"
 msgstr ""
 
-#: src/core/app.c:768 src/core/app.c:1590
+#: src/core/app.c:795 src/core/app.c:1617
 msgid "Music player"
 msgstr ""
 
-#: src/core/app.c:769
+#: src/core/app.c:796
 msgid "Start / stop writing sprint"
 msgstr ""
 
-#: src/core/app.c:771
+#: src/core/app.c:798
 msgid "Hemingway mode (no deleting)"
 msgstr ""
 
-#: src/core/app.c:772
+#: src/core/app.c:799
 msgid "Hide markup outside the paragraph"
 msgstr ""
 
-#: src/core/app.c:773
+#: src/core/app.c:800
 msgid "Smart typography (— “ ” …)"
 msgstr ""
 
-#: src/core/app.c:775 src/core/app.c:1585
+#: src/core/app.c:802 src/core/app.c:1612
 msgid "Menu and recent documents"
 msgstr ""
 
-#: src/core/app.c:775 src/core/app.c:1585
+#: src/core/app.c:802 src/core/app.c:1612
 msgid "Alt+M"
 msgstr ""
 
-#: src/core/app.c:776
+#: src/core/app.c:803
 msgid "Keyboard focus: text or the next window"
 msgstr ""
 
-#: src/core/app.c:776 src/core/app.c:1595
+#: src/core/app.c:803 src/core/app.c:1622
 msgid "Ctrl+F6"
 msgstr ""
 
-#: src/core/app.c:777
+#: src/core/app.c:804
 msgid "Mouse and touchpad (on/off)"
 msgstr ""
 
-#: src/core/app.c:778
+#: src/core/app.c:805
 msgid "Language and keyboard"
 msgstr ""
 
-#: src/core/app.c:779
+#: src/core/app.c:806
 msgid "Restart the computer"
 msgstr ""
 
-#: src/core/app.c:780
+#: src/core/app.c:807
 msgid "Shut down the computer"
 msgstr ""
 
-#: src/core/app.c:780 src/core/app.c:886 src/core/app.c:1593
+#: src/core/app.c:807 src/core/app.c:913 src/core/app.c:1620
 msgid "Ctrl+Q"
 msgstr ""
 
-#: src/core/app.c:802
+#: src/core/app.c:829
 msgid "Type a command…"
 msgstr ""
 
-#: src/core/app.c:833
+#: src/core/app.c:860
 msgid "No command found"
 msgstr ""
 
-#: src/core/app.c:859
+#: src/core/app.c:886
 msgid "File not found (a different USB drive?)"
 msgstr ""
 
-#: src/core/app.c:867
+#: src/core/app.c:894
 msgid "DOCUMENT"
 msgstr ""
 
-#: src/core/app.c:868
+#: src/core/app.c:895
 msgid "New"
 msgstr ""
 
-#: src/core/app.c:875
+#: src/core/app.c:902
 msgid "RECENT"
 msgstr ""
 
-#: src/core/app.c:879
+#: src/core/app.c:906
 msgid "WRITING"
 msgstr ""
 
-#: src/core/app.c:881
+#: src/core/app.c:908
 msgid "Session, goals and sprint"
 msgstr ""
 
-#: src/core/app.c:882
+#: src/core/app.c:909
 msgid "PREFERENCES"
 msgstr ""
 
-#: src/core/app.c:883 src/core/app.c:966 src/core/app.c:1592
+#: src/core/app.c:910 src/core/app.c:993 src/core/app.c:1619
 msgid "Appearance"
 msgstr ""
 
-#: src/core/app.c:886 src/core/app.c:1166 src/core/app.c:1593
+#: src/core/app.c:913 src/core/app.c:1193 src/core/app.c:1620
 msgid "Shut down"
 msgstr ""
 
-#: src/core/app.c:950
+#: src/core/app.c:977
 #, c-format
 msgid "Diagnostics saved to %s"
 msgstr ""
 
-#: src/core/app.c:950
+#: src/core/app.c:977
 msgid "Could not save the diagnostics"
 msgstr ""
 
-#: src/core/app.c:960
+#: src/core/app.c:987
 msgid "Display restored: automatic resolution and rotation"
 msgstr ""
 
-#: src/core/app.c:966
+#: src/core/app.c:993
 msgid "Writing"
 msgstr ""
 
-#: src/core/app.c:966
+#: src/core/app.c:993
 msgid "System"
 msgstr ""
 
-#: src/core/app.c:976
+#: src/core/app.c:1003
 msgid "THEMES"
 msgstr ""
 
-#: src/core/app.c:983
+#: src/core/app.c:1010
 msgid "+  Create my theme"
 msgstr ""
 
-#: src/core/app.c:984
-msgid "Edit this theme"
-msgstr ""
-
-#: src/core/app.c:986
-#, c-format
-msgid "Mix colors and fonts; themes are saved in %s (editable .INI files)."
-msgstr ""
-
-#: src/core/app.c:988
-msgid "TEXT FONT"
-msgstr ""
-
-#: src/core/app.c:997
-msgid "The quick brown fox jumps — “Hello!”"
-msgstr ""
-
-#: src/core/app.c:1003
-#, c-format
-msgid "Add .ttf fonts to %s (subfolders work too) and restart."
-msgstr ""
-
-#: src/core/app.c:1004
-msgid "Ready-made pack: FOLIO-FONTS-EXTRA.zip — unzip it at the root of the USB drive."
-msgstr ""
-
-#: src/core/app.c:1006
-msgid "TYPOGRAPHY"
-msgstr ""
-
-#: src/core/app.c:1007
-#, c-format
-msgid "%d px"
-msgstr ""
-
-#: src/core/app.c:1008
-msgid "Text size"
-msgstr ""
-
 #: src/core/app.c:1011
-msgid "Line spacing"
+msgid "Edit this theme"
 msgstr ""
 
 #: src/core/app.c:1013
 #, c-format
+msgid "Mix colors and fonts; themes are saved in %s (editable .INI files)."
+msgstr ""
+
+#: src/core/app.c:1015
+msgid "TEXT FONT"
+msgstr ""
+
+#: src/core/app.c:1024
+msgid "The quick brown fox jumps — “Hello!”"
+msgstr ""
+
+#: src/core/app.c:1030
+#, c-format
+msgid "Add .ttf fonts to %s (subfolders work too) and restart."
+msgstr ""
+
+#: src/core/app.c:1031
+msgid "Ready-made pack: FOLIO-FONTS-EXTRA.zip — unzip it at the root of the USB drive."
+msgstr ""
+
+#: src/core/app.c:1033
+msgid "TYPOGRAPHY"
+msgstr ""
+
+#: src/core/app.c:1034
+#, c-format
+msgid "%d px"
+msgstr ""
+
+#: src/core/app.c:1035
+msgid "Text size"
+msgstr ""
+
+#: src/core/app.c:1038
+msgid "Line spacing"
+msgstr ""
+
+#: src/core/app.c:1040
+#, c-format
 msgid "%.2f lines"
 msgstr ""
 
-#: src/core/app.c:1014
+#: src/core/app.c:1041
 msgid "Space between paragraphs"
 msgstr ""
 
-#: src/core/app.c:1016
+#: src/core/app.c:1043
 msgid "First-line indent for paragraphs (book style)"
 msgstr ""
 
-#: src/core/app.c:1018
+#: src/core/app.c:1045
 msgid "PAGE"
 msgstr ""
 
-#: src/core/app.c:1020
+#: src/core/app.c:1047
 msgid "Page"
 msgstr ""
 
-#: src/core/app.c:1020
+#: src/core/app.c:1047
 msgid "Full screen"
 msgstr ""
 
-#: src/core/app.c:1029
+#: src/core/app.c:1056
 #, c-format
 msgid "%d px (~%d characters per line)"
 msgstr ""
 
-#: src/core/app.c:1030
+#: src/core/app.c:1057
 msgid "Page width"
 msgstr ""
 
-#: src/core/app.c:1032
+#: src/core/app.c:1059
 msgid "Paper sheet on the desk (light themes)"
 msgstr ""
 
-#: src/core/app.c:1035
+#: src/core/app.c:1062
 msgid "The text fills the whole screen width, with no sheet."
 msgstr ""
 
-#: src/core/app.c:1039
+#: src/core/app.c:1066
 msgid "FOCUS MODE"
 msgstr ""
 
-#: src/core/app.c:1040
+#: src/core/app.c:1067
 msgid "Off"
 msgstr ""
 
-#: src/core/app.c:1040
+#: src/core/app.c:1067
 msgid "Sentence"
 msgstr ""
 
-#: src/core/app.c:1040
+#: src/core/app.c:1067
 msgid "Paragraph"
 msgstr ""
 
-#: src/core/app.c:1040
+#: src/core/app.c:1067
 msgid "Line"
 msgstr ""
 
-#: src/core/app.c:1043
+#: src/core/app.c:1070
 msgid "EDITOR"
 msgstr ""
 
-#: src/core/app.c:1045
+#: src/core/app.c:1072
 msgid "Typewriter — current line in the center"
 msgstr ""
 
-#: src/core/app.c:1046
+#: src/core/app.c:1073
 msgid "Live Markdown (headings, bold, lists)"
 msgstr ""
 
-#: src/core/app.c:1047
+#: src/core/app.c:1074
 msgid "Hide markup outside the current paragraph"
 msgstr ""
 
-#: src/core/app.c:1048
+#: src/core/app.c:1075
 msgid "Smart typography:  --  →  —   \"\"  →  “”   ...  →  …"
 msgstr ""
 
-#: src/core/app.c:1049
+#: src/core/app.c:1076
 msgid "Hemingway mode — deleting is not allowed"
 msgstr ""
 
-#: src/core/app.c:1050
+#: src/core/app.c:1077
 msgid "Hide the bars while writing"
 msgstr ""
 
-#: src/core/app.c:1051
+#: src/core/app.c:1078
 msgid "Blinking cursor"
 msgstr ""
 
-#: src/core/app.c:1052
+#: src/core/app.c:1079
 msgid "Smooth cursor movement"
 msgstr ""
 
-#: src/core/app.c:1059
+#: src/core/app.c:1086
 msgid "Tabs — several open documents, remembered after a restart"
 msgstr ""
 
-#: src/core/app.c:1062
+#: src/core/app.c:1089
 msgid "GOALS AND SAVING"
 msgstr ""
 
-#: src/core/app.c:1063 src/core/app.c:1535 src/core/app.c:1786
+#: src/core/app.c:1090 src/core/app.c:1562 src/core/app.c:1813
 #, c-format
 msgid "%d word"
 msgid_plural "%d words"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/core/app.c:1064
+#: src/core/app.c:1091
 msgid "Session goal"
 msgstr ""
 
-#: src/core/app.c:1066 src/core/app.c:1537 src/core/app.c:1751
+#: src/core/app.c:1093 src/core/app.c:1564 src/core/app.c:1778
 #, c-format
 msgid "%d min"
 msgstr ""
 
-#: src/core/app.c:1067
+#: src/core/app.c:1094
 msgid "Sprint length"
 msgstr ""
 
-#: src/core/app.c:1069
+#: src/core/app.c:1096
 #, c-format
 msgid "every %d s"
 msgstr ""
 
-#: src/core/app.c:1070
+#: src/core/app.c:1097
 msgid "Autosave"
 msgstr ""
 
-#: src/core/app.c:1073
+#: src/core/app.c:1100
 msgid "LANGUAGE AND KEYBOARD"
 msgstr ""
 
-#: src/core/app.c:1076
+#: src/core/app.c:1103
 msgid "Language"
 msgstr ""
 
-#: src/core/app.c:1081
+#: src/core/app.c:1108
 msgid "Keyboard"
 msgstr ""
 
-#: src/core/app.c:1090
+#: src/core/app.c:1117
 #, c-format
 msgid "Languages: %s · keyboards: %s (text files anyone can add)"
 msgstr ""
 
-#: src/core/app.c:1094
+#: src/core/app.c:1121
 msgid "DISPLAY AND POINTER"
 msgstr ""
 
-#: src/core/app.c:1095
+#: src/core/app.c:1122
 msgid "Auto"
 msgstr ""
 
-#: src/core/app.c:1100
+#: src/core/app.c:1127
 msgid "Rotate: auto"
 msgstr ""
 
-#: src/core/app.c:1108
+#: src/core/app.c:1135
 #, c-format
 msgid "Resolution: %dx%d"
 msgstr ""
 
-#: src/core/app.c:1109
+#: src/core/app.c:1136
 #, c-format
 msgid "Resolution: automatic (%dx%d)"
 msgstr ""
 
-#: src/core/app.c:1119
+#: src/core/app.c:1146
 msgid "Restore display"
 msgstr ""
 
-#: src/core/app.c:1121
+#: src/core/app.c:1148
 msgid "If the picture looks wrong or goes black: Ctrl+Alt+Home restores it; Ctrl+Alt+arrows rotate the screen."
 msgstr ""
 
-#: src/core/app.c:1125
+#: src/core/app.c:1152
 msgid "Mouse / touchpad speed"
 msgstr ""
 
-#: src/core/app.c:1127
+#: src/core/app.c:1154
 msgid "Automatic"
 msgstr ""
 
-#: src/core/app.c:1127
+#: src/core/app.c:1154
 msgid "Touchpad"
 msgstr ""
 
-#: src/core/app.c:1127
+#: src/core/app.c:1154
 msgid "Touch screen"
 msgstr ""
 
-#: src/core/app.c:1130
+#: src/core/app.c:1157
 msgid "If the pointer jumps to the corners when you use the touchpad, choose Touchpad."
 msgstr ""
 
-#: src/core/app.c:1133
+#: src/core/app.c:1160
 msgid "Use the mouse and touchpad (off = keyboard only)"
 msgstr ""
 
-#: src/core/app.c:1135
+#: src/core/app.c:1162
 msgid "SOUND"
 msgstr ""
 
-#: src/core/app.c:1136
+#: src/core/app.c:1163
 msgid "Turn on the amplifier through GPIO (some laptops; applies after a restart)"
 msgstr ""
 
-#: src/core/app.c:1138
+#: src/core/app.c:1165
 msgid "Test sound"
 msgstr ""
 
-#: src/core/app.c:1139
+#: src/core/app.c:1166
 msgid "Save diagnostics"
 msgstr ""
 
-#: src/core/app.c:1141
+#: src/core/app.c:1168
 #, c-format
 msgid "The diagnostics go to %s on the USB drive (it opens on any computer)."
 msgstr ""
 
-#: src/core/app.c:1143
+#: src/core/app.c:1170
 msgid "STARTUP"
 msgstr ""
 
-#: src/core/app.c:1144
+#: src/core/app.c:1171
 msgid "FolioOS splash screen"
 msgstr ""
 
-#: src/core/app.c:1149
+#: src/core/app.c:1176
 msgid "Splash duration (any key skips it)"
 msgstr ""
 
-#: src/core/app.c:1155
+#: src/core/app.c:1182
 msgid "ABOUT"
 msgstr ""
 
-#: src/core/app.c:1158
+#: src/core/app.c:1185
 #, c-format
 msgid "FolioOS %s · %s · %dx%d"
 msgstr ""
 
-#: src/core/app.c:1159
+#: src/core/app.c:1186
 #, c-format
 msgid "Memory: %d MB used of %d MB · %d fonts · %d themes"
 msgstr ""
 
-#: src/core/app.c:1160
+#: src/core/app.c:1187
 #, c-format
 msgid "Audio: %s"
 msgstr ""
 
-#: src/core/app.c:1165
+#: src/core/app.c:1192
 msgid "Restart"
 msgstr ""
 
-#: src/core/app.c:1185
+#: src/core/app.c:1212
 msgid "Desk (background)"
 msgstr ""
 
-#: src/core/app.c:1185
+#: src/core/app.c:1212
 msgid "Paper"
 msgstr ""
 
-#: src/core/app.c:1185 src/core/app.c:1386
+#: src/core/app.c:1212 src/core/app.c:1413
 msgid "Text"
 msgstr ""
 
-#: src/core/app.c:1185
+#: src/core/app.c:1212
 msgid "Faded text"
 msgstr ""
 
-#: src/core/app.c:1185
+#: src/core/app.c:1212
 msgid "Subtle lines"
 msgstr ""
 
-#: src/core/app.c:1185
+#: src/core/app.c:1212
 msgid "Accent"
 msgstr ""
 
-#: src/core/app.c:1185
+#: src/core/app.c:1212
 msgid "Selection"
 msgstr ""
 
-#: src/core/app.c:1185
+#: src/core/app.c:1212
 msgid "Cursor"
 msgstr ""
 
-#: src/core/app.c:1186
+#: src/core/app.c:1213
 msgid "Bars"
 msgstr ""
 
-#: src/core/app.c:1186
+#: src/core/app.c:1213
 msgid "Bar text"
 msgstr ""
 
-#: src/core/app.c:1186
+#: src/core/app.c:1213
 msgid "Borders"
 msgstr ""
 
-#: src/core/app.c:1186
+#: src/core/app.c:1213
 msgid "Panels"
 msgstr ""
 
-#: src/core/app.c:1186
+#: src/core/app.c:1213
 msgid "Panel text"
 msgstr ""
 
-#: src/core/app.c:1186
+#: src/core/app.c:1213
 msgid "Headings"
 msgstr ""
 
-#: src/core/app.c:1186
+#: src/core/app.c:1213
 msgid "Code background"
 msgstr ""
 
-#: src/core/app.c:1186
+#: src/core/app.c:1213
 msgid "Highlighter"
 msgstr ""
 
-#: src/core/app.c:1220
+#: src/core/app.c:1247
 msgid "My theme"
 msgstr ""
 
-#: src/core/app.c:1221
+#: src/core/app.c:1248
 #, c-format
 msgid "My theme %d"
 msgstr ""
 
-#: src/core/app.c:1244
+#: src/core/app.c:1271
 msgid "Give the theme a name"
 msgstr ""
 
-#: src/core/app.c:1246
+#: src/core/app.c:1273
 msgid "That name belongs to a built-in theme — choose another"
 msgstr ""
 
-#: src/core/app.c:1247
+#: src/core/app.c:1274
 msgid "You already have a theme with that name"
 msgstr ""
 
-#: src/core/app.c:1250
+#: src/core/app.c:1277
 #, c-format
 msgid "Could not write to %s (is the USB drive write-protected or full?)"
 msgstr ""
 
-#: src/core/app.c:1255
+#: src/core/app.c:1282
 #, c-format
 msgid "Theme “%s” saved to %s"
 msgstr ""
 
-#: src/core/app.c:1267
+#: src/core/app.c:1294
 msgid "Theme deleted"
 msgstr ""
 
-#: src/core/app.c:1298
+#: src/core/app.c:1325
 msgid "THEME NAME"
 msgstr ""
 
-#: src/core/app.c:1299
+#: src/core/app.c:1326
 msgid "Theme name"
 msgstr ""
 
-#: src/core/app.c:1302
+#: src/core/app.c:1329
 msgid "STARTING POINT"
 msgstr ""
 
-#: src/core/app.c:1305
+#: src/core/app.c:1332
 msgid "Colors from"
 msgstr ""
 
-#: src/core/app.c:1307
+#: src/core/app.c:1334
 msgid "Use all"
 msgstr ""
 
-#: src/core/app.c:1314
+#: src/core/app.c:1341
 msgid "Or mix: pick a color below and take it from any built-in theme."
 msgstr ""
 
-#: src/core/app.c:1318
+#: src/core/app.c:1345
 msgid "COLORS"
 msgstr ""
 
-#: src/core/app.c:1347
+#: src/core/app.c:1374
 msgid "hex code"
 msgstr ""
 
-#: src/core/app.c:1351
+#: src/core/app.c:1378
 msgid "Hue"
 msgstr ""
 
-#: src/core/app.c:1354
+#: src/core/app.c:1381
 msgid "Saturation"
 msgstr ""
 
-#: src/core/app.c:1357
+#: src/core/app.c:1384
 msgid "Lightness"
 msgstr ""
 
-#: src/core/app.c:1361
+#: src/core/app.c:1388
 msgid "Take from a built-in theme:"
 msgstr ""
 
-#: src/core/app.c:1384
+#: src/core/app.c:1411
 msgid "THEME FONTS"
 msgstr ""
 
-#: src/core/app.c:1391
+#: src/core/app.c:1418
 #, c-format
 msgid "Default (%s)"
 msgstr ""
 
-#: src/core/app.c:1392
+#: src/core/app.c:1419
 msgid "Interface"
 msgstr ""
 
-#: src/core/app.c:1400
+#: src/core/app.c:1427
 msgid "Interface = bars, menus and windows. More fonts: FOLIO-FONTS-EXTRA.zip."
 msgstr ""
 
-#: src/core/app.c:1404
+#: src/core/app.c:1431
 msgid "DESK AND PAPER"
 msgstr ""
 
-#: src/core/app.c:1405
+#: src/core/app.c:1432
 msgid "Paper sheet on the desk"
 msgstr ""
 
-#: src/core/app.c:1409
+#: src/core/app.c:1436
 msgid "Vignette at the desk edges"
 msgstr ""
 
-#: src/core/app.c:1420
+#: src/core/app.c:1447
 msgid "Save theme"
 msgstr ""
 
-#: src/core/app.c:1421 src/core/filedlg.c:60 src/core/filedlg.c:73 src/core/filedlg.c:408 src/core/filedlg.c:439
+#: src/core/app.c:1448 src/core/filedlg.c:60 src/core/filedlg.c:73 src/core/filedlg.c:410 src/core/filedlg.c:441
 msgid "Cancel"
 msgstr ""
 
-#: src/core/app.c:1422 src/core/app.c:1423 src/core/filedlg.c:57 src/core/filedlg.c:313 src/core/filedlg.c:316 src/core/filedlg.c:316
+#: src/core/app.c:1449 src/core/app.c:1450 src/core/filedlg.c:57 src/core/filedlg.c:314 src/core/filedlg.c:317 src/core/filedlg.c:317
 msgid "Delete"
 msgstr ""
 
-#: src/core/app.c:1423
+#: src/core/app.c:1450
 msgid "Delete theme?"
 msgstr ""
 
-#: src/core/app.c:1423
+#: src/core/app.c:1450
 #, c-format
 msgid "The theme file in %s will be deleted."
 msgstr ""
 
-#: src/core/app.c:1430
+#: src/core/app.c:1457
 msgid "Find"
 msgstr ""
 
-#: src/core/app.c:1431
+#: src/core/app.c:1458
 msgid "Previous (Shift+Enter)"
 msgstr ""
 
-#: src/core/app.c:1432
+#: src/core/app.c:1459
 msgid "Next (Enter)"
 msgstr ""
 
-#: src/core/app.c:1433
+#: src/core/app.c:1460
 msgid "Replace with"
 msgstr ""
 
-#: src/core/app.c:1435 src/core/filedlg.c:203
+#: src/core/app.c:1462 src/core/filedlg.c:204
 msgid "Replace"
 msgstr ""
 
-#: src/core/app.c:1436
+#: src/core/app.c:1463
 msgid "Replace all"
 msgstr ""
 
-#: src/core/app.c:1438
+#: src/core/app.c:1465
 #, c-format
 msgid "%d replacement"
 msgid_plural "%d replacements"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/core/app.c:1445
+#: src/core/app.c:1472
 msgid "Nothing found"
 msgstr ""
 
-#: src/core/app.c:1452
+#: src/core/app.c:1479
 #, c-format
 msgid "%d match"
 msgid_plural "%d matches"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/core/app.c:1490
+#: src/core/app.c:1517
 msgid "(untitled)"
 msgstr ""
 
-#: src/core/app.c:1499
+#: src/core/app.c:1526
 msgid "No headings yet."
 msgstr ""
 
-#: src/core/app.c:1500
+#: src/core/app.c:1527
 msgid "Start a line with # to create chapters."
 msgstr ""
 
-#: src/core/app.c:1529
+#: src/core/app.c:1556
 #, c-format
 msgid "goal of %d reached"
 msgstr ""
 
-#: src/core/app.c:1529
+#: src/core/app.c:1556
 #, c-format
 msgid "of %d words today"
 msgstr ""
 
-#: src/core/app.c:1530
+#: src/core/app.c:1557
 msgid "words today"
 msgstr ""
 
-#: src/core/app.c:1535
+#: src/core/app.c:1562
 msgid "This document"
 msgstr ""
 
-#: src/core/app.c:1536
+#: src/core/app.c:1563
 msgid "This session"
 msgstr ""
 
-#: src/core/app.c:1536
+#: src/core/app.c:1563
 #, c-format
 msgid "+%d in %dh%02d"
 msgstr ""
 
-#: src/core/app.c:1537
+#: src/core/app.c:1564
 msgid "Estimated reading"
 msgstr ""
 
-#: src/core/app.c:1538
+#: src/core/app.c:1565
 msgid "Pace"
 msgstr ""
 
-#: src/core/app.c:1538
+#: src/core/app.c:1565
 #, c-format
 msgid "%d words/h"
 msgstr ""
 
-#: src/core/app.c:1549
+#: src/core/app.c:1576
 msgid "15 min"
 msgstr ""
 
-#: src/core/app.c:1549
+#: src/core/app.c:1576
 msgid "25 min"
 msgstr ""
 
-#: src/core/app.c:1549
+#: src/core/app.c:1576
 msgid "45 min"
 msgstr ""
 
-#: src/core/app.c:1549
+#: src/core/app.c:1576
 msgid "60 min"
 msgstr ""
 
-#: src/core/app.c:1554
+#: src/core/app.c:1581
 msgid "Start sprint"
 msgstr ""
 
-#: src/core/app.c:1560
+#: src/core/app.c:1587
 #, c-format
 msgid "+%d word in this sprint"
 msgid_plural "+%d words in this sprint"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/core/app.c:1563
+#: src/core/app.c:1590
 msgid "Stop sprint"
 msgstr ""
 
-#: src/core/app.c:1575
+#: src/core/app.c:1602
 msgid "Ctrl+N / O / S"
 msgstr ""
 
-#: src/core/app.c:1575
+#: src/core/app.c:1602
 msgid "New · Open · Save"
 msgstr ""
 
-#: src/core/app.c:1575 src/core/filedlg.c:123
+#: src/core/app.c:1602 src/core/filedlg.c:122
 msgid "Save as / Export"
 msgstr ""
 
-#: src/core/app.c:1576
+#: src/core/app.c:1603
 msgid "Ctrl+W · Ctrl+Tab"
 msgstr ""
 
-#: src/core/app.c:1576
+#: src/core/app.c:1603
 msgid "Tabs: close · next"
 msgstr ""
 
-#: src/core/app.c:1576
+#: src/core/app.c:1603
 msgid "Alt+1…9"
 msgstr ""
 
-#: src/core/app.c:1576
+#: src/core/app.c:1603
 msgid "Go to tab 1…9"
 msgstr ""
 
-#: src/core/app.c:1577
+#: src/core/app.c:1604
 msgid "Ctrl+K"
 msgstr ""
 
-#: src/core/app.c:1577
+#: src/core/app.c:1604
 msgid "Command palette"
 msgstr ""
 
-#: src/core/app.c:1577
+#: src/core/app.c:1604
 msgid "Reading (formatted Markdown)"
 msgstr ""
 
-#: src/core/app.c:1578
+#: src/core/app.c:1605
 msgid "Ctrl+Z / Y"
 msgstr ""
 
-#: src/core/app.c:1578
+#: src/core/app.c:1605
 msgid "Undo · Redo"
 msgstr ""
 
-#: src/core/app.c:1579
+#: src/core/app.c:1606
 msgid "Ctrl+B / I"
 msgstr ""
 
-#: src/core/app.c:1579
+#: src/core/app.c:1606
 msgid "Bold · Italic"
 msgstr ""
 
-#: src/core/app.c:1579
+#: src/core/app.c:1606
 msgid "Ctrl+1…6 / 0"
 msgstr ""
 
-#: src/core/app.c:1579
+#: src/core/app.c:1606
 msgid "Heading level 1–6 · Text"
 msgstr ""
 
-#: src/core/app.c:1580
+#: src/core/app.c:1607
 msgid "Alt+↑ / ↓"
 msgstr ""
 
-#: src/core/app.c:1580
+#: src/core/app.c:1607
 msgid "Move paragraph"
 msgstr ""
 
-#: src/core/app.c:1580
+#: src/core/app.c:1607
 msgid "Tab / Shift+Tab"
 msgstr ""
 
-#: src/core/app.c:1580
+#: src/core/app.c:1607
 msgid "Indent list item"
 msgstr ""
 
-#: src/core/app.c:1582
+#: src/core/app.c:1609
 msgid "Ctrl+PgUp / PgDn"
 msgstr ""
 
-#: src/core/app.c:1582
+#: src/core/app.c:1609
 msgid "Previous · next chapter"
 msgstr ""
 
-#: src/core/app.c:1582
+#: src/core/app.c:1609
 msgid "Jump to and back from the last edit"
 msgstr ""
 
-#: src/core/app.c:1583
+#: src/core/app.c:1610
 msgid "lowercase → Title Case → UPPERCASE"
 msgstr ""
 
-#: src/core/app.c:1583
+#: src/core/app.c:1610
 msgid "Select and type ( \" *"
 msgstr ""
 
-#: src/core/app.c:1583
+#: src/core/app.c:1610
 msgid "Wraps the selection"
 msgstr ""
 
-#: src/core/app.c:1584
+#: src/core/app.c:1611
 msgid "← / → · Space (reading)"
 msgstr ""
 
-#: src/core/app.c:1584
+#: src/core/app.c:1611
 msgid "Previous · next page"
 msgstr ""
 
-#: src/core/app.c:1584
+#: src/core/app.c:1611
 msgid "Auto-scroll on/off"
 msgstr ""
 
-#: src/core/app.c:1585
+#: src/core/app.c:1612
 msgid "+ / − (reading)"
 msgstr ""
 
-#: src/core/app.c:1585
+#: src/core/app.c:1612
 msgid "Auto-scroll speed"
 msgstr ""
 
-#: src/core/app.c:1586
+#: src/core/app.c:1613
 msgid "Ctrl+← / →"
 msgstr ""
 
-#: src/core/app.c:1586
+#: src/core/app.c:1613
 msgid "Previous / next word"
 msgstr ""
 
-#: src/core/app.c:1586
+#: src/core/app.c:1613
 msgid "Ctrl+Home / End"
 msgstr ""
 
-#: src/core/app.c:1586
+#: src/core/app.c:1613
 msgid "Start · end of the text"
 msgstr ""
 
-#: src/core/app.c:1587
+#: src/core/app.c:1614
 msgid "Ctrl+= / -"
 msgstr ""
 
-#: src/core/app.c:1587
+#: src/core/app.c:1614
 msgid "Larger · smaller text"
 msgstr ""
 
-#: src/core/app.c:1588
+#: src/core/app.c:1615
 msgid "This help"
 msgstr ""
 
-#: src/core/app.c:1588
+#: src/core/app.c:1615
 msgid "Focus mode (sentence/paragraph/line)"
 msgstr ""
 
-#: src/core/app.c:1589
+#: src/core/app.c:1616
 msgid "Typewriter"
 msgstr ""
 
-#: src/core/app.c:1589
+#: src/core/app.c:1616
 msgid "Writing sprint"
 msgstr ""
 
-#: src/core/app.c:1591
+#: src/core/app.c:1618
 msgid "F7 / F8 / F9"
 msgstr ""
 
-#: src/core/app.c:1591
+#: src/core/app.c:1618
 msgid "Previous track · Play/pause · Next"
 msgstr ""
 
-#: src/core/app.c:1592
+#: src/core/app.c:1619
 msgid "Zen mode"
 msgstr ""
 
-#: src/core/app.c:1593
+#: src/core/app.c:1620
 msgid "Esc"
 msgstr ""
 
-#: src/core/app.c:1593
+#: src/core/app.c:1620
 msgid "Close window · leave zen/reading"
 msgstr ""
 
-#: src/core/app.c:1594
+#: src/core/app.c:1621
 msgid "Tab · ↑ ↓ (windows)"
 msgstr ""
 
-#: src/core/app.c:1594
+#: src/core/app.c:1621
 msgid "Move between buttons and options"
 msgstr ""
 
-#: src/core/app.c:1594
+#: src/core/app.c:1621
 msgid "Enter · Space · ← →"
 msgstr ""
 
-#: src/core/app.c:1594
+#: src/core/app.c:1621
 msgid "Press · adjust the focused option"
 msgstr ""
 
-#: src/core/app.c:1595
+#: src/core/app.c:1622
 msgid "Keyboard between the text and the windows"
 msgstr ""
 
-#: src/core/app.c:1595
+#: src/core/app.c:1622
 msgid "Ctrl+Shift+← / →"
 msgstr ""
 
-#: src/core/app.c:1595
+#: src/core/app.c:1622
 msgid "Select word by word"
 msgstr ""
 
-#: src/core/app.c:1596
+#: src/core/app.c:1623
 msgid "Become — and … (smart typography)"
 msgstr ""
 
-#: src/core/app.c:1672
+#: src/core/app.c:1699
 #, c-format
 msgid "Untitled — kept in %s until you save it"
 msgstr ""
 
-#: src/core/app.c:1679
+#: src/core/app.c:1706
 msgid "New tab (Ctrl+N)"
 msgstr ""
 
-#: src/core/app.c:1698
+#: src/core/app.c:1725
 msgid "Not saved yet (Ctrl+S)"
 msgstr ""
 
-#: src/core/app.c:1713
+#: src/core/app.c:1740
 #, c-format
 msgid "Playing: %s (F6)"
 msgstr ""
 
-#: src/core/app.c:1714
+#: src/core/app.c:1741
 msgid "Music (F6)"
 msgstr ""
 
-#: src/core/app.c:1714
+#: src/core/app.c:1741
 #, c-format
 msgid "Music (F6) — put MP3 files in the %s folder"
 msgstr ""
 
-#: src/core/app.c:1716
+#: src/core/app.c:1743
 msgid "Tabs on — click to turn off"
 msgstr ""
 
-#: src/core/app.c:1716
+#: src/core/app.c:1743
 msgid "Tabs: open several documents (like in Sublime Text)"
 msgstr ""
 
-#: src/core/app.c:1717
+#: src/core/app.c:1744
 msgid "Zen mode (F11)"
 msgstr ""
 
-#: src/core/app.c:1718
+#: src/core/app.c:1745
 msgid "Typewriter (F3)"
 msgstr ""
 
-#: src/core/app.c:1719
+#: src/core/app.c:1746
 msgid "Reading (Ctrl+P)"
 msgstr ""
 
-#: src/core/app.c:1721
+#: src/core/app.c:1748
 msgid "Appearance (F12)"
 msgstr ""
 
-#: src/core/app.c:1722
+#: src/core/app.c:1749
 msgid "Commands (Ctrl+K)"
 msgstr ""
 
-#: src/core/app.c:1734
+#: src/core/app.c:1761
 msgid "Next track (F9)"
 msgstr ""
 
-#: src/core/app.c:1736
+#: src/core/app.c:1763
 msgid "Pause (F8)"
 msgstr ""
 
-#: src/core/app.c:1736
+#: src/core/app.c:1763
 msgid "Play (F8)"
 msgstr ""
 
-#: src/core/app.c:1738
+#: src/core/app.c:1765
 msgid "Previous track (F7)"
 msgstr ""
 
-#: src/core/app.c:1751
+#: src/core/app.c:1778
 #, c-format
 msgid "%d h %02d min"
 msgstr ""
 
-#: src/core/app.c:1779
+#: src/core/app.c:1806
 msgid " · end of the text"
 msgstr ""
 
-#: src/core/app.c:1780
+#: src/core/app.c:1807
 #, c-format
 msgid " · %s · %s to the end of the chapter · %s in total"
 msgstr ""
 
-#: src/core/app.c:1781
+#: src/core/app.c:1808
 #, c-format
 msgid " · %s · %s of reading left"
 msgstr ""
 
-#: src/core/app.c:1782
+#: src/core/app.c:1809
 #, c-format
 msgid " · %s of reading left"
 msgstr ""
 
-#: src/core/app.c:1785
+#: src/core/app.c:1812
 #, c-format
 msgid "%d of %d word"
 msgid_plural "%d of %d words"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/core/app.c:1791
+#: src/core/app.c:1818
 #, c-format
 msgid "Today: %d words · %d min reading"
 msgstr ""
 
-#: src/core/app.c:2004 src/core/app.c:2009
+#: src/core/app.c:2032 src/core/app.c:2037
 msgid "Welcome back. Picking up where you left off."
 msgstr ""
 
-#: src/core/app.c:2004
+#: src/core/app.c:2032
 #, c-format
 msgid "Welcome back: %d tab reopened."
 msgid_plural "Welcome back: %d tabs reopened."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/core/app.c:2008
+#: src/core/app.c:2036
 msgid "Welcome back. Reading continues where you left off."
 msgstr ""
 
-#: src/core/app.c:2013
+#: src/core/app.c:2041
 msgid "Unsaved draft recovered"
 msgstr ""
 
-#: src/core/app.c:2018
+#: src/core/app.c:2046
 msgid ""
 "# Welcome to FolioOS\n"
 "\n"
@@ -1582,30 +1586,30 @@ msgid ""
 "Delete this text (Ctrl+A) and start your story.\n"
 msgstr ""
 
-#: src/core/app.c:2145
+#: src/core/app.c:2173
 #, c-format
 msgid "Sprint finished: %d word. Breathe and stretch."
 msgid_plural "Sprint finished: %d words. Breathe and stretch."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/core/editor.c:311
+#: src/core/editor.c:321
 msgid "Cut"
 msgstr ""
 
-#: src/core/editor.c:311
+#: src/core/editor.c:321
 msgid "Copied"
 msgstr ""
 
-#: src/core/editor.c:505
+#: src/core/editor.c:547
 msgid "There are no edits in this document yet"
 msgstr ""
 
-#: src/core/editor.c:531 src/core/editor.c:644 src/core/editor.c:657
+#: src/core/editor.c:573 src/core/editor.c:687 src/core/editor.c:706
 msgid "Hemingway mode: keep going, no deleting"
 msgstr ""
 
-#: src/core/editor.c:541
+#: src/core/editor.c:583
 msgid "Paragraph deleted — Ctrl+Z undoes it"
 msgstr ""
 
@@ -1677,172 +1681,172 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
-#: src/core/filedlg.c:67 src/core/filedlg.c:325
+#: src/core/filedlg.c:67 src/core/filedlg.c:326
 msgid "Name"
 msgstr ""
 
-#: src/core/filedlg.c:102
+#: src/core/filedlg.c:101
 msgid "Could not read this folder"
 msgstr ""
 
-#: src/core/filedlg.c:123
+#: src/core/filedlg.c:122
 msgid "Open document"
 msgstr ""
 
-#: src/core/filedlg.c:152
+#: src/core/filedlg.c:151
 msgid "Folder created"
 msgstr ""
 
-#: src/core/filedlg.c:152
+#: src/core/filedlg.c:151
 msgid "Could not create the folder"
 msgstr ""
 
-#: src/core/filedlg.c:159
+#: src/core/filedlg.c:158
 msgid "Renamed"
 msgstr ""
 
-#: src/core/filedlg.c:160
+#: src/core/filedlg.c:159
 msgid "Could not rename"
 msgstr ""
 
-#: src/core/filedlg.c:176
+#: src/core/filedlg.c:175
 msgid "Deleted"
 msgstr ""
 
-#: src/core/filedlg.c:176
+#: src/core/filedlg.c:175
 msgid "Could not delete"
 msgstr ""
 
-#: src/core/filedlg.c:192
+#: src/core/filedlg.c:191
 msgid "Type a name for the file"
 msgstr ""
 
-#: src/core/filedlg.c:201
+#: src/core/filedlg.c:202
 msgid "A folder with that name already exists"
 msgstr ""
 
-#: src/core/filedlg.c:202
+#: src/core/filedlg.c:203
 #, c-format
 msgid "\"%s\" already exists in this folder. Do you want to replace the file?"
 msgstr ""
 
-#: src/core/filedlg.c:203
+#: src/core/filedlg.c:204
 msgid "Replace file?"
-msgstr ""
-
-#: src/core/filedlg.c:212
-#, c-format
-msgid "%.1f KB"
 msgstr ""
 
 #: src/core/filedlg.c:213
 #, c-format
-msgid "%.1f MB"
+msgid "%.1f KB"
 msgstr ""
 
 #: src/core/filedlg.c:214
 #, c-format
+msgid "%.1f MB"
+msgstr ""
+
+#: src/core/filedlg.c:215
+#, c-format
 msgid "%.1f GB"
 msgstr ""
 
-#: src/core/filedlg.c:227
+#: src/core/filedlg.c:228
 msgid "DRIVES"
 msgstr ""
 
-#: src/core/filedlg.c:232
+#: src/core/filedlg.c:233
 msgid "FolioOS USB drive"
 msgstr ""
 
-#: src/core/filedlg.c:233 src/core/filedlg.c:287
+#: src/core/filedlg.c:234 src/core/filedlg.c:288
 msgid "Drive"
 msgstr ""
 
-#: src/core/filedlg.c:244
+#: src/core/filedlg.c:245
 msgid "PLACES"
 msgstr ""
 
-#: src/core/filedlg.c:245
+#: src/core/filedlg.c:246
 msgid "Documents"
 msgstr ""
 
-#: src/core/filedlg.c:245 src/core/music.c:26
+#: src/core/filedlg.c:246 src/core/music.c:26
 msgid "Music"
 msgstr ""
 
-#: src/core/filedlg.c:245
+#: src/core/filedlg.c:246
 msgid "Root"
 msgstr ""
 
-#: src/core/filedlg.c:262
+#: src/core/filedlg.c:263
 msgid "All files"
 msgstr ""
 
-#: src/core/filedlg.c:273
+#: src/core/filedlg.c:274
 msgid "Parent folder (Alt+↑)"
 msgstr ""
 
-#: src/core/filedlg.c:308 src/core/filedlg.c:308 src/core/filedlg.c:308
+#: src/core/filedlg.c:309 src/core/filedlg.c:309 src/core/filedlg.c:309
 msgid "New folder"
 msgstr ""
 
-#: src/core/filedlg.c:310
+#: src/core/filedlg.c:311
 msgid "Rename (F2)"
 msgstr ""
 
-#: src/core/filedlg.c:311
+#: src/core/filedlg.c:312
 msgid "Rename"
 msgstr ""
 
-#: src/core/filedlg.c:311 src/core/filedlg.c:317
+#: src/core/filedlg.c:312 src/core/filedlg.c:318
 msgid "Select an item"
 msgstr ""
 
-#: src/core/filedlg.c:315
+#: src/core/filedlg.c:316
 #, c-format
 msgid "Delete the folder \"%s\" and everything in it? This cannot be undone."
 msgstr ""
 
-#: src/core/filedlg.c:315
+#: src/core/filedlg.c:316
 #, c-format
 msgid "Delete \"%s\"? This cannot be undone."
 msgstr ""
 
-#: src/core/filedlg.c:325
+#: src/core/filedlg.c:326
 msgid "Size"
 msgstr ""
 
-#: src/core/filedlg.c:325
+#: src/core/filedlg.c:326
 msgid "Modified"
 msgstr ""
 
-#: src/core/filedlg.c:366
+#: src/core/filedlg.c:367
 msgid "No .md or .txt documents here"
 msgstr ""
 
-#: src/core/filedlg.c:366
+#: src/core/filedlg.c:367
 msgid "Empty folder"
 msgstr ""
 
-#: src/core/filedlg.c:406
+#: src/core/filedlg.c:407
 msgid "File name"
 msgstr ""
 
-#: src/core/filedlg.c:407
+#: src/core/filedlg.c:409
 msgid "Export"
 msgstr ""
 
-#: src/core/filedlg.c:432
+#: src/core/filedlg.c:434
 msgid ". The document stays open as .md."
 msgstr ""
 
-#: src/core/filedlg.c:436
+#: src/core/filedlg.c:438
 #, c-format
 msgid "%d item"
 msgid_plural "%d items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/core/filedlg.c:438
+#: src/core/filedlg.c:440
 msgid "Open"
 msgstr ""
 
@@ -1961,7 +1965,7 @@ msgid_plural "%d tracks · %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/core/preview.c:46 src/core/preview.c:471
+#: src/core/preview.c:46 src/core/preview.c:472
 msgid "The whole text already fits on the screen"
 msgstr ""
 
@@ -1969,45 +1973,49 @@ msgstr ""
 msgid "Already at the end of the text"
 msgstr ""
 
-#: src/core/preview.c:259
+#: src/core/preview.c:182
+msgid "Reading mode is not available for LaTeX files"
+msgstr ""
+
+#: src/core/preview.c:260
 #, c-format
 msgid "Reading: %d words per minute"
 msgstr ""
 
-#: src/core/preview.c:363
+#: src/core/preview.c:364
 msgid "Previous page (←)"
 msgstr ""
 
-#: src/core/preview.c:365
+#: src/core/preview.c:366
 msgid "Stop auto-scroll (Enter or middle button)"
 msgstr ""
 
-#: src/core/preview.c:365
+#: src/core/preview.c:366
 msgid "Auto-scroll (Enter or middle button)"
 msgstr ""
 
-#: src/core/preview.c:366
+#: src/core/preview.c:367
 msgid "Slower (−)"
 msgstr ""
 
-#: src/core/preview.c:368
+#: src/core/preview.c:369
 #, c-format
 msgid "%d wpm"
 msgstr ""
 
-#: src/core/preview.c:370
+#: src/core/preview.c:371
 msgid "Reading speed in words per minute (the mouse wheel adjusts it here)"
 msgstr ""
 
-#: src/core/preview.c:371
+#: src/core/preview.c:372
 msgid "Faster (+)"
 msgstr ""
 
-#: src/core/preview.c:372
+#: src/core/preview.c:373
 msgid "Next page (→ or space)"
 msgstr ""
 
-#: src/core/preview.c:472
+#: src/core/preview.c:473
 msgid "End of the text"
 msgstr ""
 

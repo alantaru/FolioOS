@@ -66,6 +66,10 @@ msgstr "Ошибка записи — флешка защищена от зап�
 msgid "Saved · %s"
 msgstr "Сохранено · %s"
 
+#: src/core/app.c:497 src/core/filedlg.c:197
+msgid "Export is not available for LaTeX files"
+msgstr "Экспорт недоступен для файлов LaTeX"
+
 #: src/core/app.c:483
 #, c-format
 msgid "Exported · %s"
@@ -1988,6 +1992,10 @@ msgstr "Весь текст уже помещается на экране"
 #: src/core/preview.c:47
 msgid "Already at the end of the text"
 msgstr "Вы уже в конце текста"
+
+#: src/core/preview.c:182
+msgid "Reading mode is not available for LaTeX files"
+msgstr "Режим чтения недоступен для файлов LaTeX"
 
 #: src/core/preview.c:259
 #, c-format

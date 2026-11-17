@@ -1,0 +1,124 @@
+# LaTeX: fontes .tex/.bib/.sty/.cls editadas como texto puro (sem Markdown, sem tipografia automática),
+# realce por linha em monoespaçada, fim de linha CRLF mantido, sem modo leitura nem exportação.
+# O build copia tests/latex_doc.txt (CRLF) para DOCUMENTS/artigo.tex antes e, no fim, compara o
+# arquivo gravado pelo salvamento automático, byte a byte, com tests/latex_expected.txt.
+# só pelo teclado: Alt+M → "Open…" → o diálogo lista o .tex (↓ escolhe, Enter abre)
+key esc
+wait 200
+key alt+m
+wait 200
+assert_keywin Menu
+key down
+key enter
+wait 300
+assert_keywin Abrir documento
+key down
+key enter
+wait 300
+assert_nowin
+assert_keywin text
+assert_text \section{Introdução}
+# Ctrl+P e a rolagem automática (paleta) não abrem a leitura: o texto continua editável
+key ctrl+p
+key ctrl+k
+type Rolagem automática da leitura
+key enter
+assert_auto 0
+assert_nowin
+# nem pela paleta só com o teclado (Ctrl+K, Enter): a leitura fica bloqueada e o teclado volta ao texto
+key ctrl+k
+type Modo leitura
+key enter
+wait 200
+assert_nowin
+assert_keywin text
+key ctrl+end
+# nada é transformado: -- ... aspas, # no início, sublinhado, asteriscos, crases ficam como digitados
+type Linha nova: -- e ... "aspas" 'simples' under_score_d *stars* `code` \emph{x} $a_i$ 50\% fim.¶
+assert_text Linha nova: -- e ... "aspas" 'simples' under_score_d *stars* `code` \emph{x} $a_i$ 50\% fim.
+# sem títulos nem listas: Enter depois de "- item" não continua a lista
+# Tab numa linha "- item" não recua a lista: insere 4 espaços (e não é tomado pela navegação das janelas)
+type # not a heading¶- item
+key tab
+type x¶
+assert_text # not a heading
+assert_text - item    x
+# { fecha sozinho; Ctrl+Z desfaz o par de uma vez, Ctrl+Y refaz
+type \textbf{
+assert_text \textbf{}
+key ctrl+z
+assert_no_text \textbf{
+assert_text \textbf
+key ctrl+y
+assert_text \textbf{}
+# digitar o fecho que já está adiante só passa por ele
+key left
+type negrito}
+assert_text \textbf{negrito}
+assert_no_text negrito}}
+# Backspace logo depois de [ apaga o par vazio
+type  [
+assert_text \textbf{negrito} []
+key backspace
+assert_no_text []
+# depois de \ nada fecha nem é pulado: \{ e \} ficam literais
+type \{\}
+assert_text \textbf{negrito} \{\}
+# com seleção, { $ " envolvem o texto (aspas retas)
+type  sel
+key shift+left
+key shift+left
+key shift+left
+type {
+type $
+type "
+key end
+assert_text \textbf{negrito} \{\} {$"sel"$}
+# realce: comandos, chaves, comentários e matemática, em tema claro e escuro
+key ctrl+home
+wait 300
+shot 40_latex.png
+theme 2
+shot 41_latex_escuro.png
+theme 0
+# salvamento automático (sem Ctrl+S): o build confere o arquivo (CRLF) byte a byte
+wait 21000
+# exportar fonte LaTeX para HTML não passa pelo Markdown: fica bloqueado (o build confere que não existe)
+export html /DOCUMENTS/artigo.html
+# novo .tex pelo diálogo de salvar: o nome digitado mantém a extensão (nada de novo.tex.md), fim de linha LF
+key ctrl+n
+type \section{Novo}
+key ctrl+shift+s
+wait 300
+type novo.tex
+key enter
+wait 300
+assert_nowin
+assert_file /DOCUMENTS/novo.tex
+type ¶"ok" -- fim...
+assert_text \section{Novo}
+assert_text "ok" -- fim...
+key ctrl+s
+# a fonte LaTeX salva como .md grava o texto como está e volta ao Markdown (aspas tipográficas de novo)
+export md /DOCUMENTS/novo.md
+type  "x"
+assert_text “x”
+key ctrl+s
+# um documento Markdown para conferir no fim
+key ctrl+n
+type # Nota em Markdown¶Texto com **negrito** -- e ...¶- item um¶item dois
+assert_text - item dois
+assert_text com **negrito** — e …
+export md /DOCUMENTS/nota.md
+# reinício: a fonte LaTeX volta inteira e editável
+open /DOCUMENTS/artigo.tex
+restart
+assert_text \textbf{negrito} \{\} {$"sel"$}
+assert_text \section{Introdução}
+# um .md aberto depois, na mesma sessão, volta a ter o Markdown ao vivo
+open /DOCUMENTS/nota.md
+assert_text # Nota em Markdown
+# uma tecla pula a abertura do reinício
+key ctrl+home
+wait 300
+shot 42_markdown_depois.png

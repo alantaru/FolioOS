@@ -66,6 +66,10 @@ msgstr "Schrijffout — is de USB-stick beveiligd of vol?"
 msgid "Saved · %s"
 msgstr "Opgeslagen · %s"
 
+#: src/core/app.c:497 src/core/filedlg.c:197
+msgid "Export is not available for LaTeX files"
+msgstr "Exporteren is niet beschikbaar voor LaTeX-bestanden"
+
 #: src/core/app.c:483
 #, c-format
 msgid "Exported · %s"
@@ -1979,6 +1983,10 @@ msgstr "De hele tekst past al op het scherm"
 #: src/core/preview.c:47
 msgid "Already at the end of the text"
 msgstr "Al aan het einde van de tekst"
+
+#: src/core/preview.c:182
+msgid "Reading mode is not available for LaTeX files"
+msgstr "Leesmodus is niet beschikbaar voor LaTeX-bestanden"
 
 #: src/core/preview.c:259
 #, c-format

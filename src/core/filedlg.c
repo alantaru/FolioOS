@@ -80,8 +80,7 @@ static bool hidden_name(const char *n) {
 static bool visible(FileEntry *e) {
     if (hidden_name(e->name)) return false;
     if (e->dir || show_all || mode == FD_SAVE) return true;
-    int f = format_from_path(e->name);
-    return f == FMT_MD || f == FMT_TXT;
+    return path_editable(e->name);
 }
 static int cmp_ent(FileEntry *a, FileEntry *b) {
     if (a->dir != b->dir) return a->dir ? -1 : 1;
@@ -130,7 +129,7 @@ void filedlg_show(int m) {
         go(app.vol, dir);
         str_copy(fname, path_basename(app.path), sizeof fname);
         char *dot = 0; for (char *c = fname; *c; c++) if (*c == '.') dot = c;
-        if (dot) *dot = 0;
+        if (dot && app.syntax != SYN_TEX) *dot = 0;     /* fonte LaTeX: o nome fica com a extensão (.tex, .bib…) */
     } else {
         bool isdir;
         (void)isdir; paths_ensure(app_boot_vol(), DIR_DOCS);
@@ -155,7 +154,7 @@ static void do_rename(const char *name) {
     if (sel < 0 || sel >= nents) return;
     char p[512]; path_join(p, sizeof p, cwd, ents[sel].name);
     if (pal_rename(vol, p, name)) {
-        if (app.has_path && app.vol == vol && str_ieq(app.path, p)) path_join(app.path, sizeof app.path, cwd, name);
+        if (app.has_path && app.vol == vol && str_ieq(app.path, p)) { path_join(app.path, sizeof app.path, cwd, name); app_sync_syntax(); }
         ui_toast(L("Renamed")); refresh();
     } else ui_toast(L("Could not rename"));
 }
@@ -193,7 +192,9 @@ static void commit(void) {
     char name[200]; str_copy(name, fname, sizeof name);
     for (char *c = name; *c; c++) if (*c == '/' || *c == '\\' || *c == ':' || *c == '*' || *c == '?' || *c == '"' || *c == '<' || *c == '>' || *c == '|') *c = '-';
     int f = format_from_path(name);
-    if (f < 0) { f = fmt_sel; str_cat(name, format_info(f)->ext, sizeof name); }
+    if (f < 0 && doc_syntax_from_path(name) == SYN_TEX) f = FMT_TXT;   /* .tex .bib .sty .cls: o texto como está, com a extensão digitada */
+    else if (f < 0) { f = fmt_sel; str_cat(name, format_info(f)->ext, sizeof name); }
+    if (app.syntax == SYN_TEX && !format_info(f)->editable) { ui_toast(L("Export is not available for LaTeX files")); return; }
     path_join(pending_path, sizeof pending_path, cwd, name);
     pending_fmt = f;
     bool isdir;
@@ -373,9 +374,9 @@ static void files_body(Window *w, Rect r) {
         bool hv = ui_hover(rr) && ui_hover(rows);
         if (i == sel) gfx_rrect(rr, S(8), col_alpha(T->accent, 0.16f));
         else if (hv) gfx_rrect(rr, S(8), col_alpha(T->text, 0.05f));
-        int fm = format_from_path(fe->name);
-        int ic = fe->dir ? IC_FOLDER : str_ends_i(fe->name, ".mp3") ? IC_MUSIC : (fm >= 0 ? IC_DOC : IC_FILE);
-        Color icc = fe->dir ? T->accent : col_alpha(T->panel_text, fm >= 0 ? 0.75f : 0.45f);
+        bool isdoc = format_from_path(fe->name) >= 0 || path_editable(fe->name);
+        int ic = fe->dir ? IC_FOLDER : str_ends_i(fe->name, ".mp3") ? IC_MUSIC : (isdoc ? IC_DOC : IC_FILE);
+        Color icc = fe->dir ? T->accent : col_alpha(T->panel_text, isdoc ? 0.75f : 0.45f);
         icon_draw(ic, rr.x + S(20), rr.y + rr.h * 0.5f, S(19), icc);
         float bl = rr.y + rr.h * 0.5f + face_ascent(f, px) * 0.36f;
         draw_text_ellipsis(f, px, c1, bl, c2 - c1 - S(14), fe->name, T->panel_text);
@@ -404,7 +405,8 @@ static void files_body(Window *w, Rect r) {
     int bw = SI(132), bh = SI(40);
     if (mode == FD_SAVE) {
         ui_textfield(rect(mx, fy + SI(4), mw - 2 * bw - SI(20), SI(40)), fname, sizeof fname, L("File name"), true);
-        if (ui_button(rect(mx + mw - bw, fy + SI(4), bw, bh), format_info(fmt_sel)->editable ? L("Save") : L("Export"), BTN_PRIMARY)) { commit(); return; }
+        bool tex_name = doc_syntax_from_path(fname) == SYN_TEX;   /* nome com .tex/.bib/.sty/.cls: grava o texto como está */
+        if (ui_button(rect(mx + mw - bw, fy + SI(4), bw, bh), tex_name || format_info(fmt_sel)->editable ? L("Save") : L("Export"), BTN_PRIMARY)) { commit(); return; }
         if (ui_button(rect(mx + mw - 2 * bw - SI(10), fy + SI(4), bw, bh), L("Cancel"), BTN_SUBTLE)) { wm_close(&win_files); return; }
         /* formatos */
         int cy = fy + SI(56);
@@ -415,7 +417,7 @@ static void files_body(Window *w, Rect r) {
             float wv = text_width(fb, S(13), lab, -1) + S(24);
             Rect cr = rect((int)x, cy, (int)wv, SI(30));
             bool fire = ui_item(cr);
-            bool on = fmt_sel == k, hv = ui_hover(cr);
+            bool on = fmt_sel == k && !tex_name, hv = ui_hover(cr);
             gfx_rrect(cr, S(15), on ? T->accent : col_alpha(T->text, hv ? 0.12f : 0.06f));
             draw_text_c(fb, S(13), cr, lab, on ? (col_luma(T->accent) > 0.6f ? 0xFF1A1A1A : 0xFFFFFFFF) : T->panel_text);
             ui_tooltip(fi, cr, L(fi->name));
@@ -423,14 +425,14 @@ static void files_body(Window *w, Rect r) {
                 fmt_sel = k;
                 /* troca a extensão digitada, se houver */
                 int ff = format_from_path(fname);
-                if (ff >= 0) { char *dot = 0; for (char *c = fname; *c; c++) if (*c == '.') dot = c; if (dot) *dot = 0; }
+                if (ff >= 0 || tex_name) { char *dot = 0; for (char *c = fname; *c; c++) if (*c == '.') dot = c; if (dot) *dot = 0; }
             }
             x += wv + S(8);
         }
         const FormatInfo *fi = format_info(fmt_sel);
         char info[200];
         fmt(info, sizeof info, "%s — %s%s", L(fi->name), L(fi->desc), fi->editable ? "" : L(". The document stays open as .md."));
-        draw_text_ellipsis(f, S(13), mx, cy + SI(52), mw, info, col_alpha(T->panel_text, 0.6f));
+        if (!tex_name) draw_text_ellipsis(f, S(13), mx, cy + SI(52), mw, info, col_alpha(T->panel_text, 0.6f));
     } else {
         char info[200];
         if (sel >= 0 && sel < nents) fmt(info, sizeof info, "%s", ents[sel].name); else fmt(info, sizeof info, LN("%d item", "%d items", nents), nents);

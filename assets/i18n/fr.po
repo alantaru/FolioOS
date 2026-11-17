@@ -66,6 +66,10 @@ msgstr "Erreur d’écriture — la clé USB est-elle protégée ou pleine ?"
 msgid "Saved · %s"
 msgstr "Enregistré · %s"
 
+#: src/core/app.c:497 src/core/filedlg.c:197
+msgid "Export is not available for LaTeX files"
+msgstr "L’exportation n’est pas disponible pour les fichiers LaTeX"
+
 #: src/core/app.c:483
 #, c-format
 msgid "Exported · %s"
@@ -1979,6 +1983,10 @@ msgstr "Tout le texte tient déjà à l’écran"
 #: src/core/preview.c:47
 msgid "Already at the end of the text"
 msgstr "Déjà à la fin du texte"
+
+#: src/core/preview.c:182
+msgid "Reading mode is not available for LaTeX files"
+msgstr "Le mode lecture n’est pas disponible pour les fichiers LaTeX"
 
 #: src/core/preview.c:259
 #, c-format

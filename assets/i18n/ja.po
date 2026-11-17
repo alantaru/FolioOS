@@ -66,6 +66,10 @@ msgstr "書き込みエラー：USB メモリが書き込み禁止か、いっ�
 msgid "Saved · %s"
 msgstr "保存しました · %s"
 
+#: src/core/app.c:497 src/core/filedlg.c:197
+msgid "Export is not available for LaTeX files"
+msgstr "LaTeX ファイルは書き出しできません"
+
 #: src/core/app.c:483
 #, c-format
 msgid "Exported · %s"
@@ -1970,6 +1974,10 @@ msgstr "テキスト全体がすでに画面に収まっています"
 #: src/core/preview.c:47
 msgid "Already at the end of the text"
 msgstr "すでにテキストの末尾です"
+
+#: src/core/preview.c:182
+msgid "Reading mode is not available for LaTeX files"
+msgstr "LaTeX ファイルでは閲覧モードを使用できません"
 
 #: src/core/preview.c:259
 #, c-format
