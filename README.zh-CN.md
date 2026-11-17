@@ -166,6 +166,10 @@ FolioOS 直接从固件启动。字体加载期间会显示启动画面，按任
 - **自动版本：** 每个已保存文件的上一个版本会存入 `FOLIO/VERSIONS`（每个文档保留最近 30 个）。
 - **草稿恢复**：用于从未命名的文字。
 
+**LaTeX 源文件**（`.tex`、`.bib`、`.sty`、`.cls`）以等宽字体作为纯源码打开，按行高亮命令、花括号、`%` 注释和行内公式，
+支持真正的制表位，`{`、`[` 和 `$` 会自动闭合。Markdown 样式和智能引号都不会改动源码，文件也保留原来的换行符（CRLF 仍是
+CRLF）。FolioOS 不编译 LaTeX：阅读模式和导出只用于 Markdown 文档。
+
 <a id="8-tabs-optional"></a>
 
 ### 8. 标签页（可选）
@@ -349,6 +353,13 @@ Markdown 编辑器打开，然后把 U 盘插回去，继续在 FolioOS 中写�
 </details>
 
 <details>
+<summary><b>可以写 LaTeX 吗？</b></summary>
+
+可以。FolioOS 能编辑 `.tex`、`.bib`、`.sty` 和 `.cls` 源文件，带高亮、使用等宽字体，并且完全按输入保存（没有智能引号，
+也没有 Markdown）。它不负责编译：请在装有 TeX 发行版的电脑上生成 PDF，或把文件上传到在线 LaTeX 编辑器。
+</details>
+
+<details>
 <summary><b>为什么我的电脑在启动菜单里看不到 U 盘？</b></summary>
 
 请确认 U 盘是 FAT32 格式、你选择的是以 “UEFI” 开头的选项，并且固件设置中已关闭 Secure Boot。只能以 BIOS/Legacy 模式启动的
@@ -407,6 +418,26 @@ cd FolioOS
 测试套件用脚本化的按键和鼠标事件驱动模拟器和真正的 `BOOTX64.EFI`（运行在一个小型 UEFI 宿主中），截取屏幕，并验证每一种导出
 （ZIP + XML）、每一种翻译（并对校验器做反向检查）、六种帧缓冲格式，以及 BIOS 桥的 FAT32 驱动（数千次随机操作，逐字节核对）。
 
+<a id="macos-simulator"></a>
+
+### macOS 模拟器
+
+在 Mac 上可以原生编译和运行模拟器（AppKit、Retina，快捷键里 Cmd 相当于 Ctrl）。要求：Xcode 命令行工具
+（`xcode-select --install`）——只需要 `clang`，不需要完整的 Xcode。
+
+```bash
+./build_macos.sh                             # 模拟器、"FolioOS Simulator.app" 和 U 盘文件夹
+./build_macos.sh --test                      # 同上，再加上模拟器的脚本化测试（无窗口）
+./build/macos/folio_sim                      # 在窗口中运行 FolioOS
+open "build/macos/FolioOS Simulator.app"     # 或者打开应用程序包
+```
+
+Option 是 Mac 上的 AltGr，所以它照常输入字符（许多键盘布局中的 `@ # | [ ] { }`）：在模拟器里 **Option+M** 打开菜单
+（Alt+M），**Cmd+Option+1…9** 切换标签页（Alt+1…9）。
+
+macOS 脚本只编译模拟器：UEFI 二进制文件、发布包、磁盘映像，以及在 `efi_host` 中运行真正 `BOOTX64.EFI` 的测试，仍然需要
+在 Windows 上构建（`build.ps1`）。
+
 <a id="architecture-in-one-picture"></a>
 
 ### 一图看懂架构
@@ -417,6 +448,7 @@ src/core/       可移植核心（独立 C，无 libc）：编辑器、Markdown�
 src/platform/   uefi/  GOP/UGA 显示、输入、FAT 读写、HD Audio/AC'97、USB HID 和 PS/2 驱动——运行在固件之上
                 bios/  启动扇区 + BIOS→UEFI 桥（VBE、PS/2、自有 FAT32 驱动），用于仅有 BIOS 的电脑
                 win32/ 用于开发和自动测试的模拟器
+                macos/ macOS 模拟器（AppKit），使用相同的脚本化测试
 tools/          efi_host（在 Windows 上运行 BOOTX64.EFI）、i18n 工具、磁盘镜像生成器、showcase
 assets/         字体、翻译（.po）、键盘布局、示例主题
 tests/          脚本化的端到端测试

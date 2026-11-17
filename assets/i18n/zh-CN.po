@@ -13,1567 +13,1571 @@ msgstr ""
 "X-Date-Format: {yyyy}年{month}{d}日\n"
 "X-Decimal: .\n"
 
-#: src/core/app.c:31 src/core/app.c:53 src/core/app.c:256 src/core/filedlg.c:140 src/core/md.c:239
+#: src/core/app.c:31 src/core/app.c:53 src/core/app.c:273 src/core/filedlg.c:139 src/core/md.c:239
 msgid "Untitled"
 msgstr "未命名"
 
-#: src/core/app.c:146
+#: src/core/app.c:161
 msgid "Could not open the file"
 msgstr "无法打开文件"
 
-#: src/core/app.c:268 src/core/app.c:438
+#: src/core/app.c:285 src/core/app.c:456
 msgid "Limit of 16 tabs — close one (Ctrl+W)"
 msgstr "最多 16 个标签页——请关闭一个（Ctrl+W）"
 
-#: src/core/app.c:402
+#: src/core/app.c:420
 msgid "Picking up where you left off"
 msgstr "从上次停下的地方继续"
 
-#: src/core/app.c:420
+#: src/core/app.c:438
 msgid "Close tab without saving?"
 msgstr "不保存就关闭标签页？"
 
-#: src/core/app.c:420
+#: src/core/app.c:438
 msgid "Save changes?"
 msgstr "保存更改？"
 
-#: src/core/app.c:421
+#: src/core/app.c:439
 msgid "The current document has changes that have not been saved yet."
 msgstr "当前文档有尚未保存的更改。"
 
-#: src/core/app.c:421 src/core/app.c:739 src/core/app.c:870 src/core/filedlg.c:407
+#: src/core/app.c:439 src/core/app.c:766 src/core/app.c:897 src/core/filedlg.c:409
 msgid "Save"
 msgstr "保存"
 
-#: src/core/app.c:421
+#: src/core/app.c:439
 msgid "Don't save"
 msgstr "不保存"
 
-#: src/core/app.c:428
+#: src/core/app.c:446
 msgid "This format is export-only. Open the matching .md file."
 msgstr "此格式仅用于导出。请打开对应的 .md 文件。"
 
-#: src/core/app.c:449
+#: src/core/app.c:467
 msgid "Failed to create the file"
 msgstr "无法创建文件"
 
-#: src/core/app.c:453
+#: src/core/app.c:478
 msgid "Write error — is the USB drive write-protected or full?"
 msgstr "写入出错——U 盘是否写保护或已满？"
 
-#: src/core/app.c:466 src/core/app.c:480
+#: src/core/app.c:491 src/core/app.c:507
 #, c-format
 msgid "Saved · %s"
 msgstr "已保存 · %s"
 
-#: src/core/app.c:482
+#: src/core/app.c:496 src/core/filedlg.c:197
+msgid "Export is not available for LaTeX files"
+msgstr "LaTeX 文件无法导出"
+
+#: src/core/app.c:509
 #, c-format
 msgid "Exported · %s"
 msgstr "已导出 · %s"
 
-#: src/core/app.c:530
+#: src/core/app.c:557
 msgid "Narrow"
 msgstr "窄"
 
-#: src/core/app.c:530
+#: src/core/app.c:557
 msgid "Medium"
 msgstr "中"
 
-#: src/core/app.c:530
+#: src/core/app.c:557
 msgid "Wide"
 msgstr "宽"
 
-#: src/core/app.c:530
+#: src/core/app.c:557
 msgid "Extra"
 msgstr "特宽"
 
-#: src/core/app.c:534
+#: src/core/app.c:561
 msgid "Full screen: the text uses the full width"
 msgstr "全屏：文字占满整个宽度"
 
-#: src/core/app.c:534
+#: src/core/app.c:561
 msgid "Page: text in a column, like on a sheet of paper"
 msgstr "页面：文字排成一栏，像在纸上一样"
 
-#: src/core/app.c:576
+#: src/core/app.c:603
 msgid "Settings"
 msgstr "设置"
 
-#: src/core/app.c:577 src/core/app.c:753 src/core/app.c:881 src/core/app.c:1579
+#: src/core/app.c:604 src/core/app.c:780 src/core/app.c:908 src/core/app.c:1606
 msgid "Find and replace"
 msgstr "查找和替换"
 
-#: src/core/app.c:578 src/core/app.c:881 src/core/app.c:1591
+#: src/core/app.c:605 src/core/app.c:908 src/core/app.c:1618
 msgid "Outline"
 msgstr "大纲"
 
-#: src/core/app.c:579 src/core/app.c:770 src/core/app.c:1592
+#: src/core/app.c:606 src/core/app.c:797 src/core/app.c:1619
 msgid "Session and goals"
 msgstr "会话与目标"
 
-#: src/core/app.c:580 src/core/app.c:774 src/core/app.c:885
+#: src/core/app.c:607 src/core/app.c:801 src/core/app.c:912
 msgid "Keyboard shortcuts"
 msgstr "键盘快捷键"
 
-#: src/core/app.c:581
+#: src/core/app.c:608
 msgid "Commands"
 msgstr "命令"
 
-#: src/core/app.c:582 src/core/app.c:1711
+#: src/core/app.c:609 src/core/app.c:1738
 msgid "Menu"
 msgstr "菜单"
 
-#: src/core/app.c:584
+#: src/core/app.c:611
 msgid "Theme editor"
 msgstr "主题编辑器"
 
-#: src/core/app.c:603
+#: src/core/app.c:630
 #, c-format
 msgid "Tabs on · %d documents open (Ctrl+N new, Ctrl+W close)"
 msgstr "标签页已开启 · 打开了 %d 个文档（Ctrl+N 新建，Ctrl+W 关闭）"
 
-#: src/core/app.c:603
+#: src/core/app.c:630
 msgid "Tabs on (Ctrl+N new tab, Ctrl+W close)"
 msgstr "标签页已开启（Ctrl+N 新建标签页，Ctrl+W 关闭）"
 
-#: src/core/app.c:604
+#: src/core/app.c:631
 msgid "Tabs off — your tabs are kept for when you turn them back on"
 msgstr "标签页已关闭——下次开启时会恢复"
 
-#: src/core/app.c:607
+#: src/core/app.c:634
 msgid "Turn tabs on to use Ctrl+W (Ctrl+K → Tabs, or the button at the top)"
 msgstr "开启标签页即可使用 Ctrl+W（Ctrl+K → 标签页，或顶部的按钮）"
 
-#: src/core/app.c:619
+#: src/core/app.c:646
 msgid "Focus off"
 msgstr "专注已关闭"
 
-#: src/core/app.c:619
+#: src/core/app.c:646
 msgid "Focus on sentence"
 msgstr "专注于句子"
 
-#: src/core/app.c:619
+#: src/core/app.c:646
 msgid "Focus on paragraph"
 msgstr "专注于段落"
 
-#: src/core/app.c:619
+#: src/core/app.c:646
 msgid "Focus on line"
 msgstr "专注于行"
 
-#: src/core/app.c:622
+#: src/core/app.c:649
 msgid "Typewriter: current line always centered"
 msgstr "打字机：当前行始终居中"
 
-#: src/core/app.c:622
+#: src/core/app.c:649
 msgid "Typewriter off"
 msgstr "打字机已关闭"
 
-#: src/core/app.c:623
+#: src/core/app.c:650
 msgid "Zen mode — Esc or move the mouse to the top to leave"
 msgstr "禅模式——按 Esc 或将鼠标移到顶部退出"
 
-#: src/core/app.c:623
+#: src/core/app.c:650
 msgid "Zen mode off"
 msgstr "禅模式已关闭"
 
-#: src/core/app.c:644
+#: src/core/app.c:671
 #, c-format
 msgid "Theme: %s"
 msgstr "主题：%s"
 
-#: src/core/app.c:645
+#: src/core/app.c:672
 #, c-format
 msgid "Font: %s"
 msgstr "字体：%s"
 
-#: src/core/app.c:658
+#: src/core/app.c:685
 msgid "Sprint stopped"
 msgstr "冲刺已中断"
 
-#: src/core/app.c:661
+#: src/core/app.c:688
 #, c-format
 msgid "%d-minute sprint started. Happy writing!"
 msgstr "%d 分钟冲刺已开始。写作愉快！"
 
-#: src/core/app.c:664
+#: src/core/app.c:691
 msgid "Hemingway mode: deleting is disabled"
 msgstr "海明威模式：已禁用删除"
 
-#: src/core/app.c:664
+#: src/core/app.c:691
 msgid "Hemingway mode off"
 msgstr "海明威模式已关闭"
 
-#: src/core/app.c:665
+#: src/core/app.c:692
 msgid "Markup hidden outside the current paragraph"
 msgstr "当前段落以外的标记已隐藏"
 
-#: src/core/app.c:665
+#: src/core/app.c:692
 msgid "Markup always visible"
 msgstr "标记始终可见"
 
-#: src/core/app.c:666
+#: src/core/app.c:693
 msgid "Smart typography on (— “ ” …)"
 msgstr "智能排版已开启（— “ ” …）"
 
-#: src/core/app.c:666
+#: src/core/app.c:693
 msgid "Smart typography off"
 msgstr "智能排版已关闭"
 
-#: src/core/app.c:678
+#: src/core/app.c:705
 #, c-format
 msgid "Page %s"
 msgstr "页面：%s"
 
-#: src/core/app.c:686 src/core/editor.c:708 src/core/preview.c:251
+#: src/core/app.c:713 src/core/editor.c:757 src/core/preview.c:252
 msgid "This is the last chapter"
 msgstr "这是最后一章"
 
-#: src/core/app.c:703
+#: src/core/app.c:730
 msgid "Mouse and touchpad off: keyboard only (Ctrl+K → Mouse turns them back on)"
 msgstr "鼠标和触摸板已关闭：仅用键盘（Ctrl+K → 鼠标 可重新开启）"
 
-#: src/core/app.c:703
+#: src/core/app.c:730
 msgid "Mouse and touchpad on"
 msgstr "鼠标和触摸板已开启"
 
-#: src/core/app.c:714
+#: src/core/app.c:741
 msgid "Could not read the language file"
 msgstr "无法读取语言文件"
 
-#: src/core/app.c:718
+#: src/core/app.c:745
 #, c-format
 msgid "This language needs fonts (%s) that are missing from %s. Copy FolioOS.zip to the USB drive again."
 msgstr "此语言需要的字体（%s）在 %s 中缺失。请重新将 FolioOS.zip 复制到 U 盘。"
 
-#: src/core/app.c:731
+#: src/core/app.c:758
 msgid "New document"
 msgstr "新建文档"
 
-#: src/core/app.c:731 src/core/app.c:869
+#: src/core/app.c:758 src/core/app.c:896
 msgid "Ctrl+N"
 msgstr "Ctrl+N"
 
-#: src/core/app.c:732
+#: src/core/app.c:759
 msgid "Tabs: several documents (on/off)"
 msgstr "标签页：多个文档（开/关）"
 
-#: src/core/app.c:733
+#: src/core/app.c:760
 msgid "Close tab"
 msgstr "关闭标签页"
 
-#: src/core/app.c:733
+#: src/core/app.c:760
 msgid "Ctrl+W"
 msgstr "Ctrl+W"
 
-#: src/core/app.c:734
+#: src/core/app.c:761
 msgid "Next tab"
 msgstr "下一个标签页"
 
-#: src/core/app.c:734
+#: src/core/app.c:761
 msgid "Ctrl+Tab"
 msgstr "Ctrl+Tab"
 
-#: src/core/app.c:735
+#: src/core/app.c:762
 msgid "Previous tab"
 msgstr "上一个标签页"
 
-#: src/core/app.c:735
+#: src/core/app.c:762
 msgid "Ctrl+Shift+Tab"
 msgstr "Ctrl+Shift+Tab"
 
-#: src/core/app.c:736
+#: src/core/app.c:763
 msgid "Create a custom theme (colors and fonts)"
 msgstr "创建自定义主题（颜色和字体）"
 
-#: src/core/app.c:737
+#: src/core/app.c:764
 msgid "Edit the current theme"
 msgstr "编辑当前主题"
 
-#: src/core/app.c:738 src/core/app.c:869
+#: src/core/app.c:765 src/core/app.c:896
 msgid "Open…"
 msgstr "打开…"
 
-#: src/core/app.c:738 src/core/app.c:869
+#: src/core/app.c:765 src/core/app.c:896
 msgid "Ctrl+O"
 msgstr "Ctrl+O"
 
-#: src/core/app.c:739 src/core/app.c:870
+#: src/core/app.c:766 src/core/app.c:897
 msgid "Ctrl+S"
 msgstr "Ctrl+S"
 
-#: src/core/app.c:740 src/core/app.c:870
+#: src/core/app.c:767 src/core/app.c:897
 msgid "Save as / Export…"
 msgstr "另存为 / 导出…"
 
-#: src/core/app.c:740 src/core/app.c:870 src/core/app.c:1576
+#: src/core/app.c:767 src/core/app.c:897 src/core/app.c:1603
 msgid "Ctrl+Shift+S"
 msgstr "Ctrl+Shift+S"
 
-#: src/core/app.c:741
+#: src/core/app.c:768
 msgid "Reading mode (formatted Markdown)"
 msgstr "阅读模式（格式化的 Markdown）"
 
-#: src/core/app.c:741 src/core/app.c:1578
+#: src/core/app.c:768 src/core/app.c:1605
 msgid "Ctrl+P"
 msgstr "Ctrl+P"
 
-#: src/core/app.c:742
+#: src/core/app.c:769
 msgid "Reading auto-scroll (on/off)"
 msgstr "阅读时自动滚动（开/关）"
 
-#: src/core/app.c:742 src/core/app.c:1585
+#: src/core/app.c:769 src/core/app.c:1612
 msgid "Enter (reading)"
 msgstr "Enter（阅读）"
 
-#: src/core/app.c:743
+#: src/core/app.c:770
 msgid "Next chapter"
 msgstr "下一章"
 
-#: src/core/app.c:743
+#: src/core/app.c:770
 msgid "Ctrl+PgDn"
 msgstr "Ctrl+PgDn"
 
-#: src/core/app.c:744
+#: src/core/app.c:771
 msgid "Previous chapter"
 msgstr "上一章"
 
-#: src/core/app.c:744
+#: src/core/app.c:771
 msgid "Ctrl+PgUp"
 msgstr "Ctrl+PgUp"
 
-#: src/core/app.c:745
+#: src/core/app.c:772
 msgid "Go to the last edit"
 msgstr "转到上次编辑处"
 
-#: src/core/app.c:745 src/core/app.c:1583
+#: src/core/app.c:772 src/core/app.c:1610
 msgid "Ctrl+J"
 msgstr "Ctrl+J"
 
-#: src/core/app.c:746 src/core/app.c:1582
+#: src/core/app.c:773 src/core/app.c:1609
 msgid "Duplicate paragraph"
 msgstr "复制段落"
 
-#: src/core/app.c:746 src/core/app.c:1582
+#: src/core/app.c:773 src/core/app.c:1609
 msgid "Ctrl+D"
 msgstr "Ctrl+D"
 
-#: src/core/app.c:747 src/core/app.c:1582
+#: src/core/app.c:774 src/core/app.c:1609
 msgid "Delete paragraph"
 msgstr "删除段落"
 
-#: src/core/app.c:747 src/core/app.c:1582
+#: src/core/app.c:774 src/core/app.c:1609
 msgid "Ctrl+Shift+K"
 msgstr "Ctrl+Shift+K"
 
-#: src/core/app.c:748
+#: src/core/app.c:775
 msgid "Change case"
 msgstr "大小写"
 
-#: src/core/app.c:748 src/core/app.c:1584
+#: src/core/app.c:775 src/core/app.c:1611
 msgid "Shift+F3"
 msgstr "Shift+F3"
 
-#: src/core/app.c:749
+#: src/core/app.c:776
 msgid "Insert today's date"
 msgstr "插入今天的日期"
 
-#: src/core/app.c:750
+#: src/core/app.c:777
 msgid "Focus mode (sentence / paragraph / line)"
 msgstr "专注模式（句子 / 段落 / 行）"
 
-#: src/core/app.c:751
+#: src/core/app.c:778
 msgid "Typewriter (centered line)"
 msgstr "打字机（行居中）"
 
-#: src/core/app.c:752
+#: src/core/app.c:779
 msgid "Zen mode (no bars)"
 msgstr "禅模式（无工具栏）"
 
-#: src/core/app.c:753 src/core/app.c:881 src/core/app.c:1579
+#: src/core/app.c:780 src/core/app.c:908 src/core/app.c:1606
 msgid "Ctrl+F"
 msgstr "Ctrl+F"
 
-#: src/core/app.c:754
+#: src/core/app.c:781
 msgid "Document outline"
 msgstr "文档大纲"
 
-#: src/core/app.c:755
+#: src/core/app.c:782
 msgid "Appearance: themes and typography"
 msgstr "外观：主题和排版"
 
-#: src/core/app.c:756 src/core/app.c:1588
+#: src/core/app.c:783 src/core/app.c:1615
 msgid "Next theme"
 msgstr "下一个主题"
 
-#: src/core/app.c:756 src/core/app.c:1588
+#: src/core/app.c:783 src/core/app.c:1615
 msgid "Ctrl+T"
 msgstr "Ctrl+T"
 
-#: src/core/app.c:757
+#: src/core/app.c:784
 msgid "Next font"
 msgstr "下一个字体"
 
-#: src/core/app.c:757
+#: src/core/app.c:784
 msgid "Ctrl+Shift+T"
 msgstr "Ctrl+Shift+T"
 
-#: src/core/app.c:758
+#: src/core/app.c:785
 msgid "Larger text"
 msgstr "放大文字"
 
-#: src/core/app.c:758
+#: src/core/app.c:785
 msgid "Ctrl+="
 msgstr "Ctrl+="
 
-#: src/core/app.c:759
+#: src/core/app.c:786
 msgid "Smaller text"
 msgstr "缩小文字"
 
-#: src/core/app.c:759
+#: src/core/app.c:786
 msgid "Ctrl+-"
 msgstr "Ctrl+-"
 
-#: src/core/app.c:760
+#: src/core/app.c:787
 msgid "Page or full screen (text width)"
 msgstr "页面或全屏（文字宽度）"
 
-#: src/core/app.c:761
+#: src/core/app.c:788
 msgid "Page size: narrow · medium · wide · extra"
 msgstr "页面大小：窄 · 中 · 宽 · 特宽"
 
-#: src/core/app.c:762
+#: src/core/app.c:789
 msgid "Paper sheet (show/hide)"
 msgstr "纸张（显示/隐藏）"
 
-#: src/core/app.c:763 src/core/app.c:884
+#: src/core/app.c:790 src/core/app.c:911
 msgid "Writing settings"
 msgstr "写作设置"
 
-#: src/core/app.c:764
+#: src/core/app.c:791
 msgid "Music: play / pause"
 msgstr "音乐：播放 / 暂停"
 
-#: src/core/app.c:765
+#: src/core/app.c:792
 msgid "Music: next track"
 msgstr "音乐：下一首"
 
-#: src/core/app.c:766
+#: src/core/app.c:793
 msgid "Music: previous track"
 msgstr "音乐：上一首"
 
-#: src/core/app.c:767 src/core/app.c:1591
+#: src/core/app.c:794 src/core/app.c:1618
 msgid "Music player"
 msgstr "音乐播放器"
 
-#: src/core/app.c:768
+#: src/core/app.c:795
 msgid "Sound test (chime)"
 msgstr "声音测试（铃声）"
 
-#: src/core/app.c:769
+#: src/core/app.c:796
 msgid "Start / stop writing sprint"
 msgstr "开始 / 停止写作冲刺"
 
-#: src/core/app.c:771
+#: src/core/app.c:798
 msgid "Hemingway mode (no deleting)"
 msgstr "海明威模式（不可删除）"
 
-#: src/core/app.c:772
+#: src/core/app.c:799
 msgid "Hide markup outside the paragraph"
 msgstr "隐藏段落以外的标记"
 
-#: src/core/app.c:773
+#: src/core/app.c:800
 msgid "Smart typography (— “ ” …)"
 msgstr "智能排版（— “ ” …）"
 
-#: src/core/app.c:775 src/core/app.c:1586
+#: src/core/app.c:802 src/core/app.c:1613
 msgid "Menu and recent documents"
 msgstr "菜单和最近的文档"
 
-#: src/core/app.c:775 src/core/app.c:1586
+#: src/core/app.c:802 src/core/app.c:1613
 msgid "Alt+M"
 msgstr "Alt+M"
 
-#: src/core/app.c:776
+#: src/core/app.c:803
 msgid "Keyboard focus: text or the next window"
 msgstr "键盘焦点：文本或下一个窗口"
 
-#: src/core/app.c:776 src/core/app.c:1596
+#: src/core/app.c:803 src/core/app.c:1623
 msgid "Ctrl+F6"
 msgstr "Ctrl+F6"
 
-#: src/core/app.c:777
+#: src/core/app.c:804
 msgid "Mouse and touchpad (on/off)"
 msgstr "鼠标和触摸板（开/关）"
 
-#: src/core/app.c:778 src/core/app.c:1598
+#: src/core/app.c:805 src/core/app.c:1625
 msgid "Input method on/off (Korean, Japanese)"
 msgstr "输入法 开/关（韩语、日语）"
 
-#: src/core/app.c:778 src/core/app.c:1598
+#: src/core/app.c:805 src/core/app.c:1625
 msgid "Ctrl+Space"
 msgstr "Ctrl+空格"
 
-#: src/core/app.c:779
+#: src/core/app.c:806
 msgid "Language and keyboard"
 msgstr "语言和键盘"
 
-#: src/core/app.c:780
+#: src/core/app.c:807
 msgid "Restart the computer"
 msgstr "重新启动电脑"
 
-#: src/core/app.c:781
+#: src/core/app.c:808
 msgid "Shut down the computer"
 msgstr "关闭电脑"
 
-#: src/core/app.c:781 src/core/app.c:887 src/core/app.c:1594
+#: src/core/app.c:808 src/core/app.c:914 src/core/app.c:1621
 msgid "Ctrl+Q"
 msgstr "Ctrl+Q"
 
-#: src/core/app.c:803
+#: src/core/app.c:830
 msgid "Type a command…"
 msgstr "输入命令…"
 
-#: src/core/app.c:834
+#: src/core/app.c:861
 msgid "No command found"
 msgstr "未找到命令"
 
-#: src/core/app.c:860
+#: src/core/app.c:887
 msgid "File not found (a different USB drive?)"
 msgstr "找不到文件（换了一个 U 盘？）"
 
-#: src/core/app.c:868
+#: src/core/app.c:895
 msgid "DOCUMENT"
 msgstr "文档"
 
-#: src/core/app.c:869
+#: src/core/app.c:896
 msgid "New"
 msgstr "新建"
 
-#: src/core/app.c:876
+#: src/core/app.c:903
 msgid "RECENT"
 msgstr "最近"
 
-#: src/core/app.c:880
+#: src/core/app.c:907
 msgid "WRITING"
 msgstr "写作"
 
-#: src/core/app.c:882
+#: src/core/app.c:909
 msgid "Session, goals and sprint"
 msgstr "会话、目标和冲刺"
 
-#: src/core/app.c:883
+#: src/core/app.c:910
 msgid "PREFERENCES"
 msgstr "偏好设置"
 
-#: src/core/app.c:884 src/core/app.c:967 src/core/app.c:1593
+#: src/core/app.c:911 src/core/app.c:994 src/core/app.c:1620
 msgid "Appearance"
 msgstr "外观"
 
-#: src/core/app.c:887 src/core/app.c:1167 src/core/app.c:1594
+#: src/core/app.c:914 src/core/app.c:1194 src/core/app.c:1621
 msgid "Shut down"
 msgstr "关机"
 
-#: src/core/app.c:951
+#: src/core/app.c:978
 #, c-format
 msgid "Diagnostics saved to %s"
 msgstr "诊断信息已保存到 %s"
 
-#: src/core/app.c:951
+#: src/core/app.c:978
 msgid "Could not save the diagnostics"
 msgstr "无法保存诊断信息"
 
-#: src/core/app.c:961
+#: src/core/app.c:988
 msgid "Display restored: automatic resolution and rotation"
 msgstr "显示已恢复：自动分辨率和旋转"
 
-#: src/core/app.c:967
+#: src/core/app.c:994
 msgid "Writing"
 msgstr "写作"
 
-#: src/core/app.c:967
+#: src/core/app.c:994
 msgid "System"
 msgstr "系统"
 
-#: src/core/app.c:977
+#: src/core/app.c:1004
 msgid "THEMES"
 msgstr "主题"
 
-#: src/core/app.c:984
+#: src/core/app.c:1011
 msgid "+  Create my theme"
 msgstr "+  创建我的主题"
 
-#: src/core/app.c:985
+#: src/core/app.c:1012
 msgid "Edit this theme"
 msgstr "编辑此主题"
 
-#: src/core/app.c:987
+#: src/core/app.c:1014
 #, c-format
 msgid "Mix colors and fonts; themes are saved in %s (editable .INI files)."
 msgstr "自由搭配颜色和字体；主题保存在 %s（可编辑的 .INI 文件）。"
 
-#: src/core/app.c:989
+#: src/core/app.c:1016
 msgid "TEXT FONT"
 msgstr "正文字体"
 
-#: src/core/app.c:998
+#: src/core/app.c:1025
 msgid "The quick brown fox jumps — “Hello!”"
 msgstr "天地玄黄，宇宙洪荒 — “你好！”"
 
-#: src/core/app.c:1004
+#: src/core/app.c:1031
 #, c-format
 msgid "Add .ttf fonts to %s (subfolders work too) and restart."
 msgstr "将 .ttf 字体放入 %s（子文件夹也可以）然后重启。"
 
-#: src/core/app.c:1005
+#: src/core/app.c:1032
 msgid "Included writing fonts: Literata, Lora, EB Garamond, iA Writer, Special Elite and more."
 msgstr "已附带写作字体：Literata、Lora、EB Garamond、iA Writer、Special Elite 等。"
 
-#: src/core/app.c:1007
+#: src/core/app.c:1034
 msgid "TYPOGRAPHY"
 msgstr "排版"
 
-#: src/core/app.c:1008
+#: src/core/app.c:1035
 #, c-format
 msgid "%d px"
 msgstr "%d px"
 
-#: src/core/app.c:1009
+#: src/core/app.c:1036
 msgid "Text size"
 msgstr "文字大小"
 
-#: src/core/app.c:1012
+#: src/core/app.c:1039
 msgid "Line spacing"
 msgstr "行距"
 
-#: src/core/app.c:1014
+#: src/core/app.c:1041
 #, c-format
 msgid "%.2f lines"
 msgstr "%.2f 行"
 
-#: src/core/app.c:1015
+#: src/core/app.c:1042
 msgid "Space between paragraphs"
 msgstr "段落间距"
 
-#: src/core/app.c:1017
+#: src/core/app.c:1044
 msgid "First-line indent for paragraphs (book style)"
 msgstr "段首缩进（书籍样式）"
 
-#: src/core/app.c:1019
+#: src/core/app.c:1046
 msgid "PAGE"
 msgstr "页面"
 
-#: src/core/app.c:1021
+#: src/core/app.c:1048
 msgid "Page"
 msgstr "页面"
 
-#: src/core/app.c:1021
+#: src/core/app.c:1048
 msgid "Full screen"
 msgstr "全屏"
 
-#: src/core/app.c:1030
+#: src/core/app.c:1057
 #, c-format
 msgid "%d px (~%d characters per line)"
 msgstr "%d px（每行约 %d 个字符）"
 
-#: src/core/app.c:1031
+#: src/core/app.c:1058
 msgid "Page width"
 msgstr "页面宽度"
 
-#: src/core/app.c:1033
+#: src/core/app.c:1060
 msgid "Paper sheet on the desk (light themes)"
 msgstr "桌面上的纸张（浅色主题）"
 
-#: src/core/app.c:1036
+#: src/core/app.c:1063
 msgid "The text fills the whole screen width, with no sheet."
 msgstr "文字占满整个屏幕宽度，没有纸张。"
 
-#: src/core/app.c:1040
+#: src/core/app.c:1067
 msgid "FOCUS MODE"
 msgstr "专注模式"
 
-#: src/core/app.c:1041
+#: src/core/app.c:1068
 msgid "Off"
 msgstr "关"
 
-#: src/core/app.c:1041
+#: src/core/app.c:1068
 msgid "Sentence"
 msgstr "句子"
 
-#: src/core/app.c:1041
+#: src/core/app.c:1068
 msgid "Paragraph"
 msgstr "段落"
 
-#: src/core/app.c:1041
+#: src/core/app.c:1068
 msgid "Line"
 msgstr "行"
 
-#: src/core/app.c:1044
+#: src/core/app.c:1071
 msgid "EDITOR"
 msgstr "编辑器"
 
-#: src/core/app.c:1046
+#: src/core/app.c:1073
 msgid "Typewriter — current line in the center"
 msgstr "打字机——当前行居中"
 
-#: src/core/app.c:1047
+#: src/core/app.c:1074
 msgid "Live Markdown (headings, bold, lists)"
 msgstr "实时 Markdown（标题、粗体、列表）"
 
-#: src/core/app.c:1048
+#: src/core/app.c:1075
 msgid "Hide markup outside the current paragraph"
 msgstr "隐藏当前段落以外的标记"
 
-#: src/core/app.c:1049
+#: src/core/app.c:1076
 msgid "Smart typography:  --  →  —   \"\"  →  “”   ...  →  …"
 msgstr "智能排版：  --  →  —   \"\"  →  “”   ...  →  …"
 
-#: src/core/app.c:1050
+#: src/core/app.c:1077
 msgid "Hemingway mode — deleting is not allowed"
 msgstr "海明威模式——不允许删除"
 
-#: src/core/app.c:1051
+#: src/core/app.c:1078
 msgid "Hide the bars while writing"
 msgstr "写作时隐藏工具栏"
 
-#: src/core/app.c:1052
+#: src/core/app.c:1079
 msgid "Blinking cursor"
 msgstr "光标闪烁"
 
-#: src/core/app.c:1053
+#: src/core/app.c:1080
 msgid "Smooth cursor movement"
 msgstr "光标平滑移动"
 
-#: src/core/app.c:1060
+#: src/core/app.c:1087
 msgid "Tabs — several open documents, remembered after a restart"
 msgstr "标签页——可同时打开多个文档，重启后仍会保留"
 
-#: src/core/app.c:1063
+#: src/core/app.c:1090
 msgid "GOALS AND SAVING"
 msgstr "目标与保存"
 
-#: src/core/app.c:1064 src/core/app.c:1536 src/core/app.c:1788
+#: src/core/app.c:1091 src/core/app.c:1563 src/core/app.c:1815
 #, c-format
 msgid "%d word"
 msgid_plural "%d words"
 msgstr[0] "%d 字"
 
-#: src/core/app.c:1065
+#: src/core/app.c:1092
 msgid "Session goal"
 msgstr "本次会话目标"
 
-#: src/core/app.c:1067 src/core/app.c:1538 src/core/app.c:1753
+#: src/core/app.c:1094 src/core/app.c:1565 src/core/app.c:1780
 #, c-format
 msgid "%d min"
 msgstr "%d 分钟"
 
-#: src/core/app.c:1068
+#: src/core/app.c:1095
 msgid "Sprint length"
 msgstr "冲刺时长"
 
-#: src/core/app.c:1070
+#: src/core/app.c:1097
 #, c-format
 msgid "every %d s"
 msgstr "每 %d 秒"
 
-#: src/core/app.c:1071
+#: src/core/app.c:1098
 msgid "Autosave"
 msgstr "自动保存"
 
-#: src/core/app.c:1074
+#: src/core/app.c:1101
 msgid "LANGUAGE AND KEYBOARD"
 msgstr "语言和键盘"
 
-#: src/core/app.c:1077
+#: src/core/app.c:1104
 msgid "Language"
 msgstr "语言"
 
-#: src/core/app.c:1082
+#: src/core/app.c:1109
 msgid "Keyboard"
 msgstr "键盘"
 
-#: src/core/app.c:1091
+#: src/core/app.c:1118
 #, c-format
 msgid "Languages: %s · keyboards: %s (text files anyone can add)"
 msgstr "语言：%s · 键盘：%s（任何人都能添加的文本文件）"
 
-#: src/core/app.c:1095
+#: src/core/app.c:1122
 msgid "DISPLAY AND POINTER"
 msgstr "显示与指针"
 
-#: src/core/app.c:1096
+#: src/core/app.c:1123
 msgid "Auto"
 msgstr "自动"
 
-#: src/core/app.c:1101
+#: src/core/app.c:1128
 msgid "Rotate: auto"
 msgstr "旋转：自动"
 
-#: src/core/app.c:1109
+#: src/core/app.c:1136
 #, c-format
 msgid "Resolution: %dx%d"
 msgstr "分辨率：%dx%d"
 
-#: src/core/app.c:1110
+#: src/core/app.c:1137
 #, c-format
 msgid "Resolution: automatic (%dx%d)"
 msgstr "分辨率：自动（%dx%d）"
 
-#: src/core/app.c:1120
+#: src/core/app.c:1147
 msgid "Restore display"
 msgstr "恢复显示"
 
-#: src/core/app.c:1122
+#: src/core/app.c:1149
 msgid "If the picture looks wrong or goes black: Ctrl+Alt+Home restores it; Ctrl+Alt+arrows rotate the screen."
 msgstr "如果画面异常或黑屏：Ctrl+Alt+Home 可恢复；Ctrl+Alt+方向键可旋转屏幕。"
 
-#: src/core/app.c:1126
+#: src/core/app.c:1153
 msgid "Mouse / touchpad speed"
 msgstr "鼠标 / 触控板速度"
 
-#: src/core/app.c:1128
+#: src/core/app.c:1155
 msgid "Automatic"
 msgstr "自动"
 
-#: src/core/app.c:1128
+#: src/core/app.c:1155
 msgid "Touchpad"
 msgstr "触控板"
 
-#: src/core/app.c:1128
+#: src/core/app.c:1155
 msgid "Touch screen"
 msgstr "触摸屏"
 
-#: src/core/app.c:1131
+#: src/core/app.c:1158
 msgid "If the pointer jumps to the corners when you use the touchpad, choose Touchpad."
 msgstr "如果使用触控板时指针跳到角落，请选择“触控板”。"
 
-#: src/core/app.c:1134
+#: src/core/app.c:1161
 msgid "Use the mouse and touchpad (off = keyboard only)"
 msgstr "使用鼠标和触摸板（关闭 = 仅用键盘）"
 
-#: src/core/app.c:1136
+#: src/core/app.c:1163
 msgid "SOUND"
 msgstr "声音"
 
-#: src/core/app.c:1137
+#: src/core/app.c:1164
 msgid "Turn on the amplifier through GPIO (some laptops; applies after a restart)"
 msgstr "通过 GPIO 打开功放（部分笔记本；重启后生效）"
 
-#: src/core/app.c:1139
+#: src/core/app.c:1166
 msgid "Test sound"
 msgstr "测试声音"
 
-#: src/core/app.c:1140
+#: src/core/app.c:1167
 msgid "Save diagnostics"
 msgstr "保存诊断信息"
 
-#: src/core/app.c:1142
+#: src/core/app.c:1169
 #, c-format
 msgid "The diagnostics go to %s on the USB drive (it opens on any computer)."
 msgstr "诊断信息会保存到 U 盘上的 %s（任何电脑都能打开）。"
 
-#: src/core/app.c:1144
+#: src/core/app.c:1171
 msgid "STARTUP"
 msgstr "启动"
 
-#: src/core/app.c:1145
+#: src/core/app.c:1172
 msgid "FolioOS splash screen"
 msgstr "FolioOS 启动画面"
 
-#: src/core/app.c:1150
+#: src/core/app.c:1177
 msgid "Splash duration (any key skips it)"
 msgstr "启动画面时长（按任意键可跳过）"
 
-#: src/core/app.c:1156
+#: src/core/app.c:1183
 msgid "ABOUT"
 msgstr "关于"
 
-#: src/core/app.c:1159
+#: src/core/app.c:1186
 #, c-format
 msgid "FolioOS %s · %s · %dx%d"
 msgstr "FolioOS %s · %s · %dx%d"
 
-#: src/core/app.c:1160
+#: src/core/app.c:1187
 #, c-format
 msgid "Memory: %d MB used of %d MB · %d fonts · %d themes"
 msgstr "内存：已用 %d MB / 共 %d MB · %d 种字体 · %d 个主题"
 
-#: src/core/app.c:1161
+#: src/core/app.c:1188
 #, c-format
 msgid "Audio: %s"
 msgstr "音频：%s"
 
-#: src/core/app.c:1166
+#: src/core/app.c:1193
 msgid "Restart"
 msgstr "重新启动"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1213
 msgid "Desk (background)"
 msgstr "桌面（背景）"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1213
 msgid "Paper"
 msgstr "纸张"
 
-#: src/core/app.c:1186 src/core/app.c:1387
+#: src/core/app.c:1213 src/core/app.c:1414
 msgid "Text"
 msgstr "文字"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1213
 msgid "Faded text"
 msgstr "淡化文字"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1213
 msgid "Subtle lines"
 msgstr "细线"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1213
 msgid "Accent"
 msgstr "强调色"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1213
 msgid "Selection"
 msgstr "选区"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1213
 msgid "Cursor"
 msgstr "光标"
 
-#: src/core/app.c:1187
+#: src/core/app.c:1214
 msgid "Bars"
 msgstr "工具栏"
 
-#: src/core/app.c:1187
+#: src/core/app.c:1214
 msgid "Bar text"
 msgstr "工具栏文字"
 
-#: src/core/app.c:1187
+#: src/core/app.c:1214
 msgid "Borders"
 msgstr "边框"
 
-#: src/core/app.c:1187
+#: src/core/app.c:1214
 msgid "Panels"
 msgstr "面板"
 
-#: src/core/app.c:1187
+#: src/core/app.c:1214
 msgid "Panel text"
 msgstr "面板文字"
 
-#: src/core/app.c:1187
+#: src/core/app.c:1214
 msgid "Headings"
 msgstr "标题"
 
-#: src/core/app.c:1187
+#: src/core/app.c:1214
 msgid "Code background"
 msgstr "代码背景"
 
-#: src/core/app.c:1187
+#: src/core/app.c:1214
 msgid "Highlighter"
 msgstr "荧光笔"
 
-#: src/core/app.c:1221
+#: src/core/app.c:1248
 msgid "My theme"
 msgstr "我的主题"
 
-#: src/core/app.c:1222
+#: src/core/app.c:1249
 #, c-format
 msgid "My theme %d"
 msgstr "我的主题 %d"
 
-#: src/core/app.c:1245
+#: src/core/app.c:1272
 msgid "Give the theme a name"
 msgstr "给主题起个名字"
 
-#: src/core/app.c:1247
+#: src/core/app.c:1274
 msgid "That name belongs to a built-in theme — choose another"
 msgstr "这是内置主题的名字——请换一个"
 
-#: src/core/app.c:1248
+#: src/core/app.c:1275
 msgid "You already have a theme with that name"
 msgstr "你已经有同名的主题了"
 
-#: src/core/app.c:1251
+#: src/core/app.c:1278
 #, c-format
 msgid "Could not write to %s (is the USB drive write-protected or full?)"
 msgstr "无法写入 %s（U 盘是否写保护或已满？）"
 
-#: src/core/app.c:1256
+#: src/core/app.c:1283
 #, c-format
 msgid "Theme “%s” saved to %s"
 msgstr "主题“%s”已保存到 %s"
 
-#: src/core/app.c:1268
+#: src/core/app.c:1295
 msgid "Theme deleted"
 msgstr "主题已删除"
 
-#: src/core/app.c:1299
+#: src/core/app.c:1326
 msgid "THEME NAME"
 msgstr "主题名称"
 
-#: src/core/app.c:1300
+#: src/core/app.c:1327
 msgid "Theme name"
 msgstr "主题名称"
 
-#: src/core/app.c:1303
+#: src/core/app.c:1330
 msgid "STARTING POINT"
 msgstr "起点"
 
-#: src/core/app.c:1306
+#: src/core/app.c:1333
 msgid "Colors from"
 msgstr "颜色来自"
 
-#: src/core/app.c:1308
+#: src/core/app.c:1335
 msgid "Use all"
 msgstr "全部使用"
 
-#: src/core/app.c:1315
+#: src/core/app.c:1342
 msgid "Or mix: pick a color below and take it from any built-in theme."
 msgstr "或者自由搭配：在下方选一种颜色，从任意内置主题中取用。"
 
-#: src/core/app.c:1319
+#: src/core/app.c:1346
 msgid "COLORS"
 msgstr "颜色"
 
-#: src/core/app.c:1348
+#: src/core/app.c:1375
 msgid "hex code"
 msgstr "十六进制代码"
 
-#: src/core/app.c:1352
+#: src/core/app.c:1379
 msgid "Hue"
 msgstr "色相"
 
-#: src/core/app.c:1355
+#: src/core/app.c:1382
 msgid "Saturation"
 msgstr "饱和度"
 
-#: src/core/app.c:1358
+#: src/core/app.c:1385
 msgid "Lightness"
 msgstr "亮度"
 
-#: src/core/app.c:1362
+#: src/core/app.c:1389
 msgid "Take from a built-in theme:"
 msgstr "从内置主题中取色："
 
-#: src/core/app.c:1385
+#: src/core/app.c:1412
 msgid "THEME FONTS"
 msgstr "主题字体"
 
-#: src/core/app.c:1392
+#: src/core/app.c:1419
 #, c-format
 msgid "Default (%s)"
 msgstr "默认（%s）"
 
-#: src/core/app.c:1393
+#: src/core/app.c:1420
 msgid "Interface"
 msgstr "界面"
 
-#: src/core/app.c:1401
+#: src/core/app.c:1428
 msgid "Interface = bars, menus and windows."
 msgstr "界面 = 工具栏、菜单和窗口。"
 
-#: src/core/app.c:1405
+#: src/core/app.c:1432
 msgid "DESK AND PAPER"
 msgstr "桌面与纸张"
 
-#: src/core/app.c:1406
+#: src/core/app.c:1433
 msgid "Paper sheet on the desk"
 msgstr "桌面上的纸张"
 
-#: src/core/app.c:1410
+#: src/core/app.c:1437
 msgid "Vignette at the desk edges"
 msgstr "桌面边缘暗角"
 
-#: src/core/app.c:1421
+#: src/core/app.c:1448
 msgid "Save theme"
 msgstr "保存主题"
 
-#: src/core/app.c:1422 src/core/filedlg.c:60 src/core/filedlg.c:73 src/core/filedlg.c:408 src/core/filedlg.c:439
+#: src/core/app.c:1449 src/core/filedlg.c:60 src/core/filedlg.c:73 src/core/filedlg.c:410 src/core/filedlg.c:441
 msgid "Cancel"
 msgstr "取消"
 
-#: src/core/app.c:1423 src/core/app.c:1424 src/core/filedlg.c:57 src/core/filedlg.c:313 src/core/filedlg.c:316 src/core/filedlg.c:316
+#: src/core/app.c:1450 src/core/app.c:1451 src/core/filedlg.c:57 src/core/filedlg.c:314 src/core/filedlg.c:317 src/core/filedlg.c:317
 msgid "Delete"
 msgstr "删除"
 
-#: src/core/app.c:1424
+#: src/core/app.c:1451
 msgid "Delete theme?"
 msgstr "删除主题？"
 
-#: src/core/app.c:1424
+#: src/core/app.c:1451
 #, c-format
 msgid "The theme file in %s will be deleted."
 msgstr "%s 中的主题文件将被删除。"
 
-#: src/core/app.c:1431
+#: src/core/app.c:1458
 msgid "Find"
 msgstr "查找"
 
-#: src/core/app.c:1432
+#: src/core/app.c:1459
 msgid "Previous (Shift+Enter)"
 msgstr "上一个（Shift+Enter）"
 
-#: src/core/app.c:1433
+#: src/core/app.c:1460
 msgid "Next (Enter)"
 msgstr "下一个（Enter）"
 
-#: src/core/app.c:1434
+#: src/core/app.c:1461
 msgid "Replace with"
 msgstr "替换为"
 
-#: src/core/app.c:1436 src/core/filedlg.c:203
+#: src/core/app.c:1463 src/core/filedlg.c:204
 msgid "Replace"
 msgstr "替换"
 
-#: src/core/app.c:1437
+#: src/core/app.c:1464
 msgid "Replace all"
 msgstr "全部替换"
 
-#: src/core/app.c:1439
+#: src/core/app.c:1466
 #, c-format
 msgid "%d replacement"
 msgid_plural "%d replacements"
 msgstr[0] "已替换 %d 处"
 
-#: src/core/app.c:1446
+#: src/core/app.c:1473
 msgid "Nothing found"
 msgstr "未找到任何内容"
 
-#: src/core/app.c:1453
+#: src/core/app.c:1480
 #, c-format
 msgid "%d match"
 msgid_plural "%d matches"
 msgstr[0] "%d 处匹配"
 
-#: src/core/app.c:1491
+#: src/core/app.c:1518
 msgid "(untitled)"
 msgstr "（未命名）"
 
-#: src/core/app.c:1500
+#: src/core/app.c:1527
 msgid "No headings yet."
 msgstr "还没有标题。"
 
-#: src/core/app.c:1501
+#: src/core/app.c:1528
 msgid "Start a line with # to create chapters."
 msgstr "以 # 开头的行会成为章节。"
 
-#: src/core/app.c:1530
+#: src/core/app.c:1557
 #, c-format
 msgid "goal of %d reached"
 msgstr "已达成 %d 字目标"
 
-#: src/core/app.c:1530
+#: src/core/app.c:1557
 #, c-format
 msgid "of %d words today"
 msgstr "/ 今日目标 %d 字"
 
-#: src/core/app.c:1531
+#: src/core/app.c:1558
 msgid "words today"
 msgstr "今日字数"
 
-#: src/core/app.c:1536
+#: src/core/app.c:1563
 msgid "This document"
 msgstr "本文档"
 
-#: src/core/app.c:1537
+#: src/core/app.c:1564
 msgid "This session"
 msgstr "本次会话"
 
-#: src/core/app.c:1537
+#: src/core/app.c:1564
 #, c-format
 msgid "+%d in %dh%02d"
 msgstr "%2$d 小时 %3$02d 分内 +%1$d"
 
-#: src/core/app.c:1538
+#: src/core/app.c:1565
 msgid "Estimated reading"
 msgstr "预计阅读时间"
 
-#: src/core/app.c:1539
+#: src/core/app.c:1566
 msgid "Pace"
 msgstr "速度"
 
-#: src/core/app.c:1539
+#: src/core/app.c:1566
 #, c-format
 msgid "%d words/h"
 msgstr "每小时 %d 字"
 
-#: src/core/app.c:1550
+#: src/core/app.c:1577
 msgid "15 min"
 msgstr "15 分钟"
 
-#: src/core/app.c:1550
+#: src/core/app.c:1577
 msgid "25 min"
 msgstr "25 分钟"
 
-#: src/core/app.c:1550
+#: src/core/app.c:1577
 msgid "45 min"
 msgstr "45 分钟"
 
-#: src/core/app.c:1550
+#: src/core/app.c:1577
 msgid "60 min"
 msgstr "60 分钟"
 
-#: src/core/app.c:1555
+#: src/core/app.c:1582
 msgid "Start sprint"
 msgstr "开始冲刺"
 
-#: src/core/app.c:1561
+#: src/core/app.c:1588
 #, c-format
 msgid "+%d word in this sprint"
 msgid_plural "+%d words in this sprint"
 msgstr[0] "本次冲刺 +%d 字"
 
-#: src/core/app.c:1564
+#: src/core/app.c:1591
 msgid "Stop sprint"
 msgstr "停止冲刺"
 
-#: src/core/app.c:1576
+#: src/core/app.c:1603
 msgid "Ctrl+N / O / S"
 msgstr "Ctrl+N / O / S"
 
-#: src/core/app.c:1576
+#: src/core/app.c:1603
 msgid "New · Open · Save"
 msgstr "新建 · 打开 · 保存"
 
-#: src/core/app.c:1576 src/core/filedlg.c:123
+#: src/core/app.c:1603 src/core/filedlg.c:122
 msgid "Save as / Export"
 msgstr "另存为 / 导出"
 
-#: src/core/app.c:1577
+#: src/core/app.c:1604
 msgid "Ctrl+W · Ctrl+Tab"
 msgstr "Ctrl+W · Ctrl+Tab"
 
-#: src/core/app.c:1577
+#: src/core/app.c:1604
 msgid "Tabs: close · next"
 msgstr "标签页：关闭 · 下一个"
 
-#: src/core/app.c:1577
+#: src/core/app.c:1604
 msgid "Alt+1…9"
 msgstr "Alt+1…9"
 
-#: src/core/app.c:1577
+#: src/core/app.c:1604
 msgid "Go to tab 1…9"
 msgstr "转到第 1…9 个标签页"
 
-#: src/core/app.c:1578
+#: src/core/app.c:1605
 msgid "Ctrl+K"
 msgstr "Ctrl+K"
 
-#: src/core/app.c:1578
+#: src/core/app.c:1605
 msgid "Command palette"
 msgstr "命令面板"
 
-#: src/core/app.c:1578
+#: src/core/app.c:1605
 msgid "Reading (formatted Markdown)"
 msgstr "阅读（格式化的 Markdown）"
 
-#: src/core/app.c:1579
+#: src/core/app.c:1606
 msgid "Ctrl+Z / Y"
 msgstr "Ctrl+Z / Y"
 
-#: src/core/app.c:1579
+#: src/core/app.c:1606
 msgid "Undo · Redo"
 msgstr "撤销 · 重做"
 
-#: src/core/app.c:1580
+#: src/core/app.c:1607
 msgid "Ctrl+B / I"
 msgstr "Ctrl+B / I"
 
-#: src/core/app.c:1580
+#: src/core/app.c:1607
 msgid "Bold · Italic"
 msgstr "粗体 · 斜体"
 
-#: src/core/app.c:1580
+#: src/core/app.c:1607
 msgid "Ctrl+1…6 / 0"
 msgstr "Ctrl+1…6 / 0"
 
-#: src/core/app.c:1580
+#: src/core/app.c:1607
 msgid "Heading level 1–6 · Text"
 msgstr "1–6 级标题 · 正文"
 
-#: src/core/app.c:1581
+#: src/core/app.c:1608
 msgid "Alt+↑ / ↓"
 msgstr "Alt+↑ / ↓"
 
-#: src/core/app.c:1581
+#: src/core/app.c:1608
 msgid "Move paragraph"
 msgstr "移动段落"
 
-#: src/core/app.c:1581
+#: src/core/app.c:1608
 msgid "Tab / Shift+Tab"
 msgstr "Tab / Shift+Tab"
 
-#: src/core/app.c:1581
+#: src/core/app.c:1608
 msgid "Indent list item"
 msgstr "缩进列表项"
 
-#: src/core/app.c:1583
+#: src/core/app.c:1610
 msgid "Ctrl+PgUp / PgDn"
 msgstr "Ctrl+PgUp / PgDn"
 
-#: src/core/app.c:1583
+#: src/core/app.c:1610
 msgid "Previous · next chapter"
 msgstr "上一章 · 下一章"
 
-#: src/core/app.c:1583
+#: src/core/app.c:1610
 msgid "Jump to and back from the last edit"
 msgstr "在上次编辑处来回跳转"
 
-#: src/core/app.c:1584
+#: src/core/app.c:1611
 msgid "lowercase → Title Case → UPPERCASE"
 msgstr "小写 → 首字母大写 → 全部大写"
 
-#: src/core/app.c:1584
+#: src/core/app.c:1611
 msgid "Select and type ( \" *"
 msgstr "选中后输入 ( \" *"
 
-#: src/core/app.c:1584
+#: src/core/app.c:1611
 msgid "Wraps the selection"
 msgstr "包裹所选内容"
 
-#: src/core/app.c:1585
+#: src/core/app.c:1612
 msgid "← / → · Space (reading)"
 msgstr "← / → · 空格（阅读）"
 
-#: src/core/app.c:1585
+#: src/core/app.c:1612
 msgid "Previous · next page"
 msgstr "上一页 · 下一页"
 
-#: src/core/app.c:1585
+#: src/core/app.c:1612
 msgid "Auto-scroll on/off"
 msgstr "自动滚动 开/关"
 
-#: src/core/app.c:1586
+#: src/core/app.c:1613
 msgid "+ / − (reading)"
 msgstr "+ / −（阅读）"
 
-#: src/core/app.c:1586
+#: src/core/app.c:1613
 msgid "Auto-scroll speed"
 msgstr "自动滚动速度"
 
-#: src/core/app.c:1587
+#: src/core/app.c:1614
 msgid "Ctrl+← / →"
 msgstr "Ctrl+← / →"
 
-#: src/core/app.c:1587
+#: src/core/app.c:1614
 msgid "Previous / next word"
 msgstr "上一个 / 下一个词"
 
-#: src/core/app.c:1587
+#: src/core/app.c:1614
 msgid "Ctrl+Home / End"
 msgstr "Ctrl+Home / End"
 
-#: src/core/app.c:1587
+#: src/core/app.c:1614
 msgid "Start · end of the text"
 msgstr "文本开头 · 结尾"
 
-#: src/core/app.c:1588
+#: src/core/app.c:1615
 msgid "Ctrl+= / -"
 msgstr "Ctrl+= / -"
 
-#: src/core/app.c:1588
+#: src/core/app.c:1615
 msgid "Larger · smaller text"
 msgstr "放大 · 缩小文字"
 
-#: src/core/app.c:1589
+#: src/core/app.c:1616
 msgid "This help"
 msgstr "本帮助"
 
-#: src/core/app.c:1589
+#: src/core/app.c:1616
 msgid "Focus mode (sentence/paragraph/line)"
 msgstr "专注模式（句子/段落/行）"
 
-#: src/core/app.c:1590
+#: src/core/app.c:1617
 msgid "Typewriter"
 msgstr "打字机"
 
-#: src/core/app.c:1590
+#: src/core/app.c:1617
 msgid "Writing sprint"
 msgstr "写作冲刺"
 
-#: src/core/app.c:1592
+#: src/core/app.c:1619
 msgid "F7 / F8 / F9"
 msgstr "F7 / F8 / F9"
 
-#: src/core/app.c:1592
+#: src/core/app.c:1619
 msgid "Previous track · Play/pause · Next"
 msgstr "上一首 · 播放/暂停 · 下一首"
 
-#: src/core/app.c:1593
+#: src/core/app.c:1620
 msgid "Zen mode"
 msgstr "禅模式"
 
-#: src/core/app.c:1594
+#: src/core/app.c:1621
 msgid "Esc"
 msgstr "Esc"
 
-#: src/core/app.c:1594
+#: src/core/app.c:1621
 msgid "Close window · leave zen/reading"
 msgstr "关闭窗口 · 退出禅模式/阅读"
 
-#: src/core/app.c:1595
+#: src/core/app.c:1622
 msgid "Tab · ↑ ↓ (windows)"
 msgstr "Tab · ↑ ↓（窗口）"
 
-#: src/core/app.c:1595
+#: src/core/app.c:1622
 msgid "Move between buttons and options"
 msgstr "在按钮和选项之间移动"
 
-#: src/core/app.c:1595
+#: src/core/app.c:1622
 msgid "Enter · Space · ← →"
 msgstr "Enter · 空格 · ← →"
 
-#: src/core/app.c:1595
+#: src/core/app.c:1622
 msgid "Press · adjust the focused option"
 msgstr "执行 · 调整当前选项"
 
-#: src/core/app.c:1596
+#: src/core/app.c:1623
 msgid "Keyboard between the text and the windows"
 msgstr "键盘在文本和窗口之间切换"
 
-#: src/core/app.c:1596
+#: src/core/app.c:1623
 msgid "Ctrl+Shift+← / →"
 msgstr "Ctrl+Shift+← / →"
 
-#: src/core/app.c:1596
+#: src/core/app.c:1623
 msgid "Select word by word"
 msgstr "逐词选择"
 
-#: src/core/app.c:1597
+#: src/core/app.c:1624
 msgid "Become — and … (smart typography)"
 msgstr "自动变为 — 和 …（智能排版）"
 
-#: src/core/app.c:1597
+#: src/core/app.c:1624
 msgid "Alt+F7 / Alt+F8"
 msgstr "Alt+F7 / Alt+F8"
 
-#: src/core/app.c:1597
+#: src/core/app.c:1624
 msgid "Move · resize the window (arrows, Enter)"
 msgstr "移动 · 调整窗口大小（方向键，Enter）"
 
-#: src/core/app.c:1674
+#: src/core/app.c:1701
 #, c-format
 msgid "Untitled — kept in %s until you save it"
 msgstr "未命名——保存前暂存在 %s"
 
-#: src/core/app.c:1681
+#: src/core/app.c:1708
 msgid "New tab (Ctrl+N)"
 msgstr "新建标签页（Ctrl+N）"
 
-#: src/core/app.c:1700
+#: src/core/app.c:1727
 msgid "Not saved yet (Ctrl+S)"
 msgstr "尚未保存（Ctrl+S）"
 
-#: src/core/app.c:1715
+#: src/core/app.c:1742
 #, c-format
 msgid "Playing: %s (F6)"
 msgstr "正在播放：%s（F6）"
 
-#: src/core/app.c:1716
+#: src/core/app.c:1743
 msgid "Music (F6)"
 msgstr "音乐（F6）"
 
-#: src/core/app.c:1716
+#: src/core/app.c:1743
 #, c-format
 msgid "Music (F6) — put MP3 files in the %s folder"
 msgstr "音乐（F6）——请把 MP3 文件放进 %s 文件夹"
 
-#: src/core/app.c:1718
+#: src/core/app.c:1745
 msgid "Tabs on — click to turn off"
 msgstr "标签页已开启——点击关闭"
 
-#: src/core/app.c:1718
+#: src/core/app.c:1745
 msgid "Tabs: open several documents (like in Sublime Text)"
 msgstr "标签页：同时打开多个文档（类似 Sublime Text）"
 
-#: src/core/app.c:1719
+#: src/core/app.c:1746
 msgid "Zen mode (F11)"
 msgstr "禅模式（F11）"
 
-#: src/core/app.c:1720
+#: src/core/app.c:1747
 msgid "Typewriter (F3)"
 msgstr "打字机（F3）"
 
-#: src/core/app.c:1721
+#: src/core/app.c:1748
 msgid "Reading (Ctrl+P)"
 msgstr "阅读（Ctrl+P）"
 
-#: src/core/app.c:1723
+#: src/core/app.c:1750
 msgid "Appearance (F12)"
 msgstr "外观（F12）"
 
-#: src/core/app.c:1724
+#: src/core/app.c:1751
 msgid "Commands (Ctrl+K)"
 msgstr "命令（Ctrl+K）"
 
-#: src/core/app.c:1736
+#: src/core/app.c:1763
 msgid "Next track (F9)"
 msgstr "下一首（F9）"
 
-#: src/core/app.c:1738
+#: src/core/app.c:1765
 msgid "Pause (F8)"
 msgstr "暂停（F8）"
 
-#: src/core/app.c:1738
+#: src/core/app.c:1765
 msgid "Play (F8)"
 msgstr "播放（F8）"
 
-#: src/core/app.c:1740
+#: src/core/app.c:1767
 msgid "Previous track (F7)"
 msgstr "上一首（F7）"
 
-#: src/core/app.c:1753
+#: src/core/app.c:1780
 #, c-format
 msgid "%d h %02d min"
 msgstr "%d 小时 %02d 分钟"
 
-#: src/core/app.c:1781
+#: src/core/app.c:1808
 msgid " · end of the text"
 msgstr " · 文本结尾"
 
-#: src/core/app.c:1782
+#: src/core/app.c:1809
 #, c-format
 msgid " · %s · %s to the end of the chapter · %s in total"
 msgstr " · %s · 距本章结束 %s · 共 %s"
 
-#: src/core/app.c:1783
+#: src/core/app.c:1810
 #, c-format
 msgid " · %s · %s of reading left"
 msgstr " · %s · 还需阅读 %s"
 
-#: src/core/app.c:1784
+#: src/core/app.c:1811
 #, c-format
 msgid " · %s of reading left"
 msgstr " · 还需阅读 %s"
 
-#: src/core/app.c:1787
+#: src/core/app.c:1814
 #, c-format
 msgid "%d of %d word"
 msgid_plural "%d of %d words"
 msgstr[0] "%d / %d 字"
 
-#: src/core/app.c:1793
+#: src/core/app.c:1820
 #, c-format
 msgid "Today: %d words · %d min reading"
 msgstr "今天：%d 字 · 阅读 %d 分钟"
 
-#: src/core/app.c:2010 src/core/app.c:2015
+#: src/core/app.c:2038 src/core/app.c:2043
 msgid "Welcome back. Picking up where you left off."
 msgstr "欢迎回来。从上次停下的地方继续。"
 
-#: src/core/app.c:2010
+#: src/core/app.c:2038
 #, c-format
 msgid "Welcome back: %d tab reopened."
 msgid_plural "Welcome back: %d tabs reopened."
 msgstr[0] "欢迎回来：已重新打开 %d 个标签页。"
 
-#: src/core/app.c:2014
+#: src/core/app.c:2042
 msgid "Welcome back. Reading continues where you left off."
 msgstr "欢迎回来。阅读从上次停下的地方继续。"
 
-#: src/core/app.c:2019
+#: src/core/app.c:2047
 msgid "Unsaved draft recovered"
 msgstr "已恢复未保存的草稿"
 
-#: src/core/app.c:2024
+#: src/core/app.c:2052
 msgid ""
 "# Welcome to FolioOS\n"
 "\n"
@@ -1607,29 +1611,29 @@ msgstr ""
 "\n"
 "删掉这段文字（Ctrl+A），开始你的故事。\n"
 
-#: src/core/app.c:2151
+#: src/core/app.c:2179
 #, c-format
 msgid "Sprint finished: %d word. Breathe and stretch."
 msgid_plural "Sprint finished: %d words. Breathe and stretch."
 msgstr[0] "冲刺结束：%d 字。深呼吸，伸个懒腰。"
 
-#: src/core/editor.c:320
+#: src/core/editor.c:330
 msgid "Cut"
 msgstr "已剪切"
 
-#: src/core/editor.c:320
+#: src/core/editor.c:330
 msgid "Copied"
 msgstr "已复制"
 
-#: src/core/editor.c:513
+#: src/core/editor.c:555
 msgid "There are no edits in this document yet"
 msgstr "这个文档还没有编辑记录"
 
-#: src/core/editor.c:539 src/core/editor.c:656 src/core/editor.c:669
+#: src/core/editor.c:581 src/core/editor.c:699 src/core/editor.c:718
 msgid "Hemingway mode: keep going, no deleting"
 msgstr "海明威模式：继续往前写，不要删除"
 
-#: src/core/editor.c:549
+#: src/core/editor.c:591
 msgid "Paragraph deleted — Ctrl+Z undoes it"
 msgstr "段落已删除——按 Ctrl+Z 撤销"
 
@@ -1701,171 +1705,171 @@ msgstr "文件"
 msgid "OK"
 msgstr "确定"
 
-#: src/core/filedlg.c:67 src/core/filedlg.c:325
+#: src/core/filedlg.c:67 src/core/filedlg.c:326
 msgid "Name"
 msgstr "名称"
 
-#: src/core/filedlg.c:102
+#: src/core/filedlg.c:101
 msgid "Could not read this folder"
 msgstr "无法读取此文件夹"
 
-#: src/core/filedlg.c:123
+#: src/core/filedlg.c:122
 msgid "Open document"
 msgstr "打开文档"
 
-#: src/core/filedlg.c:152
+#: src/core/filedlg.c:151
 msgid "Folder created"
 msgstr "文件夹已创建"
 
-#: src/core/filedlg.c:152
+#: src/core/filedlg.c:151
 msgid "Could not create the folder"
 msgstr "无法创建文件夹"
 
-#: src/core/filedlg.c:159
+#: src/core/filedlg.c:158
 msgid "Renamed"
 msgstr "已重命名"
 
-#: src/core/filedlg.c:160
+#: src/core/filedlg.c:159
 msgid "Could not rename"
 msgstr "无法重命名"
 
-#: src/core/filedlg.c:176
+#: src/core/filedlg.c:175
 msgid "Deleted"
 msgstr "已删除"
 
-#: src/core/filedlg.c:176
+#: src/core/filedlg.c:175
 msgid "Could not delete"
 msgstr "无法删除"
 
-#: src/core/filedlg.c:192
+#: src/core/filedlg.c:191
 msgid "Type a name for the file"
 msgstr "请输入文件名"
 
-#: src/core/filedlg.c:201
+#: src/core/filedlg.c:202
 msgid "A folder with that name already exists"
 msgstr "已存在同名文件夹"
 
-#: src/core/filedlg.c:202
+#: src/core/filedlg.c:203
 #, c-format
 msgid "\"%s\" already exists in this folder. Do you want to replace the file?"
 msgstr "此文件夹中已有“%s”。要替换该文件吗？"
 
-#: src/core/filedlg.c:203
+#: src/core/filedlg.c:204
 msgid "Replace file?"
 msgstr "替换文件？"
 
-#: src/core/filedlg.c:212
+#: src/core/filedlg.c:213
 #, c-format
 msgid "%.1f KB"
 msgstr "%.1f KB"
 
-#: src/core/filedlg.c:213
+#: src/core/filedlg.c:214
 #, c-format
 msgid "%.1f MB"
 msgstr "%.1f MB"
 
-#: src/core/filedlg.c:214
+#: src/core/filedlg.c:215
 #, c-format
 msgid "%.1f GB"
 msgstr "%.1f GB"
 
-#: src/core/filedlg.c:227
+#: src/core/filedlg.c:228
 msgid "DRIVES"
 msgstr "驱动器"
 
-#: src/core/filedlg.c:232
+#: src/core/filedlg.c:233
 msgid "FolioOS USB drive"
 msgstr "FolioOS U 盘"
 
-#: src/core/filedlg.c:233 src/core/filedlg.c:287
+#: src/core/filedlg.c:234 src/core/filedlg.c:288
 msgid "Drive"
 msgstr "驱动器"
 
-#: src/core/filedlg.c:244
+#: src/core/filedlg.c:245
 msgid "PLACES"
 msgstr "位置"
 
-#: src/core/filedlg.c:245
+#: src/core/filedlg.c:246
 msgid "Documents"
 msgstr "文档"
 
-#: src/core/filedlg.c:245 src/core/music.c:26
+#: src/core/filedlg.c:246 src/core/music.c:26
 msgid "Music"
 msgstr "音乐"
 
-#: src/core/filedlg.c:245
+#: src/core/filedlg.c:246
 msgid "Root"
 msgstr "根目录"
 
-#: src/core/filedlg.c:262
+#: src/core/filedlg.c:263
 msgid "All files"
 msgstr "所有文件"
 
-#: src/core/filedlg.c:273
+#: src/core/filedlg.c:274
 msgid "Parent folder (Alt+↑)"
 msgstr "上一级文件夹（Alt+↑）"
 
-#: src/core/filedlg.c:308 src/core/filedlg.c:308 src/core/filedlg.c:308
+#: src/core/filedlg.c:309 src/core/filedlg.c:309 src/core/filedlg.c:309
 msgid "New folder"
 msgstr "新建文件夹"
 
-#: src/core/filedlg.c:310
+#: src/core/filedlg.c:311
 msgid "Rename (F2)"
 msgstr "重命名（F2）"
 
-#: src/core/filedlg.c:311
+#: src/core/filedlg.c:312
 msgid "Rename"
 msgstr "重命名"
 
-#: src/core/filedlg.c:311 src/core/filedlg.c:317
+#: src/core/filedlg.c:312 src/core/filedlg.c:318
 msgid "Select an item"
 msgstr "请选择一个项目"
 
-#: src/core/filedlg.c:315
+#: src/core/filedlg.c:316
 #, c-format
 msgid "Delete the folder \"%s\" and everything in it? This cannot be undone."
 msgstr "删除文件夹“%s”及其所有内容？此操作无法撤销。"
 
-#: src/core/filedlg.c:315
+#: src/core/filedlg.c:316
 #, c-format
 msgid "Delete \"%s\"? This cannot be undone."
 msgstr "删除“%s”？此操作无法撤销。"
 
-#: src/core/filedlg.c:325
+#: src/core/filedlg.c:326
 msgid "Size"
 msgstr "大小"
 
-#: src/core/filedlg.c:325
+#: src/core/filedlg.c:326
 msgid "Modified"
 msgstr "修改时间"
 
-#: src/core/filedlg.c:366
+#: src/core/filedlg.c:367
 msgid "No .md or .txt documents here"
 msgstr "这里没有 .md 或 .txt 文档"
 
-#: src/core/filedlg.c:366
+#: src/core/filedlg.c:367
 msgid "Empty folder"
 msgstr "空文件夹"
 
-#: src/core/filedlg.c:406
+#: src/core/filedlg.c:407
 msgid "File name"
 msgstr "文件名"
 
-#: src/core/filedlg.c:407
+#: src/core/filedlg.c:409
 msgid "Export"
 msgstr "导出"
 
-#: src/core/filedlg.c:432
+#: src/core/filedlg.c:434
 msgid ". The document stays open as .md."
 msgstr "。文档仍以 .md 打开。"
 
-#: src/core/filedlg.c:436
+#: src/core/filedlg.c:438
 #, c-format
 msgid "%d item"
 msgid_plural "%d items"
 msgstr[0] "%d 个项目"
 
-#: src/core/filedlg.c:438
+#: src/core/filedlg.c:440
 msgid "Open"
 msgstr "打开"
 
@@ -2003,7 +2007,7 @@ msgid "%d track · %s"
 msgid_plural "%d tracks · %s"
 msgstr[0] "%d 首曲目 · %s"
 
-#: src/core/preview.c:46 src/core/preview.c:471
+#: src/core/preview.c:46 src/core/preview.c:472
 msgid "The whole text already fits on the screen"
 msgstr "全文已能完整显示在屏幕上"
 
@@ -2011,45 +2015,49 @@ msgstr "全文已能完整显示在屏幕上"
 msgid "Already at the end of the text"
 msgstr "已经到了文本结尾"
 
-#: src/core/preview.c:259
+#: src/core/preview.c:182
+msgid "Reading mode is not available for LaTeX files"
+msgstr "LaTeX 文件无法使用阅读模式"
+
+#: src/core/preview.c:260
 #, c-format
 msgid "Reading: %d words per minute"
 msgstr "阅读：每分钟 %d 字"
 
-#: src/core/preview.c:363
+#: src/core/preview.c:364
 msgid "Previous page (←)"
 msgstr "上一页（←）"
 
-#: src/core/preview.c:365
+#: src/core/preview.c:366
 msgid "Stop auto-scroll (Enter or middle button)"
 msgstr "停止自动滚动（Enter 或鼠标中键）"
 
-#: src/core/preview.c:365
+#: src/core/preview.c:366
 msgid "Auto-scroll (Enter or middle button)"
 msgstr "自动滚动（Enter 或鼠标中键）"
 
-#: src/core/preview.c:366
+#: src/core/preview.c:367
 msgid "Slower (−)"
 msgstr "慢一点（−）"
 
-#: src/core/preview.c:368
+#: src/core/preview.c:369
 #, c-format
 msgid "%d wpm"
 msgstr "每分钟 %d 字"
 
-#: src/core/preview.c:370
+#: src/core/preview.c:371
 msgid "Reading speed in words per minute (the mouse wheel adjusts it here)"
 msgstr "阅读速度，单位为每分钟字数（在这里用鼠标滚轮调整）"
 
-#: src/core/preview.c:371
+#: src/core/preview.c:372
 msgid "Faster (+)"
 msgstr "快一点（+）"
 
-#: src/core/preview.c:372
+#: src/core/preview.c:373
 msgid "Next page (→ or space)"
 msgstr "下一页（→ 或空格）"
 
-#: src/core/preview.c:472
+#: src/core/preview.c:473
 msgid "End of the text"
 msgstr "文本结尾"
 

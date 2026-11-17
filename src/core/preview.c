@@ -179,6 +179,7 @@ static bool built(void) { return npbs > 0 && pend_src < 0; }
 
 /* abre no ponto onde o cursor estava no editor */
 void preview_open(void) {
+    if (app.syntax == SYN_TEX) { ui_toast(L("Reading mode is not available for LaTeX files")); return; }   /* a leitura formata Markdown */
     active = true; scroll = target = 0; built_ver = 0xFFFFFFFF; built_w = 0;
     pend_src = app.caret.p; pend_top = false;
     auto_on = pan_on = pan_drag = false; auto_v = pan_v = 0;

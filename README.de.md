@@ -190,6 +190,13 @@ EPUB, HTML, RTF oder TXT** — ein Klick auf das Format. Alles andere geschieht 
   letzten 30 je Dokument bleiben erhalten).
 - **Entwurfswiederherstellung** für Text, der nie einen Namen bekommen hat.
 
+**LaTeX-Quelltexte** (`.tex`, `.bib`, `.sty`, `.cls`) öffnen sich als reiner Quelltext in einer
+nichtproportionalen Schrift, mit zeilenweiser Hervorhebung von Befehlen, Klammern, `%`-Kommentaren und
+Formeln im Text, echten Tabstopps und `{`, `[` und `$`, die sich selbst schließen. Weder
+Markdown-Formatierung noch typografische Anführungszeichen verändern den Quelltext, und die Datei behält
+ihre Zeilenenden (CRLF bleibt CRLF). FolioOS kompiliert kein LaTeX: Lesemodus und Export gelten für
+Markdown-Dokumente.
+
 ### 8. Tabs (optional)
 
 <img src="docs/screenshots/tabs.png" alt="Drei Dokumente als Tabs in der oberen Leiste geöffnet" width="900">
@@ -389,6 +396,15 @@ schreib in FolioOS weiter.
 </details>
 
 <details>
+<summary><b>Kann ich LaTeX schreiben?</b></summary>
+
+Ja. FolioOS bearbeitet die Quelldateien `.tex`, `.bib`, `.sty` und `.cls` mit Hervorhebung, in einer
+nichtproportionalen Schrift und genau so, wie du tippst (ohne typografische Anführungszeichen oder
+Markdown). Kompiliert wird nicht: Erzeuge das PDF auf einem Computer mit einer TeX-Distribution oder lade
+die Dateien in einen Online-LaTeX-Editor hoch.
+</details>
+
+<details>
 <summary><b>Warum zeigt mein PC den USB-Stick nicht im Bootmenü?</b></summary>
 
 Prüfe, dass der Stick FAT32 ist, dass du den Eintrag gewählt hast, der mit „UEFI“ beginnt, und dass Secure
@@ -459,6 +475,26 @@ geskripteten Tastendrücken und Mausereignissen, macht Bildschirmfotos und prüf
 jede Übersetzung (mit einer Negativkontrolle für den Prüfer), sechs Framebuffer-Formate und den FAT32-Treiber
 der BIOS-Brücke (Tausende zufälliger Operationen, Byte für Byte geprüft).
 
+### macOS-Simulator
+
+Auf einem Mac kannst du den Simulator nativ bauen und starten (AppKit, Retina, Cmd funktioniert in
+Tastenkürzeln wie Ctrl). Voraussetzungen: die Xcode Command Line Tools (`xcode-select --install`) — nur
+`clang`, das vollständige Xcode ist nicht nötig.
+
+```bash
+./build_macos.sh                             # Simulator, „FolioOS Simulator.app“ und der Stick-Ordner
+./build_macos.sh --test                      # dasselbe, plus die geskripteten Simulator-Tests (ohne Fenster)
+./build/macos/folio_sim                      # FolioOS in einem Fenster starten
+open "build/macos/FolioOS Simulator.app"     # oder das App-Paket starten
+```
+
+Option ist die AltGr-Taste des Mac und tippt daher weiter Zeichen (`@ # | [ ] { }` in vielen
+Belegungen): Im Simulator öffnet **Option+M** das Menü (Alt+M), und **Cmd+Option+1…9** wechseln die
+Tabs (Alt+1…9).
+
+Das macOS-Skript baut nur den Simulator: Die UEFI-Programme, Pakete, Disk-Images und die Tests, die das
+echte `BOOTX64.EFI` in `efi_host` starten, brauchen weiterhin den Windows-Build (`build.ps1`).
+
 <a id="architecture-in-one-picture"></a>
 
 ### Die Architektur auf einen Blick
@@ -469,6 +505,7 @@ src/core/       portabler Kern (freistehendes C, ohne libc): Editor, Markdown, T
 src/platform/   uefi/  GOP/UGA-Grafik, Eingabe, FAT-E/A, HD Audio/AC'97, USB-HID- und PS/2-Treiber — auf der Firmware
                 bios/  Bootsektoren + BIOS→UEFI-Brücke (VBE, PS/2, eigener FAT32-Treiber) für reine BIOS-PCs
                 win32/ Simulator für Entwicklung und automatische Tests
+                macos/ Simulator für macOS (AppKit), dieselben geskripteten Tests
 tools/          efi_host (startet BOOTX64.EFI unter Windows), i18n-Werkzeug, Disk-Image-Erzeuger, Showcase
 assets/         Schriften, Übersetzungen (.po), Tastaturbelegungen, Beispiel-Theme
 tests/          geskriptete End-to-End-Tests

@@ -171,6 +171,11 @@ FolioOS はファームウェアから直接起動します。フォントの読
 - **自動バージョン：** 保存したファイルの一つ前のコピーは `FOLIO/VERSIONS` に移ります（文書ごとに最新 30 個を保持）。
 - **下書きの復元**：名前を付けていない文章のために。
 
+**LaTeX のソース**（`.tex`、`.bib`、`.sty`、`.cls`）は等幅フォントのソースとして開き、コマンド、波かっこ、`%` コメント、
+行内の数式を行ごとに色分けし、本物のタブ位置を使い、`{`、`[`、`$` は自動で閉じます。Markdown の装飾やスマート引用符が
+ソースを変えることはなく、ファイルの改行コードもそのまま（CRLF は CRLF のまま）です。FolioOS は LaTeX をコンパイルしません。
+読書モードと書き出しは Markdown 文書用です。
+
 <a id="8-tabs-optional"></a>
 
 ### 8. タブ（オプション）
@@ -363,6 +368,14 @@ TextEdit などの Markdown エディターで開き、そのあと USB メモ�
 </details>
 
 <details>
+<summary><b>LaTeX は書けますか？</b></summary>
+
+はい。FolioOS は `.tex`、`.bib`、`.sty`、`.cls` のソースファイルを色分けつき、等幅フォントで、入力したとおりに
+（スマート引用符も Markdown もなしで）編集します。コンパイルはしません。PDF は TeX ディストリビューションのある
+コンピューターで作るか、ファイルをオンラインの LaTeX エディターにアップロードしてください。
+</details>
+
+<details>
 <summary><b>起動メニューに USB メモリが表示されないのはなぜですか？</b></summary>
 
 USB メモリが FAT32 であること、「UEFI」で始まる項目を選んだこと、ファームウェア設定で Secure Boot がオフになっていることを
@@ -427,6 +440,26 @@ cd FolioOS
 動かし、画面を撮影し、すべての書き出し（ZIP + XML）、すべての翻訳（検証器の否定対照つき）、6 種類のフレームバッファー形式、
 そして BIOS ブリッジの FAT32 ドライバー（何千ものランダム操作を 1 バイトずつ照合）を検証します。
 
+<a id="macos-simulator"></a>
+
+### macOS 用シミュレーター
+
+Mac ではシミュレーターをネイティブにビルドして動かせます（AppKit、Retina、ショートカットでは Cmd が Ctrl として働きます）。
+必要なもの：Xcode のコマンドラインツール（`xcode-select --install`）——`clang` だけで、Xcode 本体は不要です。
+
+```bash
+./build_macos.sh                             # シミュレーター、「FolioOS Simulator.app」、USB メモリ用フォルダー
+./build_macos.sh --test                      # 同じことに加えて、シミュレーターのスクリプトテスト（ウィンドウなし）
+./build/macos/folio_sim                      # FolioOS をウィンドウで動かす
+open "build/macos/FolioOS Simulator.app"     # またはアプリのバンドルを開く
+```
+
+Option は Mac の AltGr なので、文字の入力に使われたままです（多くの配列で `@ # | [ ] { }`）。シミュレーターでは
+**Option+M** でメニュー（Alt+M）、**Cmd+Option+1…9** でタブの切り替え（Alt+1…9）です。
+
+macOS のスクリプトが作るのはシミュレーターだけです。UEFI のバイナリ、パッケージ、ディスクイメージ、そして本物の
+`BOOTX64.EFI` を `efi_host` の中で動かすテストには、引き続き Windows でのビルド（`build.ps1`）が必要です。
+
 <a id="architecture-in-one-picture"></a>
 
 ### 1 枚でわかるアーキテクチャ
@@ -437,6 +470,7 @@ src/core/       移植可能なコア（フリースタンディング C、libc 
 src/platform/   uefi/  GOP/UGA 表示、入力、FAT 入出力、HD Audio/AC'97、USB HID と PS/2 のドライバー——ファームウェアの上で動作
                 bios/  起動セクター + BIOS→UEFI ブリッジ（VBE、PS/2、独自の FAT32 ドライバー）——BIOS のみの PC 用
                 win32/ 開発と自動テストに使うシミュレーター
+                macos/ macOS 用シミュレーター（AppKit）、同じスクリプトテスト
 tools/          efi_host（Windows で BOOTX64.EFI を実行）、i18n ツール、ディスクイメージ作成、showcase
 assets/         フォント、翻訳（.po）、キーボード配列、テーマの例
 tests/          スクリプトによるエンドツーエンドのテスト

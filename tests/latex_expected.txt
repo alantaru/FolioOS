@@ -1,0 +1,16 @@
+% Artigo de teste do FolioOS: fim de linha CRLF, acentos e tabulação
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath} % matemática
+
+\begin{document}
+\section{Introdução}
+O custo é $O(n \log n)$ e 50\% dos casos usam \emph{cache}.
+\begin{itemize}
+	\item recuo com tabulação
+\end{itemize}
+\end{document}
+Linha nova: -- e ... "aspas" 'simples' under_score_d *stars* `code` \emph{x} $a_i$ 50\% fim.
+# not a heading
+- item    x
+\textbf{negrito} \{\} {$"sel"$}

@@ -188,6 +188,12 @@ of TXT** — één klik op het formaat. De rest gaat automatisch:
   30 per document blijven bewaard).
 - **Conceptherstel** voor tekst die nooit een naam kreeg.
 
+**LaTeX-bronbestanden** (`.tex`, `.bib`, `.sty`, `.cls`) openen als platte broncode in een letter met
+vaste breedte, met markering per regel van commando’s, accolades, `%`-commentaar en formules in de tekst,
+echte tabstops en `{`, `[` en `$` die zichzelf sluiten. Markdown-opmaak en typografische
+aanhalingstekens blijven van de broncode af, en het bestand houdt zijn regeleinden (CRLF blijft CRLF).
+FolioOS compileert geen LaTeX: leesmodus en exporteren zijn voor Markdown-documenten.
+
 <a id="8-tabs-optional"></a>
 
 ### 8. Tabbladen (optioneel)
@@ -386,6 +392,15 @@ Kladblok, TextEdit of een andere Markdown-editor, steek de stick daarna weer in 
 </details>
 
 <details>
+<summary><b>Kan ik LaTeX schrijven?</b></summary>
+
+Ja. FolioOS bewerkt de bronbestanden `.tex`, `.bib`, `.sty` en `.cls` met markering, in een letter met
+vaste breedte en precies zoals je typt (geen typografische aanhalingstekens of Markdown). Compileren doet
+het niet: maak de pdf op een computer met een TeX-distributie of upload de bestanden naar een online
+LaTeX-editor.
+</details>
+
+<details>
 <summary><b>Waarom toont mijn pc de USB-stick niet in het opstartmenu?</b></summary>
 
 Controleer of de stick FAT32 is, of je de optie hebt gekozen die met "UEFI" begint en of Secure Boot is
@@ -455,6 +470,25 @@ toetsaanslagen en muisgebeurtenissen, maakt schermafbeeldingen en controleert el
 vertaling (met een negatieve controle voor de validator), zes framebufferformaten en de FAT32-driver van de
 BIOS-brug (duizenden willekeurige bewerkingen, byte voor byte gecontroleerd).
 
+### macOS-simulator
+
+Op een Mac kun je de simulator native bouwen en starten (AppKit, Retina, Cmd werkt als Ctrl in
+sneltoetsen). Vereisten: de Command Line Tools van Xcode (`xcode-select --install`) — alleen `clang`, de
+volledige Xcode is niet nodig.
+
+```bash
+./build_macos.sh                             # simulator, "FolioOS Simulator.app" en de stickmap
+./build_macos.sh --test                      # hetzelfde, plus de gescripte simulatortests (zonder venster)
+./build/macos/folio_sim                      # FolioOS in een venster starten
+open "build/macos/FolioOS Simulator.app"     # of het app-pakket openen
+```
+
+Option is de AltGr van de Mac en blijft dus tekens typen (`@ # | [ ] { }` op veel indelingen): in de
+simulator opent **Option+M** het menu (Alt+M) en wisselen **Cmd+Option+1…9** van tabblad (Alt+1…9).
+
+Het macOS-script bouwt alleen de simulator: de UEFI-programma’s, pakketten, schijfkopieën en de tests die
+het echte `BOOTX64.EFI` in `efi_host` draaien, hebben nog steeds de Windows-build nodig (`build.ps1`).
+
 <a id="architecture-in-one-picture"></a>
 
 ### De architectuur in één beeld
@@ -465,6 +499,7 @@ src/core/       draagbare kern (freestanding C, zonder libc): editor, Markdown, 
 src/platform/   uefi/  GOP/UGA-beeld, invoer, FAT-I/O, HD Audio/AC'97, USB HID- en PS/2-drivers — op de firmware
                 bios/  opstartsectoren + BIOS→UEFI-brug (VBE, PS/2, eigen FAT32-driver) voor pc’s met alleen BIOS
                 win32/ simulator voor ontwikkeling en automatische tests
+                macos/ simulator voor macOS (AppKit), dezelfde gescripte tests
 tools/          efi_host (draait BOOTX64.EFI op Windows), i18n-hulpmiddel, schijfkopiemaker, showcase
 assets/         lettertypen, vertalingen (.po), toetsenbordindelingen, voorbeeldthema
 tests/          gescripte end-to-end-tests

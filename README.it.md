@@ -189,6 +189,12 @@ TXT** — un clic sul formato. Tutto il resto è automatico:
   ultime 30 per documento).
 - **Recupero delle bozze** per il testo che non ha mai avuto un nome.
 
+**Sorgenti LaTeX** (`.tex`, `.bib`, `.sty`, `.cls`): si aprono come testo sorgente in un carattere a
+spaziatura fissa, con evidenziazione per riga di comandi, graffe, commenti `%` e formule in linea,
+tabulazioni vere e `{`, `[` e `$` che si chiudono da soli. Né lo stile Markdown né le virgolette
+tipografiche toccano il sorgente, e il file conserva i suoi fine riga (CRLF resta CRLF). FolioOS non
+compila LaTeX: la modalità lettura e l’esportazione sono per i documenti Markdown.
+
 <a id="8-tabs-optional"></a>
 
 ### 8. Schede (opzionali)
@@ -388,6 +394,15 @@ FolioOS.
 </details>
 
 <details>
+<summary><b>Posso scrivere in LaTeX?</b></summary>
+
+Sì. FolioOS modifica i file sorgente `.tex`, `.bib`, `.sty` e `.cls` con evidenziazione, in un carattere
+a spaziatura fissa ed esattamente come li scrivi (niente virgolette tipografiche né Markdown). Non li
+compila: genera il PDF su un computer con una distribuzione TeX oppure carica i file in un editor LaTeX
+online.
+</details>
+
+<details>
 <summary><b>Perché il mio PC non mostra la chiavetta nel menu di avvio?</b></summary>
 
 Controlla che la chiavetta sia in FAT32, di aver scelto la voce che inizia con "UEFI" e che il Secure Boot
@@ -457,6 +472,27 @@ eventi del mouse programmati, cattura schermate e verifica ogni esportazione (ZI
 (con un controllo negativo per il validatore), sei formati di framebuffer e il driver FAT32 del ponte BIOS
 (migliaia di operazioni casuali, verificate byte per byte).
 
+<a id="macos-simulator"></a>
+
+### Simulatore per macOS
+
+Su un Mac puoi compilare ed eseguire il simulatore in modo nativo (AppKit, Retina, Cmd funziona come Ctrl
+nelle scorciatoie). Requisiti: i Command Line Tools di Xcode (`xcode-select --install`) — basta `clang`,
+non serve Xcode completo.
+
+```bash
+./build_macos.sh                             # simulatore, "FolioOS Simulator.app" e la cartella della chiavetta
+./build_macos.sh --test                      # lo stesso, più i test programmati del simulatore (senza finestra)
+./build/macos/folio_sim                      # avvia FolioOS in una finestra
+open "build/macos/FolioOS Simulator.app"     # oppure apri il pacchetto dell’app
+```
+
+Option è l’AltGr del Mac, quindi continua a scrivere caratteri (`@ # | [ ] { }` in molti layout): nel
+simulatore **Option+M** apre il menu (Alt+M) e **Cmd+Option+1…9** cambiano scheda (Alt+1…9).
+
+Lo script per macOS compila solo il simulatore: i binari UEFI, i pacchetti, le immagini disco e i test che
+eseguono il vero `BOOTX64.EFI` dentro `efi_host` richiedono ancora la build per Windows (`build.ps1`).
+
 <a id="architecture-in-one-picture"></a>
 
 ### L’architettura in un’immagine
@@ -467,6 +503,7 @@ src/core/       nucleo portabile (C freestanding, senza libc): editor, Markdown,
 src/platform/   uefi/  video GOP/UGA, input, I/O FAT, HD Audio/AC'97, driver USB HID e PS/2 — sul firmware
                 bios/  settori di avvio + ponte BIOS→UEFI (VBE, PS/2, driver FAT32 proprio) per i PC solo BIOS
                 win32/ simulatore usato per lo sviluppo e i test automatici
+                macos/ simulatore per macOS (AppKit), stessi test programmati
 tools/          efi_host (esegue BOOTX64.EFI su Windows), strumento i18n, creatore di immagini disco, showcase
 assets/         font, traduzioni (.po), layout di tastiera, tema di esempio
 tests/          test end-to-end programmati

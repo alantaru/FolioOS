@@ -190,6 +190,12 @@ EPUB, HTML, RTF ou TXT** — un clic sur le format. Tout le reste est automatiqu
   30 dernières par document sont conservées).
 - **Récupération de brouillon** pour le texte qui n’a jamais reçu de nom.
 
+**Sources LaTeX** (`.tex`, `.bib`, `.sty`, `.cls`) : elles s’ouvrent en texte source dans une police à
+chasse fixe, avec une coloration par ligne des commandes, accolades, commentaires `%` et formules en
+ligne, de vraies tabulations, et `{`, `[` et `$` qui se ferment tout seuls. Ni le style Markdown ni les
+guillemets typographiques ne touchent la source, et le fichier garde ses fins de ligne (CRLF reste CRLF).
+FolioOS ne compile pas LaTeX : le mode lecture et l’export sont réservés aux documents Markdown.
+
 <a id="8-tabs-optional"></a>
 
 ### 8. Onglets (facultatifs)
@@ -389,6 +395,15 @@ VS Code, le Bloc-notes, TextEdit ou n’importe quel éditeur Markdown, puis reb
 </details>
 
 <details>
+<summary><b>Puis-je écrire en LaTeX ?</b></summary>
+
+Oui. FolioOS édite les fichiers sources `.tex`, `.bib`, `.sty` et `.cls` avec coloration, dans une police
+à chasse fixe et exactement tels que tapés (sans guillemets typographiques ni Markdown). Il ne les compile
+pas : produisez le PDF sur un ordinateur doté d’une distribution TeX, ou envoyez les fichiers dans un
+éditeur LaTeX en ligne.
+</details>
+
+<details>
 <summary><b>Pourquoi mon PC n’affiche-t-il pas la clé dans le menu de démarrage ?</b></summary>
 
 Vérifiez que la clé est en FAT32, que vous avez choisi l’entrée qui commence par « UEFI » et que le Secure
@@ -459,6 +474,29 @@ des événements de souris scriptés, prend des captures d’écran, valide chaq
 traduction (avec un contrôle négatif du validateur), six formats de framebuffer et le pilote FAT32 du pont
 BIOS (des milliers d’opérations aléatoires, vérifiées octet par octet).
 
+<a id="macos-simulator"></a>
+
+### Simulateur macOS
+
+Sur un Mac, vous pouvez compiler et lancer le simulateur en natif (AppKit, Retina, Cmd sert de Ctrl pour
+les raccourcis). Prérequis : les Command Line Tools de Xcode (`xcode-select --install`) — seulement
+`clang`, Xcode complet n’est pas nécessaire.
+
+```bash
+./build_macos.sh                             # simulateur, « FolioOS Simulator.app » et le dossier de la clé
+./build_macos.sh --test                      # idem, plus les tests scriptés du simulateur (sans fenêtre)
+./build/macos/folio_sim                      # lancer FolioOS dans une fenêtre
+open "build/macos/FolioOS Simulator.app"     # ou ouvrir le paquet de l’application
+```
+
+Option est l’AltGr du Mac et continue donc de taper des caractères (`@ # | [ ] { }` sur beaucoup de
+dispositions) : dans le simulateur, **Option+M** ouvre le menu (Alt+M) et **Cmd+Option+1…9** changent
+d’onglet (Alt+1…9).
+
+Le script macOS ne construit que le simulateur : les binaires UEFI, les paquets, les images disque et les
+tests qui lancent le vrai `BOOTX64.EFI` dans `efi_host` demandent toujours la compilation Windows
+(`build.ps1`).
+
 <a id="architecture-in-one-picture"></a>
 
 ### L’architecture en une image
@@ -469,6 +507,7 @@ src/core/       cœur portable (C freestanding, sans libc) : éditeur, Markdown,
 src/platform/   uefi/  affichage GOP/UGA, saisie, E/S FAT, HD Audio/AC'97, pilotes USB HID et PS/2 — sur le firmware
                 bios/  secteurs de démarrage + pont BIOS→UEFI (VBE, PS/2, pilote FAT32 propre) pour les PC uniquement BIOS
                 win32/ simulateur utilisé pour le développement et les tests automatiques
+                macos/ simulateur pour macOS (AppKit), mêmes tests scriptés
 tools/          efi_host (lance BOOTX64.EFI sous Windows), outil i18n, créateur d’image disque, showcase
 assets/         polices, traductions (.po), dispositions de clavier, thème d’exemple
 tests/          tests de bout en bout scriptés

@@ -187,6 +187,12 @@ HTML, RTF veya TXT olarak dışa aktarır** — biçime tek tıklama. Gerisi oto
   için son 30 tanesi saklanır).
 - **Taslak kurtarma**: hiç ad verilmemiş metinler için.
 
+**LaTeX kaynakları** (`.tex`, `.bib`, `.sty`, `.cls`) eş aralıklı bir yazı tipinde düz kaynak olarak
+açılır; komutlar, süslü parantezler, `%` yorumları ve satır içi matematik için satır bazında
+vurgulama, gerçek sekme durakları ve kendiliğinden kapanan `{`, `[` ve `$` vardır. Ne Markdown
+biçimlendirmesi ne de tipografik tırnaklar kaynağa dokunur; dosya satır sonlarını korur (CRLF, CRLF
+kalır). FolioOS LaTeX derlemez: okuma modu ve dışa aktarma Markdown belgeleri içindir.
+
 <a id="8-tabs-optional"></a>
 
 ### 8. Sekmeler (isteğe bağlı)
@@ -386,6 +392,14 @@ yazmaya devam edin.
 </details>
 
 <details>
+<summary><b>LaTeX yazabilir miyim?</b></summary>
+
+Evet. FolioOS `.tex`, `.bib`, `.sty` ve `.cls` kaynak dosyalarını vurgulamayla, eş aralıklı yazı tipinde
+ve tam yazıldığı gibi (tipografik tırnak ya da Markdown olmadan) düzenler. Onları derlemez: PDF’yi TeX
+dağıtımı olan bir bilgisayarda oluşturun ya da dosyaları çevrim içi bir LaTeX düzenleyicisine yükleyin.
+</details>
+
+<details>
 <summary><b>Bilgisayarım USB belleği neden önyükleme menüsünde göstermiyor?</b></summary>
 
 Belleğin FAT32 olduğunu, "UEFI" ile başlayan girişi seçtiğinizi ve donanım yazılımı ayarlarında Secure
@@ -455,6 +469,27 @@ tuş vuruşları ve fare olaylarıyla yönetir, ekran görüntüleri alır, her 
 çeviriyi (doğrulayıcı için negatif bir denetimle), altı framebuffer biçimini ve BIOS köprüsünün FAT32
 sürücüsünü (bayt bayt denetlenen binlerce rastgele işlem) doğrular.
 
+<a id="macos-simulator"></a>
+
+### macOS simülatörü
+
+Bir Mac’te simülatörü yerel olarak derleyip çalıştırabilirsiniz (AppKit, Retina, kısayollarda Cmd, Ctrl
+gibi çalışır). Gereksinimler: Xcode Command Line Tools (`xcode-select --install`) — yalnızca `clang`;
+tam Xcode gerekmez.
+
+```bash
+./build_macos.sh                             # simülatör, "FolioOS Simulator.app" ve bellek klasörü
+./build_macos.sh --test                      # aynısı, artı simülatörün betikli testleri (penceresiz)
+./build/macos/folio_sim                      # FolioOS’u bir pencerede çalıştırır
+open "build/macos/FolioOS Simulator.app"     # ya da uygulama paketini açar
+```
+
+Option, Mac’in AltGr tuşudur; bu yüzden karakter yazmaya devam eder (birçok düzende `@ # | [ ] { }`):
+simülatörde **Option+M** menüyü açar (Alt+M), **Cmd+Option+1…9** sekmeler arasında geçer (Alt+1…9).
+
+macOS betiği yalnızca simülatörü derler: UEFI ikili dosyaları, paketler, disk görüntüleri ve gerçek
+`BOOTX64.EFI`’yi `efi_host` içinde çalıştıran testler hâlâ Windows derlemesini (`build.ps1`) gerektirir.
+
 <a id="architecture-in-one-picture"></a>
 
 ### Tek resimde mimari
@@ -465,6 +500,7 @@ src/core/       taşınabilir çekirdek (freestanding C, libc yok): düzenleyici
 src/platform/   uefi/  GOP/UGA görüntü, giriş, FAT G/Ç, HD Audio/AC'97, USB HID ve PS/2 sürücüleri — donanım yazılımı üzerinde
                 bios/  önyükleme sektörleri + BIOS→UEFI köprüsü (VBE, PS/2, kendi FAT32 sürücüsü), yalnızca BIOS’lu bilgisayarlar için
                 win32/ geliştirme ve otomatik testler için simülatör
+                macos/ macOS simülatörü (AppKit), aynı betikli testler
 tools/          efi_host (BOOTX64.EFI’yi Windows’ta çalıştırır), i18n aracı, disk görüntüsü oluşturucu, showcase
 assets/         yazı tipleri, çeviriler (.po), klavye düzenleri, örnek tema
 tests/          betikli uçtan uca testler

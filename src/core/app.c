@@ -129,11 +129,26 @@ static void snapshot(int vol, const char *path, bool force) {
     mem_free(l);
 }
 
+/* sintaxe do documento ativo pelo nome do arquivo (sem nome: Markdown); chamar depois de trocar app.path */
+void app_sync_syntax(void) {
+    u8 syn = app.has_path ? (u8)doc_syntax_from_path(app.path) : (u8)SYN_MD;
+    if (syn == app.syntax) return;
+    app.syntax = syn;
+    if (syn == SYN_TEX && preview_active()) preview_close();
+    editor_invalidate();
+}
+/* fim de linha do arquivo, pela primeira linha (\r\n ou \n) */
+static bool text_crlf(const u8 *d, usize n) {
+    for (usize i = 0; i < n; i++) if (d[i] == '\n') return i > 0 && d[i - 1] == '\r';
+    return false;
+}
+
 void app_new_doc(void) {
     app_remember_pos();
     bank_session();
     doc_free(&app.doc); doc_init(&app.doc);
     app.has_path = false; app.path[0] = 0; app.vol = boot_vol;
+    app.crlf = false; app_sync_syntax();
     app.caret = app.anchor = (Pos){ 0, 0 };
     set_title_from_path();
     app.session_start_words = 0;
@@ -148,8 +163,10 @@ static bool load_into(int vol, const char *path, Pos caret) {
     bank_session();
     add_recent(vol, path);
     doc_set(&app.doc, (const char *)data, len);
+    app.crlf = text_crlf(data, len);
     mem_free(data);
     app.vol = vol; str_copy(app.path, path, sizeof app.path); app.has_path = true;
+    app_sync_syntax();
     set_title_from_path();
     app.caret = app.anchor = doc_clamp(&app.doc, caret);
     app.session_start_words = doc_words(&app.doc);
@@ -194,12 +211,12 @@ static int new_draft_id(void) {
 
 static bool write_doc_of(AppDoc *ad, int vol, const char *path, int fmtx, bool quiet);
 
-/* grava um documento de aba: o próprio arquivo (.md/.txt) ou o rascunho da aba */
+/* grava um documento de aba: o próprio arquivo (.md/.txt/.tex…) ou o rascunho da aba */
 static void flush_doc(AppDoc *ad, int *draft, u32 *dver) {
     if (ad->has_path) {
         if (!ad->doc.modified) return;
         int f = format_from_path(ad->path);
-        if ((f == FMT_MD || f == FMT_TXT) && write_doc_of(ad, ad->vol, ad->path, f, true)) { ad->doc.modified = false; ad->last_save_ms = ui.in.now; }
+        if (path_editable(ad->path) && write_doc_of(ad, ad->vol, ad->path, f >= 0 ? f : FMT_MD, true)) { ad->doc.modified = false; ad->last_save_ms = ui.in.now; }
         return;
     }
     if (doc_chars(&ad->doc) == 0) return;
@@ -314,8 +331,9 @@ static bool slot_from_entry(int i, const char *e, int pp, int po) {
         const char *bar = e; while (*bar && *bar != '|') bar++;
         bool dir;
         if (!*bar || vol >= pal_vol_count() || !pal_exists(vol, bar + 1, &dir) || dir || !pal_read(vol, bar + 1, &data, &len)) { doc_free(&d->doc); return false; }
-        doc_set(&d->doc, (const char *)data, len); mem_free(data);
+        doc_set(&d->doc, (const char *)data, len); d->crlf = text_crlf(data, len); mem_free(data);
         d->vol = vol; str_copy(d->path, bar + 1, sizeof d->path); d->has_path = true;
+        d->syntax = (u8)doc_syntax_from_path(d->path);
         str_copy(d->title, path_basename(d->path), sizeof d->title);
     }
     d->caret = d->anchor = doc_clamp(&d->doc, (Pos){ pp, po });
@@ -425,7 +443,7 @@ static void guard_then(int action) {
 }
 void app_open_path(int vol, const char *path) {
     int f = format_from_path(path);
-    if (f != FMT_MD && f != FMT_TXT && f >= 0) { ui_toast(L("This format is export-only. Open the matching .md file.")); return; }
+    if (f >= 0 && !path_editable(path)) { ui_toast(L("This format is export-only. Open the matching .md file.")); return; }
     pend_vol = vol; str_copy(pend_path, path, sizeof pend_path);
     if (prefs.tabs) {
         /* já aberto: vai para a aba; aba atual vazia: abre nela; senão, aba nova */
@@ -447,6 +465,13 @@ void app_open_path(int vol, const char *path) {
 static bool write_doc_of(AppDoc *ad, int vol, const char *path, int fmtx, bool quiet) {
     u8 *data; usize len;
     if (!export_doc(&ad->doc, fmtx, ad->title, &data, &len)) { ui_toast(L("Failed to create the file")); return false; }
+    if (ad->crlf && format_info(fmtx)->editable && doc_syntax_from_path(path) == SYN_TEX) {
+        /* fontes LaTeX voltam ao disco com o fim de linha que tinham (\r\n) */
+        usize n = 0; for (usize i = 0; i < len; i++) if (data[i] == '\n') n++;
+        u8 *o = mem_alloc(len + n + 1); usize k = 0;
+        for (usize i = 0; i < len; i++) { if (data[i] == '\n') o[k++] = '\r'; o[k++] = data[i]; }
+        mem_free(data); data = o; len = k;
+    }
     if (format_info(fmtx)->editable && !(vol == boot_vol && str_starts(path, "/FOLIO/"))) snapshot(vol, path, false);
     bool ok = pal_write(vol, path, data, len);
     mem_free(data);
@@ -468,11 +493,13 @@ bool app_save(void) {
 }
 
 void app_save_as_done(int vol, const char *path, int f) {
+    if (app.syntax == SYN_TEX && !format_info(f)->editable) { ui_toast(L("Export is not available for LaTeX files")); return; }
     if (!write_doc(vol, path, f, false)) return;
     char m[300];
     if (format_info(f)->editable) {
         drop_draft(&cur_draft);              /* deixou de ser "sem título": o rascunho da aba não serve mais */
         app.vol = vol; str_copy(app.path, path, sizeof app.path); app.has_path = true;
+        app_sync_syntax();
         set_title_from_path();
         add_recent(vol, path);
         app.doc.modified = false; app.last_save_ms = ui.in.now;
@@ -489,7 +516,7 @@ static void autosave(void) {
     last_autosave = ui.in.now;
     if (app.has_path) {
         int f = format_from_path(app.path);
-        if (f == FMT_MD || f == FMT_TXT) { if (write_doc(app.vol, app.path, f, true)) { app.doc.modified = false; app.last_save_ms = ui.in.now; } }
+        if (path_editable(app.path)) { if (write_doc(app.vol, app.path, f >= 0 ? f : FMT_MD, true)) { app.doc.modified = false; app.last_save_ms = ui.in.now; } }
     } else if (prefs.tabs) {
         flush_doc(&app, &cur_draft, &cur_dver);   /* cada aba sem nome tem o seu rascunho */
     } else if (doc_chars(&app.doc) > 0) {
@@ -1462,16 +1489,16 @@ static void outline_body(Window *w, Rect r) {
     UNUSED(w);
     Face *f = ui_font(false), *fb = ui_font(true);
     int y = r.y + SI(8) - (int)out_scroll, rh = SI(34), count = 0;
-    bool in_code = false;
+    bool in_code = false, tex = app.syntax == SYN_TEX;   /* fontes LaTeX: sem capítulos por # */
     int cur_h = -1, here = preview_active() ? preview_top_para() : app.caret.p;
-    for (int i = 0; i < app.doc.n && i <= here; i++) {
+    for (int i = 0; i < app.doc.n && i <= here && !tex; i++) {
         LineKind k = md_line(app.doc.p[i].s, app.doc.p[i].len, in_code);
         if (k.kind == LK_FENCE) in_code = !in_code;
         if (k.kind == LK_H) cur_h = i;
     }
     in_code = false;
     if (ui_hover(r) && ui.in.wheel) out_scroll -= ui.in.wheel * rh * 3;
-    for (int i = 0; i < app.doc.n; i++) {
+    for (int i = 0; i < app.doc.n && !tex; i++) {
         Para *p = &app.doc.p[i];
         LineKind k = md_line(p->s, p->len, in_code);
         if (k.kind == LK_FENCE) in_code = !in_code;
@@ -1498,7 +1525,7 @@ static void outline_body(Window *w, Rect r) {
     out_scroll = CLAMP(out_scroll, 0.0f, MAX(0.0f, content - r.h));
     if (!count) {
         draw_text_c(f, S(14), rect(r.x, r.y + SI(30), r.w, SI(24)), L("No headings yet."), col_alpha(T->panel_text, 0.55f));
-        draw_text_c(f, S(13), rect(r.x, r.y + SI(56), r.w, SI(24)), L("Start a line with # to create chapters."), col_alpha(T->panel_text, 0.45f));
+        if (!tex) draw_text_c(f, S(13), rect(r.x, r.y + SI(56), r.w, SI(24)), L("Start a line with # to create chapters."), col_alpha(T->panel_text, 0.45f));
     }
 }
 
@@ -1991,6 +2018,7 @@ void app_init(void) {
     pal_audio_probe();
     doc_init(&app.doc);
     app.vol = boot_vol;
+    app.syntax = SYN_MD; app.crlf = false;
     set_title_from_path();
     music_init(boot_vol);
     app_write_diag(false);
@@ -2006,12 +2034,12 @@ void app_init(void) {
         /* abas: reabre todas (arquivos e rascunhos de FOLIO\ABAS) na aba em que estava */
         prefs.tabs = false;
         app_tabs_enable(true);
-        if (app.has_path && prefs.last_reading && str_eq(app.path, prefs.last_path)) preview_open();
+        if (app.has_path && prefs.last_reading && str_eq(app.path, prefs.last_path) && app.syntax != SYN_TEX) preview_open();
         char m[120]; fmt(m, sizeof m, ntabs == 1 ? L("Welcome back. Picking up where you left off.") : LN("Welcome back: %d tab reopened.", "Welcome back: %d tabs reopened.", ntabs), ntabs);
         ui_toast(m);
     } else if (prefs.last_path[0] && prefs.last_vol < pal_vol_count() && pal_exists(prefs.last_vol, prefs.last_path, &d) && !d) {
         load_into(prefs.last_vol, prefs.last_path, (Pos){ prefs.last_p, prefs.last_o });
-        if (prefs.last_reading) { preview_open(); ui_toast(L("Welcome back. Reading continues where you left off.")); }
+        if (prefs.last_reading && app.syntax != SYN_TEX) { preview_open(); ui_toast(L("Welcome back. Reading continues where you left off.")); }
         else ui_toast(L("Welcome back. Picking up where you left off."));
     } else if (pal_exists(boot_vol, paths_dir(FILE_DRAFT), &d) && !d) {
         u8 *data; usize len;

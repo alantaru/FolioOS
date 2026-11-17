@@ -215,6 +215,18 @@ if (-not $NoTests) {
     Fresh
     Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\temas.txt", "--out", "build\shots") | Out-Null
     Ok "user themes (colors + fonts), theme editor, FolioOS splash - OK"
+    # LaTeX sources: the fixture is CRLF (tests\*.txt are always CRLF, see .gitattributes); after the
+    # script the autosaved file must match tests\latex_expected.txt byte for byte
+    Fresh; Copy-Item tests\latex_doc.txt "$t\DOCUMENTS\artigo.tex"
+    Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\latex.txt", "--out", "build\shots") | Out-Null
+    $got = [IO.File]::ReadAllBytes((Resolve-Path "$t\DOCUMENTS\artigo.tex").Path)
+    $want = [IO.File]::ReadAllBytes((Resolve-Path "tests\latex_expected.txt").Path)
+    if ([Convert]::ToBase64String($got) -ne [Convert]::ToBase64String($want)) { throw "autosaved DOCUMENTS\artigo.tex differs from tests\latex_expected.txt" }
+    if (-not (Test-Path "$t\DOCUMENTS\novo.tex") -or (Test-Path "$t\DOCUMENTS\novo.tex.md")) { throw "saving as novo.tex did not keep the extension" }
+    if ([IO.File]::ReadAllBytes((Resolve-Path "$t\DOCUMENTS\novo.tex").Path) -contains 13) { throw "a new .tex must be written with LF line endings" }
+    if (Test-Path "$t\DOCUMENTS\artigo.html") { throw "a LaTeX source was exported through the Markdown converter" }
+    if (-not (Get-ChildItem "$t\FOLIO\VERSIONS\*.tex" -ErrorAction SilentlyContinue)) { throw "no automatic version of the .tex file" }
+    Ok "LaTeX sources: raw text, highlighting, CRLF kept on autosave, save as .tex, no reading/export - OK"
     Fresh; Run .\build\efi_host.exe @("build\efi\BOOTX64.EFI", "--root", $t, "--script", "tests\efi_boot.txt", "--out", "build\shots")
     if (-not (Test-Path "$t\DOCUMENTS\uefi_teste.md")) { throw "BOOTX64.EFI did not write the test file" }
     Ok "real BOOTX64.EFI: boot, PlatformLang pt-BR, ABNT2 typing, saving to the volume - OK"

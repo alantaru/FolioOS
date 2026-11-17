@@ -186,6 +186,12 @@ HTML, RTF ou TXT** — um clique no formato. O resto é automático:
   mantidas as últimas 30 de cada documento).
 - **Recuperação de rascunho** para o texto que nunca recebeu nome.
 
+**Fontes LaTeX** (`.tex`, `.bib`, `.sty`, `.cls`) abrem como código-fonte numa letra monoespaçada, com
+realce por linha de comandos, chavetas, comentários `%` e matemática em linha, tabulações a sério e `{`,
+`[` e `$` que se fecham sozinhos. Nem o estilo Markdown nem as aspas tipográficas mexem no código, e o
+ficheiro mantém as suas quebras de linha (CRLF continua CRLF). O FolioOS não compila LaTeX: o modo de
+leitura e a exportação são para documentos Markdown.
+
 <a id="8-tabs-optional"></a>
 
 ### 8. Separadores (opcional)
@@ -386,6 +392,14 @@ escrever no FolioOS.
 </details>
 
 <details>
+<summary><b>Posso escrever em LaTeX?</b></summary>
+
+Sim. O FolioOS edita ficheiros-fonte `.tex`, `.bib`, `.sty` e `.cls` com realce, em letra monoespaçada e
+exatamente como foram escritos (sem aspas tipográficas nem Markdown). Não os compila: gere o PDF num
+computador com uma distribuição TeX ou envie os ficheiros para um editor de LaTeX online.
+</details>
+
+<details>
 <summary><b>Porque é que o meu PC não mostra a pen no menu de arranque?</b></summary>
 
 Confirme que a pen está em FAT32, que escolheu a entrada que começa por "UEFI" e que o Secure Boot está
@@ -455,6 +469,28 @@ com teclas e eventos de rato programados, tira capturas de ecrã, valida cada ex
 tradução (com um controlo negativo para o validador), seis formatos de framebuffer e o controlador FAT32 da
 ponte BIOS (milhares de operações aleatórias, verificadas byte a byte).
 
+<a id="macos-simulator"></a>
+
+### Simulador para macOS
+
+Num Mac pode compilar e executar o simulador de forma nativa (AppKit, Retina, Cmd funciona como Ctrl nos
+atalhos). Requisitos: as Command Line Tools do Xcode (`xcode-select --install`) — só o `clang`, não é
+preciso o Xcode completo.
+
+```bash
+./build_macos.sh                             # simulador, "FolioOS Simulator.app" e a pasta da pen
+./build_macos.sh --test                      # o mesmo, mais os testes programados do simulador (sem janela)
+./build/macos/folio_sim                      # executa o FolioOS numa janela
+open "build/macos/FolioOS Simulator.app"     # ou abre o pacote da aplicação
+```
+
+O Option é o AltGr do Mac, por isso continua a escrever caracteres (`@ # | [ ] { }` em muitos esquemas):
+no simulador, **Option+M** abre o menu (Alt+M) e **Cmd+Option+1…9** mudam de separador (Alt+1…9).
+
+O script do macOS compila só o simulador: os binários UEFI, os pacotes, as imagens de disco e os testes
+que executam o verdadeiro `BOOTX64.EFI` dentro do `efi_host` continuam a precisar da compilação no
+Windows (`build.ps1`).
+
 <a id="architecture-in-one-picture"></a>
 
 ### A arquitetura numa imagem
@@ -465,6 +501,7 @@ src/core/       núcleo portátil (C freestanding, sem libc): editor, Markdown, 
 src/platform/   uefi/  vídeo GOP/UGA, entrada, E/S FAT, HD Audio/AC'97, controladores USB HID e PS/2 — sobre o firmware
                 bios/  setores de arranque + ponte BIOS→UEFI (VBE, PS/2, controlador FAT32 próprio) para PCs só com BIOS
                 win32/ simulador usado no desenvolvimento e nos testes automáticos
+                macos/ simulador para macOS (AppKit), com os mesmos testes programados
 tools/          efi_host (corre o BOOTX64.EFI no Windows), ferramenta de i18n, gerador de imagem, showcase
 assets/         tipos de letra, traduções (.po), esquemas de teclado, tema de exemplo
 tests/          testes de ponta a ponta programados

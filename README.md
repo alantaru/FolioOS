@@ -160,6 +160,12 @@ on the format. Everything else is automatic:
   document are kept).
 - **Draft recovery** for text that was never named.
 
+**LaTeX sources** (`.tex`, `.bib`, `.sty`, `.cls`) open as plain source in a monospaced font, with
+per-line highlighting of commands, braces, `%` comments and inline math, real tab stops, and `{`, `[`
+and `$` that close themselves. No Markdown styling or smart quotes touch the source, and the file keeps
+its line endings (CRLF stays CRLF). FolioOS does not compile LaTeX: reading mode and export are for
+Markdown documents.
+
 ### 8. Tabs (optional)
 
 <img src="docs/screenshots/tabs.png" alt="Three documents open as tabs in the top bar" width="900">
@@ -331,6 +337,14 @@ versions in `FOLIO/VERSIONS`.
 
 Yes. They are plain `.md` files in `DOCUMENTS` on a FAT32 drive. Open them in Obsidian, Typora, VS Code,
 Notepad, TextEdit or any Markdown editor, then plug the drive back in and keep writing in FolioOS.
+</details>
+
+<details>
+<summary><b>Can I write LaTeX?</b></summary>
+
+Yes. FolioOS edits `.tex`, `.bib`, `.sty` and `.cls` source files with highlighting, in a monospaced
+font and exactly as typed (no smart quotes or Markdown). It does not compile them: build the PDF on a
+computer with a TeX distribution, or upload the files to an online LaTeX editor.
 </details>
 
 <details>

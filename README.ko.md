@@ -173,6 +173,11 @@ FolioOS는 펌웨어에서 바로 시작합니다. 글꼴을 불러오는 동안
 - **자동 버전:** 저장한 각 파일의 이전 사본이 `FOLIO/VERSIONS`로 갑니다(문서마다 최근 30개를 보관).
 - **초안 복구**: 이름을 한 번도 붙이지 않은 글을 위해.
 
+**LaTeX 소스**(`.tex`, `.bib`, `.sty`, `.cls`)는 고정폭 글꼴의 일반 소스로 열리며, 명령, 중괄호, `%` 주석, 줄 안의 수식을
+줄 단위로 강조하고, 진짜 탭 위치를 쓰며, `{`, `[`, `$`는 저절로 닫힙니다. Markdown 서식이나 둥근 따옴표가 소스를 바꾸지
+않고, 파일의 줄바꿈도 그대로 유지됩니다(CRLF는 CRLF 그대로). FolioOS는 LaTeX를 컴파일하지 않습니다. 읽기 모드와
+내보내기는 Markdown 문서용입니다.
+
 <a id="8-tabs-optional"></a>
 
 ### 8. 탭(선택)
@@ -362,6 +367,14 @@ Markdown 편집기로든 열고, 드라이브를 다시 꽂아 FolioOS에서 계
 </details>
 
 <details>
+<summary><b>LaTeX로 쓸 수 있나요?</b></summary>
+
+네. FolioOS는 `.tex`, `.bib`, `.sty`, `.cls` 소스 파일을 강조 표시와 함께 고정폭 글꼴로, 입력한 그대로(둥근 따옴표나
+Markdown 없이) 편집합니다. 컴파일은 하지 않습니다. PDF는 TeX 배포판이 있는 컴퓨터에서 만들거나 파일을 온라인 LaTeX
+편집기에 올리세요.
+</details>
+
+<details>
 <summary><b>부팅 메뉴에 USB 드라이브가 보이지 않는 이유는 무엇인가요?</b></summary>
 
 드라이브가 FAT32인지, "UEFI"로 시작하는 항목을 골랐는지, 펌웨어 설정에서 Secure Boot가 꺼져 있는지 확인하세요. BIOS/Legacy
@@ -425,6 +438,26 @@ cd FolioOS
 움직이고, 화면을 캡처하며, 모든 내보내기(ZIP + XML), 모든 번역(검증기에 대한 음성 대조 포함), 여섯 가지 프레임 버퍼 형식,
 BIOS 브리지의 FAT32 드라이버(무작위 작업 수천 번을 바이트 단위로 대조)를 검증합니다.
 
+<a id="macos-simulator"></a>
+
+### macOS 시뮬레이터
+
+Mac에서는 시뮬레이터를 네이티브로 빌드하고 실행할 수 있습니다(AppKit, Retina, 단축키에서 Cmd가 Ctrl처럼 동작). 필요한 것:
+Xcode 명령줄 도구(`xcode-select --install`) — `clang`만 있으면 되고 Xcode 전체는 필요 없습니다.
+
+```bash
+./build_macos.sh                             # 시뮬레이터, "FolioOS Simulator.app", 드라이브 폴더
+./build_macos.sh --test                      # 위와 같고, 시뮬레이터의 스크립트 테스트도 실행(창 없이)
+./build/macos/folio_sim                      # FolioOS를 창에서 실행
+open "build/macos/FolioOS Simulator.app"     # 또는 앱 번들 열기
+```
+
+Option은 Mac의 AltGr라서 계속 문자를 입력합니다(많은 배열에서 `@ # | [ ] { }`). 시뮬레이터에서는 **Option+M**이
+메뉴(Alt+M)를 열고 **Cmd+Option+1…9**가 탭을 바꿉니다(Alt+1…9).
+
+macOS 스크립트는 시뮬레이터만 빌드합니다. UEFI 바이너리, 패키지, 디스크 이미지, 그리고 `efi_host` 안에서 실제
+`BOOTX64.EFI`를 실행하는 테스트에는 여전히 Windows 빌드(`build.ps1`)가 필요합니다.
+
 <a id="architecture-in-one-picture"></a>
 
 ### 그림 한 장으로 보는 구조
@@ -435,6 +468,7 @@ src/core/       이식 가능한 핵심(독립형 C, libc 없음): 편집기, Ma
 src/platform/   uefi/  GOP/UGA 화면, 입력, FAT 입출력, HD Audio/AC'97, USB HID 및 PS/2 드라이버 — 펌웨어 위에서 동작
                 bios/  부트 섹터 + BIOS→UEFI 브리지(VBE, PS/2, 자체 FAT32 드라이버) — BIOS 전용 PC용
                 win32/ 개발과 자동 테스트에 쓰는 시뮬레이터
+                macos/ macOS용 시뮬레이터(AppKit), 같은 스크립트 테스트
 tools/          efi_host(Windows에서 BOOTX64.EFI 실행), i18n 도구, 디스크 이미지 생성기, showcase
 assets/         글꼴, 번역(.po), 키보드 배열, 예제 테마
 tests/          스크립트로 작성한 종단 간 테스트

@@ -187,6 +187,12 @@ RTF lub TXT** — jedno kliknięcie w format. Cała reszta dzieje się sama:
   jest ostatnich 30 na dokument).
 - **Odzyskiwanie szkiców** dla tekstu, który nigdy nie dostał nazwy.
 
+**Źródła LaTeX** (`.tex`, `.bib`, `.sty`, `.cls`) otwierają się jako zwykły kod źródłowy w czcionce o
+stałej szerokości, z podświetlaniem w obrębie wiersza poleceń, nawiasów klamrowych, komentarzy `%` i
+wzorów w tekście, prawdziwymi tabulatorami oraz `{`, `[` i `$`, które same się zamykają. Ani styl
+Markdown, ani cudzysłowy typograficzne nie zmieniają źródła, a plik zachowuje swoje końce wierszy (CRLF
+pozostaje CRLF). FolioOS nie kompiluje LaTeX-a: tryb czytania i eksport są dla dokumentów Markdown.
+
 <a id="8-tabs-optional"></a>
 
 ### 8. Karty (opcjonalnie)
@@ -386,6 +392,14 @@ w FolioOS.
 </details>
 
 <details>
+<summary><b>Czy mogę pisać w LaTeX-u?</b></summary>
+
+Tak. FolioOS edytuje pliki źródłowe `.tex`, `.bib`, `.sty` i `.cls` z podświetlaniem, czcionką o stałej
+szerokości i dokładnie tak, jak je wpisujesz (bez cudzysłowów typograficznych i Markdownu). Nie kompiluje
+ich: zbuduj PDF na komputerze z dystrybucją TeX-a albo wgraj pliki do edytora LaTeX online.
+</details>
+
+<details>
 <summary><b>Dlaczego mój komputer nie pokazuje pendrive’a w menu rozruchu?</b></summary>
 
 Sprawdź, czy pendrive jest w FAT32, czy wybrałeś pozycję zaczynającą się od „UEFI” i czy Secure Boot jest
@@ -456,6 +470,27 @@ naciśnięć klawiszy i zdarzeń myszy, robi zrzuty ekranu i sprawdza każdy eks
 tłumaczenie (z kontrolą negatywną walidatora), sześć formatów framebuffera i sterownik FAT32 mostu BIOS
 (tysiące losowych operacji sprawdzanych bajt po bajcie).
 
+<a id="macos-simulator"></a>
+
+### Symulator dla macOS
+
+Na Macu możesz zbudować i uruchomić symulator natywnie (AppKit, Retina, Cmd działa w skrótach jak Ctrl).
+Wymagania: Command Line Tools z Xcode (`xcode-select --install`) — wystarczy `clang`, pełny Xcode nie jest
+potrzebny.
+
+```bash
+./build_macos.sh                             # symulator, "FolioOS Simulator.app" i folder pendrive’a
+./build_macos.sh --test                      # to samo plus zaprogramowane testy symulatora (bez okna)
+./build/macos/folio_sim                      # uruchamia FolioOS w oknie
+open "build/macos/FolioOS Simulator.app"     # albo otwiera pakiet aplikacji
+```
+
+Option to AltGr Maca, więc dalej wpisuje znaki (`@ # | [ ] { }` w wielu układach): w symulatorze
+**Option+M** otwiera menu (Alt+M), a **Cmd+Option+1…9** przełączają karty (Alt+1…9).
+
+Skrypt dla macOS buduje tylko symulator: binaria UEFI, pakiety, obrazy dysków i testy uruchamiające
+prawdziwy `BOOTX64.EFI` w `efi_host` nadal wymagają kompilacji w Windows (`build.ps1`).
+
 <a id="architecture-in-one-picture"></a>
 
 ### Architektura na jednym obrazku
@@ -466,6 +501,7 @@ src/core/       przenośny rdzeń (C freestanding, bez libc): edytor, Markdown, 
 src/platform/   uefi/  obraz GOP/UGA, wejście, we/wy FAT, HD Audio/AC'97, sterowniki USB HID i PS/2 — na firmware’ze
                 bios/  sektory rozruchowe + most BIOS→UEFI (VBE, PS/2, własny sterownik FAT32) dla komputerów tylko z BIOS
                 win32/ symulator do tworzenia i testów automatycznych
+                macos/ symulator dla macOS (AppKit), te same zaprogramowane testy
 tools/          efi_host (uruchamia BOOTX64.EFI w Windows), narzędzie i18n, kreator obrazu dysku, showcase
 assets/         czcionki, tłumaczenia (.po), układy klawiatury, przykładowy motyw
 tests/          zaprogramowane testy od początku do końca
