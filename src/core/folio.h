@@ -18,7 +18,7 @@ typedef uint32_t u32; typedef int32_t i32;
 typedef uint64_t u64; typedef int64_t i64;
 typedef size_t usize;
 
-#define FOLIO_VERSION "4.1"
+#define FOLIO_VERSION "4.2"
 #define MIN(a,b) ((a)<(b)?(a):(b))
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define CLAMP(v,lo,hi) ((v)<(lo)?(lo):((v)>(hi)?(hi):(v)))
@@ -487,6 +487,7 @@ bool   ui_item(Rect r);                     /* item clicável genérico: clique 
 void   ui_reveal(float *scroll, Rect view); /* rola para mostrar o item focado (depois de desenhar) */
 void   wm_focus(Window *w);                 /* foco de teclado para a janela (0 = texto) */
 void   wm_cycle_focus(void);                /* Ctrl+F6: texto → janelas abertas → texto */
+bool   wm_kb_key(Event *e);                 /* Alt+F7 mover / Alt+F8 redimensionar a janela pelo teclado */
 
 enum { BTN_GHOST, BTN_PRIMARY, BTN_DANGER, BTN_SUBTLE };
 bool   ui_button(Rect r, const char *label, int style);
@@ -517,6 +518,21 @@ const char *kbd_code(int i);
 int  kbd_find(const char *code);
 void kbd_select(const char *code);
 const char *kbd_active(void);
+int  kbd_ime(void);                 /* método de entrada pedido pelo layout (IME_*) */
+const char *kbd_fonts(void);        /* fontes pedidas pelo layout (linha fonts) */
+/* ime.c: métodos de entrada (coreano hangul, japonês romaji → kana) */
+enum { IME_NONE, IME_HANGUL, IME_KANA };
+typedef struct { void (*del_back)(int ncp, void *ctx); void (*insert)(const char *s, int len, void *ctx); void *ctx; } ImeTarget;
+void  ime_setup(void);               /* depois de trocar o layout */
+bool  ime_on(void);                  /* compondo (o layout tem IME e ele está ligado) */
+void  ime_toggle(void);              /* Ctrl+Espaço */
+const char *ime_badge(void);         /* "가", "あ", "ア", "A" ou "" (sem IME) */
+bool  ime_feed(u32 ch, ImeTarget *t);    /* true = a tecla foi usada pelo IME */
+bool  ime_backspace(ImeTarget *t);       /* true = apagou dentro da composição */
+void  ime_commit(ImeTarget *t);          /* fecha a composição (tecla de navegação, clique, Enter…) */
+bool  ime_composing(void);
+void  fonts_set_kbd(const char *files);  /* fontes de reserva pedidas pelo teclado */
+void  editor_ime_commit(void);
 
 /* paths.c — pastas e arquivos do pen-drive (nomes neutros; pastas antigas em português valem) */
 enum { DIR_FOLIO, DIR_DOCS, DIR_MUSIC, DIR_FONTS, DIR_THEMES, DIR_TABS, DIR_VERSIONS, DIR_LANGUAGES, DIR_KEYBOARDS,

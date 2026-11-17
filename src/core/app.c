@@ -716,7 +716,7 @@ void app_set_language(int idx, bool save) {
     if (!fonts_lang_ok()) {
         char need[160]; str_copy(need, lang_fonts(idx), sizeof need);
         i18n_set(prev);
-        char m[300]; fmt(m, sizeof m, L("This language needs extra fonts (%s) in %s. Install the matching font pack."), need, paths_show(DIR_FONTS));
+        char m[300]; fmt(m, sizeof m, L("This language needs fonts (%s) that are missing from %s. Copy FolioOS.zip to the USB drive again."), need, paths_show(DIR_FONTS));
         ui_toast(m);
         return;
     }
@@ -775,6 +775,7 @@ static const Cmd cmds[] = {
     { N_("Menu and recent documents"), N_("Alt+M"), 0, IC_MENU },
     { N_("Keyboard focus: text or the next window"), N_("Ctrl+F6"), c_focus_cycle, IC_COMMAND },
     { N_("Mouse and touchpad (on/off)"), "", c_mouse, IC_SETTINGS },
+    { N_("Input method on/off (Korean, Japanese)"), N_("Ctrl+Space"), ime_toggle, IC_EDIT },
     { N_("Language and keyboard"), "", c_language, IC_SETTINGS },
     { N_("Restart the computer"), "", c_reboot, IC_POWER },
     { N_("Shut down the computer"), N_("Ctrl+Q"), c_shutdown, IC_POWER },
@@ -1001,7 +1002,7 @@ static void settings_body(Window *w, Rect r) {
             cur.y += SI(48);
         }
         draw_text(f, S(12), cur.x, cur.y + S(14), pathfmt(L("Add .ttf fonts to %s (subfolders work too) and restart."), DIR_FONTS), -1, col_alpha(T->panel_text, 0.45f));
-        draw_text(f, S(12), cur.x, cur.y + S(32), L("Ready-made pack: FOLIO-FONTS-EXTRA.zip — unzip it at the root of the USB drive."), -1, col_alpha(T->panel_text, 0.45f));
+        draw_text(f, S(12), cur.x, cur.y + S(32), L("Included writing fonts: Literata, Lora, EB Garamond, iA Writer, Special Elite and more."), -1, col_alpha(T->panel_text, 0.45f));
         cur.y += SI(48);
         ui_section(&cur, L("TYPOGRAPHY"));
         fmt(vt, sizeof vt, L("%d px"), (int)prefs.font_size);
@@ -1397,7 +1398,7 @@ static void theme_ed_body(Window *w, Rect r) {
             font_set_ui(ed_fui); app_apply_font();
         }
         cur.y += SI(48);
-        draw_text(f, S(12), x, cur.y + S(12), L("Interface = bars, menus and windows. More fonts: FOLIO-FONTS-EXTRA.zip."), -1, col_alpha(T->panel_text, 0.45f));
+        draw_text(f, S(12), x, cur.y + S(12), L("Interface = bars, menus and windows."), -1, col_alpha(T->panel_text, 0.45f));
         cur.y += SI(32);
     }
 
@@ -1593,7 +1594,8 @@ static void help_body(Window *w, Rect r) {
         { N_("Esc"), N_("Close window · leave zen/reading") }, { N_("Ctrl+Q"), N_("Shut down") },
         { N_("Tab · ↑ ↓ (windows)"), N_("Move between buttons and options") }, { N_("Enter · Space · ← →"), N_("Press · adjust the focused option") },
         { N_("Ctrl+F6"), N_("Keyboard between the text and the windows") }, { N_("Ctrl+Shift+← / →"), N_("Select word by word") },
-        { "-- ...", N_("Become — and … (smart typography)") },
+        { "-- ...", N_("Become — and … (smart typography)") }, { N_("Alt+F7 / Alt+F8"), N_("Move · resize the window (arrows, Enter)") },
+        { N_("Ctrl+Space"), N_("Input method on/off (Korean, Japanese)") },
     };
     Face *f = ui_font(false), *fb = ui_font(true);
     int cols = r.w > SI(640) ? 2 : 1;
@@ -1807,6 +1809,8 @@ static void draw_statusbar(float a) {
         icon_draw(IC_TIMER, rx - S(2), cy, S(14), T->accent);
         draw_text(fb, px, rx + S(10), base, s, -1, T->accent);
     }
+    const char *ib = ime_badge();                       /* método de entrada: 가 / あ / ア / A */
+    if (ib[0]) { rx -= S(30); draw_text(fb, S(14), rx, base, ib, -1, str_eq(ib, "A") ? c : T->accent); }
     u32 dk = kbd_pending();
     if (dk) { char d[8]; int n = utf8_encode(dk, d); d[n] = 0; rx -= S(28); draw_text(fb, S(15), rx, base, d, -1, T->accent); }
     gfx_set_opacity(1);
@@ -1878,6 +1882,8 @@ static bool global_key(Event *e) {
         if (zen) { zen = false; return true; }
         last_mouse_ms = ui.in.now; return true;
     }
+    if (wm_kb_key(e)) return true;                         /* Alt+F7/Alt+F8 e as setas enquanto move */
+    if (ctrl && !(e->mods & MOD_ALT) && e->ch == ' ') { ime_toggle(); return true; }   /* método de entrada (coreano, japonês) */
     if (ctrl && !(e->mods & MOD_ALT) && e->key == KEY_F6) { wm_cycle_focus(); return true; }   /* teclado: texto ↔ janelas */
     if ((e->mods & MOD_ALT) && !ctrl && (e->ch == 'm' || e->ch == 'M') && !wm_any_modal()) { if (!win_menu.open || ui.key_win == &win_menu) c_menu(); else wm_focus(&win_menu); return true; }
     if (ctrl && (e->mods & MOD_ALT) && !e->ch) {          /* Ctrl+Alt+setas: girar a tela; Ctrl+Alt+Home: restaurar */

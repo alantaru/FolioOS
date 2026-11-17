@@ -42,8 +42,6 @@ jobs:
           name: FolioOS-packages
           path: |
             build/FolioOS.zip
-            build/FOLIO-FONTS-EXTRA.zip
-            build/FOLIO-FONTS-CJK.zip
 
       - name: Upload test screenshots
         if: always()

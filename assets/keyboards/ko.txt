@@ -1,0 +1,5 @@
+# Korean - 2-set (Dubeolsik). The keys stay where they are on a US keyboard; the input method
+# builds the syllables (gksrmf = 한글). Ctrl+Space switches between Hangul and Latin letters.
+name    한국어 (두벌식)
+ime     hangul
+fonts   _LANGUAGE/NotoSansKR.ttf

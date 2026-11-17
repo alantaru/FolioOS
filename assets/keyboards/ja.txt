@@ -1,0 +1,6 @@
+# Japanese - romaji to kana (nihongo = にほんご, kk = っk, nn = ん, - = ー).
+# Ctrl+Space switches hiragana -> katakana -> Latin letters. Kanji conversion needs a dictionary
+# that is not included yet.
+name    日本語 (ローマ字かな)
+ime     kana
+fonts   _LANGUAGE/NotoSansJP.ttf

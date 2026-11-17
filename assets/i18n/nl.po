@@ -41,7 +41,7 @@ msgstr "Wijzigingen opslaan?"
 msgid "The current document has changes that have not been saved yet."
 msgstr "Het huidige document heeft wijzigingen die nog niet zijn opgeslagen."
 
-#: src/core/app.c:422 src/core/app.c:740 src/core/app.c:869 src/core/filedlg.c:407
+#: src/core/app.c:422 src/core/app.c:740 src/core/app.c:870 src/core/filedlg.c:407
 msgid "Save"
 msgstr "Opslaan"
 
@@ -99,19 +99,19 @@ msgstr "Pagina: tekst in een kolom, zoals op een vel papier"
 msgid "Settings"
 msgstr "Instellingen"
 
-#: src/core/app.c:578 src/core/app.c:754 src/core/app.c:880 src/core/app.c:1578
+#: src/core/app.c:578 src/core/app.c:754 src/core/app.c:881 src/core/app.c:1579
 msgid "Find and replace"
 msgstr "Zoeken en vervangen"
 
-#: src/core/app.c:579 src/core/app.c:880 src/core/app.c:1590
+#: src/core/app.c:579 src/core/app.c:881 src/core/app.c:1591
 msgid "Outline"
 msgstr "Overzicht"
 
-#: src/core/app.c:580 src/core/app.c:770 src/core/app.c:1591
+#: src/core/app.c:580 src/core/app.c:770 src/core/app.c:1592
 msgid "Session and goals"
 msgstr "Sessie en doelen"
 
-#: src/core/app.c:581 src/core/app.c:774 src/core/app.c:884
+#: src/core/app.c:581 src/core/app.c:774 src/core/app.c:885
 msgid "Keyboard shortcuts"
 msgstr "Sneltoetsen"
 
@@ -119,7 +119,7 @@ msgstr "Sneltoetsen"
 msgid "Commands"
 msgstr "Opdrachten"
 
-#: src/core/app.c:583 src/core/app.c:1709
+#: src/core/app.c:583 src/core/app.c:1711
 msgid "Menu"
 msgstr "Menu"
 
@@ -224,7 +224,7 @@ msgstr "Slimme typografie uit"
 msgid "Page %s"
 msgstr "Pagina %s"
 
-#: src/core/app.c:687 src/core/editor.c:696 src/core/preview.c:251
+#: src/core/app.c:687 src/core/editor.c:711 src/core/preview.c:251
 msgid "This is the last chapter"
 msgstr "Dit is het laatste hoofdstuk"
 
@@ -242,14 +242,14 @@ msgstr "Kan het taalbestand niet lezen"
 
 #: src/core/app.c:719
 #, c-format
-msgid "This language needs extra fonts (%s) in %s. Install the matching font pack."
-msgstr "Deze taal heeft extra lettertypen nodig (%s) in %s. Installeer het bijbehorende lettertypepakket."
+msgid "This language needs fonts (%s) that are missing from %s. Copy FolioOS.zip to the USB drive again."
+msgstr "Deze taal heeft lettertypen (%s) nodig die in %s ontbreken. Kopieer FolioOS.zip opnieuw naar de USB-stick."
 
 #: src/core/app.c:732
 msgid "New document"
 msgstr "Nieuw document"
 
-#: src/core/app.c:732 src/core/app.c:868
+#: src/core/app.c:732 src/core/app.c:869
 msgid "Ctrl+N"
 msgstr "Ctrl+N"
 
@@ -289,23 +289,23 @@ msgstr "Eigen thema maken (kleuren en lettertypen)"
 msgid "Edit the current theme"
 msgstr "Huidig thema bewerken"
 
-#: src/core/app.c:739 src/core/app.c:868
+#: src/core/app.c:739 src/core/app.c:869
 msgid "Open…"
 msgstr "Openen…"
 
-#: src/core/app.c:739 src/core/app.c:868
+#: src/core/app.c:739 src/core/app.c:869
 msgid "Ctrl+O"
 msgstr "Ctrl+O"
 
-#: src/core/app.c:740 src/core/app.c:869
+#: src/core/app.c:740 src/core/app.c:870
 msgid "Ctrl+S"
 msgstr "Ctrl+S"
 
-#: src/core/app.c:741 src/core/app.c:869
+#: src/core/app.c:741 src/core/app.c:870
 msgid "Save as / Export…"
 msgstr "Opslaan als / Exporteren…"
 
-#: src/core/app.c:741 src/core/app.c:869 src/core/app.c:1575
+#: src/core/app.c:741 src/core/app.c:870 src/core/app.c:1576
 msgid "Ctrl+Shift+S"
 msgstr "Ctrl+Shift+S"
 
@@ -313,7 +313,7 @@ msgstr "Ctrl+Shift+S"
 msgid "Reading mode (formatted Markdown)"
 msgstr "Leesmodus (opgemaakte Markdown)"
 
-#: src/core/app.c:742 src/core/app.c:1577
+#: src/core/app.c:742 src/core/app.c:1578
 msgid "Ctrl+P"
 msgstr "Ctrl+P"
 
@@ -321,7 +321,7 @@ msgstr "Ctrl+P"
 msgid "Reading auto-scroll (on/off)"
 msgstr "Automatisch scrollen bij lezen (aan/uit)"
 
-#: src/core/app.c:743 src/core/app.c:1584
+#: src/core/app.c:743 src/core/app.c:1585
 msgid "Enter (reading)"
 msgstr "Enter (lezen)"
 
@@ -345,23 +345,23 @@ msgstr "Ctrl+PgUp"
 msgid "Go to the last edit"
 msgstr "Naar de laatste wijziging"
 
-#: src/core/app.c:746 src/core/app.c:1582
+#: src/core/app.c:746 src/core/app.c:1583
 msgid "Ctrl+J"
 msgstr "Ctrl+J"
 
-#: src/core/app.c:747 src/core/app.c:1581
+#: src/core/app.c:747 src/core/app.c:1582
 msgid "Duplicate paragraph"
 msgstr "Alinea dupliceren"
 
-#: src/core/app.c:747 src/core/app.c:1581
+#: src/core/app.c:747 src/core/app.c:1582
 msgid "Ctrl+D"
 msgstr "Ctrl+D"
 
-#: src/core/app.c:748 src/core/app.c:1581
+#: src/core/app.c:748 src/core/app.c:1582
 msgid "Delete paragraph"
 msgstr "Alinea verwijderen"
 
-#: src/core/app.c:748 src/core/app.c:1581
+#: src/core/app.c:748 src/core/app.c:1582
 msgid "Ctrl+Shift+K"
 msgstr "Ctrl+Shift+K"
 
@@ -369,7 +369,7 @@ msgstr "Ctrl+Shift+K"
 msgid "Change case"
 msgstr "Hoofdletters / kleine letters"
 
-#: src/core/app.c:749 src/core/app.c:1583
+#: src/core/app.c:749 src/core/app.c:1584
 msgid "Shift+F3"
 msgstr "Shift+F3"
 
@@ -389,7 +389,7 @@ msgstr "Typemachine (gecentreerde regel)"
 msgid "Zen mode (no bars)"
 msgstr "Zenmodus (zonder balken)"
 
-#: src/core/app.c:754 src/core/app.c:880 src/core/app.c:1578
+#: src/core/app.c:754 src/core/app.c:881 src/core/app.c:1579
 msgid "Ctrl+F"
 msgstr "Ctrl+F"
 
@@ -401,11 +401,11 @@ msgstr "Overzicht van het document"
 msgid "Appearance: themes and typography"
 msgstr "Weergave: thema's en typografie"
 
-#: src/core/app.c:757 src/core/app.c:1587
+#: src/core/app.c:757 src/core/app.c:1588
 msgid "Next theme"
 msgstr "Volgend thema"
 
-#: src/core/app.c:757 src/core/app.c:1587
+#: src/core/app.c:757 src/core/app.c:1588
 msgid "Ctrl+T"
 msgstr "Ctrl+T"
 
@@ -445,7 +445,7 @@ msgstr "Paginagrootte: smal · gemiddeld · breed · extra breed"
 msgid "Paper sheet (show/hide)"
 msgstr "Vel papier (tonen/verbergen)"
 
-#: src/core/app.c:764 src/core/app.c:883
+#: src/core/app.c:764 src/core/app.c:884
 msgid "Writing settings"
 msgstr "Schrijfinstellingen"
 
@@ -461,7 +461,7 @@ msgstr "Muziek: volgend nummer"
 msgid "Music: previous track"
 msgstr "Muziek: vorig nummer"
 
-#: src/core/app.c:768 src/core/app.c:1590
+#: src/core/app.c:768 src/core/app.c:1591
 msgid "Music player"
 msgstr "Muziekspeler"
 
@@ -481,11 +481,11 @@ msgstr "Opmaakcodes buiten de alinea verbergen"
 msgid "Smart typography (— “ ” …)"
 msgstr "Slimme typografie (— “ ” …)"
 
-#: src/core/app.c:775 src/core/app.c:1585
+#: src/core/app.c:775 src/core/app.c:1586
 msgid "Menu and recent documents"
 msgstr "Menu en recente documenten"
 
-#: src/core/app.c:775 src/core/app.c:1585
+#: src/core/app.c:775 src/core/app.c:1586
 msgid "Alt+M"
 msgstr "Alt+M"
 
@@ -493,7 +493,7 @@ msgstr "Alt+M"
 msgid "Keyboard focus: text or the next window"
 msgstr "Toetsenbordfocus: tekst of volgend venster"
 
-#: src/core/app.c:776 src/core/app.c:1595
+#: src/core/app.c:776 src/core/app.c:1596
 msgid "Ctrl+F6"
 msgstr "Ctrl+F6"
 
@@ -501,1065 +501,1081 @@ msgstr "Ctrl+F6"
 msgid "Mouse and touchpad (on/off)"
 msgstr "Muis en touchpad (aan/uit)"
 
-#: src/core/app.c:778
+#: src/core/app.c:778 src/core/app.c:1598
+msgid "Input method on/off (Korean, Japanese)"
+msgstr "Invoermethode aan/uit (Koreaans, Japans)"
+
+#: src/core/app.c:778 src/core/app.c:1598
+msgid "Ctrl+Space"
+msgstr "Ctrl+Spatie"
+
+#: src/core/app.c:779
 msgid "Language and keyboard"
 msgstr "Taal en toetsenbord"
 
-#: src/core/app.c:779
+#: src/core/app.c:780
 msgid "Restart the computer"
 msgstr "Computer opnieuw opstarten"
 
-#: src/core/app.c:780
+#: src/core/app.c:781
 msgid "Shut down the computer"
 msgstr "Computer uitschakelen"
 
-#: src/core/app.c:780 src/core/app.c:886 src/core/app.c:1593
+#: src/core/app.c:781 src/core/app.c:887 src/core/app.c:1594
 msgid "Ctrl+Q"
 msgstr "Ctrl+Q"
 
-#: src/core/app.c:802
+#: src/core/app.c:803
 msgid "Type a command…"
 msgstr "Typ een opdracht…"
 
-#: src/core/app.c:833
+#: src/core/app.c:834
 msgid "No command found"
 msgstr "Geen opdracht gevonden"
 
-#: src/core/app.c:859
+#: src/core/app.c:860
 msgid "File not found (a different USB drive?)"
 msgstr "Bestand niet gevonden (een andere USB-stick?)"
 
-#: src/core/app.c:867
+#: src/core/app.c:868
 msgid "DOCUMENT"
 msgstr "DOCUMENT"
 
-#: src/core/app.c:868
+#: src/core/app.c:869
 msgid "New"
 msgstr "Nieuw"
 
-#: src/core/app.c:875
+#: src/core/app.c:876
 msgid "RECENT"
 msgstr "RECENT"
 
-#: src/core/app.c:879
+#: src/core/app.c:880
 msgid "WRITING"
 msgstr "SCHRIJVEN"
 
-#: src/core/app.c:881
+#: src/core/app.c:882
 msgid "Session, goals and sprint"
 msgstr "Sessie, doelen en sprint"
 
-#: src/core/app.c:882
+#: src/core/app.c:883
 msgid "PREFERENCES"
 msgstr "VOORKEUREN"
 
-#: src/core/app.c:883 src/core/app.c:966 src/core/app.c:1592
+#: src/core/app.c:884 src/core/app.c:967 src/core/app.c:1593
 msgid "Appearance"
 msgstr "Weergave"
 
-#: src/core/app.c:886 src/core/app.c:1166 src/core/app.c:1593
+#: src/core/app.c:887 src/core/app.c:1167 src/core/app.c:1594
 msgid "Shut down"
 msgstr "Uitschakelen"
 
-#: src/core/app.c:950
+#: src/core/app.c:951
 #, c-format
 msgid "Diagnostics saved to %s"
 msgstr "Diagnose opgeslagen in %s"
 
-#: src/core/app.c:950
+#: src/core/app.c:951
 msgid "Could not save the diagnostics"
 msgstr "Kan de diagnose niet opslaan"
 
-#: src/core/app.c:960
+#: src/core/app.c:961
 msgid "Display restored: automatic resolution and rotation"
 msgstr "Scherm hersteld: automatische resolutie en rotatie"
 
-#: src/core/app.c:966
+#: src/core/app.c:967
 msgid "Writing"
 msgstr "Schrijven"
 
-#: src/core/app.c:966
+#: src/core/app.c:967
 msgid "System"
 msgstr "Systeem"
 
-#: src/core/app.c:976
+#: src/core/app.c:977
 msgid "THEMES"
 msgstr "THEMA'S"
 
-#: src/core/app.c:983
+#: src/core/app.c:984
 msgid "+  Create my theme"
 msgstr "+  Mijn thema maken"
 
-#: src/core/app.c:984
+#: src/core/app.c:985
 msgid "Edit this theme"
 msgstr "Dit thema bewerken"
 
-#: src/core/app.c:986
+#: src/core/app.c:987
 #, c-format
 msgid "Mix colors and fonts; themes are saved in %s (editable .INI files)."
 msgstr "Combineer kleuren en lettertypen; thema's worden opgeslagen in %s (bewerkbare .INI-bestanden)."
 
-#: src/core/app.c:988
+#: src/core/app.c:989
 msgid "TEXT FONT"
 msgstr "LETTERTYPE VAN DE TEKST"
 
-#: src/core/app.c:997
+#: src/core/app.c:998
 msgid "The quick brown fox jumps — “Hello!”"
 msgstr "Pa’s wijze lynx bezag vroom het fikse aquaduct — “Hallo!”"
 
-#: src/core/app.c:1003
+#: src/core/app.c:1004
 #, c-format
 msgid "Add .ttf fonts to %s (subfolders work too) and restart."
 msgstr "Zet .ttf-lettertypen in %s (submappen werken ook) en start opnieuw op."
 
-#: src/core/app.c:1004
-msgid "Ready-made pack: FOLIO-FONTS-EXTRA.zip — unzip it at the root of the USB drive."
-msgstr "Kant-en-klaar pakket: FOLIO-FONTS-EXTRA.zip — pak het uit in de hoofdmap van de USB-stick."
+#: src/core/app.c:1005
+msgid "Included writing fonts: Literata, Lora, EB Garamond, iA Writer, Special Elite and more."
+msgstr "Meegeleverde schrijflettertypen: Literata, Lora, EB Garamond, iA Writer, Special Elite en meer."
 
-#: src/core/app.c:1006
+#: src/core/app.c:1007
 msgid "TYPOGRAPHY"
 msgstr "TYPOGRAFIE"
 
-#: src/core/app.c:1007
+#: src/core/app.c:1008
 #, c-format
 msgid "%d px"
 msgstr "%d px"
 
-#: src/core/app.c:1008
+#: src/core/app.c:1009
 msgid "Text size"
 msgstr "Tekstgrootte"
 
-#: src/core/app.c:1011
+#: src/core/app.c:1012
 msgid "Line spacing"
 msgstr "Regelafstand"
 
-#: src/core/app.c:1013
+#: src/core/app.c:1014
 #, c-format
 msgid "%.2f lines"
 msgstr "%.2f regels"
 
-#: src/core/app.c:1014
+#: src/core/app.c:1015
 msgid "Space between paragraphs"
 msgstr "Ruimte tussen alinea's"
 
-#: src/core/app.c:1016
+#: src/core/app.c:1017
 msgid "First-line indent for paragraphs (book style)"
 msgstr "Inspringing van de eerste regel (boekstijl)"
 
-#: src/core/app.c:1018
+#: src/core/app.c:1019
 msgid "PAGE"
 msgstr "PAGINA"
 
-#: src/core/app.c:1020
+#: src/core/app.c:1021
 msgid "Page"
 msgstr "Pagina"
 
-#: src/core/app.c:1020
+#: src/core/app.c:1021
 msgid "Full screen"
 msgstr "Volledig scherm"
 
-#: src/core/app.c:1029
+#: src/core/app.c:1030
 #, c-format
 msgid "%d px (~%d characters per line)"
 msgstr "%d px (~%d tekens per regel)"
 
-#: src/core/app.c:1030
+#: src/core/app.c:1031
 msgid "Page width"
 msgstr "Paginabreedte"
 
-#: src/core/app.c:1032
+#: src/core/app.c:1033
 msgid "Paper sheet on the desk (light themes)"
 msgstr "Vel papier op het bureau (lichte thema's)"
 
-#: src/core/app.c:1035
+#: src/core/app.c:1036
 msgid "The text fills the whole screen width, with no sheet."
 msgstr "De tekst vult de hele schermbreedte, zonder vel."
 
-#: src/core/app.c:1039
+#: src/core/app.c:1040
 msgid "FOCUS MODE"
 msgstr "FOCUSMODUS"
 
-#: src/core/app.c:1040
+#: src/core/app.c:1041
 msgid "Off"
 msgstr "Uit"
 
-#: src/core/app.c:1040
+#: src/core/app.c:1041
 msgid "Sentence"
 msgstr "Zin"
 
-#: src/core/app.c:1040
+#: src/core/app.c:1041
 msgid "Paragraph"
 msgstr "Alinea"
 
-#: src/core/app.c:1040
+#: src/core/app.c:1041
 msgid "Line"
 msgstr "Regel"
 
-#: src/core/app.c:1043
+#: src/core/app.c:1044
 msgid "EDITOR"
 msgstr "EDITOR"
 
-#: src/core/app.c:1045
+#: src/core/app.c:1046
 msgid "Typewriter — current line in the center"
 msgstr "Typemachine — huidige regel in het midden"
 
-#: src/core/app.c:1046
+#: src/core/app.c:1047
 msgid "Live Markdown (headings, bold, lists)"
 msgstr "Live Markdown (koppen, vet, lijsten)"
 
-#: src/core/app.c:1047
+#: src/core/app.c:1048
 msgid "Hide markup outside the current paragraph"
 msgstr "Opmaakcodes buiten de huidige alinea verbergen"
 
-#: src/core/app.c:1048
+#: src/core/app.c:1049
 msgid "Smart typography:  --  →  —   \"\"  →  “”   ...  →  …"
 msgstr "Slimme typografie:  --  →  —   \"\"  →  “”   ...  →  …"
 
-#: src/core/app.c:1049
+#: src/core/app.c:1050
 msgid "Hemingway mode — deleting is not allowed"
 msgstr "Hemingway-modus — verwijderen niet toegestaan"
 
-#: src/core/app.c:1050
+#: src/core/app.c:1051
 msgid "Hide the bars while writing"
 msgstr "Balken verbergen tijdens het schrijven"
 
-#: src/core/app.c:1051
+#: src/core/app.c:1052
 msgid "Blinking cursor"
 msgstr "Knipperende cursor"
 
-#: src/core/app.c:1052
+#: src/core/app.c:1053
 msgid "Smooth cursor movement"
 msgstr "Vloeiende cursorbeweging"
 
-#: src/core/app.c:1059
+#: src/core/app.c:1060
 msgid "Tabs — several open documents, remembered after a restart"
 msgstr "Tabbladen — meerdere open documenten, onthouden na herstarten"
 
-#: src/core/app.c:1062
+#: src/core/app.c:1063
 msgid "GOALS AND SAVING"
 msgstr "DOELEN EN OPSLAAN"
 
-#: src/core/app.c:1063 src/core/app.c:1535 src/core/app.c:1786
+#: src/core/app.c:1064 src/core/app.c:1536 src/core/app.c:1788
 #, c-format
 msgid "%d word"
 msgid_plural "%d words"
 msgstr[0] "%d woord"
 msgstr[1] "%d woorden"
 
-#: src/core/app.c:1064
+#: src/core/app.c:1065
 msgid "Session goal"
 msgstr "Sessiedoel"
 
-#: src/core/app.c:1066 src/core/app.c:1537 src/core/app.c:1751
+#: src/core/app.c:1067 src/core/app.c:1538 src/core/app.c:1753
 #, c-format
 msgid "%d min"
 msgstr "%d min"
 
-#: src/core/app.c:1067
+#: src/core/app.c:1068
 msgid "Sprint length"
 msgstr "Duur van de sprint"
 
-#: src/core/app.c:1069
+#: src/core/app.c:1070
 #, c-format
 msgid "every %d s"
 msgstr "elke %d s"
 
-#: src/core/app.c:1070
+#: src/core/app.c:1071
 msgid "Autosave"
 msgstr "Automatisch opslaan"
 
-#: src/core/app.c:1073
+#: src/core/app.c:1074
 msgid "LANGUAGE AND KEYBOARD"
 msgstr "TAAL EN TOETSENBORD"
 
-#: src/core/app.c:1076
+#: src/core/app.c:1077
 msgid "Language"
 msgstr "Taal"
 
-#: src/core/app.c:1081
+#: src/core/app.c:1082
 msgid "Keyboard"
 msgstr "Toetsenbord"
 
-#: src/core/app.c:1090
+#: src/core/app.c:1091
 #, c-format
 msgid "Languages: %s · keyboards: %s (text files anyone can add)"
 msgstr "Talen: %s · toetsenborden: %s (tekstbestanden die iedereen kan toevoegen)"
 
-#: src/core/app.c:1094
+#: src/core/app.c:1095
 msgid "DISPLAY AND POINTER"
 msgstr "SCHERM EN AANWIJZER"
 
-#: src/core/app.c:1095
+#: src/core/app.c:1096
 msgid "Auto"
 msgstr "Auto"
 
-#: src/core/app.c:1100
+#: src/core/app.c:1101
 msgid "Rotate: auto"
 msgstr "Draaien: auto"
 
-#: src/core/app.c:1108
+#: src/core/app.c:1109
 #, c-format
 msgid "Resolution: %dx%d"
 msgstr "Resolutie: %dx%d"
 
-#: src/core/app.c:1109
+#: src/core/app.c:1110
 #, c-format
 msgid "Resolution: automatic (%dx%d)"
 msgstr "Resolutie: automatisch (%dx%d)"
 
-#: src/core/app.c:1119
+#: src/core/app.c:1120
 msgid "Restore display"
 msgstr "Scherm herstellen"
 
-#: src/core/app.c:1121
+#: src/core/app.c:1122
 msgid "If the picture looks wrong or goes black: Ctrl+Alt+Home restores it; Ctrl+Alt+arrows rotate the screen."
 msgstr "Als het beeld verkeerd of zwart is: Ctrl+Alt+Home herstelt het; Ctrl+Alt+pijltjes draaien het scherm."
 
-#: src/core/app.c:1125
+#: src/core/app.c:1126
 msgid "Mouse / touchpad speed"
 msgstr "Snelheid van muis / touchpad"
 
-#: src/core/app.c:1127
+#: src/core/app.c:1128
 msgid "Automatic"
 msgstr "Automatisch"
 
-#: src/core/app.c:1127
+#: src/core/app.c:1128
 msgid "Touchpad"
 msgstr "Touchpad"
 
-#: src/core/app.c:1127
+#: src/core/app.c:1128
 msgid "Touch screen"
 msgstr "Aanraakscherm"
 
-#: src/core/app.c:1130
+#: src/core/app.c:1131
 msgid "If the pointer jumps to the corners when you use the touchpad, choose Touchpad."
 msgstr "Springt de aanwijzer naar de hoeken bij gebruik van de touchpad, kies dan Touchpad."
 
-#: src/core/app.c:1133
+#: src/core/app.c:1134
 msgid "Use the mouse and touchpad (off = keyboard only)"
 msgstr "Muis en touchpad gebruiken (uit = alleen toetsenbord)"
 
-#: src/core/app.c:1135
+#: src/core/app.c:1136
 msgid "SOUND"
 msgstr "GELUID"
 
-#: src/core/app.c:1136
+#: src/core/app.c:1137
 msgid "Turn on the amplifier through GPIO (some laptops; applies after a restart)"
 msgstr "Versterker inschakelen via GPIO (sommige laptops; geldt na herstarten)"
 
-#: src/core/app.c:1138
+#: src/core/app.c:1139
 msgid "Test sound"
 msgstr "Geluid testen"
 
-#: src/core/app.c:1139
+#: src/core/app.c:1140
 msgid "Save diagnostics"
 msgstr "Diagnose opslaan"
 
-#: src/core/app.c:1141
+#: src/core/app.c:1142
 #, c-format
 msgid "The diagnostics go to %s on the USB drive (it opens on any computer)."
 msgstr "De diagnose wordt opgeslagen in %s op de USB-stick (opent op elke computer)."
 
-#: src/core/app.c:1143
+#: src/core/app.c:1144
 msgid "STARTUP"
 msgstr "OPSTARTEN"
 
-#: src/core/app.c:1144
+#: src/core/app.c:1145
 msgid "FolioOS splash screen"
 msgstr "FolioOS-startscherm"
 
-#: src/core/app.c:1149
+#: src/core/app.c:1150
 msgid "Splash duration (any key skips it)"
 msgstr "Duur van het startscherm (elke toets slaat het over)"
 
-#: src/core/app.c:1155
+#: src/core/app.c:1156
 msgid "ABOUT"
 msgstr "OVER"
 
-#: src/core/app.c:1158
+#: src/core/app.c:1159
 #, c-format
 msgid "FolioOS %s · %s · %dx%d"
 msgstr "FolioOS %s · %s · %dx%d"
 
-#: src/core/app.c:1159
+#: src/core/app.c:1160
 #, c-format
 msgid "Memory: %d MB used of %d MB · %d fonts · %d themes"
 msgstr "Geheugen: %d MB gebruikt van %d MB · %d lettertypen · %d thema's"
 
-#: src/core/app.c:1160
+#: src/core/app.c:1161
 #, c-format
 msgid "Audio: %s"
 msgstr "Audio: %s"
 
-#: src/core/app.c:1165
+#: src/core/app.c:1166
 msgid "Restart"
 msgstr "Opnieuw opstarten"
 
-#: src/core/app.c:1185
+#: src/core/app.c:1186
 msgid "Desk (background)"
 msgstr "Bureau (achtergrond)"
 
-#: src/core/app.c:1185
+#: src/core/app.c:1186
 msgid "Paper"
 msgstr "Papier"
 
-#: src/core/app.c:1185 src/core/app.c:1386
+#: src/core/app.c:1186 src/core/app.c:1387
 msgid "Text"
 msgstr "Tekst"
 
-#: src/core/app.c:1185
+#: src/core/app.c:1186
 msgid "Faded text"
 msgstr "Gedempte tekst"
 
-#: src/core/app.c:1185
+#: src/core/app.c:1186
 msgid "Subtle lines"
 msgstr "Subtiele lijnen"
 
-#: src/core/app.c:1185
+#: src/core/app.c:1186
 msgid "Accent"
 msgstr "Accent"
 
-#: src/core/app.c:1185
+#: src/core/app.c:1186
 msgid "Selection"
 msgstr "Selectie"
 
-#: src/core/app.c:1185
+#: src/core/app.c:1186
 msgid "Cursor"
 msgstr "Cursor"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1187
 msgid "Bars"
 msgstr "Balken"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1187
 msgid "Bar text"
 msgstr "Tekst van de balken"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1187
 msgid "Borders"
 msgstr "Randen"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1187
 msgid "Panels"
 msgstr "Panelen"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1187
 msgid "Panel text"
 msgstr "Tekst van de panelen"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1187
 msgid "Headings"
 msgstr "Koppen"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1187
 msgid "Code background"
 msgstr "Achtergrond van code"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1187
 msgid "Highlighter"
 msgstr "Markeerstift"
 
-#: src/core/app.c:1220
+#: src/core/app.c:1221
 msgid "My theme"
 msgstr "Mijn thema"
 
-#: src/core/app.c:1221
+#: src/core/app.c:1222
 #, c-format
 msgid "My theme %d"
 msgstr "Mijn thema %d"
 
-#: src/core/app.c:1244
+#: src/core/app.c:1245
 msgid "Give the theme a name"
 msgstr "Geef het thema een naam"
 
-#: src/core/app.c:1246
+#: src/core/app.c:1247
 msgid "That name belongs to a built-in theme — choose another"
 msgstr "Die naam hoort bij een ingebouwd thema — kies een andere"
 
-#: src/core/app.c:1247
+#: src/core/app.c:1248
 msgid "You already have a theme with that name"
 msgstr "Je hebt al een thema met die naam"
 
-#: src/core/app.c:1250
+#: src/core/app.c:1251
 #, c-format
 msgid "Could not write to %s (is the USB drive write-protected or full?)"
 msgstr "Kan niet schrijven naar %s (is de USB-stick beveiligd of vol?)"
 
-#: src/core/app.c:1255
+#: src/core/app.c:1256
 #, c-format
 msgid "Theme “%s” saved to %s"
 msgstr "Thema “%s” opgeslagen in %s"
 
-#: src/core/app.c:1267
+#: src/core/app.c:1268
 msgid "Theme deleted"
 msgstr "Thema verwijderd"
 
-#: src/core/app.c:1298
+#: src/core/app.c:1299
 msgid "THEME NAME"
 msgstr "NAAM VAN HET THEMA"
 
-#: src/core/app.c:1299
+#: src/core/app.c:1300
 msgid "Theme name"
 msgstr "Naam van het thema"
 
-#: src/core/app.c:1302
+#: src/core/app.c:1303
 msgid "STARTING POINT"
 msgstr "VERTREKPUNT"
 
-#: src/core/app.c:1305
+#: src/core/app.c:1306
 msgid "Colors from"
 msgstr "Kleuren van"
 
-#: src/core/app.c:1307
+#: src/core/app.c:1308
 msgid "Use all"
 msgstr "Alle gebruiken"
 
-#: src/core/app.c:1314
+#: src/core/app.c:1315
 msgid "Or mix: pick a color below and take it from any built-in theme."
 msgstr "Of combineer: kies hieronder een kleur en neem die over uit een ingebouwd thema."
 
-#: src/core/app.c:1318
+#: src/core/app.c:1319
 msgid "COLORS"
 msgstr "KLEUREN"
 
-#: src/core/app.c:1347
+#: src/core/app.c:1348
 msgid "hex code"
 msgstr "hexcode"
 
-#: src/core/app.c:1351
+#: src/core/app.c:1352
 msgid "Hue"
 msgstr "Tint"
 
-#: src/core/app.c:1354
+#: src/core/app.c:1355
 msgid "Saturation"
 msgstr "Verzadiging"
 
-#: src/core/app.c:1357
+#: src/core/app.c:1358
 msgid "Lightness"
 msgstr "Helderheid"
 
-#: src/core/app.c:1361
+#: src/core/app.c:1362
 msgid "Take from a built-in theme:"
 msgstr "Overnemen uit een ingebouwd thema:"
 
-#: src/core/app.c:1384
+#: src/core/app.c:1385
 msgid "THEME FONTS"
 msgstr "LETTERTYPEN VAN HET THEMA"
 
-#: src/core/app.c:1391
+#: src/core/app.c:1392
 #, c-format
 msgid "Default (%s)"
 msgstr "Standaard (%s)"
 
-#: src/core/app.c:1392
+#: src/core/app.c:1393
 msgid "Interface"
 msgstr "Interface"
 
-#: src/core/app.c:1400
-msgid "Interface = bars, menus and windows. More fonts: FOLIO-FONTS-EXTRA.zip."
-msgstr "Interface = balken, menu's en vensters. Meer lettertypen: FOLIO-FONTS-EXTRA.zip."
+#: src/core/app.c:1401
+msgid "Interface = bars, menus and windows."
+msgstr "Interface = balken, menu’s en vensters."
 
-#: src/core/app.c:1404
+#: src/core/app.c:1405
 msgid "DESK AND PAPER"
 msgstr "BUREAU EN PAPIER"
 
-#: src/core/app.c:1405
+#: src/core/app.c:1406
 msgid "Paper sheet on the desk"
 msgstr "Vel papier op het bureau"
 
-#: src/core/app.c:1409
+#: src/core/app.c:1410
 msgid "Vignette at the desk edges"
 msgstr "Vignet aan de randen van het bureau"
 
-#: src/core/app.c:1420
+#: src/core/app.c:1421
 msgid "Save theme"
 msgstr "Thema opslaan"
 
-#: src/core/app.c:1421 src/core/filedlg.c:60 src/core/filedlg.c:73 src/core/filedlg.c:408 src/core/filedlg.c:439
+#: src/core/app.c:1422 src/core/filedlg.c:60 src/core/filedlg.c:73 src/core/filedlg.c:408 src/core/filedlg.c:439
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: src/core/app.c:1422 src/core/app.c:1423 src/core/filedlg.c:57 src/core/filedlg.c:313 src/core/filedlg.c:316 src/core/filedlg.c:316
+#: src/core/app.c:1423 src/core/app.c:1424 src/core/filedlg.c:57 src/core/filedlg.c:313 src/core/filedlg.c:316 src/core/filedlg.c:316
 msgid "Delete"
 msgstr "Verwijderen"
 
-#: src/core/app.c:1423
+#: src/core/app.c:1424
 msgid "Delete theme?"
 msgstr "Thema verwijderen?"
 
-#: src/core/app.c:1423
+#: src/core/app.c:1424
 #, c-format
 msgid "The theme file in %s will be deleted."
 msgstr "Het themabestand in %s wordt verwijderd."
 
-#: src/core/app.c:1430
+#: src/core/app.c:1431
 msgid "Find"
 msgstr "Zoeken"
 
-#: src/core/app.c:1431
+#: src/core/app.c:1432
 msgid "Previous (Shift+Enter)"
 msgstr "Vorige (Shift+Enter)"
 
-#: src/core/app.c:1432
+#: src/core/app.c:1433
 msgid "Next (Enter)"
 msgstr "Volgende (Enter)"
 
-#: src/core/app.c:1433
+#: src/core/app.c:1434
 msgid "Replace with"
 msgstr "Vervangen door"
 
-#: src/core/app.c:1435 src/core/filedlg.c:203
+#: src/core/app.c:1436 src/core/filedlg.c:203
 msgid "Replace"
 msgstr "Vervangen"
 
-#: src/core/app.c:1436
+#: src/core/app.c:1437
 msgid "Replace all"
 msgstr "Alles vervangen"
 
-#: src/core/app.c:1438
+#: src/core/app.c:1439
 #, c-format
 msgid "%d replacement"
 msgid_plural "%d replacements"
 msgstr[0] "%d vervanging"
 msgstr[1] "%d vervangingen"
 
-#: src/core/app.c:1445
+#: src/core/app.c:1446
 msgid "Nothing found"
 msgstr "Niets gevonden"
 
-#: src/core/app.c:1452
+#: src/core/app.c:1453
 #, c-format
 msgid "%d match"
 msgid_plural "%d matches"
 msgstr[0] "%d overeenkomst"
 msgstr[1] "%d overeenkomsten"
 
-#: src/core/app.c:1490
+#: src/core/app.c:1491
 msgid "(untitled)"
 msgstr "(naamloos)"
 
-#: src/core/app.c:1499
+#: src/core/app.c:1500
 msgid "No headings yet."
 msgstr "Nog geen koppen."
 
-#: src/core/app.c:1500
+#: src/core/app.c:1501
 msgid "Start a line with # to create chapters."
 msgstr "Begin een regel met # om hoofdstukken te maken."
 
-#: src/core/app.c:1529
+#: src/core/app.c:1530
 #, c-format
 msgid "goal of %d reached"
 msgstr "doel van %d bereikt"
 
-#: src/core/app.c:1529
+#: src/core/app.c:1530
 #, c-format
 msgid "of %d words today"
 msgstr "van %d woorden vandaag"
 
-#: src/core/app.c:1530
+#: src/core/app.c:1531
 msgid "words today"
 msgstr "woorden vandaag"
 
-#: src/core/app.c:1535
+#: src/core/app.c:1536
 msgid "This document"
 msgstr "Dit document"
 
-#: src/core/app.c:1536
+#: src/core/app.c:1537
 msgid "This session"
 msgstr "Deze sessie"
 
-#: src/core/app.c:1536
+#: src/core/app.c:1537
 #, c-format
 msgid "+%d in %dh%02d"
 msgstr "+%d in %du%02d"
 
-#: src/core/app.c:1537
+#: src/core/app.c:1538
 msgid "Estimated reading"
 msgstr "Geschatte leestijd"
 
-#: src/core/app.c:1538
+#: src/core/app.c:1539
 msgid "Pace"
 msgstr "Tempo"
 
-#: src/core/app.c:1538
+#: src/core/app.c:1539
 #, c-format
 msgid "%d words/h"
 msgstr "%d woorden/u"
 
-#: src/core/app.c:1549
+#: src/core/app.c:1550
 msgid "15 min"
 msgstr "15 min"
 
-#: src/core/app.c:1549
+#: src/core/app.c:1550
 msgid "25 min"
 msgstr "25 min"
 
-#: src/core/app.c:1549
+#: src/core/app.c:1550
 msgid "45 min"
 msgstr "45 min"
 
-#: src/core/app.c:1549
+#: src/core/app.c:1550
 msgid "60 min"
 msgstr "60 min"
 
-#: src/core/app.c:1554
+#: src/core/app.c:1555
 msgid "Start sprint"
 msgstr "Sprint starten"
 
-#: src/core/app.c:1560
+#: src/core/app.c:1561
 #, c-format
 msgid "+%d word in this sprint"
 msgid_plural "+%d words in this sprint"
 msgstr[0] "+%d woord in deze sprint"
 msgstr[1] "+%d woorden in deze sprint"
 
-#: src/core/app.c:1563
+#: src/core/app.c:1564
 msgid "Stop sprint"
 msgstr "Sprint stoppen"
 
-#: src/core/app.c:1575
+#: src/core/app.c:1576
 msgid "Ctrl+N / O / S"
 msgstr "Ctrl+N / O / S"
 
-#: src/core/app.c:1575
+#: src/core/app.c:1576
 msgid "New · Open · Save"
 msgstr "Nieuw · Openen · Opslaan"
 
-#: src/core/app.c:1575 src/core/filedlg.c:123
+#: src/core/app.c:1576 src/core/filedlg.c:123
 msgid "Save as / Export"
 msgstr "Opslaan als / Exporteren"
 
-#: src/core/app.c:1576
+#: src/core/app.c:1577
 msgid "Ctrl+W · Ctrl+Tab"
 msgstr "Ctrl+W · Ctrl+Tab"
 
-#: src/core/app.c:1576
+#: src/core/app.c:1577
 msgid "Tabs: close · next"
 msgstr "Tabbladen: sluiten · volgende"
 
-#: src/core/app.c:1576
+#: src/core/app.c:1577
 msgid "Alt+1…9"
 msgstr "Alt+1…9"
 
-#: src/core/app.c:1576
+#: src/core/app.c:1577
 msgid "Go to tab 1…9"
 msgstr "Naar tabblad 1…9"
 
-#: src/core/app.c:1577
+#: src/core/app.c:1578
 msgid "Ctrl+K"
 msgstr "Ctrl+K"
 
-#: src/core/app.c:1577
+#: src/core/app.c:1578
 msgid "Command palette"
 msgstr "Opdrachtenpalet"
 
-#: src/core/app.c:1577
+#: src/core/app.c:1578
 msgid "Reading (formatted Markdown)"
 msgstr "Lezen (opgemaakte Markdown)"
 
-#: src/core/app.c:1578
+#: src/core/app.c:1579
 msgid "Ctrl+Z / Y"
 msgstr "Ctrl+Z / Y"
 
-#: src/core/app.c:1578
+#: src/core/app.c:1579
 msgid "Undo · Redo"
 msgstr "Ongedaan maken · Opnieuw"
 
-#: src/core/app.c:1579
+#: src/core/app.c:1580
 msgid "Ctrl+B / I"
 msgstr "Ctrl+B / I"
 
-#: src/core/app.c:1579
+#: src/core/app.c:1580
 msgid "Bold · Italic"
 msgstr "Vet · Cursief"
 
-#: src/core/app.c:1579
+#: src/core/app.c:1580
 msgid "Ctrl+1…6 / 0"
 msgstr "Ctrl+1…6 / 0"
 
-#: src/core/app.c:1579
+#: src/core/app.c:1580
 msgid "Heading level 1–6 · Text"
 msgstr "Kop niveau 1–6 · Tekst"
 
-#: src/core/app.c:1580
+#: src/core/app.c:1581
 msgid "Alt+↑ / ↓"
 msgstr "Alt+↑ / ↓"
 
-#: src/core/app.c:1580
+#: src/core/app.c:1581
 msgid "Move paragraph"
 msgstr "Alinea verplaatsen"
 
-#: src/core/app.c:1580
+#: src/core/app.c:1581
 msgid "Tab / Shift+Tab"
 msgstr "Tab / Shift+Tab"
 
-#: src/core/app.c:1580
+#: src/core/app.c:1581
 msgid "Indent list item"
 msgstr "Lijstitem inspringen"
 
-#: src/core/app.c:1582
+#: src/core/app.c:1583
 msgid "Ctrl+PgUp / PgDn"
 msgstr "Ctrl+PgUp / PgDn"
 
-#: src/core/app.c:1582
+#: src/core/app.c:1583
 msgid "Previous · next chapter"
 msgstr "Vorig · volgend hoofdstuk"
 
-#: src/core/app.c:1582
+#: src/core/app.c:1583
 msgid "Jump to and back from the last edit"
 msgstr "Naar de laatste wijziging en terug"
 
-#: src/core/app.c:1583
+#: src/core/app.c:1584
 msgid "lowercase → Title Case → UPPERCASE"
 msgstr "kleine letters → Hoofdletter → HOOFDLETTERS"
 
-#: src/core/app.c:1583
+#: src/core/app.c:1584
 msgid "Select and type ( \" *"
 msgstr "Selecteren en ( \" * typen"
 
-#: src/core/app.c:1583
+#: src/core/app.c:1584
 msgid "Wraps the selection"
 msgstr "Omsluit de selectie"
 
-#: src/core/app.c:1584
+#: src/core/app.c:1585
 msgid "← / → · Space (reading)"
 msgstr "← / → · Spatie (lezen)"
 
-#: src/core/app.c:1584
+#: src/core/app.c:1585
 msgid "Previous · next page"
 msgstr "Vorige · volgende pagina"
 
-#: src/core/app.c:1584
+#: src/core/app.c:1585
 msgid "Auto-scroll on/off"
 msgstr "Automatisch scrollen aan/uit"
 
-#: src/core/app.c:1585
+#: src/core/app.c:1586
 msgid "+ / − (reading)"
 msgstr "+ / − (lezen)"
 
-#: src/core/app.c:1585
+#: src/core/app.c:1586
 msgid "Auto-scroll speed"
 msgstr "Snelheid van automatisch scrollen"
 
-#: src/core/app.c:1586
+#: src/core/app.c:1587
 msgid "Ctrl+← / →"
 msgstr "Ctrl+← / →"
 
-#: src/core/app.c:1586
+#: src/core/app.c:1587
 msgid "Previous / next word"
 msgstr "Vorig / volgend woord"
 
-#: src/core/app.c:1586
+#: src/core/app.c:1587
 msgid "Ctrl+Home / End"
 msgstr "Ctrl+Home / End"
 
-#: src/core/app.c:1586
+#: src/core/app.c:1587
 msgid "Start · end of the text"
 msgstr "Begin · einde van de tekst"
 
-#: src/core/app.c:1587
+#: src/core/app.c:1588
 msgid "Ctrl+= / -"
 msgstr "Ctrl+= / -"
 
-#: src/core/app.c:1587
+#: src/core/app.c:1588
 msgid "Larger · smaller text"
 msgstr "Grotere · kleinere tekst"
 
-#: src/core/app.c:1588
+#: src/core/app.c:1589
 msgid "This help"
 msgstr "Deze hulp"
 
-#: src/core/app.c:1588
+#: src/core/app.c:1589
 msgid "Focus mode (sentence/paragraph/line)"
 msgstr "Focusmodus (zin/alinea/regel)"
 
-#: src/core/app.c:1589
+#: src/core/app.c:1590
 msgid "Typewriter"
 msgstr "Typemachine"
 
-#: src/core/app.c:1589
+#: src/core/app.c:1590
 msgid "Writing sprint"
 msgstr "Schrijfsprint"
 
-#: src/core/app.c:1591
+#: src/core/app.c:1592
 msgid "F7 / F8 / F9"
 msgstr "F7 / F8 / F9"
 
-#: src/core/app.c:1591
+#: src/core/app.c:1592
 msgid "Previous track · Play/pause · Next"
 msgstr "Vorig nummer · Afspelen/pauzeren · Volgend"
 
-#: src/core/app.c:1592
+#: src/core/app.c:1593
 msgid "Zen mode"
 msgstr "Zenmodus"
 
-#: src/core/app.c:1593
+#: src/core/app.c:1594
 msgid "Esc"
 msgstr "Esc"
 
-#: src/core/app.c:1593
+#: src/core/app.c:1594
 msgid "Close window · leave zen/reading"
 msgstr "Venster sluiten · zen/lezen verlaten"
 
-#: src/core/app.c:1594
+#: src/core/app.c:1595
 msgid "Tab · ↑ ↓ (windows)"
 msgstr "Tab · ↑ ↓ (vensters)"
 
-#: src/core/app.c:1594
+#: src/core/app.c:1595
 msgid "Move between buttons and options"
 msgstr "Wisselt tussen knoppen en opties"
 
-#: src/core/app.c:1594
+#: src/core/app.c:1595
 msgid "Enter · Space · ← →"
 msgstr "Enter · Spatie · ← →"
 
-#: src/core/app.c:1594
+#: src/core/app.c:1595
 msgid "Press · adjust the focused option"
 msgstr "Activeren · gekozen optie aanpassen"
 
-#: src/core/app.c:1595
+#: src/core/app.c:1596
 msgid "Keyboard between the text and the windows"
 msgstr "Toetsenbord tussen tekst en vensters"
 
-#: src/core/app.c:1595
+#: src/core/app.c:1596
 msgid "Ctrl+Shift+← / →"
 msgstr "Ctrl+Shift+← / →"
 
-#: src/core/app.c:1595
+#: src/core/app.c:1596
 msgid "Select word by word"
 msgstr "Woord voor woord selecteren"
 
-#: src/core/app.c:1596
+#: src/core/app.c:1597
 msgid "Become — and … (smart typography)"
 msgstr "Worden — en … (slimme typografie)"
 
-#: src/core/app.c:1672
+#: src/core/app.c:1597
+msgid "Alt+F7 / Alt+F8"
+msgstr "Alt+F7 / Alt+F8"
+
+#: src/core/app.c:1597
+msgid "Move · resize the window (arrows, Enter)"
+msgstr "Venster verplaatsen · formaat wijzigen (pijltjes, Enter)"
+
+#: src/core/app.c:1674
 #, c-format
 msgid "Untitled — kept in %s until you save it"
 msgstr "Naamloos — bewaard in %s tot je het opslaat"
 
-#: src/core/app.c:1679
+#: src/core/app.c:1681
 msgid "New tab (Ctrl+N)"
 msgstr "Nieuw tabblad (Ctrl+N)"
 
-#: src/core/app.c:1698
+#: src/core/app.c:1700
 msgid "Not saved yet (Ctrl+S)"
 msgstr "Nog niet opgeslagen (Ctrl+S)"
 
-#: src/core/app.c:1713
+#: src/core/app.c:1715
 #, c-format
 msgid "Playing: %s (F6)"
 msgstr "Speelt af: %s (F6)"
 
-#: src/core/app.c:1714
+#: src/core/app.c:1716
 msgid "Music (F6)"
 msgstr "Muziek (F6)"
 
-#: src/core/app.c:1714
+#: src/core/app.c:1716
 #, c-format
 msgid "Music (F6) — put MP3 files in the %s folder"
 msgstr "Muziek (F6) — zet MP3-bestanden in de map %s"
 
-#: src/core/app.c:1716
+#: src/core/app.c:1718
 msgid "Tabs on — click to turn off"
 msgstr "Tabbladen aan — klik om uit te zetten"
 
-#: src/core/app.c:1716
+#: src/core/app.c:1718
 msgid "Tabs: open several documents (like in Sublime Text)"
 msgstr "Tabbladen: meerdere documenten openen (zoals in Sublime Text)"
 
-#: src/core/app.c:1717
+#: src/core/app.c:1719
 msgid "Zen mode (F11)"
 msgstr "Zenmodus (F11)"
 
-#: src/core/app.c:1718
+#: src/core/app.c:1720
 msgid "Typewriter (F3)"
 msgstr "Typemachine (F3)"
 
-#: src/core/app.c:1719
+#: src/core/app.c:1721
 msgid "Reading (Ctrl+P)"
 msgstr "Lezen (Ctrl+P)"
 
-#: src/core/app.c:1721
+#: src/core/app.c:1723
 msgid "Appearance (F12)"
 msgstr "Weergave (F12)"
 
-#: src/core/app.c:1722
+#: src/core/app.c:1724
 msgid "Commands (Ctrl+K)"
 msgstr "Opdrachten (Ctrl+K)"
 
-#: src/core/app.c:1734
+#: src/core/app.c:1736
 msgid "Next track (F9)"
 msgstr "Volgend nummer (F9)"
 
-#: src/core/app.c:1736
+#: src/core/app.c:1738
 msgid "Pause (F8)"
 msgstr "Pauzeren (F8)"
 
-#: src/core/app.c:1736
+#: src/core/app.c:1738
 msgid "Play (F8)"
 msgstr "Afspelen (F8)"
 
-#: src/core/app.c:1738
+#: src/core/app.c:1740
 msgid "Previous track (F7)"
 msgstr "Vorig nummer (F7)"
 
-#: src/core/app.c:1751
+#: src/core/app.c:1753
 #, c-format
 msgid "%d h %02d min"
 msgstr "%d u %02d min"
 
-#: src/core/app.c:1779
+#: src/core/app.c:1781
 msgid " · end of the text"
 msgstr " · einde van de tekst"
 
-#: src/core/app.c:1780
+#: src/core/app.c:1782
 #, c-format
 msgid " · %s · %s to the end of the chapter · %s in total"
 msgstr " · %s · %s tot het einde van het hoofdstuk · %s in totaal"
 
-#: src/core/app.c:1781
+#: src/core/app.c:1783
 #, c-format
 msgid " · %s · %s of reading left"
 msgstr " · %s · nog %s lezen"
 
-#: src/core/app.c:1782
+#: src/core/app.c:1784
 #, c-format
 msgid " · %s of reading left"
 msgstr " · nog %s lezen"
 
-#: src/core/app.c:1785
+#: src/core/app.c:1787
 #, c-format
 msgid "%d of %d word"
 msgid_plural "%d of %d words"
 msgstr[0] "%d van %d woord"
 msgstr[1] "%d van %d woorden"
 
-#: src/core/app.c:1791
+#: src/core/app.c:1793
 #, c-format
 msgid "Today: %d words · %d min reading"
 msgstr "Vandaag: %d woorden · %d min lezen"
 
-#: src/core/app.c:2004 src/core/app.c:2009
+#: src/core/app.c:2010 src/core/app.c:2015
 msgid "Welcome back. Picking up where you left off."
 msgstr "Welkom terug. Verder waar je gebleven was."
 
-#: src/core/app.c:2004
+#: src/core/app.c:2010
 #, c-format
 msgid "Welcome back: %d tab reopened."
 msgid_plural "Welcome back: %d tabs reopened."
 msgstr[0] "Welkom terug: %d tabblad heropend."
 msgstr[1] "Welkom terug: %d tabbladen heropend."
 
-#: src/core/app.c:2008
+#: src/core/app.c:2014
 msgid "Welcome back. Reading continues where you left off."
 msgstr "Welkom terug. Het lezen gaat verder waar je gebleven was."
 
-#: src/core/app.c:2013
+#: src/core/app.c:2019
 msgid "Unsaved draft recovered"
 msgstr "Niet-opgeslagen concept hersteld"
 
-#: src/core/app.c:2018
+#: src/core/app.c:2024
 msgid ""
 "# Welcome to FolioOS\n"
 "\n"
@@ -1593,30 +1609,30 @@ msgstr ""
 "\n"
 "Wis deze tekst (Ctrl+A) en begin je verhaal.\n"
 
-#: src/core/app.c:2145
+#: src/core/app.c:2151
 #, c-format
 msgid "Sprint finished: %d word. Breathe and stretch."
 msgid_plural "Sprint finished: %d words. Breathe and stretch."
 msgstr[0] "Sprint voltooid: %d woord. Adem in en rek je uit."
 msgstr[1] "Sprint voltooid: %d woorden. Adem in en rek je uit."
 
-#: src/core/editor.c:311
+#: src/core/editor.c:322
 msgid "Cut"
 msgstr "Geknipt"
 
-#: src/core/editor.c:311
+#: src/core/editor.c:322
 msgid "Copied"
 msgstr "Gekopieerd"
 
-#: src/core/editor.c:505
+#: src/core/editor.c:516
 msgid "There are no edits in this document yet"
 msgstr "Er zijn nog geen wijzigingen in dit document"
 
-#: src/core/editor.c:531 src/core/editor.c:644 src/core/editor.c:657
+#: src/core/editor.c:542 src/core/editor.c:659 src/core/editor.c:672
 msgid "Hemingway mode: keep going, no deleting"
 msgstr "Hemingway-modus: ga door, niet verwijderen"
 
-#: src/core/editor.c:541
+#: src/core/editor.c:552
 msgid "Paragraph deleted — Ctrl+Z undoes it"
 msgstr "Alinea verwijderd — Ctrl+Z maakt het ongedaan"
 
@@ -1905,6 +1921,26 @@ msgstr "november"
 msgid "December"
 msgstr "december"
 
+#: src/core/ime.c:200
+msgid "This keyboard has no input method (choose one in Settings › System)"
+msgstr "Dit toetsenbord heeft geen invoermethode (kies er een in Instellingen › Systeem)"
+
+#: src/core/ime.c:204
+msgid "Input: Latin letters"
+msgstr "Invoer: Latijnse letters"
+
+#: src/core/ime.c:204
+msgid "Input: Hangul"
+msgstr "Invoer: Hangul"
+
+#: src/core/ime.c:204
+msgid "Input: Hiragana"
+msgstr "Invoer: hiragana"
+
+#: src/core/ime.c:204
+msgid "Input: Katakana"
+msgstr "Invoer: katakana"
+
 #: src/core/music.c:131
 #, c-format
 msgid "No sound: %s. Details in %s"
@@ -2120,7 +2156,23 @@ msgstr "Toetsenbord: %s (Tab wisselt, Esc sluit)"
 msgid "Keyboard: text"
 msgstr "Toetsenbord: tekst"
 
-#: src/core/ui.c:246
+#: src/core/ui.c:229
+msgid "No window open"
+msgstr "Geen venster geopend"
+
+#: src/core/ui.c:230
+msgid "This window cannot be resized"
+msgstr "Dit venster kan niet van grootte veranderen"
+
+#: src/core/ui.c:233
+msgid "Move the window with the arrows · Enter confirms · Esc cancels"
+msgstr "Verplaats het venster met de pijltjes · Enter bevestigt · Esc annuleert"
+
+#: src/core/ui.c:234
+msgid "Resize the window with the arrows · Enter confirms · Esc cancels"
+msgstr "Wijzig de venstergrootte met de pijltjes · Enter bevestigt · Esc annuleert"
+
+#: src/core/ui.c:283
 msgid "Close (Esc)"
 msgstr "Sluiten (Esc)"
 

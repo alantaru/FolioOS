@@ -1,0 +1,43 @@
+# Métodos de entrada: coreano (hangul, 2 conjuntos) e japonês (romaji → kana)
+wait 300
+key esc
+wait 200
+key ctrl+a
+key delete
+# coreano: as teclas US montam as sílabas; a final passa para a sílaba seguinte (핫 + ㅔ = 하세)
+kbd ko
+raw gksrmf dkssudgktpdy
+assert_text 한글 안녕하세요
+# final composta e separação: 읽 + 어 = 읽어
+raw  dlfrdj
+assert_text 읽어
+# Backspace desfaz uma peça por vez: 각 → 가 → ㄱ → (nada)
+raw  rkr
+key backspace
+assert_text 읽어 가
+key backspace
+key backspace
+raw .
+assert_text 읽어 .
+# Ctrl+Espaço: letras latinas
+key ctrl+space
+raw abc
+assert_text .abc
+key ctrl+space
+shot i01_hangul.png
+# japonês: romaji vira kana; kk = っ, n antes de consoante = ん, - = ー
+key enter
+kbd ja
+raw nihongo kitte toukyou ra-men
+assert_text にほんご きって とうきょう らーめn
+# Ctrl+Espaço fecha a composição (o n pendente vira ん) e passa para katakana
+key ctrl+space
+assert_text にほんご きって とうきょう らーめん
+raw  kata
+assert_text らーめん カタ
+# Ctrl+Espaço de novo: latinas
+key ctrl+space
+raw  kana
+assert_text カタ kana
+key ctrl+space
+shot i02_kana.png

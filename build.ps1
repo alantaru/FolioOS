@@ -7,7 +7,7 @@
 #                          writes build\folio.img (MBR + FAT32) for Rufus/Etcher/dd
 #                          (-Vhd writes build\folio.vhd for VirtualBox/Hyper-V with EFI)
 # Requirements: gcc (MinGW-w64) and perl on PATH (Git for Windows ships perl); nasm only for -Legacy.
-# Optional: .\tools\fetch-cjk-fonts.ps1 once, to also build FOLIO-FONTS-CJK.zip.
+# The Chinese/Japanese/Korean fonts are downloaded once by tools\fetch-cjk-fonts.ps1 (run automatically).
 # =============================================================================
 param([switch]$NoTests, [switch]$Legacy, [switch]$Image, [int]$ImageMB = 2048, [switch]$Vhd)
 $ErrorActionPreference = "Stop"
@@ -53,6 +53,17 @@ if ($oldPot -ne (Get-Content -Raw build\folio.pot)) {
     Write-Host "      interface texts changed: assets\i18n\folio.pot updated (run: build\i18n.exe update assets\i18n\folio.pot assets\i18n\*.po)" -ForegroundColor Yellow
 }
 Run .\build\i18n.exe (@("check", "assets\i18n\folio.pot") + (Get-ChildItem assets\i18n\*.po | ForEach-Object { $_.FullName }))
+# README in every language: same content as README.md (tools/readmes.pl); warn when a block is still in English
+$perl = Get-Command perl -ErrorAction SilentlyContinue
+if (-not $perl -and (Test-Path "$env:ProgramFiles\Git\usr\bin\perl.exe")) { $perl = "$env:ProgramFiles\Git\usr\bin\perl.exe" }
+if ($perl) {
+    $ErrorActionPreference = "Continue"
+    $rd = & $perl tools\readmes.pl --check 2>&1 | ForEach-Object { "$_" }
+    $rdok = $LASTEXITCODE -eq 0
+    $ErrorActionPreference = "Stop"
+    if ($rdok) { Write-Host "      README: 15 languages with the same content as README.md" }
+    else { $rd | ForEach-Object { Write-Host "      $_" -ForegroundColor Yellow }; Write-Host "      README translations out of date: run perl tools\readmes.pl and translate the new blocks" -ForegroundColor Yellow }
+}
 # negative control: the checker must reject a translation whose %s/%d do not match the original
 $bad = "build\i18n_bad.po"
 (Get-Content -Raw -Encoding UTF8 assets\i18n\es.po) -replace 'msgstr "Tema: %s"', 'msgstr "Tema: %d"' | Set-Content -Encoding UTF8 $bad
@@ -81,6 +92,11 @@ New-Item -ItemType Directory -Force "$usb\EFI\BOOT", "$usb\FOLIO\FONTS", "$usb\F
     "$usb\FOLIO\THEMES", "$usb\DOCUMENTS", "$usb\MUSIC" | Out-Null
 Copy-Item build\efi\BOOTX64.EFI, build\efi\BOOTIA32.EFI "$usb\EFI\BOOT\"
 Copy-Item assets\fonts\*.ttf, assets\fonts\OFL-*.txt "$usb\FOLIO\FONTS\"
+# every language works out of the box: the writing fonts and the CJK fonts are part of the system
+if (-not (Test-Path "assets\fonts-cjk\_LANGUAGE\NotoSansSC.ttf")) { Write-Host "      downloading the Chinese/Japanese/Korean fonts (once)"; & .\tools\fetch-cjk-fonts.ps1 }
+foreach ($cjk in "NotoSansSC.ttf", "NotoSansJP.ttf", "NotoSansKR.ttf") { if (-not (Test-Path "assets\fonts-cjk\_LANGUAGE\$cjk")) { throw "missing assets\fonts-cjk\_LANGUAGE\$cjk (run .\tools\fetch-cjk-fonts.ps1)" } }
+Copy-Item -Recurse assets\fonts-extras "$usb\FOLIO\FONTS\EXTRA"
+Copy-Item -Recurse assets\fonts-cjk\_LANGUAGE "$usb\FOLIO\FONTS\_LANGUAGE"
 Copy-Item assets\i18n\*.po "$usb\FOLIO\LANGUAGES\"
 Copy-Item assets\keyboards\*.txt "$usb\FOLIO\KEYBOARDS\"
 Copy-Item docs\README.txt, docs\LEIA-ME.txt, docs\INSTALL.txt "$usb\"
@@ -112,20 +128,10 @@ foreach ($x in "CONFIG.INI", "DIAGNOSTICS.TXT", "DRAFT.MD", "TABS", "VERSIONS") 
 Write-Zip $stage $zip ""
 Remove-Item -Recurse -Force $stage
 Ok ("distribution package: $zip ({0:N1} MB) - unzip at the root of a FAT32 USB drive" -f ((Get-Item $zip).Length / 1MB))
-# optional font pack: unzip at the drive root -> FOLIO\FONTS\EXTRA\<family>
-$fz = "build\FOLIO-FONTS-EXTRA.zip"
-Write-Zip "assets\fonts-extras" $fz "FOLIO/FONTS/EXTRA/"
-Ok ("extra font pack: $fz ({0:N1} MB, {1} families)" -f ((Get-Item $fz).Length / 1MB), (Get-ChildItem -Directory assets\fonts-extras).Count)
-# CJK pack (Chinese/Japanese/Korean interface): only when the fonts were downloaded
-if (Test-Path "assets\fonts-cjk\_LANGUAGE\NotoSansSC.ttf") {
-    $cz = "build\FOLIO-FONTS-CJK.zip"
-    Write-Zip "assets\fonts-cjk" $cz "FOLIO/FONTS/"
-    Ok ("CJK font pack: $cz ({0:N1} MB)" -f ((Get-Item $cz).Length / 1MB))
-} else {
-    Write-Host "      CJK font pack skipped (run .\tools\fetch-cjk-fonts.ps1 once to build it)" -ForegroundColor Yellow
-}
+# the separate font packs of 4.1 are now part of FolioOS.zip
+foreach ($old in "build\FOLIO-FONTS-EXTRA.zip", "build\FOLIO-FONTS-CJK.zip") { if (Test-Path $old) { Remove-Item -Force $old } }
 $size = (Get-Item build\efi\BOOTX64.EFI).Length / 1KB
-Ok ("BOOTX64.EFI {0:N0} KB - fonts {1:N1} MB - {2} languages - {3} keyboards" -f $size, ((Get-ChildItem "$usb\FOLIO\FONTS\*.ttf" | Measure-Object Length -Sum).Sum / 1MB), ((Get-ChildItem assets\i18n\*.po).Count + 1), (Get-ChildItem assets\keyboards\*.txt -Exclude _*).Count)
+Ok ("BOOTX64.EFI {0:N0} KB - fonts {1:N1} MB - {2} languages - {3} keyboards" -f $size, ((Get-ChildItem -Recurse "$usb\FOLIO\FONTS\*.ttf" | Measure-Object Length -Sum).Sum / 1MB), ((Get-ChildItem assets\i18n\*.po).Count + 1), (Get-ChildItem assets\keyboards\*.txt -Exclude _*).Count)
 
 if ($Legacy) {
     Step "L" "Legacy FOLIO-86 v3 (BIOS) -> build\legacy"
@@ -170,8 +176,6 @@ if (-not $NoTests) {
     if (-not (Select-String -Quiet -Path "$t\FOLIO\CONFIG.INI" -Pattern "^tabs=1")) { throw "tabs were not saved in CONFIG.INI" }
     Ok "tabs: on/off, new, switch, close, reopen after restart (untitled too) - OK"
     Fresh
-    New-Item -ItemType Directory -Force "$t\FOLIO\FONTS\EXTRA" | Out-Null
-    Copy-Item -Recurse "assets\fonts-extras\Lora", "assets\fonts-extras\iA Writer Quattro" "$t\FOLIO\FONTS\EXTRA\"
     Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\temas.txt", "--out", "build\shots") | Out-Null
     Ok "user themes (colors + fonts), theme editor, FolioOS splash - OK"
     Fresh; Run .\build\efi_host.exe @("build\efi\BOOTX64.EFI", "--root", $t, "--script", "tests\efi_boot.txt", "--out", "build\shots")
@@ -183,7 +187,6 @@ if (-not $NoTests) {
     # old Portuguese installs keep Portuguese
     Remove-Item Env:\FOLIO_PLATFORM_LANG
     Fresh
-    if (Test-Path "assets\fonts-cjk\_LANGUAGE") { Copy-Item -Recurse "assets\fonts-cjk\_LANGUAGE" "$t\FOLIO\FONTS\" }
     Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\i18n.txt", "--out", "build\shots") | Out-Null
     if (-not (Select-String -Quiet -Path "$t\FOLIO\CONFIG.INI" -Pattern "^language=")) { throw "language was not saved in CONFIG.INI" }
     Fresh; Remove-Item -Recurse -Force "$t\FOLIO\FONTS\_LANGUAGE" -ErrorAction SilentlyContinue
@@ -197,6 +200,10 @@ if (-not $NoTests) {
     if (-not (Select-String -Quiet -Path "$t\FOLIO\CONFIG.INI" -Pattern "^use_mouse=0")) { throw "turning the mouse off was not saved in CONFIG.INI" }
     if (-not (Select-String -Quiet -Path "$t\FOLIO\CONFIG.INI" -Pattern "^typewriter=1")) { throw "a setting changed with the keyboard was not saved" }
     Ok "keyboard only: mouse off, menu, files, settings, themes, outline, Ctrl+F6, dialogs, reading - OK"
+    # input methods: Korean Hangul composition and Japanese romaji to kana (CJK fonts are on every drive)
+    Fresh
+    Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\ime.txt", "--out", "build\shots") | Out-Null
+    Ok "input methods: Korean (Hangul syllables, backspace by jamo), Japanese (romaji to hiragana/katakana) - OK"
     # universal video: pixel formats, Blt only, padded stride, UGA (no GOP), portrait panel with EDID
     $vs = "build\test_video.txt"; Set-Content -Encoding ascii $vs "wait 1200`nshot v.png`nquit"
     foreach ($g in @(@("--gop", "rgb"), @("--gop", "mask16"), @("--gop", "blt"), @("--gop", "pad"), @("--gop", "uga"), @("--size", "800x1280", "--edid"))) {

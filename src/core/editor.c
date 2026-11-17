@@ -303,6 +303,17 @@ void editor_insert_text(const char *s, int len) {
     touched();
     caret_changed(false);
 }
+/* alvo do método de entrada (coreano, japonês): troca os últimos caracteres compostos */
+static void ed_ime_del(int ncp, void *ctx) {
+    UNUSED(ctx);
+    Pos a = app.caret;
+    for (int i = 0; i < ncp; i++) a = doc_left(D, a);
+    if (pos_cmp(a, app.caret) < 0) doc_delete(D, a, app.caret, true);
+    app.caret = app.anchor = a;
+}
+static void ed_ime_ins(const char *s, int len, void *ctx) { UNUSED(ctx); editor_insert_text(s, len); }
+static ImeTarget ed_ime = { ed_ime_del, ed_ime_ins, &ed_ime };
+void editor_ime_commit(void) { ime_commit(&ed_ime); }
 void editor_select_all(void) { app.anchor = (Pos){ 0, 0 }; app.caret = doc_end(D); caret_changed(false); }
 void editor_copy(bool cut) {
     if (!has_sel()) return;
@@ -624,6 +635,9 @@ void editor_key(Event *e) {
         }
     }
     if (e->ch && alt && !ctrl && !(e->mods & MOD_ALTGR)) return;   /* Alt+letra sem atalho não digita (como Ctrl+letra) */
+    /* método de entrada: qualquer tecla que não seja letra fecha a sílaba em composição */
+    if (!(e->ch && !ctrl && e->ch >= 32) && e->key != KEY_BACKSPACE) ime_commit(&ed_ime);
+    if (e->ch && !ctrl && e->ch >= 32 && ime_feed(e->ch, &ed_ime)) { if (app.last_edit_ms + 1200 < ui.in.now) doc_undo_break(D); return; }
     if (e->ch && !ctrl) {
         if (e->ch == 9) { Event t2 = *e; t2.ch = 0; t2.key = KEY_TAB; editor_key(&t2); return; }
         if (e->ch < 32) return;
@@ -641,6 +655,7 @@ void editor_key(Event *e) {
         else if (!sh) { doc_undo_break(D); editor_insert_text("    ", 4); }
         return; }
     case KEY_BACKSPACE:
+        if (ime_backspace(&ed_ime)) return;      /* desfaz uma peça da sílaba em composição */
         if (prefs.hemingway) { ui_toast(L("Hemingway mode: keep going, no deleting")); return; }
         doc_undo_break(D);
         if (has_sel()) delete_sel();
@@ -785,6 +800,7 @@ void editor_mouse(Rect area) {
     float dx = (float)(in->mx - col_x), dy = (float)(in->my - area_y) + scroll_y - top_pad;
     bool in_chrome = in->my < ui.block_top || in->my >= ui.H - ui.block_bottom;
     if (in->pressed && rect_has(area, in->mx, in->my) && !in_chrome && ui.active != (void *)&scroll_target) {
+        ime_commit(&ed_ime);
         Pos p = hit(dx, CLAMP(dy, 0.0f, doc_h - 1));
         selecting = true;
         sel_mode = in->triple ? 2 : in->dbl ? 1 : 0;

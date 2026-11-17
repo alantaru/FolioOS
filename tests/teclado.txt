@@ -98,6 +98,32 @@ assert_text # One!?
 key esc
 wait 300
 assert_nowin
+# Alt+F7 move e Alt+F8 redimensiona a janela pelas setas; Enter confirma, Esc desfaz
+key f12
+wait 300
+markwin
+key alt+f7
+key right
+key right
+key down
+key enter
+wait 100
+assert_winmoved 1 1 0 0
+markwin
+key alt+f8
+key left
+key enter
+wait 100
+assert_winmoved 0 0 1 0
+markwin
+key alt+f7
+key right
+key esc
+wait 100
+assert_winmoved 0 0 0 0
+key esc
+wait 300
+assert_nowin
 # diálogo "Salvar alterações?": Shift+Tab = Cancelar; nada se perde
 key ctrl+n
 wait 300

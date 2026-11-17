@@ -10,6 +10,9 @@
  *     dead    ´ ` ^                   saídas que são teclas mortas (acento + letra)
  *     compose ´ a á                   tecla morta + letra → resultado
  *     include _compose.txt            lê outro arquivo (as composições comuns)
+ *     ime     hangul                  método de entrada: hangul (coreano, 2 conjuntos) ou kana
+ *                                     (japonês, romaji → hiragana/katakana); Ctrl+Espaço liga/desliga
+ *     fonts   _LANGUAGE/NotoSansKR.ttf  fontes de que o texto digitado precisa (em FOLIO/FONTS)
  *
  * Um caractere pode ser escrito literalmente, como U+00E9 ou como "space". Linhas que começam
  * com # são comentários. Arquivos que começam com _ não aparecem na lista (são incluídos). */
@@ -30,6 +33,8 @@ static u32  kmap[128], kalt[128];
 static u32  deads[MAX_DEAD]; static int ndead;
 static struct { u32 d, c, r; } comp[MAX_COMPOSE]; static int ncomp;
 static u32  dead;   /* tecla morta pendente */
+static int  act_ime;              /* IME_* pedido pelo layout */
+static char act_fonts[160];
 
 /* ------------------------------------------------------------ leitura */
 static bool next_tok(const char **p, const char *end, char *out, int cap) {
@@ -101,6 +106,13 @@ static void apply(const char *path, int depth) {
         } else if (str_eq(kw, "compose")) {
             if (!next_tok(&q, le, a, sizeof a) || !next_tok(&q, le, b, sizeof b) || !next_tok(&q, le, c, sizeof c)) continue;
             if (ncomp < MAX_COMPOSE) { comp[ncomp].d = tok_cp(a); comp[ncomp].c = tok_cp(b); comp[ncomp].r = tok_cp(c); ncomp++; }
+        } else if (str_eq(kw, "ime")) {
+            if (!next_tok(&q, le, a, sizeof a)) continue;
+            act_ime = str_ieq(a, "hangul") ? IME_HANGUL : str_ieq(a, "kana") ? IME_KANA : IME_NONE;
+        } else if (str_eq(kw, "fonts")) {
+            while (q < le && (*q == ' ' || *q == '\t')) q++;
+            int n = MIN((int)(le - q), (int)sizeof act_fonts - 1);
+            memcpy(act_fonts, q, (usize)n); act_fonts[n] = 0;
         } else if (str_eq(kw, "include")) {
             if (!next_tok(&q, le, a, sizeof a) || a[0] == '/' || has_dots(a)) continue;
             char sub[160]; path_join(sub, sizeof sub, KB_DIR, a);
@@ -142,16 +154,20 @@ int kbd_find(const char *code) {
     return -1;
 }
 const char *kbd_active(void) { return act_code; }
+int kbd_ime(void) { return act_ime; }
+const char *kbd_fonts(void) { return act_fonts; }
 
 /* carrega um layout; código desconhecido (ou pasta ausente) = teclado US sem alterações */
 void kbd_select(const char *code) {
     memset(kmap, 0, sizeof kmap); memset(kalt, 0, sizeof kalt);
-    ndead = ncomp = 0; dead = 0;
+    ndead = ncomp = 0; dead = 0; act_ime = IME_NONE; act_fonts[0] = 0;
     str_copy(act_code, code && code[0] ? code : "us", sizeof act_code);
     for (char *c = act_code; *c; c++) if (*c >= 'A' && *c <= 'Z') *c += 32;
-    if (has_dots(act_code)) return;
+    if (has_dots(act_code)) { fonts_set_kbd(""); ime_setup(); return; }
     char fn[40], path[160]; fmt(fn, sizeof fn, "%s.txt", act_code); path_join(path, sizeof path, KB_DIR, fn);
     apply(path, 0);
+    fonts_set_kbd(act_fonts);     /* coreano/japonês: a fonte vem junto com o teclado */
+    ime_setup();
 }
 
 /* ------------------------------------------------------------ tradução das teclas */

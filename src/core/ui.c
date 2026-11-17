@@ -217,6 +217,42 @@ void ui_reveal(float *scroll, Rect view) {
     ui.nav_reveal = false;
 }
 
+/* ------------------------------------------------------------ mover/redimensionar pelo teclado
+ * Alt+F7 move, Alt+F8 redimensiona (como no Linux): setas andam 32 px (com Shift, 4 px),
+ * Enter confirma, Esc volta ao lugar de antes; outra tecla confirma e segue adiante. */
+static int kb_mode; static Window *kb_w; static Rect kb_orig;
+bool wm_kb_key(Event *e) {
+    bool alt = (e->mods & MOD_ALT) != 0, ctrl = (e->mods & MOD_CTRL) != 0, sh = (e->mods & MOD_SHIFT) != 0;
+    if (!kb_mode) {
+        if (!alt || ctrl || (e->key != KEY_F7 && e->key != KEY_F8)) return false;
+        Window *w = ui.key_win && ui.key_win->open ? ui.key_win : wm_top();
+        if (!w) { ui_toast(L("No window open")); return true; }
+        if (e->key == KEY_F8 && !w->resizable) { ui_toast(L("This window cannot be resized")); return true; }
+        kb_mode = e->key == KEY_F7 ? 1 : 2; kb_w = w; kb_orig = w->r;
+        wm_raise(w);
+        ui_toast(kb_mode == 1 ? L("Move the window with the arrows · Enter confirms · Esc cancels")
+                              : L("Resize the window with the arrows · Enter confirms · Esc cancels"));
+        ui.redraw = true;
+        return true;
+    }
+    if (!kb_w->open) { kb_mode = 0; return false; }
+    if (e->key == KEY_ENTER) { kb_mode = 0; ui.redraw = true; return true; }
+    if (e->key == KEY_ESC) { kb_w->r = kb_orig; kb_mode = 0; ui.redraw = true; return true; }
+    int dx = e->key == KEY_LEFT ? -1 : e->key == KEY_RIGHT ? 1 : 0, dy = e->key == KEY_UP ? -1 : e->key == KEY_DOWN ? 1 : 0;
+    if (!dx && !dy) { kb_mode = 0; ui.redraw = true; return false; }
+    int st = sh ? SI(4) : SI(32);
+    Window *w = kb_w;
+    if (kb_mode == 1) {
+        w->r.x = CLAMP(w->r.x + dx * st, -w->r.w + SI(80), ui.W - SI(80));
+        w->r.y = CLAMP(w->r.y + dy * st, 0, ui.H - SI(40));
+    } else {
+        w->r.w = MIN(MAX(w->min_w, w->r.w + dx * st), ui.W - w->r.x);
+        w->r.h = MIN(MAX(w->min_h, w->r.h + dy * st), ui.H - w->r.y);
+    }
+    ui.redraw = true;
+    return true;
+}
+
 /* ------------------------------------------------------------ desenho de janela */
 static void draw_window(Window *w) {
     float a = ease_out(w->anim);
@@ -229,7 +265,8 @@ static void draw_window(Window *w) {
     gfx_shadow(rect(r.x, r.y + SI(10), r.w, r.h), rad, S(34), T->dark ? 0x80000000 : 0x2A3A2A1A);
     gfx_shadow(rect(r.x, r.y + SI(1), r.w, r.h), rad, S(4), T->dark ? 0x50000000 : 0x14000000);
     gfx_rrect(r, rad, T->panel);
-    bool kf = w == ui.key_win && ui.nav_show && !w->modal;   /* janela com o teclado: borda na cor de destaque */
+    /* janela com o teclado (ou sendo movida pelo teclado): borda na cor de destaque */
+    bool kf = (w == ui.key_win && ui.nav_show && !w->modal) || (kb_mode && kb_w == w);
     gfx_rrect_line(r, rad, kf ? S(1.5f) : S(1), kf ? T->accent : col_alpha(T->border, T->dark ? 0.9f : 0.8f));
     int th = w->no_titlebar ? 0 : SI(46);
     if (!w->no_titlebar) {
@@ -479,6 +516,22 @@ void ui_scrollbar(Rect track, float *scroll, float content, float view) {
     gfx_rrect(thumb, track.w * 0.5f, col_alpha(T->text, hv || ui.active == scroll ? 0.35f : 0.18f));
 }
 
+/* alvo do método de entrada nos campos: o campo focado (buf/cap guardados em tf_buf/tf_cap) */
+static char *tf_buf; static int tf_cap;
+static void tf_ime_del(int ncp, void *ctx) {
+    UNUSED(ctx);
+    int len = str_len(tf_buf), p = ui.focus_caret;
+    for (int i = 0; i < ncp && p > 0; i++) p = utf8_prev(tf_buf, p);
+    memmove(tf_buf + p, tf_buf + ui.focus_caret, (usize)(len - ui.focus_caret + 1));
+    ui.focus_caret = p;
+}
+static void tf_ime_ins(const char *s, int n, void *ctx) {
+    UNUSED(ctx);
+    int len = str_len(tf_buf);
+    if (len + n >= tf_cap - 1) return;
+    memmove(tf_buf + ui.focus_caret + n, tf_buf + ui.focus_caret, (usize)(len - ui.focus_caret + 1));
+    memcpy(tf_buf + ui.focus_caret, s, (usize)n); ui.focus_caret += n;
+}
 /* campo de texto de uma linha */
 static int prev_cp(const char *s, int i) { return utf8_prev(s, i); }
 bool ui_textfield(Rect r, char *buf, int cap, const char *ph, bool autofocus) {
@@ -502,6 +555,12 @@ bool ui_textfield(Rect r, char *buf, int cap, const char *ph, bool autofocus) {
             if (e->type != EV_KEY) continue;
             bool sel_all = ui.focus_sel == 1;
             bool used = true;
+            ImeTarget tg = { tf_ime_del, tf_ime_ins, buf }; tf_buf = buf; tf_cap = cap;
+            if (e->ch && !(e->mods & MOD_CTRL) && e->ch >= 32) {
+                if (sel_all && ime_on()) { buf[0] = 0; len = 0; ui.focus_caret = 0; ui.focus_sel = 0; sel_all = false; }
+                if (ime_feed(e->ch, &tg)) { len = str_len(buf); changed = true; e->type = EV_NONE; continue; }
+            } else if (e->key == KEY_BACKSPACE && !sel_all && ime_backspace(&tg)) { len = str_len(buf); changed = true; e->type = EV_NONE; continue; }
+            else ime_commit(&tg);
             if (e->ch && (e->mods & MOD_CTRL) && (e->ch == 'a')) { ui.focus_sel = 1; ui.focus_caret = len; }
             else if (e->ch && (e->mods & MOD_CTRL) && e->ch == 'v') {
                 extern const char *editor_clipboard(void);

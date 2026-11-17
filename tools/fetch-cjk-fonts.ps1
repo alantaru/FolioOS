@@ -1,7 +1,7 @@
 # =============================================================================
 # FolioOS - downloads the fonts needed by the Chinese, Japanese and Korean interface
 # (Noto Sans SC/JP/KR, SIL Open Font License) into assets\fonts-cjk\_LANGUAGE.
-# build.ps1 then packs them as build\FOLIO-FONTS-CJK.zip (unzip at the drive root).
+# build.ps1 runs this when they are missing and ships them in FolioOS.zip (FOLIO\FONTS\_LANGUAGE).
 # The files are large (~35 MB in total), so they are not stored in the repository.
 # =============================================================================
 $ErrorActionPreference = "Stop"

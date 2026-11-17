@@ -298,6 +298,7 @@ static LRESULT CALLBACK wndproc(HWND h, UINT m, WPARAM wp, LPARAM lp) {
             else if (wp >= '0' && wp <= '9') ch = (u32)wp;
             else if (wp == VK_OEM_PLUS) ch = '=';
             else if (wp == VK_OEM_MINUS) ch = '-';
+            else if (wp == VK_SPACE) ch = ' ';          /* Ctrl+Espaço: método de entrada */
             if (ch) { e.type = EV_KEY; e.ch = ch; e.mods = mods; push(&e); return 0; }
         }
         if (m == WM_SYSKEYDOWN && wp == VK_F4) { e.type = EV_QUIT; push(&e); return 0; }
@@ -374,6 +375,7 @@ static int parse_key(const char *s, int *mods) {
     if (!_stricmp(s, "space")) return -(int)' ';
     return -(int)(unsigned char)s[0];   /* letra com modificador */
 }
+static Rect mark_r;
 static int run_script(const char *file, const char *outdir) {
     FILE *f = fopen(file, "rb");
     if (!f) { fprintf(stderr, "roteiro não encontrado: %s\n", file); return 1; }
@@ -523,6 +525,14 @@ static int run_script(const char *file, const char *outdir) {
             Window *w = wm_top();
             if (w) { fprintf(stderr, "FALHA: janela ainda aberta: %s\n", w->title); return 2; }
             printf("ok: nenhuma janela aberta\n");
+        } else if (!strcmp(line, "markwin")) {         /* guarda a posição da janela do topo */
+            Window *w = wm_top(); if (!w) { fprintf(stderr, "FALHA: markwin sem janela\n"); return 2; }
+            mark_r = w->r; printf("ok: janela marcada\n");
+        } else if (!strcmp(line, "assert_winmoved")) { /* dx dy dw dh esperados desde o markwin (0 = igual, 1 = mudou) */
+            Window *w = wm_top(); int a[4] = { 0 }; sscanf(arg, "%d %d %d %d", &a[0], &a[1], &a[2], &a[3]);
+            int d[4] = { w ? w->r.x - mark_r.x : 0, w ? w->r.y - mark_r.y : 0, w ? w->r.w - mark_r.w : 0, w ? w->r.h - mark_r.h : 0 };
+            for (int k = 0; k < 4; k++) if ((d[k] != 0) != (a[k] != 0)) { fprintf(stderr, "FALHA: janela %d,%d %dx%d (mudança %d %d %d %d)\n", w ? w->r.x : 0, w ? w->r.y : 0, w ? w->r.w : 0, w ? w->r.h : 0, d[0], d[1], d[2], d[3]); return 2; }
+            printf("ok: janela mudou %d %d %d %d\n", d[0], d[1], d[2], d[3]);
         } else if (!strcmp(line, "assert_keywin")) {     /* quem recebe o teclado: "text" ou o título (msgid) da janela */
             const char *got = ui.key_win ? ui.key_win->title : "text";
             if (strcmp(got, arg)) { fprintf(stderr, "FALHA: teclado em \"%s\" (esperado \"%s\")\n", got, arg); return 2; }

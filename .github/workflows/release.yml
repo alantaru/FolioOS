@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Existing tag to publish (e.g. v4.1.0)'
+        description: 'Existing tag to publish (e.g. v4.2.0)'
         required: true
-        default: 'v4.1.0'
+        default: 'v4.2.0'
 
 permissions:
   contents: write
@@ -47,6 +47,4 @@ jobs:
           generate_release_notes: true
           files: |
             build/FolioOS.zip
-            build/FOLIO-FONTS-EXTRA.zip
-            build/FOLIO-FONTS-CJK.zip
             build/FolioOS-disk-image.zip

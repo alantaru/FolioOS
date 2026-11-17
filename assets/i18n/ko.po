@@ -7,7 +7,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Language-Name: 한국어 (Korean)\n"
-"X-Keyboard: us\n"
+"X-Keyboard: ko\n"
 "X-Quotes: “”‘’\n"
 "X-Fonts: _LANGUAGE/NotoSansKR.ttf\n"
 "X-Date-Format: {yyyy}년 {month} {d}일\n"
@@ -41,7 +41,7 @@ msgstr "변경 내용을 저장할까요?"
 msgid "The current document has changes that have not been saved yet."
 msgstr "현재 문서에 아직 저장하지 않은 변경 내용이 있습니다."
 
-#: src/core/app.c:422 src/core/app.c:740 src/core/app.c:869 src/core/filedlg.c:407
+#: src/core/app.c:422 src/core/app.c:740 src/core/app.c:870 src/core/filedlg.c:407
 msgid "Save"
 msgstr "저장"
 
@@ -99,19 +99,19 @@ msgstr "페이지: 종이처럼 한 단으로 표시합니다"
 msgid "Settings"
 msgstr "설정"
 
-#: src/core/app.c:578 src/core/app.c:754 src/core/app.c:880 src/core/app.c:1578
+#: src/core/app.c:578 src/core/app.c:754 src/core/app.c:881 src/core/app.c:1579
 msgid "Find and replace"
 msgstr "찾기 및 바꾸기"
 
-#: src/core/app.c:579 src/core/app.c:880 src/core/app.c:1590
+#: src/core/app.c:579 src/core/app.c:881 src/core/app.c:1591
 msgid "Outline"
 msgstr "개요"
 
-#: src/core/app.c:580 src/core/app.c:770 src/core/app.c:1591
+#: src/core/app.c:580 src/core/app.c:770 src/core/app.c:1592
 msgid "Session and goals"
 msgstr "세션과 목표"
 
-#: src/core/app.c:581 src/core/app.c:774 src/core/app.c:884
+#: src/core/app.c:581 src/core/app.c:774 src/core/app.c:885
 msgid "Keyboard shortcuts"
 msgstr "키보드 단축키"
 
@@ -119,7 +119,7 @@ msgstr "키보드 단축키"
 msgid "Commands"
 msgstr "명령"
 
-#: src/core/app.c:583 src/core/app.c:1709
+#: src/core/app.c:583 src/core/app.c:1711
 msgid "Menu"
 msgstr "메뉴"
 
@@ -224,7 +224,7 @@ msgstr "스마트 타이포그래피 끔"
 msgid "Page %s"
 msgstr "페이지: %s"
 
-#: src/core/app.c:687 src/core/editor.c:696 src/core/preview.c:251
+#: src/core/app.c:687 src/core/editor.c:711 src/core/preview.c:251
 msgid "This is the last chapter"
 msgstr "마지막 장입니다"
 
@@ -242,14 +242,14 @@ msgstr "언어 파일을 읽을 수 없습니다"
 
 #: src/core/app.c:719
 #, c-format
-msgid "This language needs extra fonts (%s) in %s. Install the matching font pack."
-msgstr "이 언어에는 %2$s에 추가 글꼴(%1$s)이 필요합니다. 해당 글꼴 팩을 설치하세요."
+msgid "This language needs fonts (%s) that are missing from %s. Copy FolioOS.zip to the USB drive again."
+msgstr "이 언어에 필요한 글꼴(%s)이 %s에 없습니다. FolioOS.zip을 USB 드라이브에 다시 복사하세요."
 
 #: src/core/app.c:732
 msgid "New document"
 msgstr "새 문서"
 
-#: src/core/app.c:732 src/core/app.c:868
+#: src/core/app.c:732 src/core/app.c:869
 msgid "Ctrl+N"
 msgstr "Ctrl+N"
 
@@ -289,23 +289,23 @@ msgstr "나만의 테마 만들기(색과 글꼴)"
 msgid "Edit the current theme"
 msgstr "현재 테마 편집"
 
-#: src/core/app.c:739 src/core/app.c:868
+#: src/core/app.c:739 src/core/app.c:869
 msgid "Open…"
 msgstr "열기…"
 
-#: src/core/app.c:739 src/core/app.c:868
+#: src/core/app.c:739 src/core/app.c:869
 msgid "Ctrl+O"
 msgstr "Ctrl+O"
 
-#: src/core/app.c:740 src/core/app.c:869
+#: src/core/app.c:740 src/core/app.c:870
 msgid "Ctrl+S"
 msgstr "Ctrl+S"
 
-#: src/core/app.c:741 src/core/app.c:869
+#: src/core/app.c:741 src/core/app.c:870
 msgid "Save as / Export…"
 msgstr "다른 이름으로 저장 / 내보내기…"
 
-#: src/core/app.c:741 src/core/app.c:869 src/core/app.c:1575
+#: src/core/app.c:741 src/core/app.c:870 src/core/app.c:1576
 msgid "Ctrl+Shift+S"
 msgstr "Ctrl+Shift+S"
 
@@ -313,7 +313,7 @@ msgstr "Ctrl+Shift+S"
 msgid "Reading mode (formatted Markdown)"
 msgstr "읽기 모드(서식 있는 Markdown)"
 
-#: src/core/app.c:742 src/core/app.c:1577
+#: src/core/app.c:742 src/core/app.c:1578
 msgid "Ctrl+P"
 msgstr "Ctrl+P"
 
@@ -321,7 +321,7 @@ msgstr "Ctrl+P"
 msgid "Reading auto-scroll (on/off)"
 msgstr "읽기 자동 스크롤(켜기/끄기)"
 
-#: src/core/app.c:743 src/core/app.c:1584
+#: src/core/app.c:743 src/core/app.c:1585
 msgid "Enter (reading)"
 msgstr "Enter(읽기)"
 
@@ -345,23 +345,23 @@ msgstr "Ctrl+PgUp"
 msgid "Go to the last edit"
 msgstr "마지막 편집 위치로 이동"
 
-#: src/core/app.c:746 src/core/app.c:1582
+#: src/core/app.c:746 src/core/app.c:1583
 msgid "Ctrl+J"
 msgstr "Ctrl+J"
 
-#: src/core/app.c:747 src/core/app.c:1581
+#: src/core/app.c:747 src/core/app.c:1582
 msgid "Duplicate paragraph"
 msgstr "문단 복제"
 
-#: src/core/app.c:747 src/core/app.c:1581
+#: src/core/app.c:747 src/core/app.c:1582
 msgid "Ctrl+D"
 msgstr "Ctrl+D"
 
-#: src/core/app.c:748 src/core/app.c:1581
+#: src/core/app.c:748 src/core/app.c:1582
 msgid "Delete paragraph"
 msgstr "문단 삭제"
 
-#: src/core/app.c:748 src/core/app.c:1581
+#: src/core/app.c:748 src/core/app.c:1582
 msgid "Ctrl+Shift+K"
 msgstr "Ctrl+Shift+K"
 
@@ -369,7 +369,7 @@ msgstr "Ctrl+Shift+K"
 msgid "Change case"
 msgstr "대소문자 바꾸기"
 
-#: src/core/app.c:749 src/core/app.c:1583
+#: src/core/app.c:749 src/core/app.c:1584
 msgid "Shift+F3"
 msgstr "Shift+F3"
 
@@ -389,7 +389,7 @@ msgstr "타자기(줄 가운데 정렬)"
 msgid "Zen mode (no bars)"
 msgstr "젠 모드(막대 없음)"
 
-#: src/core/app.c:754 src/core/app.c:880 src/core/app.c:1578
+#: src/core/app.c:754 src/core/app.c:881 src/core/app.c:1579
 msgid "Ctrl+F"
 msgstr "Ctrl+F"
 
@@ -401,11 +401,11 @@ msgstr "문서 개요"
 msgid "Appearance: themes and typography"
 msgstr "모양: 테마와 타이포그래피"
 
-#: src/core/app.c:757 src/core/app.c:1587
+#: src/core/app.c:757 src/core/app.c:1588
 msgid "Next theme"
 msgstr "다음 테마"
 
-#: src/core/app.c:757 src/core/app.c:1587
+#: src/core/app.c:757 src/core/app.c:1588
 msgid "Ctrl+T"
 msgstr "Ctrl+T"
 
@@ -445,7 +445,7 @@ msgstr "페이지 크기: 좁게 · 보통 · 넓게 · 아주 넓게"
 msgid "Paper sheet (show/hide)"
 msgstr "종이(표시/숨기기)"
 
-#: src/core/app.c:764 src/core/app.c:883
+#: src/core/app.c:764 src/core/app.c:884
 msgid "Writing settings"
 msgstr "쓰기 설정"
 
@@ -461,7 +461,7 @@ msgstr "음악: 다음 곡"
 msgid "Music: previous track"
 msgstr "음악: 이전 곡"
 
-#: src/core/app.c:768 src/core/app.c:1590
+#: src/core/app.c:768 src/core/app.c:1591
 msgid "Music player"
 msgstr "음악 플레이어"
 
@@ -481,11 +481,11 @@ msgstr "문단 밖의 마크업 숨기기"
 msgid "Smart typography (— “ ” …)"
 msgstr "스마트 타이포그래피(— “ ” …)"
 
-#: src/core/app.c:775 src/core/app.c:1585
+#: src/core/app.c:775 src/core/app.c:1586
 msgid "Menu and recent documents"
 msgstr "메뉴와 최근 문서"
 
-#: src/core/app.c:775 src/core/app.c:1585
+#: src/core/app.c:775 src/core/app.c:1586
 msgid "Alt+M"
 msgstr "Alt+M"
 
@@ -493,7 +493,7 @@ msgstr "Alt+M"
 msgid "Keyboard focus: text or the next window"
 msgstr "키보드 포커스: 본문 또는 다음 창"
 
-#: src/core/app.c:776 src/core/app.c:1595
+#: src/core/app.c:776 src/core/app.c:1596
 msgid "Ctrl+F6"
 msgstr "Ctrl+F6"
 
@@ -501,1059 +501,1075 @@ msgstr "Ctrl+F6"
 msgid "Mouse and touchpad (on/off)"
 msgstr "마우스와 터치패드 (켜기/끄기)"
 
-#: src/core/app.c:778
+#: src/core/app.c:778 src/core/app.c:1598
+msgid "Input method on/off (Korean, Japanese)"
+msgstr "입력기 켜기/끄기 (한국어, 일본어)"
+
+#: src/core/app.c:778 src/core/app.c:1598
+msgid "Ctrl+Space"
+msgstr "Ctrl+스페이스"
+
+#: src/core/app.c:779
 msgid "Language and keyboard"
 msgstr "언어 및 키보드"
 
-#: src/core/app.c:779
+#: src/core/app.c:780
 msgid "Restart the computer"
 msgstr "컴퓨터 다시 시작"
 
-#: src/core/app.c:780
+#: src/core/app.c:781
 msgid "Shut down the computer"
 msgstr "컴퓨터 끄기"
 
-#: src/core/app.c:780 src/core/app.c:886 src/core/app.c:1593
+#: src/core/app.c:781 src/core/app.c:887 src/core/app.c:1594
 msgid "Ctrl+Q"
 msgstr "Ctrl+Q"
 
-#: src/core/app.c:802
+#: src/core/app.c:803
 msgid "Type a command…"
 msgstr "명령을 입력하세요…"
 
-#: src/core/app.c:833
+#: src/core/app.c:834
 msgid "No command found"
 msgstr "명령을 찾을 수 없습니다"
 
-#: src/core/app.c:859
+#: src/core/app.c:860
 msgid "File not found (a different USB drive?)"
 msgstr "파일을 찾을 수 없습니다(다른 USB 메모리인가요?)"
 
-#: src/core/app.c:867
+#: src/core/app.c:868
 msgid "DOCUMENT"
 msgstr "문서"
 
-#: src/core/app.c:868
+#: src/core/app.c:869
 msgid "New"
 msgstr "새로 만들기"
 
-#: src/core/app.c:875
+#: src/core/app.c:876
 msgid "RECENT"
 msgstr "최근 항목"
 
-#: src/core/app.c:879
+#: src/core/app.c:880
 msgid "WRITING"
 msgstr "쓰기"
 
-#: src/core/app.c:881
+#: src/core/app.c:882
 msgid "Session, goals and sprint"
 msgstr "세션, 목표, 스프린트"
 
-#: src/core/app.c:882
+#: src/core/app.c:883
 msgid "PREFERENCES"
 msgstr "환경설정"
 
-#: src/core/app.c:883 src/core/app.c:966 src/core/app.c:1592
+#: src/core/app.c:884 src/core/app.c:967 src/core/app.c:1593
 msgid "Appearance"
 msgstr "모양"
 
-#: src/core/app.c:886 src/core/app.c:1166 src/core/app.c:1593
+#: src/core/app.c:887 src/core/app.c:1167 src/core/app.c:1594
 msgid "Shut down"
 msgstr "끄기"
 
-#: src/core/app.c:950
+#: src/core/app.c:951
 #, c-format
 msgid "Diagnostics saved to %s"
 msgstr "진단 정보를 %s에 저장했습니다"
 
-#: src/core/app.c:950
+#: src/core/app.c:951
 msgid "Could not save the diagnostics"
 msgstr "진단 정보를 저장할 수 없습니다"
 
-#: src/core/app.c:960
+#: src/core/app.c:961
 msgid "Display restored: automatic resolution and rotation"
 msgstr "화면 복원됨: 자동 해상도와 회전"
 
-#: src/core/app.c:966
+#: src/core/app.c:967
 msgid "Writing"
 msgstr "쓰기"
 
-#: src/core/app.c:966
+#: src/core/app.c:967
 msgid "System"
 msgstr "시스템"
 
-#: src/core/app.c:976
+#: src/core/app.c:977
 msgid "THEMES"
 msgstr "테마"
 
-#: src/core/app.c:983
+#: src/core/app.c:984
 msgid "+  Create my theme"
 msgstr "+  내 테마 만들기"
 
-#: src/core/app.c:984
+#: src/core/app.c:985
 msgid "Edit this theme"
 msgstr "이 테마 편집"
 
-#: src/core/app.c:986
+#: src/core/app.c:987
 #, c-format
 msgid "Mix colors and fonts; themes are saved in %s (editable .INI files)."
 msgstr "색과 글꼴을 섞어 보세요. 테마는 %s에 저장됩니다(편집 가능한 .INI 파일)."
 
-#: src/core/app.c:988
+#: src/core/app.c:989
 msgid "TEXT FONT"
 msgstr "본문 글꼴"
 
-#: src/core/app.c:997
+#: src/core/app.c:998
 msgid "The quick brown fox jumps — “Hello!”"
 msgstr "다람쥐 헌 쳇바퀴에 타고파 — “안녕하세요!”"
 
-#: src/core/app.c:1003
+#: src/core/app.c:1004
 #, c-format
 msgid "Add .ttf fonts to %s (subfolders work too) and restart."
 msgstr ".ttf 글꼴을 %s에 넣고(하위 폴더도 가능) 다시 시작하세요."
 
-#: src/core/app.c:1004
-msgid "Ready-made pack: FOLIO-FONTS-EXTRA.zip — unzip it at the root of the USB drive."
-msgstr "바로 쓰는 팩: FOLIO-FONTS-EXTRA.zip — USB 메모리 최상위 폴더에 압축을 푸세요."
+#: src/core/app.c:1005
+msgid "Included writing fonts: Literata, Lora, EB Garamond, iA Writer, Special Elite and more."
+msgstr "기본 제공 글쓰기 글꼴: Literata, Lora, EB Garamond, iA Writer, Special Elite 등."
 
-#: src/core/app.c:1006
+#: src/core/app.c:1007
 msgid "TYPOGRAPHY"
 msgstr "타이포그래피"
 
-#: src/core/app.c:1007
+#: src/core/app.c:1008
 #, c-format
 msgid "%d px"
 msgstr "%d px"
 
-#: src/core/app.c:1008
+#: src/core/app.c:1009
 msgid "Text size"
 msgstr "글자 크기"
 
-#: src/core/app.c:1011
+#: src/core/app.c:1012
 msgid "Line spacing"
 msgstr "줄 간격"
 
-#: src/core/app.c:1013
+#: src/core/app.c:1014
 #, c-format
 msgid "%.2f lines"
 msgstr "%.2f줄"
 
-#: src/core/app.c:1014
+#: src/core/app.c:1015
 msgid "Space between paragraphs"
 msgstr "문단 간격"
 
-#: src/core/app.c:1016
+#: src/core/app.c:1017
 msgid "First-line indent for paragraphs (book style)"
 msgstr "문단 첫 줄 들여쓰기(책 스타일)"
 
-#: src/core/app.c:1018
+#: src/core/app.c:1019
 msgid "PAGE"
 msgstr "페이지"
 
-#: src/core/app.c:1020
+#: src/core/app.c:1021
 msgid "Page"
 msgstr "페이지"
 
-#: src/core/app.c:1020
+#: src/core/app.c:1021
 msgid "Full screen"
 msgstr "전체 화면"
 
-#: src/core/app.c:1029
+#: src/core/app.c:1030
 #, c-format
 msgid "%d px (~%d characters per line)"
 msgstr "%d px(줄당 약 %d자)"
 
-#: src/core/app.c:1030
+#: src/core/app.c:1031
 msgid "Page width"
 msgstr "페이지 너비"
 
-#: src/core/app.c:1032
+#: src/core/app.c:1033
 msgid "Paper sheet on the desk (light themes)"
 msgstr "책상 위의 종이(밝은 테마)"
 
-#: src/core/app.c:1035
+#: src/core/app.c:1036
 msgid "The text fills the whole screen width, with no sheet."
 msgstr "종이 없이 텍스트가 화면 전체 너비를 채웁니다."
 
-#: src/core/app.c:1039
+#: src/core/app.c:1040
 msgid "FOCUS MODE"
 msgstr "집중 모드"
 
-#: src/core/app.c:1040
+#: src/core/app.c:1041
 msgid "Off"
 msgstr "끔"
 
-#: src/core/app.c:1040
+#: src/core/app.c:1041
 msgid "Sentence"
 msgstr "문장"
 
-#: src/core/app.c:1040
+#: src/core/app.c:1041
 msgid "Paragraph"
 msgstr "문단"
 
-#: src/core/app.c:1040
+#: src/core/app.c:1041
 msgid "Line"
 msgstr "줄"
 
-#: src/core/app.c:1043
+#: src/core/app.c:1044
 msgid "EDITOR"
 msgstr "편집기"
 
-#: src/core/app.c:1045
+#: src/core/app.c:1046
 msgid "Typewriter — current line in the center"
 msgstr "타자기 — 현재 줄을 가운데에"
 
-#: src/core/app.c:1046
+#: src/core/app.c:1047
 msgid "Live Markdown (headings, bold, lists)"
 msgstr "실시간 Markdown(제목, 굵게, 목록)"
 
-#: src/core/app.c:1047
+#: src/core/app.c:1048
 msgid "Hide markup outside the current paragraph"
 msgstr "현재 문단 밖의 마크업 숨기기"
 
-#: src/core/app.c:1048
+#: src/core/app.c:1049
 msgid "Smart typography:  --  →  —   \"\"  →  “”   ...  →  …"
 msgstr "스마트 타이포그래피:  --  →  —   \"\"  →  “”   ...  →  …"
 
-#: src/core/app.c:1049
+#: src/core/app.c:1050
 msgid "Hemingway mode — deleting is not allowed"
 msgstr "헤밍웨이 모드 — 지울 수 없음"
 
-#: src/core/app.c:1050
+#: src/core/app.c:1051
 msgid "Hide the bars while writing"
 msgstr "쓰는 동안 막대 숨기기"
 
-#: src/core/app.c:1051
+#: src/core/app.c:1052
 msgid "Blinking cursor"
 msgstr "깜박이는 커서"
 
-#: src/core/app.c:1052
+#: src/core/app.c:1053
 msgid "Smooth cursor movement"
 msgstr "부드러운 커서 이동"
 
-#: src/core/app.c:1059
+#: src/core/app.c:1060
 msgid "Tabs — several open documents, remembered after a restart"
 msgstr "탭 — 여러 문서를 열어 두고 다시 시작해도 기억"
 
-#: src/core/app.c:1062
+#: src/core/app.c:1063
 msgid "GOALS AND SAVING"
 msgstr "목표와 저장"
 
-#: src/core/app.c:1063 src/core/app.c:1535 src/core/app.c:1786
+#: src/core/app.c:1064 src/core/app.c:1536 src/core/app.c:1788
 #, c-format
 msgid "%d word"
 msgid_plural "%d words"
 msgstr[0] "%d단어"
 
-#: src/core/app.c:1064
+#: src/core/app.c:1065
 msgid "Session goal"
 msgstr "세션 목표"
 
-#: src/core/app.c:1066 src/core/app.c:1537 src/core/app.c:1751
+#: src/core/app.c:1067 src/core/app.c:1538 src/core/app.c:1753
 #, c-format
 msgid "%d min"
 msgstr "%d분"
 
-#: src/core/app.c:1067
+#: src/core/app.c:1068
 msgid "Sprint length"
 msgstr "스프린트 길이"
 
-#: src/core/app.c:1069
+#: src/core/app.c:1070
 #, c-format
 msgid "every %d s"
 msgstr "%d초마다"
 
-#: src/core/app.c:1070
+#: src/core/app.c:1071
 msgid "Autosave"
 msgstr "자동 저장"
 
-#: src/core/app.c:1073
+#: src/core/app.c:1074
 msgid "LANGUAGE AND KEYBOARD"
 msgstr "언어 및 키보드"
 
-#: src/core/app.c:1076
+#: src/core/app.c:1077
 msgid "Language"
 msgstr "언어"
 
-#: src/core/app.c:1081
+#: src/core/app.c:1082
 msgid "Keyboard"
 msgstr "키보드"
 
-#: src/core/app.c:1090
+#: src/core/app.c:1091
 #, c-format
 msgid "Languages: %s · keyboards: %s (text files anyone can add)"
 msgstr "언어: %s · 키보드: %s(누구나 추가할 수 있는 텍스트 파일)"
 
-#: src/core/app.c:1094
+#: src/core/app.c:1095
 msgid "DISPLAY AND POINTER"
 msgstr "화면과 포인터"
 
-#: src/core/app.c:1095
+#: src/core/app.c:1096
 msgid "Auto"
 msgstr "자동"
 
-#: src/core/app.c:1100
+#: src/core/app.c:1101
 msgid "Rotate: auto"
 msgstr "회전: 자동"
 
-#: src/core/app.c:1108
+#: src/core/app.c:1109
 #, c-format
 msgid "Resolution: %dx%d"
 msgstr "해상도: %dx%d"
 
-#: src/core/app.c:1109
+#: src/core/app.c:1110
 #, c-format
 msgid "Resolution: automatic (%dx%d)"
 msgstr "해상도: 자동(%dx%d)"
 
-#: src/core/app.c:1119
+#: src/core/app.c:1120
 msgid "Restore display"
 msgstr "화면 복원"
 
-#: src/core/app.c:1121
+#: src/core/app.c:1122
 msgid "If the picture looks wrong or goes black: Ctrl+Alt+Home restores it; Ctrl+Alt+arrows rotate the screen."
 msgstr "화면이 이상하거나 검게 나오면: Ctrl+Alt+Home으로 복원하고, Ctrl+Alt+화살표로 화면을 회전합니다."
 
-#: src/core/app.c:1125
+#: src/core/app.c:1126
 msgid "Mouse / touchpad speed"
 msgstr "마우스 / 터치패드 속도"
 
-#: src/core/app.c:1127
+#: src/core/app.c:1128
 msgid "Automatic"
 msgstr "자동"
 
-#: src/core/app.c:1127
+#: src/core/app.c:1128
 msgid "Touchpad"
 msgstr "터치패드"
 
-#: src/core/app.c:1127
+#: src/core/app.c:1128
 msgid "Touch screen"
 msgstr "터치스크린"
 
-#: src/core/app.c:1130
+#: src/core/app.c:1131
 msgid "If the pointer jumps to the corners when you use the touchpad, choose Touchpad."
 msgstr "터치패드를 쓸 때 포인터가 모서리로 튀면 '터치패드'를 선택하세요."
 
-#: src/core/app.c:1133
+#: src/core/app.c:1134
 msgid "Use the mouse and touchpad (off = keyboard only)"
 msgstr "마우스와 터치패드 사용 (끄면 키보드만)"
 
-#: src/core/app.c:1135
+#: src/core/app.c:1136
 msgid "SOUND"
 msgstr "소리"
 
-#: src/core/app.c:1136
+#: src/core/app.c:1137
 msgid "Turn on the amplifier through GPIO (some laptops; applies after a restart)"
 msgstr "GPIO로 앰프 켜기(일부 노트북, 다시 시작한 뒤 적용)"
 
-#: src/core/app.c:1138
+#: src/core/app.c:1139
 msgid "Test sound"
 msgstr "소리 테스트"
 
-#: src/core/app.c:1139
+#: src/core/app.c:1140
 msgid "Save diagnostics"
 msgstr "진단 정보 저장"
 
-#: src/core/app.c:1141
+#: src/core/app.c:1142
 #, c-format
 msgid "The diagnostics go to %s on the USB drive (it opens on any computer)."
 msgstr "진단 정보는 USB 메모리의 %s에 저장됩니다(어느 컴퓨터에서나 열 수 있음)."
 
-#: src/core/app.c:1143
+#: src/core/app.c:1144
 msgid "STARTUP"
 msgstr "시작"
 
-#: src/core/app.c:1144
+#: src/core/app.c:1145
 msgid "FolioOS splash screen"
 msgstr "FolioOS 시작 화면"
 
-#: src/core/app.c:1149
+#: src/core/app.c:1150
 msgid "Splash duration (any key skips it)"
 msgstr "시작 화면 표시 시간(아무 키나 누르면 건너뜀)"
 
-#: src/core/app.c:1155
+#: src/core/app.c:1156
 msgid "ABOUT"
 msgstr "정보"
 
-#: src/core/app.c:1158
+#: src/core/app.c:1159
 #, c-format
 msgid "FolioOS %s · %s · %dx%d"
 msgstr "FolioOS %s · %s · %dx%d"
 
-#: src/core/app.c:1159
+#: src/core/app.c:1160
 #, c-format
 msgid "Memory: %d MB used of %d MB · %d fonts · %d themes"
 msgstr "메모리: %d MB 사용 중 / 전체 %d MB · 글꼴 %d개 · 테마 %d개"
 
-#: src/core/app.c:1160
+#: src/core/app.c:1161
 #, c-format
 msgid "Audio: %s"
 msgstr "오디오: %s"
 
-#: src/core/app.c:1165
+#: src/core/app.c:1166
 msgid "Restart"
 msgstr "다시 시작"
 
-#: src/core/app.c:1185
+#: src/core/app.c:1186
 msgid "Desk (background)"
 msgstr "책상(배경)"
 
-#: src/core/app.c:1185
+#: src/core/app.c:1186
 msgid "Paper"
 msgstr "종이"
 
-#: src/core/app.c:1185 src/core/app.c:1386
+#: src/core/app.c:1186 src/core/app.c:1387
 msgid "Text"
 msgstr "텍스트"
 
-#: src/core/app.c:1185
+#: src/core/app.c:1186
 msgid "Faded text"
 msgstr "흐린 텍스트"
 
-#: src/core/app.c:1185
+#: src/core/app.c:1186
 msgid "Subtle lines"
 msgstr "가는 선"
 
-#: src/core/app.c:1185
+#: src/core/app.c:1186
 msgid "Accent"
 msgstr "강조색"
 
-#: src/core/app.c:1185
+#: src/core/app.c:1186
 msgid "Selection"
 msgstr "선택 영역"
 
-#: src/core/app.c:1185
+#: src/core/app.c:1186
 msgid "Cursor"
 msgstr "커서"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1187
 msgid "Bars"
 msgstr "막대"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1187
 msgid "Bar text"
 msgstr "막대 텍스트"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1187
 msgid "Borders"
 msgstr "테두리"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1187
 msgid "Panels"
 msgstr "패널"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1187
 msgid "Panel text"
 msgstr "패널 텍스트"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1187
 msgid "Headings"
 msgstr "제목"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1187
 msgid "Code background"
 msgstr "코드 배경"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1187
 msgid "Highlighter"
 msgstr "형광펜"
 
-#: src/core/app.c:1220
+#: src/core/app.c:1221
 msgid "My theme"
 msgstr "내 테마"
 
-#: src/core/app.c:1221
+#: src/core/app.c:1222
 #, c-format
 msgid "My theme %d"
 msgstr "내 테마 %d"
 
-#: src/core/app.c:1244
+#: src/core/app.c:1245
 msgid "Give the theme a name"
 msgstr "테마 이름을 정하세요"
 
-#: src/core/app.c:1246
+#: src/core/app.c:1247
 msgid "That name belongs to a built-in theme — choose another"
 msgstr "기본 제공 테마의 이름입니다 — 다른 이름을 고르세요"
 
-#: src/core/app.c:1247
+#: src/core/app.c:1248
 msgid "You already have a theme with that name"
 msgstr "같은 이름의 테마가 이미 있습니다"
 
-#: src/core/app.c:1250
+#: src/core/app.c:1251
 #, c-format
 msgid "Could not write to %s (is the USB drive write-protected or full?)"
 msgstr "%s에 쓸 수 없습니다(USB 메모리가 쓰기 금지되었거나 가득 찼나요?)"
 
-#: src/core/app.c:1255
+#: src/core/app.c:1256
 #, c-format
 msgid "Theme “%s” saved to %s"
 msgstr "테마 “%s”을(를) %s에 저장했습니다"
 
-#: src/core/app.c:1267
+#: src/core/app.c:1268
 msgid "Theme deleted"
 msgstr "테마를 삭제했습니다"
 
-#: src/core/app.c:1298
+#: src/core/app.c:1299
 msgid "THEME NAME"
 msgstr "테마 이름"
 
-#: src/core/app.c:1299
+#: src/core/app.c:1300
 msgid "Theme name"
 msgstr "테마 이름"
 
-#: src/core/app.c:1302
+#: src/core/app.c:1303
 msgid "STARTING POINT"
 msgstr "출발점"
 
-#: src/core/app.c:1305
+#: src/core/app.c:1306
 msgid "Colors from"
 msgstr "색 가져올 곳"
 
-#: src/core/app.c:1307
+#: src/core/app.c:1308
 msgid "Use all"
 msgstr "모두 사용"
 
-#: src/core/app.c:1314
+#: src/core/app.c:1315
 msgid "Or mix: pick a color below and take it from any built-in theme."
 msgstr "또는 섞어 보세요: 아래에서 색을 고르고 기본 제공 테마에서 가져옵니다."
 
-#: src/core/app.c:1318
+#: src/core/app.c:1319
 msgid "COLORS"
 msgstr "색"
 
-#: src/core/app.c:1347
+#: src/core/app.c:1348
 msgid "hex code"
 msgstr "16진수 코드"
 
-#: src/core/app.c:1351
+#: src/core/app.c:1352
 msgid "Hue"
 msgstr "색상"
 
-#: src/core/app.c:1354
+#: src/core/app.c:1355
 msgid "Saturation"
 msgstr "채도"
 
-#: src/core/app.c:1357
+#: src/core/app.c:1358
 msgid "Lightness"
 msgstr "밝기"
 
-#: src/core/app.c:1361
+#: src/core/app.c:1362
 msgid "Take from a built-in theme:"
 msgstr "기본 제공 테마에서 가져오기:"
 
-#: src/core/app.c:1384
+#: src/core/app.c:1385
 msgid "THEME FONTS"
 msgstr "테마 글꼴"
 
-#: src/core/app.c:1391
+#: src/core/app.c:1392
 #, c-format
 msgid "Default (%s)"
 msgstr "기본값(%s)"
 
-#: src/core/app.c:1392
+#: src/core/app.c:1393
 msgid "Interface"
 msgstr "인터페이스"
 
-#: src/core/app.c:1400
-msgid "Interface = bars, menus and windows. More fonts: FOLIO-FONTS-EXTRA.zip."
-msgstr "인터페이스 = 막대, 메뉴, 창. 더 많은 글꼴: FOLIO-FONTS-EXTRA.zip."
+#: src/core/app.c:1401
+msgid "Interface = bars, menus and windows."
+msgstr "화면 = 막대, 메뉴, 창."
 
-#: src/core/app.c:1404
+#: src/core/app.c:1405
 msgid "DESK AND PAPER"
 msgstr "책상과 종이"
 
-#: src/core/app.c:1405
+#: src/core/app.c:1406
 msgid "Paper sheet on the desk"
 msgstr "책상 위의 종이"
 
-#: src/core/app.c:1409
+#: src/core/app.c:1410
 msgid "Vignette at the desk edges"
 msgstr "책상 가장자리 비네팅"
 
-#: src/core/app.c:1420
+#: src/core/app.c:1421
 msgid "Save theme"
 msgstr "테마 저장"
 
-#: src/core/app.c:1421 src/core/filedlg.c:60 src/core/filedlg.c:73 src/core/filedlg.c:408 src/core/filedlg.c:439
+#: src/core/app.c:1422 src/core/filedlg.c:60 src/core/filedlg.c:73 src/core/filedlg.c:408 src/core/filedlg.c:439
 msgid "Cancel"
 msgstr "취소"
 
-#: src/core/app.c:1422 src/core/app.c:1423 src/core/filedlg.c:57 src/core/filedlg.c:313 src/core/filedlg.c:316 src/core/filedlg.c:316
+#: src/core/app.c:1423 src/core/app.c:1424 src/core/filedlg.c:57 src/core/filedlg.c:313 src/core/filedlg.c:316 src/core/filedlg.c:316
 msgid "Delete"
 msgstr "삭제"
 
-#: src/core/app.c:1423
+#: src/core/app.c:1424
 msgid "Delete theme?"
 msgstr "테마를 삭제할까요?"
 
-#: src/core/app.c:1423
+#: src/core/app.c:1424
 #, c-format
 msgid "The theme file in %s will be deleted."
 msgstr "%s에 있는 테마 파일이 삭제됩니다."
 
-#: src/core/app.c:1430
+#: src/core/app.c:1431
 msgid "Find"
 msgstr "찾기"
 
-#: src/core/app.c:1431
+#: src/core/app.c:1432
 msgid "Previous (Shift+Enter)"
 msgstr "이전(Shift+Enter)"
 
-#: src/core/app.c:1432
+#: src/core/app.c:1433
 msgid "Next (Enter)"
 msgstr "다음(Enter)"
 
-#: src/core/app.c:1433
+#: src/core/app.c:1434
 msgid "Replace with"
 msgstr "바꿀 내용"
 
-#: src/core/app.c:1435 src/core/filedlg.c:203
+#: src/core/app.c:1436 src/core/filedlg.c:203
 msgid "Replace"
 msgstr "바꾸기"
 
-#: src/core/app.c:1436
+#: src/core/app.c:1437
 msgid "Replace all"
 msgstr "모두 바꾸기"
 
-#: src/core/app.c:1438
+#: src/core/app.c:1439
 #, c-format
 msgid "%d replacement"
 msgid_plural "%d replacements"
 msgstr[0] "%d개 바꿈"
 
-#: src/core/app.c:1445
+#: src/core/app.c:1446
 msgid "Nothing found"
 msgstr "찾은 항목이 없습니다"
 
-#: src/core/app.c:1452
+#: src/core/app.c:1453
 #, c-format
 msgid "%d match"
 msgid_plural "%d matches"
 msgstr[0] "%d개 일치"
 
-#: src/core/app.c:1490
+#: src/core/app.c:1491
 msgid "(untitled)"
 msgstr "(제목 없음)"
 
-#: src/core/app.c:1499
+#: src/core/app.c:1500
 msgid "No headings yet."
 msgstr "아직 제목이 없습니다."
 
-#: src/core/app.c:1500
+#: src/core/app.c:1501
 msgid "Start a line with # to create chapters."
 msgstr "줄을 #으로 시작하면 장이 만들어집니다."
 
-#: src/core/app.c:1529
+#: src/core/app.c:1530
 #, c-format
 msgid "goal of %d reached"
 msgstr "목표 %d단어 달성"
 
-#: src/core/app.c:1529
+#: src/core/app.c:1530
 #, c-format
 msgid "of %d words today"
 msgstr "/ 오늘 목표 %d단어"
 
-#: src/core/app.c:1530
+#: src/core/app.c:1531
 msgid "words today"
 msgstr "오늘 쓴 단어"
 
-#: src/core/app.c:1535
+#: src/core/app.c:1536
 msgid "This document"
 msgstr "이 문서"
 
-#: src/core/app.c:1536
+#: src/core/app.c:1537
 msgid "This session"
 msgstr "이번 세션"
 
-#: src/core/app.c:1536
+#: src/core/app.c:1537
 #, c-format
 msgid "+%d in %dh%02d"
 msgstr "%2$d시간 %3$02d분 동안 +%1$d"
 
-#: src/core/app.c:1537
+#: src/core/app.c:1538
 msgid "Estimated reading"
 msgstr "예상 읽기 시간"
 
-#: src/core/app.c:1538
+#: src/core/app.c:1539
 msgid "Pace"
 msgstr "속도"
 
-#: src/core/app.c:1538
+#: src/core/app.c:1539
 #, c-format
 msgid "%d words/h"
 msgstr "시간당 %d단어"
 
-#: src/core/app.c:1549
+#: src/core/app.c:1550
 msgid "15 min"
 msgstr "15분"
 
-#: src/core/app.c:1549
+#: src/core/app.c:1550
 msgid "25 min"
 msgstr "25분"
 
-#: src/core/app.c:1549
+#: src/core/app.c:1550
 msgid "45 min"
 msgstr "45분"
 
-#: src/core/app.c:1549
+#: src/core/app.c:1550
 msgid "60 min"
 msgstr "60분"
 
-#: src/core/app.c:1554
+#: src/core/app.c:1555
 msgid "Start sprint"
 msgstr "스프린트 시작"
 
-#: src/core/app.c:1560
+#: src/core/app.c:1561
 #, c-format
 msgid "+%d word in this sprint"
 msgid_plural "+%d words in this sprint"
 msgstr[0] "이번 스프린트에서 +%d단어"
 
-#: src/core/app.c:1563
+#: src/core/app.c:1564
 msgid "Stop sprint"
 msgstr "스프린트 중지"
 
-#: src/core/app.c:1575
+#: src/core/app.c:1576
 msgid "Ctrl+N / O / S"
 msgstr "Ctrl+N / O / S"
 
-#: src/core/app.c:1575
+#: src/core/app.c:1576
 msgid "New · Open · Save"
 msgstr "새로 만들기 · 열기 · 저장"
 
-#: src/core/app.c:1575 src/core/filedlg.c:123
+#: src/core/app.c:1576 src/core/filedlg.c:123
 msgid "Save as / Export"
 msgstr "다른 이름으로 저장 / 내보내기"
 
-#: src/core/app.c:1576
+#: src/core/app.c:1577
 msgid "Ctrl+W · Ctrl+Tab"
 msgstr "Ctrl+W · Ctrl+Tab"
 
-#: src/core/app.c:1576
+#: src/core/app.c:1577
 msgid "Tabs: close · next"
 msgstr "탭: 닫기 · 다음"
 
-#: src/core/app.c:1576
+#: src/core/app.c:1577
 msgid "Alt+1…9"
 msgstr "Alt+1…9"
 
-#: src/core/app.c:1576
+#: src/core/app.c:1577
 msgid "Go to tab 1…9"
 msgstr "1…9번 탭으로 이동"
 
-#: src/core/app.c:1577
+#: src/core/app.c:1578
 msgid "Ctrl+K"
 msgstr "Ctrl+K"
 
-#: src/core/app.c:1577
+#: src/core/app.c:1578
 msgid "Command palette"
 msgstr "명령 팔레트"
 
-#: src/core/app.c:1577
+#: src/core/app.c:1578
 msgid "Reading (formatted Markdown)"
 msgstr "읽기(서식 있는 Markdown)"
 
-#: src/core/app.c:1578
+#: src/core/app.c:1579
 msgid "Ctrl+Z / Y"
 msgstr "Ctrl+Z / Y"
 
-#: src/core/app.c:1578
+#: src/core/app.c:1579
 msgid "Undo · Redo"
 msgstr "실행 취소 · 다시 실행"
 
-#: src/core/app.c:1579
+#: src/core/app.c:1580
 msgid "Ctrl+B / I"
 msgstr "Ctrl+B / I"
 
-#: src/core/app.c:1579
+#: src/core/app.c:1580
 msgid "Bold · Italic"
 msgstr "굵게 · 기울임"
 
-#: src/core/app.c:1579
+#: src/core/app.c:1580
 msgid "Ctrl+1…6 / 0"
 msgstr "Ctrl+1…6 / 0"
 
-#: src/core/app.c:1579
+#: src/core/app.c:1580
 msgid "Heading level 1–6 · Text"
 msgstr "제목 수준 1–6 · 본문"
 
-#: src/core/app.c:1580
+#: src/core/app.c:1581
 msgid "Alt+↑ / ↓"
 msgstr "Alt+↑ / ↓"
 
-#: src/core/app.c:1580
+#: src/core/app.c:1581
 msgid "Move paragraph"
 msgstr "문단 이동"
 
-#: src/core/app.c:1580
+#: src/core/app.c:1581
 msgid "Tab / Shift+Tab"
 msgstr "Tab / Shift+Tab"
 
-#: src/core/app.c:1580
+#: src/core/app.c:1581
 msgid "Indent list item"
 msgstr "목록 항목 들여쓰기"
 
-#: src/core/app.c:1582
+#: src/core/app.c:1583
 msgid "Ctrl+PgUp / PgDn"
 msgstr "Ctrl+PgUp / PgDn"
 
-#: src/core/app.c:1582
+#: src/core/app.c:1583
 msgid "Previous · next chapter"
 msgstr "이전 장 · 다음 장"
 
-#: src/core/app.c:1582
+#: src/core/app.c:1583
 msgid "Jump to and back from the last edit"
 msgstr "마지막 편집 위치로 갔다 오기"
 
-#: src/core/app.c:1583
+#: src/core/app.c:1584
 msgid "lowercase → Title Case → UPPERCASE"
 msgstr "소문자 → 첫 글자 대문자 → 대문자"
 
-#: src/core/app.c:1583
+#: src/core/app.c:1584
 msgid "Select and type ( \" *"
 msgstr "선택한 뒤 ( \" * 입력"
 
-#: src/core/app.c:1583
+#: src/core/app.c:1584
 msgid "Wraps the selection"
 msgstr "선택 영역을 감쌉니다"
 
-#: src/core/app.c:1584
+#: src/core/app.c:1585
 msgid "← / → · Space (reading)"
 msgstr "← / → · 스페이스(읽기)"
 
-#: src/core/app.c:1584
+#: src/core/app.c:1585
 msgid "Previous · next page"
 msgstr "이전 페이지 · 다음 페이지"
 
-#: src/core/app.c:1584
+#: src/core/app.c:1585
 msgid "Auto-scroll on/off"
 msgstr "자동 스크롤 켜기/끄기"
 
-#: src/core/app.c:1585
+#: src/core/app.c:1586
 msgid "+ / − (reading)"
 msgstr "+ / −(읽기)"
 
-#: src/core/app.c:1585
+#: src/core/app.c:1586
 msgid "Auto-scroll speed"
 msgstr "자동 스크롤 속도"
 
-#: src/core/app.c:1586
+#: src/core/app.c:1587
 msgid "Ctrl+← / →"
 msgstr "Ctrl+← / →"
 
-#: src/core/app.c:1586
+#: src/core/app.c:1587
 msgid "Previous / next word"
 msgstr "이전 / 다음 단어"
 
-#: src/core/app.c:1586
+#: src/core/app.c:1587
 msgid "Ctrl+Home / End"
 msgstr "Ctrl+Home / End"
 
-#: src/core/app.c:1586
+#: src/core/app.c:1587
 msgid "Start · end of the text"
 msgstr "텍스트 처음 · 끝"
 
-#: src/core/app.c:1587
+#: src/core/app.c:1588
 msgid "Ctrl+= / -"
 msgstr "Ctrl+= / -"
 
-#: src/core/app.c:1587
+#: src/core/app.c:1588
 msgid "Larger · smaller text"
 msgstr "글자 크게 · 작게"
 
-#: src/core/app.c:1588
+#: src/core/app.c:1589
 msgid "This help"
 msgstr "이 도움말"
 
-#: src/core/app.c:1588
+#: src/core/app.c:1589
 msgid "Focus mode (sentence/paragraph/line)"
 msgstr "집중 모드(문장/문단/줄)"
 
-#: src/core/app.c:1589
+#: src/core/app.c:1590
 msgid "Typewriter"
 msgstr "타자기"
 
-#: src/core/app.c:1589
+#: src/core/app.c:1590
 msgid "Writing sprint"
 msgstr "쓰기 스프린트"
 
-#: src/core/app.c:1591
+#: src/core/app.c:1592
 msgid "F7 / F8 / F9"
 msgstr "F7 / F8 / F9"
 
-#: src/core/app.c:1591
+#: src/core/app.c:1592
 msgid "Previous track · Play/pause · Next"
 msgstr "이전 곡 · 재생/일시 정지 · 다음 곡"
 
-#: src/core/app.c:1592
+#: src/core/app.c:1593
 msgid "Zen mode"
 msgstr "젠 모드"
 
-#: src/core/app.c:1593
+#: src/core/app.c:1594
 msgid "Esc"
 msgstr "Esc"
 
-#: src/core/app.c:1593
+#: src/core/app.c:1594
 msgid "Close window · leave zen/reading"
 msgstr "창 닫기 · 젠 모드/읽기 나가기"
 
-#: src/core/app.c:1594
+#: src/core/app.c:1595
 msgid "Tab · ↑ ↓ (windows)"
 msgstr "Tab · ↑ ↓(창)"
 
-#: src/core/app.c:1594
+#: src/core/app.c:1595
 msgid "Move between buttons and options"
 msgstr "버튼과 옵션 사이 이동"
 
-#: src/core/app.c:1594
+#: src/core/app.c:1595
 msgid "Enter · Space · ← →"
 msgstr "Enter · 스페이스 · ← →"
 
-#: src/core/app.c:1594
+#: src/core/app.c:1595
 msgid "Press · adjust the focused option"
 msgstr "실행 · 선택한 옵션 조정"
 
-#: src/core/app.c:1595
+#: src/core/app.c:1596
 msgid "Keyboard between the text and the windows"
 msgstr "키보드를 본문과 창 사이에서 전환"
 
-#: src/core/app.c:1595
+#: src/core/app.c:1596
 msgid "Ctrl+Shift+← / →"
 msgstr "Ctrl+Shift+← / →"
 
-#: src/core/app.c:1595
+#: src/core/app.c:1596
 msgid "Select word by word"
 msgstr "단어 단위로 선택"
 
-#: src/core/app.c:1596
+#: src/core/app.c:1597
 msgid "Become — and … (smart typography)"
 msgstr "— 와 … 로 바뀝니다(스마트 타이포그래피)"
 
-#: src/core/app.c:1672
+#: src/core/app.c:1597
+msgid "Alt+F7 / Alt+F8"
+msgstr "Alt+F7 / Alt+F8"
+
+#: src/core/app.c:1597
+msgid "Move · resize the window (arrows, Enter)"
+msgstr "창 이동 · 크기 조절 (화살표, Enter)"
+
+#: src/core/app.c:1674
 #, c-format
 msgid "Untitled — kept in %s until you save it"
 msgstr "제목 없음 — 저장할 때까지 %s에 보관됩니다"
 
-#: src/core/app.c:1679
+#: src/core/app.c:1681
 msgid "New tab (Ctrl+N)"
 msgstr "새 탭(Ctrl+N)"
 
-#: src/core/app.c:1698
+#: src/core/app.c:1700
 msgid "Not saved yet (Ctrl+S)"
 msgstr "아직 저장되지 않음(Ctrl+S)"
 
-#: src/core/app.c:1713
+#: src/core/app.c:1715
 #, c-format
 msgid "Playing: %s (F6)"
 msgstr "재생 중: %s(F6)"
 
-#: src/core/app.c:1714
+#: src/core/app.c:1716
 msgid "Music (F6)"
 msgstr "음악(F6)"
 
-#: src/core/app.c:1714
+#: src/core/app.c:1716
 #, c-format
 msgid "Music (F6) — put MP3 files in the %s folder"
 msgstr "음악(F6) — MP3 파일을 %s 폴더에 넣으세요"
 
-#: src/core/app.c:1716
+#: src/core/app.c:1718
 msgid "Tabs on — click to turn off"
 msgstr "탭 켜짐 — 클릭하면 꺼집니다"
 
-#: src/core/app.c:1716
+#: src/core/app.c:1718
 msgid "Tabs: open several documents (like in Sublime Text)"
 msgstr "탭: 여러 문서 열기(Sublime Text처럼)"
 
-#: src/core/app.c:1717
+#: src/core/app.c:1719
 msgid "Zen mode (F11)"
 msgstr "젠 모드(F11)"
 
-#: src/core/app.c:1718
+#: src/core/app.c:1720
 msgid "Typewriter (F3)"
 msgstr "타자기(F3)"
 
-#: src/core/app.c:1719
+#: src/core/app.c:1721
 msgid "Reading (Ctrl+P)"
 msgstr "읽기(Ctrl+P)"
 
-#: src/core/app.c:1721
+#: src/core/app.c:1723
 msgid "Appearance (F12)"
 msgstr "모양(F12)"
 
-#: src/core/app.c:1722
+#: src/core/app.c:1724
 msgid "Commands (Ctrl+K)"
 msgstr "명령(Ctrl+K)"
 
-#: src/core/app.c:1734
+#: src/core/app.c:1736
 msgid "Next track (F9)"
 msgstr "다음 곡(F9)"
 
-#: src/core/app.c:1736
+#: src/core/app.c:1738
 msgid "Pause (F8)"
 msgstr "일시 정지(F8)"
 
-#: src/core/app.c:1736
+#: src/core/app.c:1738
 msgid "Play (F8)"
 msgstr "재생(F8)"
 
-#: src/core/app.c:1738
+#: src/core/app.c:1740
 msgid "Previous track (F7)"
 msgstr "이전 곡(F7)"
 
-#: src/core/app.c:1751
+#: src/core/app.c:1753
 #, c-format
 msgid "%d h %02d min"
 msgstr "%d시간 %02d분"
 
-#: src/core/app.c:1779
+#: src/core/app.c:1781
 msgid " · end of the text"
 msgstr " · 텍스트 끝"
 
-#: src/core/app.c:1780
+#: src/core/app.c:1782
 #, c-format
 msgid " · %s · %s to the end of the chapter · %s in total"
 msgstr " · %s · 장 끝까지 %s · 전체 %s"
 
-#: src/core/app.c:1781
+#: src/core/app.c:1783
 #, c-format
 msgid " · %s · %s of reading left"
 msgstr " · %s · 남은 읽기 시간 %s"
 
-#: src/core/app.c:1782
+#: src/core/app.c:1784
 #, c-format
 msgid " · %s of reading left"
 msgstr " · 남은 읽기 시간 %s"
 
-#: src/core/app.c:1785
+#: src/core/app.c:1787
 #, c-format
 msgid "%d of %d word"
 msgid_plural "%d of %d words"
 msgstr[0] "%d / %d단어"
 
-#: src/core/app.c:1791
+#: src/core/app.c:1793
 #, c-format
 msgid "Today: %d words · %d min reading"
 msgstr "오늘: %d단어 · 읽기 %d분"
 
-#: src/core/app.c:2004 src/core/app.c:2009
+#: src/core/app.c:2010 src/core/app.c:2015
 msgid "Welcome back. Picking up where you left off."
 msgstr "다시 오신 것을 환영합니다. 멈춘 곳에서 이어서 합니다."
 
-#: src/core/app.c:2004
+#: src/core/app.c:2010
 #, c-format
 msgid "Welcome back: %d tab reopened."
 msgid_plural "Welcome back: %d tabs reopened."
 msgstr[0] "다시 오신 것을 환영합니다: 탭 %d개를 다시 열었습니다."
 
-#: src/core/app.c:2008
+#: src/core/app.c:2014
 msgid "Welcome back. Reading continues where you left off."
 msgstr "다시 오신 것을 환영합니다. 멈춘 곳에서 이어 읽습니다."
 
-#: src/core/app.c:2013
+#: src/core/app.c:2019
 msgid "Unsaved draft recovered"
 msgstr "저장하지 않은 초안을 복구했습니다"
 
-#: src/core/app.c:2018
+#: src/core/app.c:2024
 msgid ""
 "# Welcome to FolioOS\n"
 "\n"
@@ -1587,29 +1603,29 @@ msgstr ""
 "\n"
 "이 텍스트를 지우고(Ctrl+A) 당신의 이야기를 시작하세요.\n"
 
-#: src/core/app.c:2145
+#: src/core/app.c:2151
 #, c-format
 msgid "Sprint finished: %d word. Breathe and stretch."
 msgid_plural "Sprint finished: %d words. Breathe and stretch."
 msgstr[0] "스프린트 완료: %d단어. 숨을 고르고 몸을 펴세요."
 
-#: src/core/editor.c:311
+#: src/core/editor.c:322
 msgid "Cut"
 msgstr "잘라 냄"
 
-#: src/core/editor.c:311
+#: src/core/editor.c:322
 msgid "Copied"
 msgstr "복사됨"
 
-#: src/core/editor.c:505
+#: src/core/editor.c:516
 msgid "There are no edits in this document yet"
 msgstr "이 문서에는 아직 편집 기록이 없습니다"
 
-#: src/core/editor.c:531 src/core/editor.c:644 src/core/editor.c:657
+#: src/core/editor.c:542 src/core/editor.c:659 src/core/editor.c:672
 msgid "Hemingway mode: keep going, no deleting"
 msgstr "헤밍웨이 모드: 지우지 말고 계속 쓰세요"
 
-#: src/core/editor.c:541
+#: src/core/editor.c:552
 msgid "Paragraph deleted — Ctrl+Z undoes it"
 msgstr "문단 삭제됨 — Ctrl+Z로 되돌릴 수 있습니다"
 
@@ -1897,6 +1913,26 @@ msgstr "11월"
 msgid "December"
 msgstr "12월"
 
+#: src/core/ime.c:200
+msgid "This keyboard has no input method (choose one in Settings › System)"
+msgstr "이 키보드에는 입력기가 없습니다 (설정 › 시스템에서 선택하세요)"
+
+#: src/core/ime.c:204
+msgid "Input: Latin letters"
+msgstr "입력: 로마자"
+
+#: src/core/ime.c:204
+msgid "Input: Hangul"
+msgstr "입력: 한글"
+
+#: src/core/ime.c:204
+msgid "Input: Hiragana"
+msgstr "입력: 히라가나"
+
+#: src/core/ime.c:204
+msgid "Input: Katakana"
+msgstr "입력: 가타카나"
+
 #: src/core/music.c:131
 #, c-format
 msgid "No sound: %s. Details in %s"
@@ -2111,7 +2147,23 @@ msgstr "키보드: %s (Tab 이동, Esc 닫기)"
 msgid "Keyboard: text"
 msgstr "키보드: 본문"
 
-#: src/core/ui.c:246
+#: src/core/ui.c:229
+msgid "No window open"
+msgstr "열린 창이 없습니다"
+
+#: src/core/ui.c:230
+msgid "This window cannot be resized"
+msgstr "이 창은 크기를 바꿀 수 없습니다"
+
+#: src/core/ui.c:233
+msgid "Move the window with the arrows · Enter confirms · Esc cancels"
+msgstr "화살표로 창 이동 · Enter 확인 · Esc 취소"
+
+#: src/core/ui.c:234
+msgid "Resize the window with the arrows · Enter confirms · Esc cancels"
+msgstr "화살표로 창 크기 조절 · Enter 확인 · Esc 취소"
+
+#: src/core/ui.c:283
 msgid "Close (Esc)"
 msgstr "닫기(Esc)"
 

@@ -497,7 +497,8 @@ static Face *fallback;
 #define MAX_LANG_FONTS 6
 static Face *lang_faces[MAX_LANG_FONTS];   /* fontes de reserva do idioma (X-Fonts) */
 static int   nlang_faces;
-static char  lang_files[160];
+static char  lang_files[160], kbd_files[160];   /* do idioma (X-Fonts) e do teclado (fonts) */
+static int   nlang_from_lang;
 
 static void fam_complete(Family *fm) {
     if (!fm->f[FS_REG]) {
@@ -602,6 +603,7 @@ Family *font_mono(void) { return &fams[mono_fam]; }
 Face *fam_face(Family *f, int style) { return f->f[style & 3] ? f->f[style & 3] : f->f[0]; }
 
 /* ------------------------------------------------------------ texto */
+static bool lazy_cjk(u32 cp);
 static inline u16 resolve(Face **f, u32 cp) {
     u16 g = face_gid(*f, cp);
     if (!g && cp > 32 && fallback && *f != fallback) {
@@ -613,6 +615,7 @@ static inline u16 resolve(Face **f, u32 cp) {
         u16 g2 = face_gid(lang_faces[i], cp);
         if (g2) { *f = lang_faces[i]; return g2; }
     }
+    if (!g && cp >= 0x1100 && lazy_cjk(cp)) return resolve(f, cp);   /* coreano/japonês/chinês no texto: a fonte vem sob demanda */
     return g;
 }
 
@@ -693,15 +696,10 @@ static void face_free(Face *f) {
     mem_free(f);
 }
 
-/* fontes de reserva do idioma: "CJK/NotoSansSC.ttf; CJK/Outra.ttf" (caminhos em FOLIO/FONTS).
- * Carregadas só quando o idioma é escolhido; as do idioma anterior são liberadas. */
-void fonts_set_lang(const char *files) {
-    if (!files) files = "";
-    if (str_eq(files, lang_files)) return;
-    if (nlang_faces) glyph_cache_trim();
-    for (int i = 0; i < nlang_faces; i++) face_free(lang_faces[i]);
-    nlang_faces = 0;
-    str_copy(lang_files, files, sizeof lang_files);
+/* fontes de reserva: "_LANGUAGE/NotoSansSC.ttf; _LANGUAGE/Outra.ttf" (caminhos em FOLIO/FONTS).
+ * Vêm do idioma da interface (X-Fonts) e do teclado (linha fonts do layout: digitar coreano com a
+ * interface em inglês). Carregadas só quando pedidas; as que deixaram de ser pedidas são liberadas. */
+static void load_list(const char *files) {
     const char *p = files;
     while (*p && nlang_faces < MAX_LANG_FONTS) {
         while (*p == ' ' || *p == ';' || *p == ',') p++;
@@ -722,4 +720,40 @@ void fonts_set_lang(const char *files) {
         if (f) lang_faces[nlang_faces++] = f; else mem_free(data);
     }
 }
-bool fonts_lang_ok(void) { return lang_files[0] == 0 || nlang_faces > 0; }
+/* Texto em coreano, japonês ou chinês sem fonte carregada (documento aberto com a interface em outro
+ * idioma, ou digitado com outro teclado): carrega a fonte certa do pacote CJK uma vez, na primeira
+ * letra que faltar. Sem o pacote, nada muda (a letra fica como estava). */
+static bool lazy_tried[3];
+static bool lazy_cjk(u32 cp) {
+    static const char *files[3] = { "_LANGUAGE/NotoSansKR.ttf", "_LANGUAGE/NotoSansJP.ttf", "_LANGUAGE/NotoSansSC.ttf" };
+    int k = (cp >= 0xAC00 && cp <= 0xD7A3) || (cp >= 0x1100 && cp <= 0x11FF) || (cp >= 0x3130 && cp <= 0x318F) ? 0
+          : (cp >= 0x3040 && cp <= 0x30FF) || (cp >= 0x31F0 && cp <= 0x31FF) ? 1
+          : (cp >= 0x3000 && cp <= 0x303F) || (cp >= 0x3400 && cp <= 0x9FFF) || (cp >= 0xFF00 && cp <= 0xFFEF) ? 2 : -1;
+    if (k < 0 || lazy_tried[k] || nlang_faces >= MAX_LANG_FONTS) return false;
+    lazy_tried[k] = true;
+    int before = nlang_faces;
+    load_list(files[k]);
+    return nlang_faces > before;
+}
+static void reload_lang_faces(void) {
+    memset(lazy_tried, 0, sizeof lazy_tried);
+    if (nlang_faces) glyph_cache_trim();
+    for (int i = 0; i < nlang_faces; i++) face_free(lang_faces[i]);
+    nlang_faces = 0;
+    load_list(lang_files);
+    nlang_from_lang = nlang_faces;
+    if (!str_eq(kbd_files, lang_files)) load_list(kbd_files);
+}
+void fonts_set_lang(const char *files) {
+    if (!files) files = "";
+    if (str_eq(files, lang_files)) return;
+    str_copy(lang_files, files, sizeof lang_files);
+    reload_lang_faces();
+}
+void fonts_set_kbd(const char *files) {
+    if (!files) files = "";
+    if (str_eq(files, kbd_files)) return;
+    str_copy(kbd_files, files, sizeof kbd_files);
+    reload_lang_faces();
+}
+bool fonts_lang_ok(void) { return lang_files[0] == 0 || nlang_from_lang > 0; }
