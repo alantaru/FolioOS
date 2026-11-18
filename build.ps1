@@ -163,7 +163,9 @@ Get-ChildItem "$stage\DOCUMENTS" -Exclude Welcome.md | Remove-Item -Recurse -For
 Get-ChildItem "$stage\MUSIC" -Exclude README.txt | Remove-Item -Recurse -Force
 foreach ($x in "CONFIG.INI", "DIAGNOSTICS.TXT", "DRAFT.MD", "TABS", "VERSIONS") { if (Test-Path "$stage\FOLIO\$x") { Remove-Item -Recurse -Force "$stage\FOLIO\$x" } }
 Write-Zip $stage $zip ""
-Remove-Item -Recurse -Force $stage
+# the disk image is built from this same clean copy: never from build\usb_files, which keeps the
+# developer's own documents and music between builds
+if (-not ($Image -or $Vhd)) { Remove-Item -Recurse -Force $stage }
 Ok ("distribution package: $zip ({0:N1} MB) - unzip at the root of a FAT32 USB drive" -f ((Get-Item $zip).Length / 1MB))
 # the separate font packs of 4.1 are now part of FolioOS.zip
 foreach ($old in "build\FOLIO-FONTS-EXTRA.zip", "build\FOLIO-FONTS-CJK.zip") { if (Test-Path $old) { Remove-Item -Force $old } }
@@ -280,8 +282,11 @@ if (-not $NoTests) {
 if ($Image -or $Vhd) {
     Step 8 "Disk image (MBR + FAT32, $ImageMB MB)"
     Run gcc @("-O2", "-Wall", "tools\mkimg.c", "-o", "build\mkimg.exe")
-    if ($Image) { Run .\build\mkimg.exe @("build\usb_files", "build\folio.img", "$ImageMB") }
-    if ($Vhd)   { Run .\build\mkimg.exe @("build\usb_files", "build\folio.vhd", "$ImageMB", "--vhd") }
+    if ($Image) { Run .\build\mkimg.exe @("build\zip_stage", "build\folio.img", "$ImageMB") }
+    if ($Vhd)   { Run .\build\mkimg.exe @("build\zip_stage", "build\folio.vhd", "$ImageMB", "--vhd") }
+    Remove-Item -Recurse -Force build\zip_stage
+    # hybrid: the same image also starts on PCs with BIOS only (boot code only, the FAT32 is unchanged)
+    if ($Image -and (Test-Path build\biosboot.exe)) { Run .\build\biosboot.exe @("build\folio.img") | Out-Null; Ok "build\folio.img boots on UEFI and on BIOS-only PCs" }
 }
 
 Write-Host "`nDone. To install on a FAT32 USB drive:  .\flash_usb.ps1 -DriveLetter E:" -ForegroundColor Green
