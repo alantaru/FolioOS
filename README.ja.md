@@ -483,13 +483,18 @@ tests/          スクリプトによるエンドツーエンドのテスト
 
 ## ロードマップ
 
+FolioOS は同じエディターを共有する 2 つのエディションに分かれます。ずっとオフラインの **FolioOS** と、Wi-Fi で文章を同期する
+最小限の Linux、**FolioOS Sync** です。計画の全体は [ROADMAP.md](ROADMAP.md) にあります。
+
 - [x] BIOS のみの PC（Legacy/CSM）と ARM64（UEFI ファームウェアの Raspberry Pi、ARM ノートパソコン）
 - [x] 韓国語入力（2 ボル式ハングル）と日本語のかな入力（ローマ字 → ひらがな／カタカナ）
+- [ ] コンピューターのディスクへのインストール——単独のシステムとして、またはほかのどのシステムとも並べて——パーティション管理ツールつき
+- [ ] FolioOS Sync：Wi-Fi と、WebDAV、SFTP、Git、Dropbox、Google Drive、OneDrive、Syncthing による同期
 - [ ] 日本語の漢字変換と中国語のピンイン入力（辞書が必要）
 - [ ] 複雑な文字の組版と右から左に書く文字（アラビア文字、ヘブライ文字、デーヴァナーガリー…）
 - [ ] Hunspell 互換の辞書によるスペルチェック
 - [ ] Secure Boot 対応（署名済みの shim）
-- [ ] シミュレーターとツールの Linux 版・macOS 版
+- [ ] シミュレーターとツールの Linux 版（macOS：完了）
 
 [Discussions](https://github.com/alantaru/FolioOS/discussions) で投票や提案をどうぞ。
 

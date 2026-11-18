@@ -512,13 +512,19 @@ Een programma van ~600 KB bestuurt de hele machine via een dunne platformlaag. D
 
 ## Planning
 
+FolioOS splitst in twee edities met dezelfde editor: **FolioOS**, voor altijd offline, en **FolioOS Sync**,
+een minimale Linux met wifi die je teksten synchroniseert. Het volledige plan staat in
+[ROADMAP.md](ROADMAP.md).
+
 - [x] Pc’s met alleen BIOS (Legacy/CSM) en ARM64 (Raspberry Pi met UEFI-firmware, ARM-laptops)
 - [x] Koreaanse invoer (Hangul met 2 sets) en Japanse kana-invoer (romaji → hiragana/katakana)
+- [ ] Installeren op de schijf van de computer — als enig systeem of naast elk ander — met partitiebeheer
+- [ ] FolioOS Sync: wifi en synchronisatie met WebDAV, SFTP, Git, Dropbox, Google Drive, OneDrive en Syncthing
 - [ ] Japanse kanji-omzetting en Chinese pinyin-invoer (hebben woordenboeken nodig)
 - [ ] Tekstvormgeving en schriften van rechts naar links (Arabisch, Hebreeuws, Devanagari…)
 - [ ] Spellingcontrole met Hunspell-compatibele woordenboeken
 - [ ] Ondersteuning voor Secure Boot (ondertekende shim)
-- [ ] Linux- en macOS-versies van de simulator en de hulpmiddelen
+- [ ] Linux-versie van de simulator en de hulpmiddelen (macOS: klaar)
 
 Stem en doe voorstellen in de [Discussions](https://github.com/alantaru/FolioOS/discussions).
 

@@ -513,13 +513,19 @@ tests/          betikli uçtan uca testler
 
 ## Yol haritası
 
+FolioOS, aynı düzenleyiciyi paylaşan iki sürüme ayrılıyor: sonsuza dek çevrim dışı **FolioOS** ve
+metinlerinizi eşitleyen, Wi-Fi’lı minimal bir Linux olan **FolioOS Sync**. Planın tamamı
+[ROADMAP.md](ROADMAP.md) dosyasında.
+
 - [x] Yalnızca BIOS’lu bilgisayarlar (Legacy/CSM) ve ARM64 (UEFI donanım yazılımlı Raspberry Pi, ARM dizüstüler)
 - [x] Korece giriş (2 setli Hangıl) ve Japonca kana girişi (romaji → hiragana/katakana)
+- [ ] Bilgisayarın diskine kurulum — tek sistem olarak ya da herhangi bir sistemin yanına — bölüm yöneticisiyle
+- [ ] FolioOS Sync: Wi-Fi ve WebDAV, SFTP, Git, Dropbox, Google Drive, OneDrive ve Syncthing ile eşitleme
 - [ ] Japonca kanji dönüşümü ve Çince pinyin girişi (sözlük gerektirir)
 - [ ] Metin biçimlendirme ve sağdan sola yazılar (Arapça, İbranice, Devanagari…)
 - [ ] Hunspell uyumlu sözlüklerle yazım denetimi
 - [ ] Secure Boot desteği (imzalı shim)
-- [ ] Simülatör ve araçların Linux ve macOS sürümleri
+- [ ] Simülatörün ve araçların Linux sürümü (macOS: tamamlandı)
 
 [Discussions](https://github.com/alantaru/FolioOS/discussions) bölümünde oy verin ve öneride bulunun.
 

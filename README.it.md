@@ -514,13 +514,19 @@ Dettagli in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Roadmap
 
+FolioOS si divide in due edizioni che condividono lo stesso editor: **FolioOS**, offline per sempre, e
+**FolioOS Sync**, un Linux minimale con Wi-Fi che sincronizza i tuoi testi. Il piano completo è in
+[ROADMAP.md](ROADMAP.md).
+
 - [x] PC solo BIOS (Legacy/CSM) e ARM64 (Raspberry Pi con firmware UEFI, portatili ARM)
 - [x] Input coreano (hangul a 2 set) e input kana giapponese (romaji → hiragana/katakana)
+- [ ] Installazione sul disco del computer — come unico sistema o accanto a qualsiasi altro — con un gestore di partizioni
+- [ ] FolioOS Sync: Wi-Fi e sincronizzazione con WebDAV, SFTP, Git, Dropbox, Google Drive, OneDrive e Syncthing
 - [ ] Conversione in kanji (giapponese) e input pinyin (cinese) (richiedono dizionari)
 - [ ] Composizione del testo e scritture da destra a sinistra (arabo, ebraico, devanagari…)
 - [ ] Controllo ortografico con dizionari compatibili con Hunspell
 - [ ] Supporto al Secure Boot (shim firmato)
-- [ ] Versioni Linux e macOS del simulatore e degli strumenti
+- [ ] Versione Linux del simulatore e degli strumenti (macOS: fatto)
 
 Vota e proponi nelle [Discussions](https://github.com/alantaru/FolioOS/discussions).
 

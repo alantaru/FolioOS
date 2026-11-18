@@ -450,13 +450,19 @@ A ~600 KB binary owns the whole machine through a thin platform layer. Details i
 
 ## Roadmap
 
+FolioOS is splitting into two editions that share the same editor: **FolioOS**, offline forever, and
+**FolioOS Sync**, a minimal Linux with Wi-Fi that syncs your texts. The full plan is in
+[ROADMAP.md](ROADMAP.md).
+
 - [x] PCs with BIOS only (Legacy/CSM) and ARM64 (Raspberry Pi with UEFI firmware, ARM laptops)
 - [x] Korean input (2-set Hangul) and Japanese kana input (romaji → hiragana/katakana)
+- [ ] Install on the computer's disk — as the only system or next to any other — with a partition manager
+- [ ] FolioOS Sync: Wi-Fi and sync with WebDAV, SFTP, Git, Dropbox, Google Drive, OneDrive and Syncthing
 - [ ] Japanese kanji conversion and Chinese pinyin input (need dictionaries)
 - [ ] Text shaping and right-to-left scripts (Arabic, Hebrew, Devanagari…)
 - [ ] Spell checking with Hunspell-compatible dictionaries
 - [ ] Secure Boot support (signed shim)
-- [ ] Linux and macOS builds of the simulator and tools
+- [ ] Linux build of the simulator and tools (macOS: done)
 
 Vote and suggest in [Discussions](https://github.com/alantaru/FolioOS/discussions).
 

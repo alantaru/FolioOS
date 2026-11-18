@@ -460,13 +460,18 @@ tests/          脚本化的端到端测试
 
 ## 路线图
 
+FolioOS 正在分成两个共用同一编辑器的版本：永远离线的 **FolioOS**，以及带 Wi-Fi、可同步文本的极简 Linux——**FolioOS Sync**。
+完整计划见 [ROADMAP.md](ROADMAP.md)。
+
 - [x] 仅有 BIOS 的电脑（Legacy/CSM）和 ARM64（装有 UEFI 固件的 Raspberry Pi、ARM 笔记本）
 - [x] 韩文输入（两套式韩文）和日文假名输入（罗马字 → 平假名/片假名）
+- [ ] 安装到电脑硬盘——作为唯一系统或与任何其他系统并存——并附带分区管理器
+- [ ] FolioOS Sync：Wi-Fi，以及通过 WebDAV、SFTP、Git、Dropbox、Google Drive、OneDrive 和 Syncthing 同步
 - [ ] 日文汉字转换和中文拼音输入（需要词典）
 - [ ] 复杂文字排版和从右到左的文字（阿拉伯文、希伯来文、天城文…）
 - [ ] 使用 Hunspell 兼容词典的拼写检查
 - [ ] Secure Boot 支持（已签名的 shim）
-- [ ] 模拟器和工具的 Linux 与 macOS 版本
+- [ ] 模拟器和工具的 Linux 版本（macOS：已完成）
 
 欢迎在 [Discussions](https://github.com/alantaru/FolioOS/discussions) 中投票和提出建议。
 

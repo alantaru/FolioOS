@@ -481,13 +481,18 @@ tests/          스크립트로 작성한 종단 간 테스트
 
 ## 로드맵
 
+FolioOS는 같은 편집기를 공유하는 두 가지 에디션으로 나뉩니다. 영원히 오프라인인 **FolioOS**와, Wi-Fi로 글을 동기화하는
+최소한의 Linux인 **FolioOS Sync**입니다. 전체 계획은 [ROADMAP.md](ROADMAP.md)에 있습니다.
+
 - [x] BIOS 전용 PC(Legacy/CSM)와 ARM64(UEFI 펌웨어의 Raspberry Pi, ARM 노트북)
 - [x] 한국어 입력(두벌식 한글)과 일본어 가나 입력(로마자 → 히라가나/가타카나)
+- [ ] 컴퓨터 디스크에 설치 — 단독 시스템으로 또는 다른 어떤 시스템과도 함께 — 파티션 관리자 포함
+- [ ] FolioOS Sync: Wi-Fi와 WebDAV, SFTP, Git, Dropbox, Google Drive, OneDrive, Syncthing 동기화
 - [ ] 일본어 한자 변환과 중국어 병음 입력(사전 필요)
 - [ ] 복잡한 문자 조판과 오른쪽에서 왼쪽으로 쓰는 문자(아랍 문자, 히브리 문자, 데바나가리…)
 - [ ] Hunspell 호환 사전을 쓰는 맞춤법 검사
 - [ ] Secure Boot 지원(서명된 shim)
-- [ ] 시뮬레이터와 도구의 Linux 및 macOS 버전
+- [ ] 시뮬레이터와 도구의 Linux 버전(macOS: 완료)
 
 [Discussions](https://github.com/alantaru/FolioOS/discussions)에서 투표하고 제안해 주세요.
 
