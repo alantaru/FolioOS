@@ -18,7 +18,7 @@ typedef uint32_t u32; typedef int32_t i32;
 typedef uint64_t u64; typedef int64_t i64;
 typedef size_t usize;
 
-#define FOLIO_VERSION "4.2"
+#define FOLIO_VERSION "4.3"
 #define MIN(a,b) ((a)<(b)?(a):(b))
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define CLAMP(v,lo,hi) ((v)<(lo)?(lo):((v)>(hi)?(hi):(v)))
