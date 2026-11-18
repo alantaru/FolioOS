@@ -25,6 +25,16 @@ mbr:
 .moved:
     sti
     mov [drive], dl
+    mov al, [boot_index]           ; ao lado de outro sistema: o instalador grava aqui a entrada do FolioOS
+    cmp al, 4                      ; (0xFF = não: a ativa, como sempre; a do outro sistema continua ativa)
+    jae .scan
+    mov ah, 16
+    mul ah
+    add ax, 0x07BE
+    mov si, ax
+    cmp byte [si + 4], 0
+    jne .go
+.scan:
     mov si, 0x07BE                 ; 1ª passada: partição ativa
 .act:
     test byte [si], 0x80
@@ -83,6 +93,8 @@ fail:
 drive:      db 0x80
 msg_nopart: db "FolioOS: no FAT32 partition", 0
 msg_io:     db "FolioOS: disk read error", 0
+    times 437 - ($ - $$) db 0
+boot_index: db 0xFF                ; byte 437: a entrada (0..3) a iniciar; 0xFF = a ativa (o instalador muda)
     times 440 - ($ - $$) db 0
 %endif
 

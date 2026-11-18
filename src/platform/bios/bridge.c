@@ -78,7 +78,7 @@ static void fatal(const char *m) { puts_("\r\nFolioOS: "); puts_(m); puts_("\r\n
 
 /* ============================================================ modo real (stub.asm) */
 typedef struct { u32 eax, ebx, ecx, edx, esi, edi, ebp; u16 ds, es; u32 eflags; } RmRegs;
-typedef struct { u32 magic; u8 *drive; u32 *e820_count; u8 *e820; void (*rm_int)(int, RmRegs *); } BootInfo;
+typedef struct { u32 magic; u8 *drive; u32 *e820_count; u8 *e820; void (*rm_int)(int, RmRegs *); void (*rm_chain)(int); } BootInfo;
 static BootInfo *bi;
 static void rm(int n, RmRegs *r) { bi->rm_int(n, r); }
 #define LOW_VBE  0x5000     /* buffers abaixo de 1 MB para o BIOS */
@@ -514,6 +514,24 @@ static bool drive_rw(BDisk *d, u64 lba, u32 n, u8 *buf, bool w) {
     return true;
 }
 static bool disk_rw(u64 lba, u32 n, u8 *buf, bool w) { return drive_rw(bootd, lba, n, buf, w); }
+
+/* ============================================================ o outro sistema (fase 3, dual boot só BIOS)
+ * O FolioOS foi instalado ao lado: o MBR do disco é o dele, e o código original do outro sistema está guardado em
+ * FOLIO/OTHERMBR.BIN. Chain recebe esses 440 bytes, monta em 0x7C00 o setor 0 como o outro sistema o espera (o
+ * código dele + a tabela de agora), volta o vídeo ao modo texto e salta (stub.asm, rm_chain): não volta. */
+typedef struct { EFI_STATUS (EFIAPI *Chain)(const u8 *code440); } FOLIO_BIOS_CHAIN;
+static const EFI_GUID G_FCHAIN = { 0x464f4c49, 0x4f43, 0x4841, { 0x49, 0x4e, 0x4d, 0x42, 0x52, 0x00, 0x00, 0x01 } };
+static EFI_STATUS EFIAPI chain_mbr(const u8 *code) {
+    static u8 sec[512];
+    if (!disk_rw(0, 1, sec, false) || sec[510] != 0x55 || sec[511] != 0xAA) return DEV_ERROR;
+    u8 *at = (u8 *)0x7C00;
+    memcpy(at, code, 440); memcpy(at + 440, sec + 440, 72);    /* assinatura do disco e a tabela continuam as de agora */
+    RmRegs r; memset(&r, 0, sizeof r); r.eax = 0x0003; rm(0x10, &r);   /* modo texto 80x25, como o BIOS entregou */
+    bi->rm_chain(bootd->drive);
+    return DEV_ERROR;
+}
+static FOLIO_BIOS_CHAIN fchain = { chain_mbr };
+static int h_chain;
 static bool fat_io(void *ctx, u64 lba, u32 n, void *buf, bool w) { (void)ctx; return disk_rw(lba, n, buf, w); }
 
 static Fat fat;
@@ -923,6 +941,7 @@ __attribute__((section(".text.entry"))) void bridge_main(BootInfo *info) {
     reg(&h_fs, &G_SFS, &sfs); reg(&h_fs, &G_DP, bootd->dp);   /* o volume fica "dentro" do disco de boot */
     for (int i = 0; i < nbdisks; i++) { reg(&bdisks[i].handle, &G_BIO, &bdisks[i].bio); reg(&bdisks[i].handle, &G_DP, bdisks[i].dp); }
     reg(&h_image, &G_LIMG, &li);
+    reg(&h_chain, &G_FCHAIN, &fchain);              /* iniciar o outro sistema (fase 3) */
     reg(&h_pci, &G_RBIO, rbio_marker);
     if (com1) reg(&h_serial, &G_SERIAL, &sio);
     if (mouse_on) { reg(&h_mouse, &G_SPTR, &ptr); reg(&h_mouse, &G_DP, (void *)dp_end); }

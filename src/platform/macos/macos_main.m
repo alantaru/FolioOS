@@ -144,6 +144,7 @@ bool pal_boot_entry_add(const char *desc, int part_num, u64 part_lba, u64 part_c
     (void)desc; (void)part_num; (void)part_lba; (void)part_count; (void)part_guid; (void)path; return false;
 }
 bool pal_boot_entry_remove(void) { return false; }
+bool pal_chain_mbr(const u8 *code) { (void)code; return false; }
 bool pal_boot_other(char *name, int cap) { (void)name; (void)cap; return false; }
 void pal_boot_other_start(void) {}
 

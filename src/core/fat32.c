@@ -521,8 +521,14 @@ int fat_rename(Fat *f, FatNode *n, const uint16_t *newname) {
 /* Formata a região [part_lba, part_lba + nsec) como FAT32 (setores de 512 bytes). Grava o setor de boot
  * (e a cópia no setor 6), o FSInfo, as duas FATs zeradas e a pasta raiz vazia com o rótulo. */
 bool fat32_format(FatIo io, void *ctx, uint64_t part_lba, uint64_t nsec, const char *label, uint32_t serial) {
+    return fat32_format2(io, ctx, part_lba, nsec, nsec, label, serial);
+}
+/* plan: até onde o volume pode crescer depois sem mover dados (a FAT já nasce do tamanho de plan; o cluster é o
+ * de nsec). plan = nsec: a FAT exata, como sempre. */
+bool fat32_format2(FatIo io, void *ctx, uint64_t part_lba, uint64_t nsec, uint64_t plan, const char *label, uint32_t serial) {
     static u8 z[64 * 512];
     if (nsec > 0xFFFFFFFFull) nsec = 0xFFFFFFFFull;
+    if (plan > 0xFFFFFFFFull) plan = 0xFFFFFFFFull;
     u64 bytes = nsec * 512;
     u32 spc = bytes <= 8ull << 30 ? 8 : bytes <= 16ull << 30 ? 16 : bytes <= 32ull << 30 ? 32 : 64;
     const u32 rsvd = 32;
@@ -532,6 +538,12 @@ bool fat32_format(FatIo io, void *ctx, uint64_t part_lba, uint64_t nsec, const c
         fatsz = (u32)((nsec - rsvd + t2 - 1) / t2);
         nclus = (u32)((nsec - rsvd - 2ull * fatsz) / spc);
         if (nclus >= 65525 || spc == 1) break;
+    }
+    if (plan > nsec) {                                   /* FAT com folga para crescer, se ainda sobrar FAT32 */
+        u32 t2 = (256 * spc + 2) / 2;
+        u64 pf = (plan - rsvd + t2 - 1) / t2;
+        if (pf * 128 > 0x0FFFFFF7ull) pf = 0x0FFFFFF7ull / 128;
+        if (nsec > rsvd + 2 * pf) { u64 nc2 = (nsec - rsvd - 2 * pf) / spc; if (nc2 >= 65525) { fatsz = (u32)pf; nclus = (u32)nc2; } }
     }
     if (nclus < 65525 || nclus > 0x0FFFFFF5) return false;
     memset(z, 0, sizeof z);

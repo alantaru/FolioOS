@@ -97,6 +97,17 @@ static u64 total, done;
 static void prog(int pct, const char *what) { if (S->progress) S->progress(S->ctx, pct, what); }
 
 /* 1 e 2: a origem tem o sistema? cópia de segurança do começo (MBR + GPT) e do fim (GPT de reserva) do disco */
+/* a cópia de segurança do começo (MBR + GPT) e do fim (GPT de reserva) do disco, em FOLIO/BACKUP/disk-<data>.bin
+ * no pendrive: um cabeçalho de 512 bytes ("FOLIOBAK" + setores do disco), os 34 primeiros e os 33 últimos setores */
+static bool save_disk_start(const BlkDev *dev, const InstallSrc *src, InstallResult *r) {
+    u32 n = 34; u8 *b = B;
+    memcpy(b, "FOLIOBAK", 8); for (int i = 0; i < 8; i++) b[8 + i] = (u8)(dev->nsec >> (8 * i));
+    memset(b + 16, 0, 512 - 16);
+    if (!dev->rw(dev->ctx, 0, n, b + 512, false) || !dev->rw(dev->ctx, dev->nsec - 33, 33, b + 512 + n * 512, false)) { set_err(r, INST_ERR_READ, "disk"); return false; }
+    char name[64] = "disk-"; scat(name, src->date, sizeof name); scat(name, ".bin", sizeof name);
+    if (!src->backup || !src->backup(src->ctx, name, b, 512 + (n + 33) * 512)) { set_err(r, INST_ERR_BACKUP, name); return false; }
+    return true;
+}
 static bool prepare(const BlkDev *dev, const InstallSrc *src, const InstallOpts *o, InstallResult *r) {
     memset(r, 0, sizeof *r);
     S = src; D = dev; O = o;
@@ -111,13 +122,7 @@ static bool prepare(const BlkDev *dev, const InstallSrc *src, const InstallOpts 
     total = 0; done = 0;
     for (int i = 0; i < nent; i++) if (!ents[i].dir) total += ents[i].size;
     prog(1, "backup");
-    u32 n = 34; u8 *b = B;
-    memcpy(b, "FOLIOBAK", 8); for (int i = 0; i < 8; i++) b[8 + i] = (u8)(dev->nsec >> (8 * i));
-    memset(b + 16, 0, 512 - 16);
-    if (!dev->rw(dev->ctx, 0, n, b + 512, false) || !dev->rw(dev->ctx, dev->nsec - 33, 33, b + 512 + n * 512, false)) { set_err(r, INST_ERR_READ, "disk"); return false; }
-    char name[64] = "disk-"; scat(name, src->date, sizeof name); scat(name, ".bin", sizeof name);
-    if (!src->backup || !src->backup(src->ctx, name, b, 512 + (n + 33) * 512)) { set_err(r, INST_ERR_BACKUP, name); return false; }
-    return true;
+    return save_disk_start(dev, src, r);
 }
 
 /* 4 e 5: formata a partição do FolioOS e copia tudo, guardando o CRC de cada arquivo */
@@ -176,6 +181,8 @@ static bool verify(InstallResult *r, int pct) {
 static const char *efi_name(void) { return O->efi_name && O->efi_name[0] ? O->efi_name : "BOOTX64.EFI"; }
 
 /* ------------------------------------------------------------ fase 1: o disco inteiro */
+static u64 shrunk_start, shrunk_count;           /* install_shrink_alongside: o NTFS antes de encolher (vai para o FOLIO.ID) */
+static void u64_str(u64 v, char *o) { char t[24]; int k = 0; do { t[k++] = (char)('0' + v % 10); v /= 10; } while (v); for (int i = 0; i < k; i++) o[i] = t[k - 1 - i]; o[k] = 0; }
 /* FOLIO/INSTALLED.ID na partição do FolioOS: o que foi instalado (para remover e atualizar com segurança depois) */
 static bool get_dir(Fat *v, FatNode *parent, const char *name, FatNode *out);
 static bool put_whole(Fat *v, FatNode *dir, const char *name, const u8 *data, u32 n);
@@ -184,6 +191,10 @@ static bool write_marker(InstallResult *r, const char *kind) {
     FatNode root, folio; fat_root(&f, &root);
     char t[200] = "FolioOS installed on this disk\r\nkind=";
     scat(t, kind, sizeof t); scat(t, "\r\nversion=", sizeof t); scat(t, O->version && O->version[0] ? O->version : "?", sizeof t); scat(t, "\r\n", sizeof t);
+    if (shrunk_count) {   /* a partição que encolheu, como era (no BIOS não há FOLIO.ID na partição EFI) */
+        char num[24]; scat(t, "shrunk=", sizeof t); u64_str(shrunk_start, num); scat(t, num, sizeof t);
+        scat(t, ",", sizeof t); u64_str(shrunk_count, num); scat(t, num, sizeof t); scat(t, "\r\n", sizeof t);
+    }
     if (!get_dir(&f, &root, "FOLIO", &folio) || !put_whole(&f, &folio, "INSTALLED.ID", (const u8 *)t, (u32)slen(t))) { set_err(r, INST_ERR_WRITE, "FOLIO/INSTALLED.ID"); return false; }
     return true;
 }
@@ -292,8 +303,6 @@ static bool esp_clean(const BlkDev *dev, const Part *esp, InstallResult *r) {
     if (c.verdict != SAFE_OK) { set_err(r, INST_ERR_NOESP, fs_safety_short(c.verdict)); return false; }
     return true;
 }
-static u64 shrunk_start, shrunk_count;           /* install_shrink_alongside: o NTFS antes de encolher (vai para o FOLIO.ID) */
-static void u64_str(u64 v, char *o) { char t[24]; int k = 0; do { t[k++] = (char)('0' + v % 10); v /= 10; } while (v); for (int i = 0; i < k; i++) o[i] = t[k - 1 - i]; o[k] = 0; }
 static bool parse_u64(const char *s, int len, int *i, u64 *v) {
     int k = *i; u64 x = 0; bool any = false;
     while (k < len && s[k] >= '0' && s[k] <= '9') { x = x * 10 + (u64)(s[k] - '0'); k++; any = true; }
@@ -345,7 +354,7 @@ static void alongside(const BlkDev *dev, const InstallSrc *src, Region fr, Insta
     char id[192] = "FolioOS data partition\r\ndata=", gs[37];
     part_guid_str(r->part_guid, gs); scat(id, gs, sizeof id); scat(id, "\r\n", sizeof id);
     if (shrunk_count) {   /* encolhendo: o NTFS como era, para a desinstalação devolver exatamente o mesmo tamanho */
-        char num[48]; scat(id, "ntfs=", sizeof id); u64_str(shrunk_start, num); scat(id, num, sizeof id);
+        char num[48]; scat(id, "shrunk=", sizeof id); u64_str(shrunk_start, num); scat(id, num, sizeof id);
         scat(id, ",", sizeof id); u64_str(shrunk_count, num); scat(id, num, sizeof id); scat(id, "\r\n", sizeof id);
     }
     if (!put_whole(&ef, &d_folio, "FOLIO.ID", (const u8 *)id, (u32)slen(id))) { set_err(r, INST_ERR_WRITE, "FOLIO.ID"); return; }
@@ -359,10 +368,64 @@ static void alongside(const BlkDev *dev, const InstallSrc *src, Region fr, Insta
     prog(100, "done");
     r->code = INST_OK;
 }
+/* Fase 3, PC só BIOS (disco MBR): o FolioOS ganha uma partição FAT32 primária no espaço livre (a do outro sistema
+ * continua ativa), o setor de boot dela é o do FolioOS, e o código do MBR passa a ser o do FolioOS com o byte 437
+ * apontando a entrada dele. O código original do MBR vai para FOLIO/OTHERMBR.BIN (440 bytes + o nome do sistema):
+ * o seletor o inicia pela ponte BIOS, e a desinstalação o devolve. O MBR é a última coisa gravada. */
+static void alongside_mbr(const BlkDev *dev, const InstallSrc *src, Region fr, InstallResult *r) {
+    static PartTable t; static u8 mbrc[512], vbrc[512], s[512], orig[512];
+    prog(2, "partition");
+    if (!part_read(dev, &t) || t.scheme != SCHEME_MBR) { set_err(r, INST_ERR_REGION, "MBR"); return; }
+    if (src->read(src->ctx, "FOLIO/TOOLS/bios/mbr.bin", 0, mbrc, 440) != 440 || src->read(src->ctx, "FOLIO/TOOLS/bios/vbr.bin", 0, vbrc, 512) != 512) { set_err(r, INST_ERR_BOOTCODE, "FOLIO/TOOLS/bios"); return; }
+    if (!dev->rw(dev->ctx, 0, 1, orig, false)) { set_err(r, INST_ERR_READ, "MBR"); return; }
+    if (!memcmp(orig, mbrc, 400)) { set_err(r, INST_ERR_REGION, "FolioOS MBR already"); return; }   /* reinstalar: desinstale antes */
+    u64 al = 2048, start = (fr.start + al - 1) / al * al, count = fr.count > start - fr.start ? (fr.count - (start - fr.start)) / al * al : 0;
+    if (count > 0xFFFFFFFFull) count = 0xFFFFFFFFull & ~(al - 1);
+    if (count * 512 < ALONGSIDE_MIN_BYTES) { set_err(r, INST_ERR_SMALL, ""); return; }
+    if (part_overlaps(dev, &t, start, count, -1)) { set_err(r, INST_ERR_REGION, ""); return; }
+    /* o nome do outro sistema, pelo que está na partição ativa (o seletor mostra; sem nome, "o outro sistema") */
+    const char *name = "";
+    for (int i = 0; i < t.n; i++) if (t.p[i].active) name = t.p[i].fs == FS_NTFS ? "Windows" : t.p[i].fs == FS_EXT ? "Linux" : "";
+    int pi = part_add(dev, &t, start, count, GPT_MSDATA, 0x0C, "FolioOS", src->seed ^ 0xB105);
+    if (pi < 0) { set_err(r, INST_ERR_REGION, "4 primary partitions"); return; }
+    if (!part_write(dev, &t)) { set_err(r, INST_ERR_WRITE, "partition table"); return; }
+    if (!part_read(dev, &t)) { set_err(r, INST_ERR_READ, "partition table"); return; }
+    int slot = -1;
+    for (int i = 0; i < t.n; i++) if (t.p[i].start == start) slot = t.p[i].slot;
+    if (slot < 0 || slot > 3) { set_err(r, INST_ERR_REGION, "slot"); return; }
+    r->part_lba = start; r->part_count = count;
+    if (!format_and_copy(r, 4, 86) || !write_marker(r, "alongside") || !write_docs_place(r)) return;
+    /* o MBR original, guardado na partição do FolioOS (antes de mudar qualquer coisa no MBR) */
+    {
+        static u8 om[440 + 64]; int n = 440;
+        memcpy(om, orig, 440); for (int i = 0; name[i] && n < (int)sizeof om; i++) om[n++] = (u8)name[i];
+        FatNode root, folio; fat_root(&f, &root);
+        if (!get_dir(&f, &root, "FOLIO", &folio) || !put_whole(&f, &folio, "OTHERMBR.BIN", om, (u32)n)) { set_err(r, INST_ERR_WRITE, "FOLIO/OTHERMBR.BIN"); return; }
+    }
+    /* o setor de boot da partição nova (e a cópia no setor 6): o salto e o código do FolioOS, o BPB fica */
+    prog(88, "boot code");
+    u64 vb[2] = { start, start + 6 };
+    for (int k = 0; k < 2; k++) {
+        if (!dev->rw(dev->ctx, vb[k], 1, s, false)) { set_err(r, INST_ERR_READ, "boot sector"); return; }
+        memcpy(s, vbrc, 3); memcpy(s + 90, vbrc + 90, 420);
+        if (!dev->rw(dev->ctx, vb[k], 1, s, true)) { set_err(r, INST_ERR_WRITE, "boot sector"); return; }
+    }
+    if (!verify(r, 90)) return;
+    /* por último, o MBR: o código do FolioOS, com a entrada dele no byte 437 (a tabela e a assinatura ficam) */
+    prog(98, "MBR");
+    if (!dev->rw(dev->ctx, 0, 1, s, false)) { set_err(r, INST_ERR_READ, "MBR"); return; }
+    memcpy(s, mbrc, 440); s[437] = (u8)slot;
+    if (!dev->rw(dev->ctx, 0, 1, s, true)) { set_err(r, INST_ERR_WRITE, "MBR"); return; }
+    if (dev->flush) dev->flush(dev->ctx);
+    memcpy(r->part_guid, t.disk_guid, 16);
+    prog(100, "done");
+    r->code = INST_OK;
+}
+
 void install_alongside(const BlkDev *dev, const InstallSrc *src, const InstallOpts *o, Region fr, InstallResult *r) {
     shrunk_start = shrunk_count = 0;
     if (!prepare(dev, src, o, r)) return;
-    alongside(dev, src, fr, r);
+    if (o->bios) alongside_mbr(dev, src, fr, r); else alongside(dev, src, fr, r);
 }
 
 /* Fase 2, sem espaço livre: encolhe o NTFS que começa em part_start para new_count setores (o fim fica
@@ -373,11 +436,12 @@ void install_shrink_alongside(const BlkDev *dev, const InstallSrc *src, const In
     static PartTable t; static FsCheck c;
     if (!prepare(dev, src, o, r)) return;
     prog(2, "shrink");
-    if (!part_read(dev, &t) || t.scheme != SCHEME_GPT) { set_err(r, INST_ERR_NOTGPT, ""); return; }
+    bool mbr = o->bios;                                          /* PC só BIOS: disco MBR (fase 3) */
+    if (!part_read(dev, &t) || t.scheme != (mbr ? SCHEME_MBR : SCHEME_GPT)) { set_err(r, mbr ? INST_ERR_REGION : INST_ERR_NOTGPT, mbr ? "MBR" : ""); return; }
     int k = -1;
     for (int i = 0; i < t.n; i++) if (t.p[i].start == part_start) k = i;
-    if (k < 0 || t.p[k].fs != FS_NTFS) { set_err(r, INST_ERR_SHRINK, "partition"); return; }
-    {   /* a partição EFI tem de estar em ordem antes de mexer no NTFS (senão encolheria à toa) */
+    if (k < 0 || !fs_resizable(t.p[k].fs) || (!mbr && !memcmp(t.p[k].type, GPT_ESP, 16))) { set_err(r, INST_ERR_SHRINK, "partition"); return; }
+    if (!mbr) {   /* a partição EFI tem de estar em ordem antes de mexer na outra (senão encolheria à toa) */
         int esp = -1;
         for (int i = 0; i < t.n && esp < 0; i++) if (!memcmp(t.p[i].type, GPT_ESP, 16)) esp = i;
         if (esp < 0 || t.p[esp].fs != FS_FAT32) { set_err(r, INST_ERR_NOESP, ""); return; }
@@ -388,7 +452,7 @@ void install_shrink_alongside(const BlkDev *dev, const InstallSrc *src, const In
     fs_check(dev, &t.p[k], &c);
     if (c.verdict != SAFE_OK) { set_err(r, INST_ERR_SHRINK, fs_safety_short(c.verdict)); return; }
     if ((end - part_start) * dev->bs < c.min_bytes) { set_err(r, INST_ERR_SHRINK, "size"); return; }
-    int rc = ntfs_shrink(dev, part_start, t.p[k].count, end - part_start);
+    int rc = fs_resize(dev, t.p[k].fs, part_start, t.p[k].count, end - part_start);   /* NTFS, FAT32 ou exFAT */
     if (rc != NTFS_SHRINK_OK) {
         static const char *why[] = { "", "unreadable", "not clean", "size", "too small", "bad clusters", "write" };
         set_err(r, INST_ERR_SHRINK, rc > 0 && rc < 7 ? why[rc] : "?"); return;
@@ -397,11 +461,11 @@ void install_shrink_alongside(const BlkDev *dev, const InstallSrc *src, const In
     t.p[k].count = end - part_start;
     if (!part_write(dev, &t)) { set_err(r, INST_ERR_WRITE, "partition table"); return; }
     if (dev->flush) dev->flush(dev->ctx);
-    /* o espaço livre que começa onde o NTFS agora termina */
+    /* o espaço livre que começa onde a outra partição agora termina */
     Region fr[16]; int nf = part_free(dev, &t, fr, 16), pick = -1;
     for (int i = 0; i < nf; i++) if (fr[i].start == end) pick = i;
     if (pick < 0) { set_err(r, INST_ERR_REGION, ""); return; }
-    alongside(dev, src, fr[pick], r);
+    if (mbr) alongside_mbr(dev, src, fr[pick], r); else alongside(dev, src, fr[pick], r);
     shrunk_start = shrunk_count = 0;
 }
 
@@ -462,6 +526,31 @@ static bool find_whole(const PartTable *t, InstallFound *f) {
     return true;
 }
 /* ao lado de outro sistema: a partição EFI tem \EFI\FolioOS\FOLIO.ID, que diz qual é a partição de dados */
+/* a partição logo antes da do FolioOS (sem outra no meio), NTFS, FAT32 ou exFAT, que pode receber o espaço de volta;
+ * id: o texto do FOLIO.ID (UEFI) ou do FOLIO/INSTALLED.ID (BIOS), com "shrunk=" (ou o antigo "ntfs=") */
+static void find_neighbor(const BlkDev *dev, const PartTable *t, InstallFound *f, const u8 *id, int n) {
+    /* o NTFS logo antes (sem outra partição no meio) pode receber o espaço de volta */
+    int q = -1;
+    for (int i = 0; i < t->n; i++)
+        if (t->p[i].start + t->p[i].count <= f->part_start && (q < 0 || t->p[i].start > t->p[q].start)) q = i;
+    if (q >= 0 && fs_resizable(t->p[q].fs) && memcmp(t->p[q].type, GPT_ESP, 16)) {   /* NTFS, FAT32 ou exFAT */
+        /* até onde começa a próxima partição (ou o fim utilizável do disco): a original ia até lá, e a partição
+         * do FolioOS, alinhada a 1 MiB, pode ter deixado um resto livre depois dela */
+        u64 end = t->scheme == SCHEME_GPT ? dev->nsec - 33 : dev->nsec;   /* GPT: antes da cópia de reserva */
+        for (int i = 0; i < t->n; i++) if (t->p[i].start >= f->part_start + f->part_count && t->p[i].start < end) end = t->p[i].start;
+        u64 want = end - t->p[q].start, max = fs_grow_max(dev, t->p[q].fs, t->p[q].start);
+        for (int i = 0; i + 5 < n; i++) {                       /* "shrunk=<início>,<tamanho>" (antes: "ntfs="): a outra antes de encolher */
+            int kl = !memcmp(id + i, "shrunk=", 7) ? 7 : !memcmp(id + i, "ntfs=", 5) ? 5 : 0;
+            if (!kl) continue;
+            int j = i + kl; u64 s0, c0;
+            if (parse_u64((const char *)id, n, &j, &s0) && j < n && id[j] == ',' && (j++, parse_u64((const char *)id, n, &j, &c0))
+                && s0 == t->p[q].start && c0 > t->p[q].count && c0 <= want) want = c0;
+            break;
+        }
+        if (max > want) max = want;
+        if (max > t->p[q].count) { f->ntfs = q; f->grow_fs = t->p[q].fs; f->ntfs_start = t->p[q].start; f->ntfs_count = t->p[q].count; f->ntfs_grow_to = max; }
+    }
+}
 static bool find_alongside(const BlkDev *dev, const PartTable *t, InstallFound *f) {
     static Fat ef; static u8 id[512];
     if (t->scheme != SCHEME_GPT) return false;
@@ -476,27 +565,24 @@ static bool find_alongside(const BlkDev *dev, const PartTable *t, InstallFound *
     if (k < 0) return false;
     f->found = true; f->kind = FOUND_ALONGSIDE; f->esp_start = t->p[esp].start;
     f->part_start = t->p[k].start; f->part_count = t->p[k].count; memcpy(f->part_guid, g, 16);
-    /* o NTFS logo antes (sem outra partição no meio) pode receber o espaço de volta */
-    int q = -1;
-    for (int i = 0; i < t->n; i++)
-        if (t->p[i].start + t->p[i].count <= f->part_start && (q < 0 || t->p[i].start > t->p[q].start)) q = i;
-    if (q >= 0 && t->p[q].fs == FS_NTFS) {
-        /* até onde começa a próxima partição (ou o fim utilizável do disco): o NTFS original ia até lá, e a partição
-         * do FolioOS, alinhada a 1 MiB, pode ter deixado um resto livre depois dela */
-        u64 end = dev->nsec - 33;                              /* depois do último setor utilizável (antes da GPT de reserva) */
-        for (int i = 0; i < t->n; i++) if (t->p[i].start >= f->part_start + f->part_count && t->p[i].start < end) end = t->p[i].start;
-        u64 want = end - t->p[q].start, max = ntfs_grow_max(dev, t->p[q].start);
-        for (int i = 0; i + 5 < n; i++) {                       /* "ntfs=<início>,<tamanho>": o NTFS antes de encolher */
-            if (memcmp(id + i, "ntfs=", 5)) continue;
-            int j = i + 5; u64 s0, c0;
-            if (parse_u64((const char *)id, n, &j, &s0) && j < n && id[j] == ',' && (j++, parse_u64((const char *)id, n, &j, &c0))
-                && s0 == t->p[q].start && c0 > t->p[q].count && c0 <= want) want = c0;
-            break;
-        }
-        if (max > want) max = want;
-        if (max > t->p[q].count) { f->ntfs = q; f->ntfs_start = t->p[q].start; f->ntfs_count = t->p[q].count; f->ntfs_grow_to = max; }
-    }
+    find_neighbor(dev, t, f, id, n);
     return true;
+}
+
+/* ao lado de outro sistema num PC só BIOS (fase 3): uma primária FAT32 com FOLIO/OTHERMBR.BIN (o MBR original) */
+static bool find_alongside_mbr(const BlkDev *dev, const PartTable *t, InstallFound *f) {
+    static Fat v; static u8 om[600], id[512];
+    if (t->scheme != SCHEME_MBR) return false;
+    for (int i = 0; i < t->n; i++) {
+        if (t->p[i].fs != FS_FAT32 || t->p[i].logical || !fat_mount(&v, dio, 0, t->p[i].start)) continue;
+        if (fat_get(&v, "FOLIO/OTHERMBR.BIN", om, sizeof om) < 440) continue;
+        f->found = true; f->kind = FOUND_ALONGSIDE; f->bios = true; f->esp_start = 0;
+        f->part_start = t->p[i].start; f->part_count = t->p[i].count;
+        int n = fat_get(&v, "FOLIO/INSTALLED.ID", id, sizeof id - 1);
+        find_neighbor(dev, t, f, id, n > 0 ? n : 0);
+        return true;
+    }
+    return false;
 }
 
 bool install_find(const BlkDev *dev, InstallFound *f) {
@@ -504,7 +590,7 @@ bool install_find(const BlkDev *dev, InstallFound *f) {
     memset(f, 0, sizeof *f); f->ntfs = -1;
     D = dev;
     if (dev->bs != 512 || !part_read(dev, &t)) return false;
-    if (!find_alongside(dev, &t, f) && !find_whole(&t, f)) return false;
+    if (!find_alongside(dev, &t, f) && !find_alongside_mbr(dev, &t, f) && !find_whole(&t, f)) return false;
     /* a versão instalada (FOLIO/INSTALLED.ID) e os textos que estão lá (para a prévia e a cópia) */
     if (fat_mount(&fd, dio, 0, f->part_start)) {
         int m = fat_get(&fd, "FOLIO/INSTALLED.ID", id, sizeof id - 1);
@@ -594,7 +680,7 @@ void install_update(const BlkDev *dev, const InstallSrc *src, const InstallOpts 
         prog(2 + (int)(85 * (total ? done * 100 / total : 100) / 100), e->path);
     }
     /* 2. ao lado de outro sistema: o programa na partição EFI também */
-    if (fo->kind == FOUND_ALONGSIDE) {
+    if (fo->kind == FOUND_ALONGSIDE && !fo->bios) {   /* no BIOS não há partição EFI: o programa está só na partição do FolioOS */
         prog(90, "EFI system partition");
         static PartTable t; int esp = -1;
         if (!part_read(dev, &t)) { set_err(r, INST_ERR_READ, "partition table"); return; }
@@ -640,6 +726,15 @@ void install_remove(const BlkDev *dev, const InstallSrc *src, const InstallOpts 
         r->code = INST_OK;
         return;
     }
+    if (f->bios) {
+        /* 2 (BIOS). o MBR volta a ser o do outro sistema: o código guardado em FOLIO/OTHERMBR.BIN, com a tabela de agora
+         * (que a seguir perde a entrada do FolioOS); a partição do outro sistema nunca deixou de ser a ativa */
+        static u8 om[600];
+        prog(60, "MBR");
+        if (!fat_mount(&fd, dio, 0, f->part_start) || fat_get(&fd, "FOLIO/OTHERMBR.BIN", om, sizeof om) < 440) { set_err(r, INST_ERR_READ, "FOLIO/OTHERMBR.BIN"); return; }
+        if (!part_read(dev, &t) || t.scheme != SCHEME_MBR) { set_err(r, INST_ERR_REGION, "MBR"); return; }
+        memcpy(t.mbr_code, om, 440);
+    } else {
     /* 2. a partição EFI perde só \EFI\FolioOS (o programa e o FOLIO.ID) */
     prog(60, "EFI system partition");
     if (!part_read(dev, &t) || t.scheme != SCHEME_GPT) { set_err(r, INST_ERR_NOTGPT, ""); return; }
@@ -665,13 +760,14 @@ void install_remove(const BlkDev *dev, const InstallSrc *src, const InstallOpts 
             if (fat_delete(&ef, &fol) != FAT_OK || fat_flush(&ef) != FAT_OK) { set_err(r, INST_ERR_WRITE, "EFI/FolioOS"); return; }
         }
     }
+    }
     /* 3. a tabela: sai a entrada do FolioOS; o NTFS de antes, se for o caso, cresce (a entrada primeiro: um volume
      * menor que a partição é normal, então uma queda de energia entre 3 e 4 não estraga nada) */
     prog(70, "partition");
     int k = -1, q = -1;
     for (int i = 0; i < t.n; i++) {
-        if (!memcmp(t.p[i].guid, f->part_guid, 16)) k = i;
-        if (grow && f->ntfs >= 0 && t.p[i].start == f->ntfs_start && t.p[i].fs == FS_NTFS) q = i;
+        if (f->bios ? t.p[i].start == f->part_start : !memcmp(t.p[i].guid, f->part_guid, 16)) k = i;
+        if (grow && f->ntfs >= 0 && t.p[i].start == f->ntfs_start && t.p[i].fs == f->grow_fs) q = i;
     }
     if (k < 0 || t.p[k].start != f->part_start) { set_err(r, INST_ERR_REGION, "partition"); return; }
     if (q >= 0) t.p[q].count = f->ntfs_grow_to;
@@ -680,12 +776,103 @@ void install_remove(const BlkDev *dev, const InstallSrc *src, const InstallOpts 
     /* 4. o NTFS volta a ocupar o espaço (o Windows roda o chkdsk uma vez na próxima vez que iniciar) */
     if (q >= 0) {
         prog(80, "NTFS");
-        int rc = ntfs_grow(dev, f->ntfs_start, f->ntfs_grow_to, f->ntfs_grow_to);
+        int rc = fs_resize(dev, f->grow_fs, f->ntfs_start, f->ntfs_grow_to, f->ntfs_grow_to);
         if (rc != NTFS_SHRINK_OK) { set_err(r, INST_ERR_GROW, ""); return; }
     }
     r->part_lba = f->part_start; r->part_count = f->part_count;
     prog(100, "done");
     r->code = INST_OK;
+}
+
+/* ------------------------------------------------------------ gerenciador de partições (fase 1) */
+/* Cada operação: cópia de segurança do começo do disco no pendrive, depois a mudança, na ordem que sobrevive a
+ * uma queda de energia. A tela mostra o antes → depois e pede a confirmação antes de chamar. */
+static bool op_begin(const BlkDev *dev, const InstallSrc *src, InstallResult *r, PartTable *t, uint64_t part_start, int *k) {
+    memset(r, 0, sizeof *r);
+    S = src; D = dev; B = src->buf; BSZ = src->bufsize & ~511u;
+    if (!B || BSZ < 65536) { set_err(r, INST_ERR_SOURCE, "buffer"); return false; }
+    if (dev->bs != 512) { set_err(r, INST_ERR_WRITE, "4K sectors"); return false; }
+    if (!part_read(dev, t)) { set_err(r, INST_ERR_READ, "partition table"); return false; }
+    if (t->has_extended) { set_err(r, INST_ERR_REGION, "extended partition"); return false; }   /* lógicas: só leitura nesta fase */
+    *k = -1;
+    for (int i = 0; i < t->n; i++) if (t->p[i].start == part_start) *k = i;
+    if (!save_disk_start(dev, src, r)) return false;
+    return true;
+}
+/* quanto um FAT32 criado aqui pode crescer depois sem mover dados: até 4 vezes, sem passar do fim do disco */
+static u64 grow_room(const BlkDev *dev, u64 start, u64 count) { u64 m = count * 4, end = dev->nsec - 34 - start; return m < end ? m : end; }
+void part_op_create(const BlkDev *dev, const InstallSrc *src, uint64_t start, uint64_t count, const char *label, InstallResult *r) {
+    static PartTable t; int k;
+    if (!op_begin(dev, src, r, &t, ~0ull, &k)) return;
+    if (t.scheme == SCHEME_NONE) part_new(&t, SCHEME_GPT, src->seed);                 /* disco vazio: GPT */
+    u64 s = (start + 2047) / 2048 * 2048, c = count > s - start ? (count - (s - start)) / 2048 * 2048 : 0;
+    if (c * 512 < (64ull << 20)) { set_err(r, INST_ERR_SMALL, ""); return; }          /* FAT32: 64 MB no mínimo */
+    if (c > 0xFFFFFFFFull) c = 0xFFFFFFFFull & ~2047ull;
+    {   /* dentro do espaço livre de verdade da tabela que vai ser gravada (uma GPT nova reserva o fim do disco) */
+        Region fr[32]; int nf = part_free(dev, &t, fr, 32); bool in = false;
+        for (int i = 0; i < nf && !in; i++)
+            if (s >= fr[i].start && s < fr[i].start + fr[i].count) { u64 room = (fr[i].start + fr[i].count - s) / 2048 * 2048; if (c > room) c = room; in = true; }
+        if (!in || c * 512 < (64ull << 20)) { set_err(r, INST_ERR_REGION, ""); return; }
+    }
+    if (part_overlaps(dev, &t, s, c, -1)) { set_err(r, INST_ERR_REGION, ""); return; }
+    int pi = part_add(dev, &t, s, c, GPT_MSDATA, 0x0C, label && label[0] ? label : "Data", src->seed ^ 0xC0DE);
+    if (pi < 0) { set_err(r, INST_ERR_REGION, t.scheme == SCHEME_MBR ? "4 primary partitions" : ""); return; }
+    /* o volume primeiro (a tabela ainda não aponta para ele), depois a tabela */
+    if (!fat32_format2(dio, 0, s, c, grow_room(dev, s, c), label && label[0] ? label : "DATA", (u32)(src->seed >> 9))) { set_err(r, INST_ERR_FORMAT, ""); return; }
+    if (!part_write(dev, &t)) { set_err(r, INST_ERR_WRITE, "partition table"); return; }
+    if (dev->flush) dev->flush(dev->ctx);
+    r->part_lba = s; r->part_count = c; r->code = INST_OK;
+}
+void part_op_delete(const BlkDev *dev, const InstallSrc *src, uint64_t part_start, InstallResult *r) {
+    static PartTable t; int k;
+    if (!op_begin(dev, src, r, &t, part_start, &k)) return;
+    if (k < 0) { set_err(r, INST_ERR_REGION, "partition"); return; }
+    u64 s = t.p[k].start;
+    if (!part_del(&t, k) || !part_write(dev, &t)) { set_err(r, INST_ERR_WRITE, "partition table"); return; }
+    /* o começo do volume zerado: nada mais o reconhece (o espaço fica realmente livre) */
+    memset(B, 0, 32 * 512);
+    if (!dev->rw(dev->ctx, s, 32, B, true)) { set_err(r, INST_ERR_WRITE, "volume"); return; }
+    if (dev->flush) dev->flush(dev->ctx);
+    r->part_lba = s; r->code = INST_OK;
+}
+void part_op_format(const BlkDev *dev, const InstallSrc *src, uint64_t part_start, const char *label, InstallResult *r) {
+    static PartTable t; int k;
+    if (!op_begin(dev, src, r, &t, part_start, &k)) return;
+    if (k < 0) { set_err(r, INST_ERR_REGION, "partition"); return; }
+    Part *p = &t.p[k];
+    if (p->count * 512 < (64ull << 20) || p->count > 0xFFFFFFFFull) { set_err(r, INST_ERR_SMALL, ""); return; }
+    if (!fat32_format2(dio, 0, p->start, p->count, grow_room(dev, p->start, p->count), label && label[0] ? label : "DATA", (u32)(src->seed >> 9))) { set_err(r, INST_ERR_FORMAT, ""); return; }
+    /* o tipo passa a dizer FAT32 (a partição EFI continua EFI) */
+    bool changed = false;
+    if (t.scheme == SCHEME_GPT && memcmp(p->type, GPT_ESP, 16) && memcmp(p->type, GPT_MSDATA, 16)) { memcpy(p->type, GPT_MSDATA, 16); changed = true; }
+    if (t.scheme == SCHEME_MBR && p->mbr_type != 0x0C && p->mbr_type != 0x0B && p->mbr_type != 0xEF) { p->mbr_type = 0x0C; changed = true; }
+    if (changed && !part_write(dev, &t)) { set_err(r, INST_ERR_WRITE, "partition table"); return; }
+    if (dev->flush) dev->flush(dev->ctx);
+    r->part_lba = p->start; r->part_count = p->count; r->code = INST_OK;
+}
+void part_op_resize(const BlkDev *dev, const InstallSrc *src, uint64_t part_start, uint64_t new_count, InstallResult *r) {
+    static PartTable t; static FsCheck c; int k;
+    if (!op_begin(dev, src, r, &t, part_start, &k)) return;
+    if (k < 0 || !fs_resizable(t.p[k].fs)) { set_err(r, INST_ERR_SHRINK, "partition"); return; }
+    Part *p = &t.p[k];
+    fs_check(dev, p, &c);
+    if (c.verdict != SAFE_OK && !(c.verdict == SAFE_DIRTY && p->fs == FS_NTFS && new_count > p->count)) { set_err(r, INST_ERR_SHRINK, fs_safety_short(c.verdict)); return; }
+    if (new_count == p->count || !new_count) { set_err(r, INST_ERR_RESIZE, ""); return; }
+    if (new_count < p->count) {
+        if (new_count * dev->bs < c.min_bytes) { set_err(r, INST_ERR_RESIZE, ""); return; }
+        int rc = fs_resize(dev, p->fs, p->start, p->count, new_count);       /* o volume, depois a tabela */
+        if (rc != NTFS_SHRINK_OK) { set_err(r, INST_ERR_RESIZE, "volume"); return; }
+        p->count = new_count;
+        if (!part_write(dev, &t)) { set_err(r, INST_ERR_WRITE, "partition table"); return; }
+    } else {
+        if (part_overlaps(dev, &t, p->start, new_count, k) || new_count > fs_grow_max(dev, p->fs, p->start)) { set_err(r, INST_ERR_RESIZE, ""); return; }
+        p->count = new_count;                                                  /* a tabela, depois o volume */
+        if (!part_write(dev, &t)) { set_err(r, INST_ERR_WRITE, "partition table"); return; }
+        int rc = fs_resize(dev, p->fs, p->start, new_count, new_count);
+        if (rc != NTFS_SHRINK_OK) { set_err(r, INST_ERR_RESIZE, "volume"); return; }
+    }
+    if (dev->flush) dev->flush(dev->ctx);
+    r->part_lba = p->start; r->part_count = new_count; r->code = INST_OK;
 }
 
 #ifndef N_
@@ -709,6 +896,7 @@ const char *install_error(int code) {
     case INST_ERR_REGION: return N_("The chosen space is not free");
     case INST_ERR_SHRINK: return N_("Could not shrink the other system's partition");
     case INST_ERR_GROW: return N_("Could not give the space back to the other system's partition");
+    case INST_ERR_RESIZE: return N_("This partition cannot change to that size without moving data");
     default: return N_("Error");
     }
 }

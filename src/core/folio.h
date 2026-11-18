@@ -166,6 +166,7 @@ bool  pal_disk_flush(int disk);          /* esvazia o cache de escrita (chamado 
 bool  pal_boot_entry_add(const char *desc, int part_num, u64 part_lba, u64 part_count, const u8 part_guid[16], const char *path);
 /* outro sistema para o seletor de boot: a 1ª entrada ativa da ordem de boot que não é o FolioOS */
 bool  pal_boot_entry_remove(void);         /* desinstalar: tira as entradas de boot do FolioOS da UEFI */
+bool  pal_chain_mbr(const u8 *code440);   /* PC só BIOS: inicia o MBR original do outro sistema (não volta; false = não deu) */
 bool  pal_boot_other(char *name, int cap);
 void  pal_boot_other_start(void);          /* inicia o outro sistema (só volta se não conseguir) */
 PalFile *pal_fopen(int vol, const char *path, u64 *size);
@@ -692,6 +693,9 @@ void installer_open_remove(void);         /* a mesma tela, com "remover" já mar
 void installer_open_update(void);         /* a mesma tela, com "atualizar" já marcado */
 void installer_poll(void);               /* no começo de cada quadro: roda a instalação pedida */
 Window *installer_window(void);
+void partitions_open(void);               /* o gerenciador de partições (criar, redimensionar, formatar, apagar) */
+void partitions_poll(void);               /* no começo de cada quadro: roda a operação pedida */
+Window *partitions_window(void);
 void boot_chooser(void);                 /* chooser.c: ao lado de outro sistema, "aperte uma tecla para escrever" */
 /* splash */
 #define SPLASH_SECS_DEFAULT 10

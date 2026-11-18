@@ -47,5 +47,21 @@ int ntfs_shrink(const BlkDev *d, uint64_t part_lba, uint64_t part_sectors, uint6
  * da tabela cresce antes). O $Bitmap não ganha clusters, então o máximo é ntfs_grow_max() (o tamanho de antes de
  * encolher sempre cabe). Aceita volume marcado como sujo (o encolher deixa assim); recusa hibernado/diário aberto. */
 uint64_t ntfs_grow_max(const BlkDev *d, uint64_t part_lba);
+/* FAT32, sem mover dados (os mesmos códigos NTFS_SHRINK_*): o volume passa a ter new_sectors (menor ou maior,
+ * dentro da partição). Encolher só se os clusters que saem estão livres; crescer até onde a FAT existente alcança.
+ * Nunca abaixo de 65525 clusters (deixaria de ser FAT32). Atualiza o BPB (e a cópia) e o FSInfo. */
+uint64_t fat32_min_sectors(const BlkDev *d, uint64_t part_lba);
+uint64_t fat32_max_sectors(const BlkDev *d, uint64_t part_lba);
+int fat32_resize(const BlkDev *d, uint64_t part_lba, uint64_t part_sectors, uint64_t new_sectors);
+/* exFAT, do mesmo jeito: só os clusters livres no fim (pelo bitmap de alocação) saem; cresce até onde o bitmap e a
+ * FAT já reservados alcançam. Atualiza as duas regiões de boot (com a soma de verificação) e o tamanho do bitmap. */
+uint64_t exfat_min_sectors(const BlkDev *d, uint64_t part_lba);
+uint64_t exfat_max_sectors(const BlkDev *d, uint64_t part_lba);
+int exfat_resize(const BlkDev *d, uint64_t part_lba, uint64_t part_sectors, uint64_t new_sectors);
+/* qualquer um dos três: new_sectors é o tamanho da partição (encolher: o volume antes da entrada da tabela; crescer:
+ * a entrada da tabela antes, com part_sectors = o tamanho novo). fs_grow_max: até quanto a partição pode crescer. */
+bool fs_resizable(int fs);
+int fs_resize(const BlkDev *d, int fs, uint64_t part_lba, uint64_t part_sectors, uint64_t new_sectors);
+uint64_t fs_grow_max(const BlkDev *d, int fs, uint64_t part_lba);
 int ntfs_grow(const BlkDev *d, uint64_t part_lba, uint64_t part_sectors, uint64_t new_sectors);
 #endif

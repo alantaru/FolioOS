@@ -17,13 +17,15 @@ Status: ✅ done · 🔨 in progress · ⏳ planned
 
 ## FolioOS (offline edition)
 
-### Phase 1 — Disk tools and installing as the only system 🔨
+### Phase 1 — Disk tools and installing as the only system ✅
 - ✅ Disk access through UEFI (`BlockIo`) and through the BIOS bridge (INT 13h). SATA, NVMe, USB and IDE
   disks are listed with their model and size.
 - ✅ GPT and MBR partition tables, read and written in full (CRC32, backup GPT header, protective MBR).
   Rewriting a GPT keeps every entry in its slot, so partition numbers never change.
-- **Partition manager.** It can create, delete, format and resize partitions, with the safety rules
-  below. In this phase it handles FAT32 (create, format, grow, shrink) and deletes any partition.
+- ✅ **Partition manager** (Settings → System → "Disks and partitions…", or the command palette). It can
+  create, delete, format and resize partitions, with the safety rules below: it creates and formats FAT32,
+  grows and shrinks NTFS, FAT32 and exFAT without moving data, and deletes any partition after the
+  confirmation word.
 - ✅ **Install on this computer as the only system.** The installer erases the disk only after the
   user types a confirmation word. It then creates GPT with one FAT32 partition on UEFI PCs (the
   partition is also the EFI system partition) or MBR with FAT32 and the BIOS bridge on BIOS-only
@@ -45,7 +47,7 @@ Status: ✅ done · 🔨 in progress · ⏳ planned
   has been checked, so a power cut leaves either the old or the new file. `FOLIO\INSTALLED.ID` records
   the installed version.
 
-### Phase 2 — Dual boot on UEFI PCs 🔨
+### Phase 2 — Dual boot on UEFI PCs ✅
 - ✅ FolioOS gets a FAT32 partition of its own in the free space. The existing EFI system partition
   receives only `\EFI\FolioOS\` (the program and `FOLIO.ID`, which names FolioOS's partition); fonts,
   settings and texts stay on FolioOS's partition. Nothing else on the disk changes: the table gains one
@@ -69,7 +71,9 @@ Status: ✅ done · 🔨 in progress · ⏳ planned
     moving blocks is the risky part the rules forbid. When there is no free space, the installer explains
     how to shrink the partition from Linux (GParted) and then uses the free space. The ext4 checks are
     tested against volumes made by Linux itself (Alpine in QEMU, `tools\ext-fixtures.ps1`);
-  - FAT32 and exFAT.
+  - ✅ FAT32 and exFAT: shrink and grow back the same way (only the end moves; the FAT or the allocation
+    bitmap is sized so the volume can grow back). Checked by Windows' `chkdsk` and by Linux's `fsck.vfat` and
+    `fsck.exfat` against volumes formatted by Windows (`testsixtures`).
 - ✅ **Refused with a clear explanation** of how to fix it in the owning system. Each partition shows
   its state in the installer:
   - volumes encrypted with BitLocker or LUKS;
@@ -86,9 +90,16 @@ Status: ✅ done · 🔨 in progress · ⏳ planned
   Windows ask once for the recovery key. On a disk with BitLocker, the installer does not write anything
   until the user confirms they have the key. Phase 7 removes the Secure Boot part.
 
-### Phase 3 — Dual boot on BIOS-only PCs ⏳
-- Our MBR starts FolioOS, and the BIOS bridge shows the same chooser. To start the other system
-  it runs the original MBR, which was saved at install time and is restored on uninstall.
+### Phase 3 — Dual boot on BIOS-only PCs ✅
+- ✅ FolioOS gets a primary FAT32 partition in the free space (or by shrinking NTFS, FAT32 or exFAT, as in
+  phase 2). The other entries of the MBR keep their positions and bytes, and the other system's partition
+  stays the active one.
+- ✅ Our MBR starts FolioOS's partition (its entry number is kept in the MBR), and the BIOS bridge shows the
+  same chooser. To start the other system it runs the original MBR code, saved at install time in
+  `FOLIOOTHERMBR.BIN`, exactly as the BIOS would have.
+- ✅ Uninstalling puts the original MBR code back, removes FolioOS's entry and grows the other partition
+  back: the table, the MBR and the boot sectors come back byte for byte the originals. The QEMU lab checks it
+  on SeaBIOS with a stand-in for the other system (`dual-bios-ide`, `toolsakeother.asm`).
 
 ### Phase 7 — Secure Boot ⏳
 - FolioOS is signed with the project's key and started through a shim signed by Microsoft.
@@ -102,7 +113,9 @@ Status: ✅ done · 🔨 in progress · ⏳ planned
    ("Windows (C:) 237 GB → 180 GB, new FolioOS 57 GB"), and applied together with one confirmation.
 2. **Never lose data.**
    - The partition table and boot sectors are backed up first.
-   - Every operation writes a journal to the USB drive, so a power cut can be resumed or rolled back.
+   - Every operation is ordered so a power cut leaves a usable disk: a volume is shrunk before its table
+     entry, and the entry grows before its volume, so a volume is never larger than its partition.
+     (This replaces the journal first planned: with this order there is nothing to resume.)
    - Each file system is checked before it is resized and verified afterwards.
 3. **Only what is safe.** Moving the start of a partition copies data and stays off until it is as
    well tested as everything else. File systems that cannot be resized safely are refused, with

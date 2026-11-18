@@ -156,6 +156,37 @@ try {
 & .\build\install_test.exe "$work\src" $big 1100 --same-table $bigOrig | Select-Object -Last 1
 if ($LASTEXITCODE -eq 0) { Pass "partition table and NTFS size exactly as Windows made them" } else { Fail "partition table differs from the original" }
 
+# ---- 4. FAT32 and exFAT made by Windows (tests\fixtures\fat32-data, exfat-data): shrink, then grow, without moving data
+foreach ($kind in "FAT32", "exFAT") {
+Write-Host "$kind shrink and grow checked by Windows"
+$tag = $kind.ToLower(); $fo = "$work\$tag-orig.img"; $fx = "$work\$tag.img"
+$i = [IO.File]::OpenRead("tests\fixtures\$tag-data.img.gz"); $g = New-Object IO.Compression.GZipStream($i, [IO.Compression.CompressionMode]::Decompress)
+$o = [IO.File]::Create($fo); $g.CopyTo($o); $o.Dispose(); $g.Dispose(); $i.Dispose()
+Copy-Item $fo $fx
+$vf = New-Vhd $fo; $v = Get-Vols $vf; $fb = Get-Hashes "$(($v | Where-Object { $_.fs -eq $kind }).letter):\"; Dismount-DiskImage -ImagePath $vf | Out-Null
+foreach ($step in @(@{ mib = 400; what = "shrunk" }, @{ mib = 900; what = "grown" })) {
+    & .\build\fscheck_test.exe --resize $fx $step.mib
+    if ($LASTEXITCODE -ne 0) { Fail "fscheck_test --resize $($step.mib)"; break }
+    Remove-Item "$work\$tag.vhd" -ErrorAction SilentlyContinue
+    $vf = New-Vhd $fx
+    try {
+        $v = Get-Vols $vf; $fv = $v | Where-Object { $_.fs -eq $kind }
+        if ($fv -and [math]::Abs($fv.size - [int64]$step.mib * 1MB) -lt 2MB) { Pass "$kind $($step.what) to $($step.mib) MiB: Windows mounts it" } else { Fail "$kind after $($step.what): $(($v | ForEach-Object { "$($_.fs) $($_.size)" }) -join ', ')"; continue }
+        $fa = Get-Hashes "$($fv.letter):\"
+        $diff = @($fb.Keys | Where-Object { $fa[$_] -ne $fb[$_] })
+        if ($fa.Count -eq $fb.Count -and $diff.Count -eq 0) { Pass "all $($fa.Count) files the same" } else { Fail "files differ: $($diff -join ', ')" }
+        $out = chkdsk "$($fv.letter):" 2>&1; $rc = $LASTEXITCODE; $out | Set-Content "$work\chkdsk-$tag-$($step.mib).txt"
+        if ($rc -eq 0) { Pass "chkdsk: no problems" } else { Fail "chkdsk exit $rc - see $work\chkdsk-$tag-$($step.mib).txt" }
+        if ($step.what -eq "grown") {   # the new space can be used
+            $b = New-Object byte[] (64MB); (New-Object Random 3).NextBytes($b)
+            [IO.File]::WriteAllBytes("$($fv.letter):\after-grow.bin", $b); Write-VolumeCache $fv.letter
+            if ([Linq.Enumerable]::SequenceEqual($b, [IO.File]::ReadAllBytes("$($fv.letter):\after-grow.bin"))) { Pass "a 64 MB file written and read back" } else { Fail "new file differs" }
+            $out = chkdsk "$($fv.letter):" 2>&1; if ($LASTEXITCODE -eq 0) { Pass "chkdsk after writing: no problems" } else { Fail "chkdsk after writing exit $LASTEXITCODE" }
+        }
+    } finally { Dismount-DiskImage -ImagePath $vf -ErrorAction SilentlyContinue | Out-Null }
+}
+}
+
 if ($fails) { Write-Host "$fails problem(s); images and chkdsk logs kept in $work" -ForegroundColor Red; exit 1 }
 Remove-Item -Recurse -Force $work
 Write-Host "NTFS shrink: Windows agrees" -ForegroundColor Green

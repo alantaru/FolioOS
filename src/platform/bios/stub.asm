@@ -235,6 +235,38 @@ bits 32
     popad
     ret
 
+; ------------------------------------------------------------ inicia o outro sistema (sem volta)
+; void rm_chain(int drive) — a ponte já pôs o setor de boot a iniciar em 0x7C00 (o MBR original do outro sistema
+; com a tabela de agora). Volta ao modo real, com o PIC como o BIOS deixou, e salta para 0:7C00 com DL = disco.
+rm_chain:
+    cli
+    mov eax, [esp + 4]
+    mov [chain_drive], al
+    jmp 0x18:.pm16
+bits 16
+.pm16:
+    mov ax, 0x20
+    mov ds, ax
+    mov es, ax
+    mov ss, ax
+    mov eax, cr0
+    and al, 0xFE
+    mov cr0, eax
+    jmp 0:.rm
+.rm:
+    xor ax, ax
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
+    mov sp, 0x7C00
+    lidt [rm_idtr]
+    mov dl, [chain_drive]
+    sti
+    jmp 0:0x7C00
+bits 32
+
 align 8
 gdt:
     dq 0
@@ -255,6 +287,7 @@ rm_regs:   times 9 dd 0
 pic1: db 0
 pic2: db 0
 boot_drive: db 0
+chain_drive: db 0
 align 4
 ; estrutura passada à ponte (ver BootInfo em bridge.c)
 boot_info:
@@ -263,6 +296,7 @@ boot_info:
     dd e820_count
     dd E820_BUF
     dd rm_int
+    dd rm_chain
 e820_count: dd 0
 msg_hello: db "FolioOS BIOS bridge", 13, 10, 0
 msg_a20:   db "FolioOS: could not enable the A20 line", 0

@@ -16,9 +16,10 @@ no libc and no driver model: the UEFI firmware provides the hardware access it n
                 │ settings.c CONFIG.INI                    preview.c reading mode   splash.c base.c         │
                 │ disks.c    the PC's disks   part.c GPT/MBR tables   fat32.c own FAT32 (format too)        │
                 │ install.c  install, update, uninstall (copy + CRC check, safe file swap, texts to USB)    │
-                │ installer.c installer screen: next to another system (or shrinking NTFS), whole disk      │
-                │ fscheck.c  other systems' partitions: refusals, NTFS read/shrink/grow without moving data │
-                │ chooser.c  boot chooser next to another system: "press a key to write", else BootNext     │
+                │ installer.c installer screen: next to another system (or shrinking it), whole disk        │
+                │ fscheck.c  other systems' partitions: refusals, NTFS/FAT32/exFAT shrink/grow in place     │
+                │ chooser.c  boot chooser: "press a key to write", else BootNext or the original MBR        │
+                │ partitions.c disks and partitions window: create, delete, format, resize                  │
                 └───────────────────────────────────┬────────────────────────────────────────────────────┘
                                                     │  pal_* (platform abstraction, folio.h)
                        ┌────────────────────────────┴─────────────────────────────┐

@@ -13,7 +13,7 @@
  *   --put-winefi <arquivo>: num disco que já existe, esse programa EFI vira o Windows Boot Manager (laboratório)
  *   --remove: desinstala o que foi instalado ao lado (textos para a origem, NTFS crescido de volta) e confere
  *   --update: atualiza o FolioOS instalado com a origem; texto e CONFIG.INI da pessoa intactos, programa igual
- *   --same-table <original.img>: MBR, GPT e setores de boot NTFS iguais aos do disco original */
+ *   --same-table <original.img>: MBR, GPT e setores de boot (NTFS, FAT32, exFAT) iguais aos do disco original */
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <stdio.h>
@@ -95,6 +95,9 @@ static void fat_put(Fat *f, FatNode *dir, const char *name, bool is_dir, u32 siz
 /* GPT como um Windows depois de encolher o C:: partição EFI 100 MB (FAT32 com o Windows Boot Manager e o
  * \EFI\BOOT de reserva), MSR 16 MB, um buraco na tabela (entrada 3 apagada), "Windows" 300 MB e
  * recuperação 200 MB no fim do disco, com dados aleatórios; o espaço livre fica entre o C: e a recuperação */
+static u32 rd32(const u8 *p) { return (u32)p[0] | (u32)p[1] << 8 | (u32)p[2] << 16 | (u32)p[3] << 24; }
+static const char *winbios;                        /* --windows-bios <mbr.bin>: um PC só BIOS com "Windows" */
+static const char *mbrfat;                         /* --mbr-fat32 <mbr.bin>: PC só BIOS, FAT32 no disco todo */
 static const char *winefi;                         /* --winefi: um programa EFI de verdade no lugar do Windows (laboratório) */
 static void put_efi(Fat *f, FatNode *dir, const char *name) {
     FatNode x;
@@ -102,6 +105,39 @@ static void put_efi(Fat *f, FatNode *dir, const char *name) {
     FILE *e = fopen(winefi, "rb"); if (!e) { perror(winefi); exit(2); }
     static u8 b[4 << 20]; u32 n = (u32)fread(b, 1, sizeof b, e); fclose(e);
     fat_put(f, dir, name, false, 0, &x); fat_write(f, &x, 0, b, n);
+}
+/* --windows-bios <mbr.bin>: um PC só BIOS com "Windows": MBR com o código dado (build/fakeother.bin), a partição
+ * ativa no começo (NTFS de mentira, 300 MB), outra no fim (100 MB) e espaço livre no meio */
+static void make_windows_bios(const BlkDev *d, const char *code_path) {
+    static PartTable t; part_new(&t, SCHEME_MBR, 99);
+    int w = part_add(d, &t, 2048, 300 * 2048, GPT_MSDATA, 0x07, "", 1);
+    u64 rs = (d->nsec - 100 * 2048) / 2048 * 2048;
+    int rc = part_add(d, &t, rs, 100 * 2048, GPT_MSDATA, 0x27, "", 2);
+    if (w < 0 || rc < 0) { fprintf(stderr, "tabela falhou\n"); exit(2); }
+    t.p[w].active = true;
+    if (!part_write(d, &t)) { fprintf(stderr, "tabela falhou\n"); exit(2); }
+    fill_random(t.p[w].start, t.p[w].count, true); fill_random(t.p[rc].start, t.p[rc].count, false);
+    static u8 s[512], code[440]; FILE *c = fopen(code_path, "rb");
+    if (!c || fread(code, 1, 440, c) != 440) { fprintf(stderr, "código do MBR: %s\n", code_path); exit(2); }
+    fclose(c);
+    dio(0, 0, 1, s, false); memcpy(s, code, 440); dio(0, 0, 1, s, true);
+}
+/* --mbr-fat32 <mbr.bin>: um PC só BIOS sem espaço livre: MBR com o código dado e uma FAT32 ativa no disco todo
+ * (com alguns arquivos), para instalar encolhendo-a (fase 3) */
+static void make_mbr_fat32(const BlkDev *d, const char *code_path) {
+    static PartTable t; part_new(&t, SCHEME_MBR, 98);
+    Region fr[2]; int nf = part_free(d, &t, fr, 2);
+    int k = nf ? part_add(d, &t, fr[0].start, fr[0].count, GPT_MSDATA, 0x0C, "", 3) : -1;
+    if (k < 0) { fprintf(stderr, "tabela falhou\n"); exit(2); }
+    t.p[k].active = true;
+    if (!part_write(d, &t) || !fat32_format(dio, 0, t.p[k].start, t.p[k].count, "OTHER", 0x5151)) { fprintf(stderr, "formatação falhou\n"); exit(2); }
+    static Fat f; FatNode root, x; fat_mount(&f, dio, 0, t.p[k].start); fat_root(&f, &root);
+    for (int i = 0; i < 20; i++) { char n[16]; snprintf(n, sizeof n, "doc%02d.txt", i); fat_put(&f, &root, n, false, 4096 * (i + 1), &x); }
+    fat_flush(&f);
+    static u8 s[512], code[440]; FILE *c = fopen(code_path, "rb");
+    if (!c || fread(code, 1, 440, c) != 440) { fprintf(stderr, "código do MBR: %s\n", code_path); exit(2); }
+    fclose(c);
+    dio(0, 0, 1, s, false); memcpy(s, code, 440); dio(0, 0, 1, s, true);
 }
 static void make_windows(const BlkDev *d) {
     static PartTable t; part_new(&t, SCHEME_GPT, 77);
@@ -173,13 +209,14 @@ static int same_table(const BlkDev *d, const char *orig) {
     static PartTable t;
     if (!part_read(d, &t)) return 2;
     for (int i = 0; i < t.n; i++) {
-        if (t.p[i].fs != FS_NTFS) continue;
+        if (!fs_resizable(t.p[i].fs) || !memcmp(t.p[i].type, GPT_ESP, 16)) continue;
         _fseeki64(o, (long long)(t.p[i].start * 512), SEEK_SET);
         if (fread(b, 1, 512, o) != 512 || !dio(0, t.p[i].start, 1, a, false)) return 2;
-        if (memcmp(a, b, 512)) { fprintf(stderr, "FALHA: o setor de boot do NTFS em %llu mudou (o tamanho do volume)\n", (unsigned long long)t.p[i].start); fails++; }
+        if (t.p[i].fs == FS_EXFAT) a[0x70] = b[0x70];   /* exFAT: PercentInUse fica "desconhecido" (0xFF), o que vale */
+        if (memcmp(a, b, 512)) { fprintf(stderr, "FALHA: o setor de boot (%s) em %llu mudou (o tamanho do volume)\n", part_fs_name(t.p[i].fs), (unsigned long long)t.p[i].start); fails++; }
     }
     fclose(o);
-    if (!fails) printf("tabela, MBR e setores de boot NTFS iguais aos do original\n");
+    if (!fails) printf("tabela, MBR e setores de boot dos volumes iguais aos do original\n");
     return fails ? 1 : 0;
 }
 static u32 crc_range(u64 lba, u64 count) {
@@ -220,7 +257,7 @@ static int compare(const BlkDev *d, const char *before) {
     if (a.n != b.n + 1) { fprintf(stderr, "FALHA: %d entradas antes, %d depois (devia ser uma a mais)\n", b.n, a.n); fails++; }
     for (int i = 0; i < b.n; i++) {
         const Part *o = &b.p[i], *n = 0;
-        for (int k = 0; k < a.n; k++) if (!memcmp(a.p[k].guid, o->guid, 16)) n = &a.p[k];
+        for (int k = 0; k < a.n; k++) if (b.scheme == SCHEME_MBR ? a.p[k].start == o->start : !memcmp(a.p[k].guid, o->guid, 16)) n = &a.p[k];   /* MBR: sem GUID */
         if (!n || n->slot != o->slot || n->start != o->start || n->count != o->count || memcmp(n->type, o->type, 16) || memcmp(n->name, o->name, sizeof o->name) || n->attrs != o->attrs) {
             fprintf(stderr, "FALHA: a entrada %d da tabela mudou\n", o->slot + 1); fails++; continue;
         }
@@ -263,6 +300,8 @@ int main(int argc, char **argv) {
         if (!strcmp(argv[i], "--remove")) remove_mode = true;
         if (!strcmp(argv[i], "--update")) update_mode = true;
         if (!strcmp(argv[i], "--winefi") && i + 1 < argc) winefi = argv[++i];
+        if (!strcmp(argv[i], "--windows-bios") && i + 1 < argc) winbios = argv[++i];
+        if (!strcmp(argv[i], "--mbr-fat32") && i + 1 < argc) mbrfat = argv[++i];
     }
     img = fopen(argv[2], "r+b");
     if (!img) { img = fopen(argv[2], "w+b"); if (!img) { perror(argv[2]); return 2; } }
@@ -272,6 +311,8 @@ int main(int argc, char **argv) {
     for (int i = 4; i + 1 < argc; i++) if (!strcmp(argv[i], "--put-winefi")) { int rc = put_winefi(&d, argv[i + 1]); fclose(img); return rc; }
     for (int i = 4; i + 1 < argc; i++) if (!strcmp(argv[i], "--same-table")) { int rc = same_table(&d, argv[i + 1]); fclose(img); return rc; }
     if (windows) make_windows(&d);
+    if (mbrfat) { make_mbr_fat32(&d, mbrfat); if (!alongside) { fclose(img); printf("disco MBR com FAT32 montado\n"); return 0; } }
+    if (winbios) { make_windows_bios(&d, winbios); if (!alongside) { fclose(img); printf("disco com Windows (BIOS) de teste montado\n"); return 0; } }
     if (windows && !alongside) { fclose(img); printf("disco com Windows de teste montado\n"); return 0; }   /* só o disco (para testes em etapas) */
     static u8 buf[1 << 21];
     InstallSrc s = { 0 };
@@ -280,6 +321,28 @@ int main(int argc, char **argv) {
     snprintf(s.date, sizeof s.date, "test-%llu", (unsigned long long)GetTickCount64());
     InstallResult r;
     s.save = s_save;
+    /* gerenciador de partições: --list (a tabela), --op-create <início MiB> <MiB> <rótulo>, --op-delete <n>,
+     * --op-format <n> <rótulo>, --op-resize <n> <MiB> (n = a ordem do --list, a partir de 1) */
+    for (int i = 4; i < argc; i++) {
+        static PartTable lt; bool listing = !strcmp(argv[i], "--list");
+        bool op = !strncmp(argv[i], "--op-", 5);
+        if (!listing && !op) continue;
+        if (op) {
+            if (!part_read(&d, &lt)) lt.n = 0;
+            int n = i + 1 < argc ? atoi(argv[i + 1]) : 0; Part *p = n >= 1 && n <= lt.n ? &lt.p[n - 1] : 0;
+            if (!strcmp(argv[i], "--op-create") && i + 3 < argc) part_op_create(&d, &s, (u64)atoll(argv[i + 1]) * 2048, (u64)atoll(argv[i + 2]) * 2048, argv[i + 3], &r);
+            else if (!strcmp(argv[i], "--op-delete") && p) part_op_delete(&d, &s, p->start, &r);
+            else if (!strcmp(argv[i], "--op-format") && p && i + 2 < argc) part_op_format(&d, &s, p->start, argv[i + 2], &r);
+            else if (!strcmp(argv[i], "--op-resize") && p && i + 2 < argc) part_op_resize(&d, &s, p->start, (u64)atoll(argv[i + 2]) * 2048, &r);
+            else { fprintf(stderr, "uso: %s (partição %d de %d)\n", argv[i], n, lt.n); fclose(img); return 2; }
+            if (r.code) { fprintf(stderr, "FALHA: %s: %s\n", install_error(r.code), r.path); fclose(img); return 1; }
+            printf("%s: ok\n", argv[i]);
+        }
+        if (!part_read(&d, &lt)) { printf("sem tabela\n"); fclose(img); return 0; }
+        for (int k = 0; k < lt.n; k++)
+            printf("%d %llu %llu %s %s\n", k + 1, (unsigned long long)lt.p[k].start, (unsigned long long)lt.p[k].count, part_fs_name(lt.p[k].fs), lt.p[k].label[0] ? lt.p[k].label : "-");
+        fclose(img); return 0;
+    }
     if (update_mode) {
         /* atualizar: o que é da pessoa (um texto e o CONFIG.INI) não pode mudar; o programa tem de ficar igual ao da origem */
         static Fat v; InstallFound f, g; int fails = 0;
@@ -311,7 +374,7 @@ int main(int argc, char **argv) {
         W("EFI"); fat_lookup(&v, &root, w, &dir); W("BOOT"); fat_lookup(&v, &dir, w, &dir); W("BOOTX64.EFI");
         if (!n || fat_lookup(&v, &dir, w, &x) != FAT_OK || x.size != n || fat_read(&v, &x, 0, b, n) != (int)n || memcmp(a, b, n)) { fprintf(stderr, "FALHA: EFI/BOOT/BOOTX64.EFI diferente da origem\n"); fails++; }
         W("BOOTX64.EFI.~new"); if (fat_lookup(&v, &dir, w, &x) == FAT_OK) { fprintf(stderr, "FALHA: sobrou um .~new\n"); fails++; }
-        if (f.kind == FOUND_ALONGSIDE) {
+        if (f.kind == FOUND_ALONGSIDE && !f.bios) {
             static Fat ev; if (!fat_mount(&ev, dio, 0, f.esp_start)) return 2;
             FatNode d1, d2; int lk[3];
             fat_root(&ev, &root); W("EFI"); lk[0] = fat_lookup(&ev, &root, w, &d1); W("FolioOS"); lk[1] = fat_lookup(&ev, &d1, w, &d2); W("BOOTX64.EFI");
@@ -340,12 +403,14 @@ int main(int argc, char **argv) {
             if (install_find(&d, &g)) { fprintf(stderr, "FALHA: o FolioOS ainda é reconhecido no disco\n"); fails++; }
         } else
         if (!part_read(&d, &t1) || t1.n != t0.n - 1) { fprintf(stderr, "FALHA: a tabela devia ter uma entrada a menos\n"); fails++; }
-        for (int i = 0; i < t1.n; i++) if (!memcmp(t1.p[i].guid, f.part_guid, 16)) { fprintf(stderr, "FALHA: a partição do FolioOS continua na tabela\n"); fails++; }
+        for (int i = 0; i < t1.n; i++) if (f.bios ? t1.p[i].start == f.part_start : !memcmp(t1.p[i].guid, f.part_guid, 16)) { fprintf(stderr, "FALHA: a partição do FolioOS continua na tabela\n"); fails++; }
         if (install_find(&d, &g)) { fprintf(stderr, "FALHA: \\EFI\\FolioOS continua na partição EFI\n"); fails++; }
         if (f.ntfs >= 0) {
             static Ntfs n; bool ok = false;
             for (int i = 0; i < t1.n; i++)
-                if (t1.p[i].start == f.ntfs_start) ok = t1.p[i].count == f.ntfs_grow_to && ntfs_open(&n, &d, f.ntfs_start) && n.nclus == (f.ntfs_grow_to - 1) / (n.cs / 512) && ntfs_flags(&n) == NTFS_DIRTY;
+                if (t1.p[i].start == f.ntfs_start)
+                    ok = t1.p[i].count == f.ntfs_grow_to && (f.grow_fs != FS_NTFS ? fs_grow_max(&d, f.grow_fs, f.ntfs_start) > 0
+                         : ntfs_open(&n, &d, f.ntfs_start) && n.nclus == (f.ntfs_grow_to - 1) / (n.cs / 512) && ntfs_flags(&n) == NTFS_DIRTY);
             if (!ok) { fprintf(stderr, "FALHA: o NTFS não cresceu de volta\n"); fails++; }
         }
         /* os textos estão na origem, um por um */
@@ -369,7 +434,7 @@ int main(int argc, char **argv) {
         fclose(img);
         if (fails) return 1;
         printf("desinstalado: %d textos copiados para %s; %s\n", copied, f.docs_files ? r.path : "-",
-               f.ntfs >= 0 ? "o NTFS cresceu de volta" : "o espaço ficou livre");
+               f.ntfs >= 0 ? "a partição de antes cresceu de volta" : "o espaço ficou livre");
         return 0;
     }
     if (!alongside) {
@@ -397,28 +462,64 @@ int main(int argc, char **argv) {
     if (!part_read(&d, &before)) { fprintf(stderr, "sem tabela\n"); return 2; }
     if (shrink) {
         /* sem espaço livre: encolhe o NTFS (o disco feito pelo Windows, tests\fixtures\ntfs-big) e instala depois dele */
+        /* (também FAT32 e exFAT feitos pelo Windows: tests/fixtures/fat32-pc, exfat-pc) */
         int k = -1, fails = 0;
-        for (int i = 0; i < before.n; i++) if (before.p[i].fs == FS_NTFS) k = i;
-        if (k < 0) { fprintf(stderr, "sem NTFS\n"); return 2; }
+        for (int i = 0; i < before.n; i++) if (fs_resizable(before.p[i].fs) && memcmp(before.p[i].type, GPT_ESP, 16)) k = i;
+        if (k < 0) { fprintf(stderr, "sem partição de dados\n"); return 2; }
+        bool isntfs = before.p[k].fs == FS_NTFS;
         static Ntfs n; u64 last0 = 0;
-        if (!ntfs_open(&n, &d, before.p[k].start) || !ntfs_last_used(&n, &last0)) { fprintf(stderr, "NTFS ilegível\n"); return 2; }
+        if (isntfs && (!ntfs_open(&n, &d, before.p[k].start) || !ntfs_last_used(&n, &last0))) { fprintf(stderr, "NTFS ilegível\n"); return 2; }
         u64 want = before.p[k].count - (600ull << 11);              /* 600 MiB para o FolioOS */
         install_shrink_alongside(&d, &s, &o, before.p[k].start, want, &r);
         if (r.code) { fprintf(stderr, "FALHA: %s: %s\n", install_error(r.code), r.path); fclose(img); return 1; }
         if (!part_read(&d, &after) || after.n != before.n + 1) { fprintf(stderr, "FALHA: a tabela devia ter uma entrada a mais\n"); fails++; }
         const Part *a = &before.p[k], *b = 0;
-        for (int i = 0; i < after.n; i++) if (!memcmp(after.p[i].guid, a->guid, 16)) b = &after.p[i];
+        for (int i = 0; i < after.n; i++) if (before.scheme == SCHEME_MBR ? after.p[i].start == a->start : !memcmp(after.p[i].guid, a->guid, 16)) b = &after.p[i];   /* MBR: sem GUID */
         u64 end = (a->start + want) / 2048 * 2048;
         if (!b || b->start != a->start || b->slot != a->slot || b->count != end - a->start || memcmp(b->type, a->type, 16)) { fprintf(stderr, "FALHA: entrada do NTFS\n"); fails++; }
         if (r.part_lba != end) { fprintf(stderr, "FALHA: o FolioOS devia começar onde o NTFS termina (%llu, não %llu)\n", (unsigned long long)end, (unsigned long long)r.part_lba); fails++; }
         u64 last1 = 0;
-        if (!ntfs_open(&n, &d, a->start) || n.nclus != (end - a->start - 1) / (n.cs / 512) || ntfs_flags(&n) != NTFS_DIRTY || !ntfs_last_used(&n, &last1) || last1 != last0) {
+        if (isntfs ? (!ntfs_open(&n, &d, a->start) || n.nclus != (end - a->start - 1) / (n.cs / 512) || ntfs_flags(&n) != NTFS_DIRTY || !ntfs_last_used(&n, &last1) || last1 != last0)
+                   : fs_grow_max(&d, a->fs, a->start) == 0) {   /* FAT32/exFAT: o volume encolhido tem de ser legível (o fsck vem depois) */
             fprintf(stderr, "FALHA: o NTFS encolhido não confere\n"); fails++;
         }
         fclose(img);
         if (fails) return 1;
-        printf("instalado encolhendo o NTFS: %llu -> %llu MB, FolioOS %llu MB em LBA %llu, %s\n", (unsigned long long)(a->count / 2048),
+        printf("instalado encolhendo a partição %s: ", part_fs_name(a->fs)); printf("%llu -> %llu MB, FolioOS %llu MB em LBA %llu, %s\n", (unsigned long long)(a->count / 2048),
                (unsigned long long)((end - a->start) / 2048), (unsigned long long)(r.part_count / 2048), (unsigned long long)r.part_lba, r.boot_path);
+        return 0;
+    }
+    if (o.bios) {
+        /* PC só BIOS (fase 3): as entradas de antes ficam nas mesmas posições e com os mesmos bytes, os dados delas não
+         * mudam, o MBR passa a ser o do FolioOS apontando a entrada nova, e o código original vai para OTHERMBR.BIN */
+        static u8 s0[512], s1[512], om[600], mbrc[440]; int fails = 0;
+        dio(0, 0, 1, s0, false);
+        u32 crc0[4] = { 0 }; for (int i = 0; i < before.n; i++) if (before.p[i].slot >= 0 && before.p[i].slot < 4) crc0[before.p[i].slot] = crc_range(before.p[i].start, before.p[i].count);
+        Region fr[8]; int nf = part_free(&d, &before, fr, 8), big = -1;
+        for (int i = 0; i < nf; i++) if (big < 0 || fr[i].count > fr[big].count) big = i;
+        if (big < 0) { fprintf(stderr, "sem espaço livre\n"); return 2; }
+        install_alongside(&d, &s, &o, fr[big], &r);
+        if (r.code) { fprintf(stderr, "FALHA: %s: %s\n", install_error(r.code), r.path); fclose(img); return 1; }
+        dio(0, 0, 1, s1, false);
+        if (!part_read(&d, &after) || after.n != before.n + 1) { fprintf(stderr, "FALHA: a tabela devia ter uma entrada a mais\n"); fails++; }
+        int slot = -1;
+        for (int i = 0; i < after.n; i++) if (after.p[i].start == r.part_lba) slot = after.p[i].slot;
+        for (int sl = 0; sl < 4; sl++) {
+            const u8 *a = s0 + 446 + 16 * sl, *b = s1 + 446 + 16 * sl;
+            if (a[4] && memcmp(a, b, 16)) { fprintf(stderr, "FALHA: a entrada %d do MBR mudou\n", sl + 1); fails++; }
+            if (a[4] && crc_range(rd32(a + 8), rd32(a + 12)) != crc0[sl]) { fprintf(stderr, "FALHA: o conteúdo da partição %d mudou\n", sl + 1); fails++; }
+        }
+        if (s_read(0, "FOLIO/TOOLS/bios/mbr.bin", 0, mbrc, 440) != 440 || memcmp(s1, mbrc, 437) || s1[437] != slot) { fprintf(stderr, "FALHA: o MBR não é o do FolioOS apontando a entrada %d\n", slot + 1); fails++; }
+        static Fat v; FatNode root, dir, x; u16 w[32];
+        #define W3(str) do { int _i = 0; for (; (str)[_i]; _i++) w[_i] = (u16)(unsigned char)(str)[_i]; w[_i] = 0; } while (0)
+        fat_mount(&v, dio, 0, r.part_lba); fat_root(&v, &root); W3("FOLIO"); fat_lookup(&v, &root, w, &dir); W3("OTHERMBR.BIN");
+        int on = fat_lookup(&v, &dir, w, &x) == FAT_OK ? fat_read(&v, &x, 0, om, sizeof om) : -1;
+        #undef W3
+        if (on < 440 || memcmp(om, s0, 440)) { fprintf(stderr, "FALHA: FOLIO/OTHERMBR.BIN não guarda o MBR original\n"); fails++; }
+        fclose(img);
+        if (fails) return 1;
+        printf("instalado ao lado (BIOS): partição %llu MB em LBA %llu, entrada %d no MBR; o MBR original guardado (%d bytes)\n",
+               (unsigned long long)(r.part_count / 2048), (unsigned long long)r.part_lba, slot + 1, on);
         return 0;
     }
     u32 crcs[PART_MAX];

@@ -22,7 +22,7 @@ static char  hint[MAXD][200];             /* sem opção "ao lado": como abrir e
 static bool  has_key;                      /* "tenho a chave de recuperação do BitLocker" */
 /* opções da lista: ao lado de outro sistema (no espaço livre, ou encolhendo o NTFS dele: nada é apagado) ou o
  * disco inteiro. Encolhendo: a partição (início, tamanho, rótulo) e o máximo que o FolioOS pode ganhar */
-static struct { int d, mode; Region fr; u64 pstart, pcount, maxfol; char plabel[40]; } opt[MAXD * 4];
+static struct { int d, mode; Region fr; u64 pstart, pcount, maxfol; int pfs; char plabel[40]; } opt[MAXD * 4];
 static float fol_mb;                       /* encolhendo: o tamanho escolhido para o FolioOS, em MiB */
 static InstallFound found[MAXD];            /* o FolioOS já instalado ao lado, em cada disco (para remover) */
 static bool  copy_texts = true;            /* remover: copiar os textos para o pendrive antes */
@@ -68,8 +68,11 @@ static void scan(void) {
             if (nopt < MAXD * 4) { opt[nopt].d = i; opt[nopt].mode = MODE_REMOVE; opt[nopt].fr.start = opt[nopt].fr.count = 0; nopt++; }
         }
         /* ao lado: GPT, partição EFI FAT32 e espaço livre que chegue (só em PCs UEFI) */
-        if (table && t.scheme == SCHEME_GPT && !is_bios() && !why[i][0] && !found[i].found) {
-            bool esp = false; for (int p = 0; p < t.n; p++) if (!memcmp(t.p[p].type, GPT_ESP, 16) && t.p[p].fs == FS_FAT32 && cv[p].verdict == SAFE_OK) esp = true;   /* a EFI recebe a pasta EFI/FolioOS: só se estiver em ordem */
+        /* UEFI: disco GPT com partição EFI; PC só BIOS (fase 3): disco MBR com uma posição primária livre */
+        int prim = 0; for (int p = 0; table && p < t.n; p++) if (!t.p[p].logical) prim++;
+        bool mbr_ok = table && is_bios() && t.scheme == SCHEME_MBR && !t.has_extended && prim < 4;
+        if (table && ((t.scheme == SCHEME_GPT && !is_bios()) || mbr_ok) && !why[i][0] && !found[i].found) {
+            bool esp = mbr_ok; for (int p = 0; !mbr_ok && p < t.n; p++) if (!memcmp(t.p[p].type, GPT_ESP, 16) && t.p[p].fs == FS_FAT32 && cv[p].verdict == SAFE_OK) esp = true;   /* a EFI recebe a pasta EFI/FolioOS: só se estiver em ordem */
             Region fr[16]; int nf = part_free(&b, &t, fr, 16), big = -1;
             for (int f = 0; f < nf; f++) if (big < 0 || fr[f].count > fr[big].count) big = f;
             if (esp && big >= 0 && fr[big].count * d.bs >= ALONGSIDE_MIN_BYTES && t.n > 0 && nopt < MAXD * 4) {
@@ -79,14 +82,14 @@ static void scan(void) {
                  * e o FolioOS com o resto (até o que a pessoa escolher); escolhe o NTFS que mais pode ceder */
                 int bp = -1; u64 bmax = 0;
                 for (int p = 0; p < t.n; p++) {
-                    if (t.p[p].fs != FS_NTFS || cv[p].verdict != SAFE_OK || !cv[p].min_bytes) continue;
+                    if (!fs_resizable(t.p[p].fs) || !memcmp(t.p[p].type, GPT_ESP, 16) || cv[p].verdict != SAFE_OK || !cv[p].min_bytes) continue;   /* NTFS, FAT32 ou exFAT */
                     u64 size = t.p[p].count * d.bs, keep = cv[p].min_bytes + size / 10;
                     u64 room = size > keep ? (size - keep) & ~((1ull << 20) - 1) : 0;
                     if (room >= ALONGSIDE_MIN_BYTES && room > bmax) { bmax = room; bp = p; }
                 }
                 if (bp >= 0) {
                     opt[nopt].d = i; opt[nopt].mode = MODE_SHRINK; opt[nopt].fr.start = opt[nopt].fr.count = 0;
-                    opt[nopt].pstart = t.p[bp].start; opt[nopt].pcount = t.p[bp].count; opt[nopt].maxfol = bmax;
+                    opt[nopt].pstart = t.p[bp].start; opt[nopt].pcount = t.p[bp].count; opt[nopt].maxfol = bmax; opt[nopt].pfs = t.p[bp].fs;
                     str_copy(opt[nopt].plabel, t.p[bp].label, sizeof opt[nopt].plabel); nopt++;
                 } else {
                     /* não dá para abrir espaço daqui: diz como fazer no próprio sistema (o ext4 o FolioOS não encolhe:
@@ -299,8 +302,8 @@ static void installer_body(Window *w, Rect r) {
                 if (str_eq(iv, FOLIO_VERSION)) str_copy(line, L("Reinstall the FolioOS program on this disk (your texts and settings stay)"), sizeof line);
                 else fmt(line, sizeof line, L("Update FolioOS on this disk (%s → %s)"), iv, FOLIO_VERSION);
             }
-            else             if (opt[i].mode == MODE_REMOVE) str_copy(line, found[d].kind == FOUND_WHOLE ? L("Remove FolioOS from this disk (the disk is left empty)") : found[d].ntfs >= 0 ? L("Remove FolioOS from this disk (Windows gets the space back)") : L("Remove FolioOS from this disk (its space becomes free)"), sizeof line);
-            else if (opt[i].mode == MODE_SHRINK) { disk_size_text(opt[i].maxfol, sz, sizeof sz); fmt(line, sizeof line, L("Next to the other system, making room in its NTFS partition (up to %s)"), sz); }
+            else if (opt[i].mode == MODE_REMOVE) str_copy(line, found[d].kind == FOUND_WHOLE ? L("Remove FolioOS from this disk (the disk is left empty)") : found[d].ntfs >= 0 ? (found[d].grow_fs == FS_NTFS ? L("Remove FolioOS from this disk (Windows gets the space back)") : L("Remove FolioOS from this disk (the partition before it gets the space back)")) : L("Remove FolioOS from this disk (its space becomes free)"), sizeof line);
+            else if (opt[i].mode == MODE_SHRINK) { disk_size_text(opt[i].maxfol, sz, sizeof sz); fmt(line, sizeof line, L("Next to the other system, making room in its %s partition (up to %s)"), part_fs_name(opt[i].pfs), sz); }
             else if (al) { free_text(i, sz, sizeof sz); fmt(line, sizeof line, L("Next to the other system, in %s of free space"), sz); }
             else str_copy(line, L("The whole disk (everything on it is erased)"), sizeof line);
             draw_text_ellipsis(fb, S(14.5f), it.x + S(44), it.y + S(27), it.w - S(56), line, why[d][0] ? dim : (al ? T->panel_text : 0xFFC0392B));
@@ -351,7 +354,7 @@ static void installer_body(Window *w, Rect r) {
         if (fo->ntfs >= 0) {
             char a[24], b2[24];
             disk_size_text(fo->ntfs_count * di[d].bs, a, sizeof a); disk_size_text(fo->ntfs_grow_to * di[d].bs, b2, sizeof b2);
-            fmt(line, sizeof line, L("NTFS%s: %s → %s"), "", a, b2);
+            fmt(line, sizeof line, L("%s%s: %s → %s"), part_fs_name(fo->grow_fs), "", a, b2);
             y = wrap(fb, S(13), x + S(24), y, wd - S(24), line, T->accent);
         }
         y += S(8);
@@ -362,8 +365,9 @@ static void installer_body(Window *w, Rect r) {
             y += S(44);
         } else y = wrap(f, S(13.5f), x, y, wd, L("There are no texts on FolioOS's partition."), dim) + S(4);
         if (fo->kind == FOUND_WHOLE) y = wrap(fb, S(13.5f), x, y, wd, L("The disk will be left empty, with no partitions, ready for another system."), 0xFFC0392B);
-        else y = wrap(f, S(13.5f), x, y, wd, L("The EFI system partition loses only the folder EFI/FolioOS, and the computer starts the other system directly again."), T->panel_text);
-        if (fo->ntfs >= 0) y = wrap(f, S(13.5f), x, y + S(4), wd, L("The next time Windows starts, it checks its partition (chkdsk) once; this is expected."), T->panel_text);
+        else y = wrap(f, S(13.5f), x, y, wd, fo->bios ? L("The start of the disk gets the other system's original boot code back, and the computer starts it directly again.")
+                                                       : L("The EFI system partition loses only the folder EFI/FolioOS, and the computer starts the other system directly again."), T->panel_text);
+        if (fo->ntfs >= 0 && fo->grow_fs == FS_NTFS) y = wrap(f, S(13.5f), x, y + S(4), wd, L("The next time Windows starts, it checks its partition (chkdsk) once; this is expected."), T->panel_text);
         fmt(line, sizeof line, L("Before anything is written, the start of the disk (partition table and boot sectors) is saved to %s on this USB drive."), "FOLIO/BACKUP");
         y = wrap(f, S(13.5f), x, y + S(4), wd, line, dim) + S(8);
         const char *word = L("ERASE");
@@ -398,19 +402,20 @@ static void installer_body(Window *w, Rect r) {
             char a[24], b2[24], lab[48] = "";
             disk_size_text(size, a, sizeof a); disk_size_text((size - fol) / (1u << 20) * (1u << 20), b2, sizeof b2);
             if (opt[sel].plabel[0]) fmt(lab, sizeof lab, " \"%s\"", opt[sel].plabel);
-            fmt(line, sizeof line, L("NTFS%s: %s → %s"), lab, a, b2);
+            fmt(line, sizeof line, L("%s%s: %s → %s"), part_fs_name(opt[sel].pfs), lab, a, b2);
             y = wrap(fb, S(13), x + S(24), y, wd - S(24), line, T->accent);
             disk_size_text(fol, sz, sizeof sz);
             fmt(line, sizeof line, L("+ FolioOS · FAT32 · %s, in the space this frees"), sz);
             y = wrap(fb, S(13), x + S(24), y, wd - S(24), line, T->accent) + S(6);
             ui_slider(rect(x, (int)y, wd, SI(52)), &fol_mb, lo, hi, L("Size for FolioOS"), sz);
             y += S(56);
-            y = wrap(f, S(13.5f), x, y, wd, L("No file is moved: FolioOS only takes free space from the end of that partition. The next time Windows starts, it checks the partition (chkdsk) once; this is expected."), T->panel_text);
+            y = wrap(f, S(13.5f), x, y, wd, opt[sel].pfs == FS_NTFS ? L("No file is moved: FolioOS only takes free space from the end of that partition. The next time Windows starts, it checks the partition (chkdsk) once; this is expected.") : L("No file is moved: FolioOS only takes free space from the end of that partition."), T->panel_text);
         } else {
             free_text(sel, sz, sizeof sz);
             fmt(line, sizeof line, L("+ FolioOS · FAT32 · %s, in the free space"), sz);
             y = wrap(fb, S(13), x + S(24), y, wd - S(24), line, T->accent) + S(8);
-            y = wrap(f, S(13.5f), x, y, wd, L("The EFI system partition only receives the folder EFI/FolioOS. Your texts, fonts and settings are copied from this USB drive to the new partition."), T->panel_text);
+            y = wrap(f, S(13.5f), x, y, wd, is_bios() ? L("The start of the disk gets FolioOS's boot code; the other system's original code is kept, and FolioOS starts it. Your texts, fonts and settings are copied from this USB drive to the new partition.")
+                                                      : L("The EFI system partition only receives the folder EFI/FolioOS. Your texts, fonts and settings are copied from this USB drive to the new partition."), T->panel_text);
         }
         fmt(line, sizeof line, LN("When the computer starts, FolioOS waits %d second for a key; without one, the other system starts as usual.",
                                   "When the computer starts, FolioOS waits %d seconds for a key; without one, the other system starts as usual.", prefs.boot_wait), prefs.boot_wait);

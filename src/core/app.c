@@ -910,6 +910,7 @@ static const Cmd cmds[] = {
     { N_("Update FolioOS on this computer"), "", installer_open_update, IC_DRIVE },
     { N_("Exchange texts with the USB drive"), "", app_exchange_texts, IC_DOC },
     { N_("Remove FolioOS from this computer"), "", installer_open_remove, IC_DRIVE },
+    { N_("Disks and partitions"), "", partitions_open, IC_DRIVE },
     { N_("Restart the computer"), "", c_reboot, IC_POWER },
     { N_("Shut down the computer"), N_("Ctrl+Q"), c_shutdown, IC_POWER },
 };
@@ -1324,6 +1325,8 @@ static void settings_body(Window *w, Rect r) {
         draw_text_ellipsis(f, S(13.5f), cur.x, cur.y + S(58), wd, l3, col_alpha(T->panel_text, 0.7f));
         cur.y += SI(80);
         if (ui_button(rect(cur.x, cur.y, wd, SI(38)), L("Install FolioOS on this computer…"), BTN_GHOST)) installer_open();
+        cur.y += SI(48);
+        if (ui_button(rect(cur.x, cur.y, wd, SI(38)), L("Disks and partitions…"), BTN_GHOST)) partitions_open();
         cur.y += SI(48);
         if (ui_button(rect(cur.x, cur.y, SI(150), SI(38)), L("Restart"), BTN_GHOST)) c_reboot();
         if (ui_button(rect(cur.x + SI(160), cur.y, SI(150), SI(38)), L("Shut down"), BTN_DANGER)) c_shutdown();
@@ -2143,6 +2146,9 @@ void app_init(void) {
             mem_free(id);
         }
     }
+    if (!alongside) {   /* PC só BIOS (fase 3): instalado ao lado, o MBR original do outro sistema está guardado aqui */
+        bool d; if (pal_exists(boot_vol, "/FOLIO/OTHERMBR.BIN", &d) && !d) alongside = true;
+    }
     paths_init(boot_vol);
     fonts_init();
     splash_start();                         /* FolioOS: aparece já, enquanto as fontes carregam */
@@ -2176,6 +2182,7 @@ void app_init(void) {
     wm_add(&win_settings); wm_add(&win_find); wm_add(&win_outline); wm_add(&win_stats);
     wm_add(&win_help); wm_add(&win_palette); wm_add(&win_menu); wm_add(&win_music); wm_add(&win_files); wm_add(&win_theme_ed);
     wm_add(installer_window());
+    wm_add(partitions_window());
     ui.in.now = pal_ms();
     app.session_start_ms = ui.in.now;
     last_frame_ms = ui.in.now; last_mouse_ms = ui.in.now;
@@ -2231,6 +2238,7 @@ static float auto_scale(int W, int H) {
 
 bool app_frame(void) {
     installer_poll();                    /* instalação pedida no quadro anterior (desenha o progresso por conta própria) */
+    partitions_poll();
     Surface *s = pal_screen();
     Input *in = &ui.in;
     u64 now = pal_ms();

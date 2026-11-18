@@ -183,7 +183,7 @@ bool part_read(const BlkDev *d, PartTable *t) {
                     const u8 *l = eb + 446;
                     if (l[4] && rd32(l + 12)) {
                         Part *p = &t->p[t->n++]; memset(p, 0, sizeof *p);
-                        p->start = ebr + rd32(l + 8); p->count = rd32(l + 12); p->mbr_type = l[4]; p->logical = true;
+                        p->start = ebr + rd32(l + 8); p->count = rd32(l + 12); p->mbr_type = l[4]; p->logical = true; p->slot = -1;
                     }
                     const u8 *nx = eb + 446 + 16;
                     if (!is_ext(nx[4]) || !rd32(nx + 8)) break;
@@ -193,7 +193,7 @@ bool part_read(const BlkDev *d, PartTable *t) {
             }
             if (t->n >= PART_MAX) break;
             Part *p = &t->p[t->n++]; memset(p, 0, sizeof *p);
-            p->start = s; p->count = c; p->mbr_type = ty; p->active = e[0] == 0x80;
+            p->start = s; p->count = c; p->mbr_type = ty; p->active = e[0] == 0x80; p->slot = i;   /* a posição na tabela (preservada ao regravar) */
         }
     }
     for (int i = 0; i < t->n; i++) {
@@ -265,6 +265,7 @@ int part_add(const BlkDev *d, PartTable *t, u64 start, u64 count, const u8 type[
     int slot = 0;                                      /* GPT: a primeira posição livre; as outras entradas não se mexem */
     for (bool used = true; used && slot < 128; ) { used = false; for (int i = 0; i < t->n; i++) if (t->p[i].slot == slot) { used = true; slot++; break; } }
     if (t->scheme == SCHEME_GPT && slot >= 128) return -1;
+    if (t->scheme == SCHEME_MBR && slot >= 4) return -1;            /* MBR: quatro primárias */
     Part *p = &t->p[t->n]; memset(p, 0, sizeof *p);
     p->start = start; p->count = count; p->mbr_type = mbr_type; p->slot = slot;
     if (type) memcpy(p->type, type, 16);
@@ -327,16 +328,29 @@ static bool write_mbr(const BlkDev *d, const PartTable *t) {
     int ext_slot = -1;
     if (t->has_extended && old[510] == 0x55 && old[511] == 0xAA)
         for (int i = 0; i < 4; i++) if (is_ext(old[446 + i * 16 + 4])) { ext_slot = i; memcpy(m + 446 + i * 16, old + 446 + i * 16, 16); }
-    const Part *pr[4]; int np = 0;
-    for (int i = 0; i < t->n; i++) if (!t->p[i].logical) { if (np >= 4) return false; pr[np++] = &t->p[i]; }
-    for (int i = 1; i < np; i++) for (int j = i; j > 0 && pr[j]->start < pr[j - 1]->start; j--) { const Part *x = pr[j]; pr[j] = pr[j - 1]; pr[j - 1] = x; }
-    int slot = 0;
-    for (int i = 0; i < np; i++) {
-        if (slot == ext_slot) slot++;
-        if (slot >= 4 || pr[i]->start > 0xFFFFFFFFull || pr[i]->count > 0xFFFFFFFFull) return false;
-        u8 *e = m + 446 + 16 * slot++;
-        e[0] = pr[i]->active ? 0x80 : 0; e[1] = 0xFE; e[2] = 0xFF; e[3] = 0xFF; e[4] = pr[i]->mbr_type; e[5] = 0xFE; e[6] = 0xFF; e[7] = 0xFF;
-        wr32(e + 8, (u32)pr[i]->start); wr32(e + 12, (u32)pr[i]->count);
+    /* cada primária na sua posição (o número da partição não muda: sda2 continua sda2); as novas vão para a primeira
+     * posição livre; uma entrada que não mudou é regravada byte a byte como estava (com os CHS de quem a criou) */
+    bool used[4] = { ext_slot == 0, ext_slot == 1, ext_slot == 2, ext_slot == 3 };
+    const Part *at[4] = { 0 };
+    for (int pass = 0; pass < 2; pass++)
+        for (int i = 0; i < t->n; i++) {
+            const Part *p = &t->p[i];
+            if (p->logical) continue;
+            bool fixed = p->slot >= 0 && p->slot < 4 && !used[p->slot] && !at[p->slot];
+            if (pass == 0 && !fixed) continue;
+            if (pass == 1 && (fixed || (p->slot >= 0 && p->slot < 4 && at[p->slot] == p))) continue;
+            int s = fixed ? p->slot : -1;
+            for (int k = 0; s < 0 && k < 4; k++) if (!used[k] && !at[k]) s = k;
+            if (s < 0 || p->start > 0xFFFFFFFFull || p->count > 0xFFFFFFFFull) return false;
+            at[s] = p;
+        }
+    bool oldok = old[510] == 0x55 && old[511] == 0xAA;
+    for (int s = 0; s < 4; s++) {
+        const Part *p = at[s]; if (!p) continue;
+        u8 *e = m + 446 + 16 * s; const u8 *o = old + 446 + 16 * s;
+        if (oldok && o[4] == p->mbr_type && rd32(o + 8) == (u32)p->start && rd32(o + 12) == (u32)p->count && (o[0] == 0x80) == p->active) { memcpy(e, o, 16); continue; }
+        e[0] = p->active ? 0x80 : 0; e[1] = 0xFE; e[2] = 0xFF; e[3] = 0xFF; e[4] = p->mbr_type; e[5] = 0xFE; e[6] = 0xFF; e[7] = 0xFF;
+        wr32(e + 8, (u32)p->start); wr32(e + 12, (u32)p->count);
     }
     m[510] = 0x55; m[511] = 0xAA;
     /* restos de uma GPT antiga (início e fim do disco) confundiriam o firmware: apaga as assinaturas */

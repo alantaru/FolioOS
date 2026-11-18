@@ -64,7 +64,8 @@ function Add-Files([string]$root) {
     [IO.File]::WriteAllBytes("$root\Documents\tail.bin", $tail)
 }
 
-function New-Fixture([string]$name, [string]$style, [scriptblock]$extra, [int]$mb = 48, [switch]$esp) {
+function New-Fixture([string]$name, [string]$style, [scriptblock]$extra, [int]$mb = 48, [switch]$esp, [string]$fs = "NTFS") {
+    $pre = if ($fs -eq "NTFS") { "ntfs" } else { $fs.ToLower() }   # ntfs-<name>, fat32-<name>, exfat-<name>
     $vhd = Join-Path $work "$name.vhd"
     if (Test-Path $vhd) { Dismount-DiskImage -ImagePath $vhd -ErrorAction SilentlyContinue | Out-Null; Remove-Item $vhd }
     "create vdisk file=`"$vhd`" maximum=$mb type=fixed" | Set-Content "$work\dp.txt" -Encoding Ascii
@@ -83,24 +84,29 @@ function New-Fixture([string]$name, [string]$style, [scriptblock]$extra, [int]$m
             Set-Partition -DiskNumber $disk.Number -PartitionNumber $e.PartitionNumber -GptType "{c12a7328-f81f-11d2-ba4b-00a0c93ec93b}"
         }
         $p = New-Partition -DiskNumber $disk.Number -UseMaximumSize -AssignDriveLetter
-        Format-Volume -Partition $p -FileSystem NTFS -NewFileSystemLabel "FOLIOTEST" -Confirm:$false -Force | Out-Null
+        Format-Volume -Partition $p -FileSystem $fs -NewFileSystemLabel "FOLIOTEST" -Confirm:$false -Force | Out-Null
         $L = (Get-Partition -DiskNumber $disk.Number -PartitionNumber $p.PartitionNumber).DriveLetter
         Add-Files "${L}:"
         & $extra "${L}:"
         Write-VolumeCache $L
-        $f = [NtfsFacts]::Query($L)
+        $f = if ($fs -eq "NTFS") { [NtfsFacts]::Query($L) } else { @(0, 0, 0, 0) }
         $dq = fsutil dirty query "${L}:"
         Write-Host "  $name : $dq"
     } finally { Dismount-DiskImage -ImagePath $vhd | Out-Null }
     # a fixed VHD is the raw disk followed by a 512-byte footer
     $len = (Get-Item $vhd).Length - 512
     $src = [IO.File]::OpenRead($vhd)
-    $dst = [IO.File]::Create("$out\ntfs-$name.img.gz")
+    $dst = [IO.File]::Create("$out\$pre-$name.img.gz")
     $gz = New-Object IO.Compression.GZipStream($dst, [IO.Compression.CompressionLevel]::Optimal)
     $buf = New-Object byte[] (1MB); $left = $len
     while ($left -gt 0) { $k = $src.Read($buf, 0, [Math]::Min($buf.Length, $left)); $gz.Write($buf, 0, $k); $left -= $k }
     $gz.Dispose(); $dst.Dispose(); $src.Dispose()
     Remove-Item $vhd
+    if ($fs -ne "NTFS") {
+        "fs=$($fs.ToLower()) bytes=$len" | Set-Content "$out\$pre-$name.txt" -Encoding Ascii
+        Write-Host "  $pre-$name -> $out\$pre-$name.img.gz ($([int]((Get-Item "$out\$pre-$name.img.gz").Length / 1KB)) KB)"
+        return
+    }
     $flags = @{ clean = 0; dirty = 1; hiber = 2; big = 0 }[$name]
     "flags=$flags cs=$($f[0]) nclus=$($f[1]) last=$($f[2]) mft=$($f[3]) bytes=$len" | Set-Content "$out\ntfs-$name.txt" -Encoding Ascii
     Write-Host "  $name : cs=$($f[0]) nclus=$($f[1]) last=$($f[2]) -> $out\ntfs-$name.img.gz ($([int]((Get-Item "$out\ntfs-$name.img.gz").Length / 1KB)) KB)"
@@ -117,5 +123,11 @@ if ($Only -eq "" -or $Only -eq "dirty") { New-Fixture "dirty" "MBR" { param($r) 
 if ($Only -eq "" -or $Only -eq "hiber") { New-Fixture "hiber" "GPT" { param($r) Set-Hiberfil $r "HIBR" } }
 # a whole "Windows" disk with no free space: EFI system partition + NTFS filling the rest (the installer has to shrink it)
 if ($Only -eq "" -or $Only -eq "big") { New-Fixture "big" "GPT" { param($r) Set-Hiberfil $r "" } -mb 1100 -esp }
+# data disks formatted by Windows as FAT32 and exFAT (1100 MB: room to shrink above the FAT32 minimum of 65525 clusters)
+if ($Only -eq "" -or $Only -eq "fat32") { New-Fixture "data" "GPT" { param($r) } -mb 1100 -fs FAT32 }
+if ($Only -eq "" -or $Only -eq "exfat") { New-Fixture "data" "GPT" { param($r) } -mb 1100 -fs exFAT }
+# a PC disk with an EFI system partition and a FAT32 / exFAT data partition filling the rest (install by shrinking it)
+if ($Only -eq "" -or $Only -eq "fat32pc") { New-Fixture "pc" "GPT" { param($r) } -mb 1100 -esp -fs FAT32 }
+if ($Only -eq "" -or $Only -eq "exfatpc") { New-Fixture "pc" "GPT" { param($r) } -mb 1100 -esp -fs exFAT }
 Remove-Item -Recurse -Force $work
 Write-Host "fixtures in $out"

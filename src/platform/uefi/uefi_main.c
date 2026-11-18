@@ -1451,6 +1451,17 @@ bool pal_boot_entry_remove(void) {
     }
     return ok;
 }
+/* PC só BIOS (a ponte do FOLIO\BIOS.SYS): ela oferece um protocolo próprio que inicia o MBR original do outro
+ * sistema (ver bridge.c, FOLIO_BIOS_CHAIN). Num firmware UEFI de verdade ele não existe: devolve false. */
+typedef struct { EFI_STATUS (EFIAPI *Chain)(const u8 *code440); } FOLIO_BIOS_CHAIN;
+bool pal_chain_mbr(const u8 *code) {
+    static EFI_GUID g = { 0x464f4c49, 0x4f43, 0x4841, { 0x49, 0x4e, 0x4d, 0x42, 0x52, 0x00, 0x00, 0x01 } };
+    FOLIO_BIOS_CHAIN *c = 0;
+    if (EFI_ERROR(ST->BootServices->LocateProtocol(&g, 0, (void **)&c)) || !c) return false;
+    dbg("boot chooser: starting the other system's MBR (BIOS)");
+    c->Chain(code);
+    return false;
+}
 static int other_num = -1;
 bool pal_boot_other(char *name, int cap) {
     CHAR16 nm[16]; UINTN osz = 0; boot_var_name(nm, "BootOrder", -1);

@@ -516,6 +516,212 @@ int ntfs_grow(const BlkDev *d, u64 part_lba, u64 part_sectors, u64 new_sectors) 
     return NTFS_SHRINK_OK;
 }
 
+/* ------------------------------------------------------------ FAT32: encolher e crescer sem mover dados */
+typedef struct { u32 spc, rsvd, nfats, fatsz, total, data, nclus, fsinfo, bkboot; } Fat32Geo;
+static bool f32_geo(const BlkDev *d, u64 lba, Fat32Geo *g, u8 *b) {
+    if (d->bs != 512 || !d->rw(d->ctx, lba, 1, b, false) || b[510] != 0x55 || b[511] != 0xAA) return false;
+    if (rd16(b + 11) != 512 || !b[13] || rd16(b + 17) != 0 || rd16(b + 22) != 0 || !rd32(b + 36) || rd16(b + 19)) return false;
+    g->spc = b[13]; g->rsvd = rd16(b + 14); g->nfats = b[16] ? b[16] : 1; g->fatsz = rd32(b + 36); g->total = rd32(b + 32);
+    g->data = g->rsvd + g->nfats * g->fatsz;
+    if (!g->rsvd || g->total <= g->data) return false;
+    g->nclus = (g->total - g->data) / g->spc;
+    if (g->nclus > g->fatsz * 128 - 2) g->nclus = g->fatsz * 128 - 2;
+    g->fsinfo = rd16(b + 48); g->bkboot = rd16(b + 50);
+    return g->nclus >= 65525;
+}
+/* o último cluster em uso (o maior número com entrada diferente de zero na FAT); 1 = nenhum */
+static bool f32_last_used(const BlkDev *d, u64 lba, const Fat32Geo *g, u32 *last) {
+    static u8 s[512];
+    u32 secs = (g->nclus + 2 + 127) / 128;
+    *last = 1;
+    for (u32 k = 0; k < secs; k++) {
+        if (!d->rw(d->ctx, lba + g->rsvd + k, 1, s, false)) return false;
+        for (u32 i = 0; i < 128; i++) { u32 c = k * 128 + i; if (c >= 2 && c < g->nclus + 2 && (rd32(s + 4 * i) & 0x0FFFFFFF)) *last = c; }
+    }
+    return true;
+}
+u64 fat32_min_sectors(const BlkDev *d, u64 lba) {
+    static u8 b[512]; Fat32Geo g; u32 last;
+    if (!f32_geo(d, lba, &g, b) || !f32_last_used(d, lba, &g, &last)) return 0;
+    u32 need = last >= 2 ? last - 1 : 1;                       /* clusters 2..last ficam dentro */
+    if (need < 65525) need = 65525;                            /* abaixo disso o volume deixaria de ser FAT32 */
+    return (u64)g.data + (u64)need * g.spc;
+}
+u64 fat32_max_sectors(const BlkDev *d, u64 lba) {
+    static u8 b[512]; Fat32Geo g;
+    if (!f32_geo(d, lba, &g, b)) return 0;
+    return (u64)g.data + (u64)(g.fatsz * 128 - 2) * g.spc;    /* até onde a FAT que já existe alcança */
+}
+int fat32_resize(const BlkDev *d, u64 lba, u64 part_sectors, u64 new_sectors) {
+    static u8 b[512], s[512]; Fat32Geo g;
+    if (!f32_geo(d, lba, &g, b)) return NTFS_SHRINK_UNREADABLE;
+    if (new_sectors > part_sectors || new_sectors > 0xFFFFFFFFull || new_sectors <= g.data) return NTFS_SHRINK_BAD_SIZE;
+    u64 nc = (new_sectors - g.data) / g.spc;
+    if (nc < 65525 || nc > (u64)g.fatsz * 128 - 2) return NTFS_SHRINK_TOO_SMALL;
+    if (nc == g.nclus) return NTFS_SHRINK_BAD_SIZE;
+    /* em ordem: nem marcado como sujo (entrada 1 da FAT, byte de estado do BPB) */
+    if (!d->rw(d->ctx, lba + g.rsvd, 1, s, false)) return NTFS_SHRINK_UNREADABLE;
+    u32 e1 = rd32(s + 4);
+    if (!(e1 & 0x08000000u) || !(e1 & 0x04000000u) || (b[0x41] & 1)) return NTFS_SHRINK_NOT_CLEAN;
+    u32 from = (u32)(nc < g.nclus ? nc : g.nclus) + 2, to = (u32)(nc < g.nclus ? g.nclus : nc) + 2;
+    if (nc < g.nclus) {
+        u32 last; if (!f32_last_used(d, lba, &g, &last)) return NTFS_SHRINK_UNREADABLE;
+        if (last >= from) return NTFS_SHRINK_TOO_SMALL;        /* há dados depois do novo fim */
+    } else {
+        /* crescer: as entradas dos clusters novos têm de ficar livres (zera em todas as cópias da FAT) */
+        for (u32 c = from; c < to; ) {
+            u32 sec = c / 128;
+            for (u32 f = 0; f < g.nfats; f++) {
+                u64 at = lba + g.rsvd + (u64)f * g.fatsz + sec;
+                if (!d->rw(d->ctx, at, 1, s, false)) return NTFS_SHRINK_UNREADABLE;
+                for (u32 i = 0; i < 128; i++) { u32 cc = sec * 128 + i; if (cc >= from && cc < to) { s[4*i] = s[4*i+1] = s[4*i+2] = 0; s[4*i+3] &= 0xF0; } }
+                if (!d->rw(d->ctx, at, 1, s, true)) return NTFS_SHRINK_WRITE;
+            }
+            c = (sec + 1) * 128;
+        }
+    }
+    /* FSInfo (e a cópia junto do setor de boot reserva): os livres mudam pela diferença; a dica volta ao começo */
+    u32 secs_fsi[2] = { g.fsinfo, g.bkboot ? g.bkboot + g.fsinfo : 0 };
+    for (int k = 0; k < 2; k++) {
+        if (!secs_fsi[k] || secs_fsi[k] >= g.rsvd || !d->rw(d->ctx, lba + secs_fsi[k], 1, s, false)) continue;
+        if (rd32(s) != 0x41615252u || rd32(s + 484) != 0x61417272u) continue;
+        u32 fc = rd32(s + 488);
+        if (fc != 0xFFFFFFFFu) { i64 nf = (i64)fc + (i64)nc - (i64)g.nclus; fc = nf < 0 ? 0xFFFFFFFFu : (u32)nf; }
+        s[488] = (u8)fc; s[489] = (u8)(fc >> 8); s[490] = (u8)(fc >> 16); s[491] = (u8)(fc >> 24);
+        s[492] = 2; s[493] = s[494] = s[495] = 0;
+        if (!d->rw(d->ctx, lba + secs_fsi[k], 1, s, true)) return NTFS_SHRINK_WRITE;
+    }
+    /* por último, o total de setores: no setor de boot reserva e depois no principal (é o que muda o volume) */
+    u32 nt = (u32)new_sectors;
+    if (g.bkboot && g.bkboot < g.rsvd && d->rw(d->ctx, lba + g.bkboot, 1, s, false) && s[510] == 0x55 && s[511] == 0xAA) {
+        s[32] = (u8)nt; s[33] = (u8)(nt >> 8); s[34] = (u8)(nt >> 16); s[35] = (u8)(nt >> 24);
+        if (!d->rw(d->ctx, lba + g.bkboot, 1, s, true)) return NTFS_SHRINK_WRITE;
+    }
+    b[32] = (u8)nt; b[33] = (u8)(nt >> 8); b[34] = (u8)(nt >> 16); b[35] = (u8)(nt >> 24);
+    if (!d->rw(d->ctx, lba, 1, b, true)) return NTFS_SHRINK_WRITE;
+    if (d->flush) d->flush(d->ctx);
+    return NTFS_SHRINK_OK;
+}
+
+/* ------------------------------------------------------------ exFAT: encolher e crescer sem mover dados */
+typedef struct { u64 vol_len; u32 fat_off, fat_len, heap, nclus, root, bps, spc; u32 bm_clus; u64 bm_len; u64 bm_ent_lba; u32 bm_ent_off; } ExGeo;
+static bool ex_geo(const BlkDev *d, u64 lba, ExGeo *g, u8 *b) {
+    if (d->bs != 512 || !d->rw(d->ctx, lba, 1, b, false) || memcmp(b + 3, "EXFAT   ", 8)) return false;
+    if (b[0x6C] != 9 || b[0x6D] > 16 || b[0x6E] != 1) return false;            /* setores de 512, uma FAT */
+    g->bps = 512; g->spc = 1u << b[0x6D];
+    g->vol_len = rd64(b + 0x48); g->fat_off = rd32(b + 0x50); g->fat_len = rd32(b + 0x54);
+    g->heap = rd32(b + 0x58); g->nclus = rd32(b + 0x5C); g->root = rd32(b + 0x60);
+    if (g->nclus < 1 || g->root < 2) return false;
+    /* o bitmap de alocação: a entrada 0x81 da raiz (a raiz pode ter vários clusters; a entrada costuma estar no 1º) */
+    static u8 s[512];
+    u32 c = g->root;
+    for (int hop = 0; hop < 64 && c >= 2 && c < g->nclus + 2; hop++) {
+        u64 at = lba + g->heap + (u64)(c - 2) * g->spc;
+        for (u32 k = 0; k < g->spc; k++) {
+            if (!d->rw(d->ctx, at + k, 1, s, false)) return false;
+            for (u32 e = 0; e < 512; e += 32) {
+                if (s[e] == 0) return false;
+                if (s[e] == 0x81) { g->bm_clus = rd32(s + e + 20); g->bm_len = rd64(s + e + 24); g->bm_ent_lba = at + k; g->bm_ent_off = e; return g->bm_clus >= 2; }
+            }
+        }
+        u8 f[512]; u64 fs = lba + g->fat_off + c / 128;            /* o próximo cluster da raiz, pela FAT */
+        if (!d->rw(d->ctx, fs, 1, f, false)) return false;
+        c = rd32(f + (c % 128) * 4);
+    }
+    return false;
+}
+/* o último cluster em uso, pelo bitmap (bit i = cluster i+2) */
+static bool ex_last_used(const BlkDev *d, u64 lba, const ExGeo *g, u32 *last) {
+    static u8 s[512];
+    u64 at = lba + g->heap + (u64)(g->bm_clus - 2) * g->spc;
+    u32 bytes = (g->nclus + 7) / 8;
+    *last = 1;
+    for (u32 o = 0; o < bytes; o += 512) {
+        if (!d->rw(d->ctx, at + o / 512, 1, s, false)) return false;
+        for (u32 i = 0; i < 512 && o + i < bytes; i++) if (s[i]) for (int bit = 0; bit < 8; bit++) {
+            u32 n = (o + i) * 8 + bit; if (n < g->nclus && (s[i] >> bit & 1)) *last = n + 2;
+        }
+    }
+    return true;
+}
+/* clusters do bitmap já reservados (contíguo, como formatam o Windows e o Linux) e o que a FAT alcança */
+static u32 ex_cap(const ExGeo *g) {
+    u64 bm_bytes = (g->bm_len + (u64)g->spc * 512 - 1) / ((u64)g->spc * 512) * g->spc * 512;
+    u64 a = bm_bytes * 8, b = (u64)g->fat_len * 128 - 2;
+    return (u32)(a < b ? a : b);
+}
+u64 exfat_min_sectors(const BlkDev *d, u64 lba) {
+    static u8 b[512]; ExGeo g; u32 last;
+    if (!ex_geo(d, lba, &g, b) || !ex_last_used(d, lba, &g, &last)) return 0;
+    return (u64)g.heap + (u64)(last >= 2 ? last - 1 : 1) * g.spc;
+}
+u64 exfat_max_sectors(const BlkDev *d, u64 lba) {
+    static u8 b[512]; ExGeo g;
+    if (!ex_geo(d, lba, &g, b)) return 0;
+    return (u64)g.heap + (u64)ex_cap(&g) * g.spc;
+}
+/* soma da região de boot (setores 0 a 10), sem VolumeFlags (106, 107) e PercentInUse (112) */
+static u32 ex_boot_sum(const u8 *reg) {
+    u32 sum = 0;
+    for (u32 i = 0; i < 11 * 512; i++) { if (i == 106 || i == 107 || i == 112) continue; sum = ((sum & 1) ? 0x80000000u : 0) + (sum >> 1) + reg[i]; }
+    return sum;
+}
+int exfat_resize(const BlkDev *d, u64 lba, u64 part_sectors, u64 new_sectors) {
+    static u8 b[512], reg[12 * 512], s[512]; ExGeo g;
+    if (!ex_geo(d, lba, &g, b)) return NTFS_SHRINK_UNREADABLE;
+    if (new_sectors > part_sectors || new_sectors <= g.heap) return NTFS_SHRINK_BAD_SIZE;
+    if (rd16(b + 0x6A) & 0x0006) return NTFS_SHRINK_NOT_CLEAN;               /* sujo ou falha de mídia */
+    u64 nc64 = (new_sectors - g.heap) / g.spc;
+    if (nc64 < 1 || nc64 > ex_cap(&g) || nc64 > 0xFFFFFFF5ull) return NTFS_SHRINK_TOO_SMALL;
+    u32 nc = (u32)nc64;
+    if (nc == g.nclus) return NTFS_SHRINK_BAD_SIZE;
+    u64 bm_at = lba + g.heap + (u64)(g.bm_clus - 2) * g.spc;
+    if (nc < g.nclus) {
+        u32 last; if (!ex_last_used(d, lba, &g, &last)) return NTFS_SHRINK_UNREADABLE;
+        if (last >= nc + 2) return NTFS_SHRINK_TOO_SMALL;                      /* há dados depois do novo fim */
+    } else {
+        /* crescer: os bits dos clusters novos (e o resto do último byte) ficam zerados no bitmap */
+        for (u32 n = g.nclus; n < nc; ) {
+            u32 sec = n / 4096;
+            if (!d->rw(d->ctx, bm_at + sec, 1, s, false)) return NTFS_SHRINK_UNREADABLE;
+            for (u32 i = 0; i < 4096; i++) { u32 m = sec * 4096 + i; if (m >= g.nclus && m < nc) s[i / 8] &= (u8)~(1u << (i % 8)); }
+            if (!d->rw(d->ctx, bm_at + sec, 1, s, true)) return NTFS_SHRINK_WRITE;
+            n = (sec + 1) * 4096;
+        }
+    }
+    /* o tamanho do bitmap na entrada 0x81 (a especificação pede exatamente ceil(ClusterCount / 8)) */
+    if (!d->rw(d->ctx, g.bm_ent_lba, 1, s, false)) return NTFS_SHRINK_UNREADABLE;
+    u64 bl = (nc + 7) / 8;
+    for (int i = 0; i < 8; i++) s[g.bm_ent_off + 24 + i] = (u8)(bl >> (8 * i));
+    if (!d->rw(d->ctx, g.bm_ent_lba, 1, s, true)) return NTFS_SHRINK_WRITE;
+    /* as duas regiões de boot: VolumeLength, ClusterCount, PercentInUse desconhecido, soma recalculada; a reserva primeiro */
+    for (int pass = 0; pass < 2; pass++) {
+        u64 base = lba + (pass == 0 ? 12 : 0);
+        if (!d->rw(d->ctx, base, 12, reg, false)) return NTFS_SHRINK_UNREADABLE;
+        if (memcmp(reg + 3, "EXFAT   ", 8)) { if (pass == 0) continue; return NTFS_SHRINK_UNREADABLE; }
+        for (int i = 0; i < 8; i++) reg[0x48 + i] = (u8)(new_sectors >> (8 * i));
+        for (int i = 0; i < 4; i++) reg[0x5C + i] = (u8)(nc >> (8 * i));
+        reg[0x70] = 0xFF;
+        u32 sum = ex_boot_sum(reg);
+        for (u32 i = 0; i < 512; i += 4) { reg[11 * 512 + i] = (u8)sum; reg[11 * 512 + i + 1] = (u8)(sum >> 8); reg[11 * 512 + i + 2] = (u8)(sum >> 16); reg[11 * 512 + i + 3] = (u8)(sum >> 24); }
+        if (!d->rw(d->ctx, base, 12, reg, true)) return NTFS_SHRINK_WRITE;
+    }
+    if (d->flush) d->flush(d->ctx);
+    return NTFS_SHRINK_OK;
+}
+
+/* ------------------------------------------------------------ redimensionar, qualquer um dos três (tamanho = a partição) */
+bool fs_resizable(int fs) { return fs == FS_NTFS || fs == FS_FAT32 || fs == FS_EXFAT; }
+int fs_resize(const BlkDev *d, int fs, u64 lba, u64 part_sectors, u64 new_sectors) {
+    if (fs == FS_FAT32) return fat32_resize(d, lba, part_sectors > new_sectors ? part_sectors : new_sectors, new_sectors);
+    if (fs == FS_EXFAT) return exfat_resize(d, lba, part_sectors > new_sectors ? part_sectors : new_sectors, new_sectors);
+    if (fs == FS_NTFS) return new_sectors < part_sectors ? ntfs_shrink(d, lba, part_sectors, new_sectors) : ntfs_grow(d, lba, new_sectors, new_sectors);
+    return NTFS_SHRINK_UNREADABLE;
+}
+u64 fs_grow_max(const BlkDev *d, int fs, u64 lba) {
+    return fs == FS_NTFS ? ntfs_grow_max(d, lba) : fs == FS_FAT32 ? fat32_max_sectors(d, lba) : fs == FS_EXFAT ? exfat_max_sectors(d, lba) : 0;
+}
+
 /* ------------------------------------------------------------ veredito por partição */
 void fs_check(const BlkDev *d, const Part *p, FsCheck *o) {
     memset(o, 0, sizeof *o);
@@ -531,13 +737,19 @@ void fs_check(const BlkDev *d, const Part *p, FsCheck *o) {
          * FAT, e liga o bit 0 do byte de estado no BPB; o exFAT tem VolumeFlags (bit 1 sujo, bit 2 falha de mídia) */
         static u8 b[4096], fat[4096];
         if (d->bs > sizeof b || !d->rw(d->ctx, p->start, 1, b, false)) { o->verdict = SAFE_UNREADABLE; return; }
-        if (p->fs == FS_EXFAT) { o->verdict = rd16(b + 0x6A) & 0x0006 ? SAFE_DIRTY : SAFE_OK; return; }
+        if (p->fs == FS_EXFAT) {
+            o->verdict = rd16(b + 0x6A) & 0x0006 ? SAFE_DIRTY : SAFE_OK;
+            if (o->verdict == SAFE_OK) o->min_bytes = exfat_min_sectors(d, p->start) * d->bs;   /* encolher até aqui não move dados */
+            return;
+        }
         u32 rsvd = rd16(b + 0x0E), bps = rd16(b + 0x0B);
         if (bps != d->bs || !rsvd || !d->rw(d->ctx, p->start + rsvd, 1, fat, false)) { o->verdict = SAFE_UNREADABLE; return; }
         bool dirty;
         if (p->fs == FS_FAT32) { u32 e1 = rd32(fat + 4); dirty = !(e1 & 0x08000000u) || !(e1 & 0x04000000u) || (b[0x41] & 1); }
         else { u16 e1 = rd16(fat + 2); dirty = !(e1 & 0x8000) || !(e1 & 0x4000) || (b[0x25] & 1); }
-        o->verdict = dirty ? SAFE_DIRTY : SAFE_OK; return;
+        o->verdict = dirty ? SAFE_DIRTY : SAFE_OK;
+        if (!dirty && p->fs == FS_FAT32) o->min_bytes = fat32_min_sectors(d, p->start) * d->bs;
+        return;
     }
     case FS_EXT: {
         static u8 b[4096];                                       /* um setor, de 512 ou de 4096 bytes */

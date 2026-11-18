@@ -62,6 +62,7 @@ if ($clang -and $nasm) {
     Run $nasm @("-f", "bin", "-DMBR", "src\platform\bios\boot.asm", "-o", "build\bios\mbr.bin")
     Run $nasm @("-f", "bin", "-DVBR", "src\platform\bios\boot.asm", "-o", "build\bios\vbr.bin")
     Run $nasm @("-f", "bin", "-i", "build/bios/", "src\platform\bios\stub.asm", "-o", "build\bios\BIOS.SYS")
+    Run $nasm @("-f", "bin", "tools\fakeother.asm", "-o", "build\fakeother.bin")   # the "other system" MBR of the phase 3 tests
     Run gcc @("-O2", "-Wall", "-Wextra", "tools\biosboot.c", "-o", "build\biosboot.exe")
     Run gcc @("-O2", "-Wall", "-Wextra", "tools\fat32_test.c", "src\core\fat32.c", "src\core\part.c", "-o", "build\fat32_test.exe")
     Run gcc @("-O2", "-Wall", "-Wextra", "tools\part_test.c", "src\core\part.c", "src\core\fat32.c", "-o", "build\part_test.exe")
@@ -329,6 +330,28 @@ if (-not $NoTests) {
         # becomes the USB drive's, every file swapped only after its new copy was checked
         foreach ($k in "inst-uefi", "inst-bios") { Run .\build\install_test.exe @("$ft\src", "$ft\$k.img", "600", "--update") | Out-Null; Run .\build\fat32_test.exe @("$ft\$k.img", "--fsck") | Out-Null }
         Ok "update an installation (UEFI and BIOS): program replaced and checked, the person's texts and settings untouched - OK"
+        # phase 3, a PC with BIOS only: next to "Windows" on an MBR disk (the old entries keep their positions and bytes, the
+        # original MBR code kept in FOLIO\OTHERMBR.BIN), update, uninstall: the table and the MBR back to the original
+        $wb = "$ft\winbios.img"; Remove-Item $wb -ErrorAction SilentlyContinue
+        Run .\build\install_test.exe @("$ft\src", $wb, "1400", "--windows-bios", "build\fakeother.bin") | Out-Null
+        Copy-Item $wb "$ft\winbios-orig.img"
+        Run .\build\install_test.exe @("$ft\src", $wb, "1400", "--alongside", "--bios") | Out-Null
+        Run .\build\fat32_test.exe @($wb, "--fsck") | Out-Null
+        Run .\build\install_test.exe @("$ft\src", $wb, "1400", "--update", "--bios") | Out-Null
+        Run .\build\install_test.exe @("$ft\src", $wb, "1400", "--remove") | Out-Null
+        Run .\build\install_test.exe @("$ft\src", $wb, "1400", "--same-table", "$ft\winbios-orig.img") | Out-Null
+        Remove-Item $wb, "$ft\winbios-orig.img"
+        # and with no free space: an MBR disk with one FAT32 filling it is shrunk, FolioOS goes after it, then uninstalled
+        Run .\build\install_test.exe @("$ft\src", $wb, "1400", "--mbr-fat32", "build\fakeother.bin") | Out-Null
+        Copy-Item $wb "$ft\winbios-orig.img"
+        Run .\build\install_test.exe @("$ft\src", $wb, "1400", "--shrink-ntfs", "--bios") | Out-Null
+        Run .\build\fat32_test.exe @($wb, "--fsck") | Out-Null
+        Run .\build\install_test.exe @("$ft\src", $wb, "1400", "--remove") | Out-Null
+        Run .\build\install_test.exe @("$ft\src", $wb, "1400", "--same-table", "$ft\winbios-orig.img") | Out-Null
+        Run .\build\fat32_test.exe @($wb, "--fsck") | Out-Null
+        Remove-Item $wb, "$ft\winbios-orig.img"
+        Get-ChildItem "$ft\src\DOCUMENTS" -Directory -Filter "computer-*" | Remove-Item -Recurse -Force
+        Ok "next to Windows on a PC with BIOS only: MBR entries untouched, original MBR kept, update, uninstall back to the original; also by shrinking - OK"
         # where the texts live, chosen at install time: docs_place= in the installed CONFIG.INI (on the USB drive: no DOCUMENTS on the disk)
         foreach ($m in "--docs-stick", "--docs-both") { Run .\build\install_test.exe @("$ft\src", "$ft\docs.img", "600", $m) | Out-Null; Remove-Item "$ft\docs.img" }
         # uninstall a whole-disk install (UEFI and BIOS): texts to the USB drive, the disk left empty (no table)
@@ -429,6 +452,48 @@ if (-not $NoTests) {
         Run .\build\fscheck_test.exe @("--shrunk", "$ft\big.img", "983") | Out-Null
         Run .\build\fat32_test.exe @("$ft\big.img", "--fsck") | Out-Null
         Ok "installer with no free space: NTFS made by Windows shrunk without moving data, FolioOS installed after it (engine and screen) - OK"
+        # FAT32 and exFAT made by Windows: shrink and grow without moving data (every file the same, the volume back byte
+        # for byte), then the whole installer on a PC disk (EFI + FAT32/exFAT, no free space): shrink, install, uninstall
+        foreach ($k in "fat32", "exfat") {
+            foreach ($n in "data", "pc") {
+                $gi = [IO.File]::OpenRead("tests\fixtures\$k-$n.img.gz"); $gz = New-Object IO.Compression.GZipStream($gi, [IO.Compression.CompressionMode]::Decompress)
+                $go = [IO.File]::Create("$ft\$k-$n.img"); $gz.CopyTo($go); $go.Dispose(); $gz.Dispose(); $gi.Dispose()
+            }
+            Run .\build\fscheck_test.exe @("--$k", "$ft\$k-data.img") | Out-Null
+            if ($k -eq "fat32") { Run .\build\fat32_test.exe @("$ft\$k-data.img", "--fsck") | Out-Null }
+            Copy-Item "$ft\$k-pc.img" "$ft\$k-pc-orig.img"
+            Run .\build\install_test.exe @("$ft\src", "$ft\$k-pc.img", "1100", "--shrink-ntfs") | Out-Null
+            Run .\build\fat32_test.exe @("$ft\$k-pc.img", "--fsck") | Out-Null
+            Run .\build\install_test.exe @("$ft\src", "$ft\$k-pc.img", "1100", "--remove") | Out-Null
+            Run .\build\install_test.exe @("$ft\src", "$ft\$k-pc.img", "1100", "--same-table", "$ft\$k-pc-orig.img") | Out-Null
+            Remove-Item "$ft\$k-data.img", "$ft\$k-pc.img", "$ft\$k-pc-orig.img"
+            Get-ChildItem "$ft\src\DOCUMENTS" -Directory -Filter "computer-*" | Remove-Item -Recurse -Force   # the copied texts (keeps the test USB drive the same)
+        }
+        Ok "FAT32 and exFAT made by Windows: shrink and grow without moving data; install next to them and uninstall - OK"
+        # partition manager, engine: create, grow, shrink, grow again, format, delete, grow into the freed space (FAT32 made
+        # here gets a FAT with room to grow), every step consistent
+        $pm = "$ft\pm.img"; Remove-Item $pm -ErrorAction SilentlyContinue
+        foreach ($a in @(@("--op-create", "1", "300", "DADOS"), @("--op-create", "400", "200", "OUTRO"), @("--op-resize", "1", "380"), @("--op-resize", "2", "150"),
+                         @("--op-resize", "2", "300"), @("--op-format", "2", "NOVO"), @("--op-delete", "1"), @("--op-resize", "1", "500"))) {
+            Run .\build\install_test.exe (@("$ft\src", $pm, "1000") + $a) | Out-Null
+            Run .\build\fat32_test.exe @($pm, "--fsck") | Out-Null
+        }
+        $l = (& .\build\install_test.exe "$ft\src" $pm 1000 --list) -join "`n"
+        if ($l -notmatch "^1 819200 1024000 FAT32 NOVO$") { throw "partition manager (engine): unexpected table: $l" }
+        # and the screen, keyboard only: create on an empty disk, shrink it with the slider, then delete it (word APAGAR)
+        Remove-Item $pm; $xf = [IO.File]::Create($pm); $xf.SetLength(1000MB); $xf.Close()
+        $ol = $env:FOLIO_PLATFORM_LANG; $env:FOLIO_PLATFORM_LANG = "pt-BR"; $env:FOLIO_DISKS = $pm
+        try {
+            Fresh; Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\particoes.txt", "--out", "build\shots") | Out-Null
+            $l = @(& .\build\install_test.exe "$ft\src" $pm 1000 --list)
+            if ($l.Count -ne 1 -or $l[0] -notmatch "^1 2048 (\d+) FAT32 DATA$" -or [int64]$Matches[1] -ge 2045952) { throw "partition manager (screen): expected one smaller FAT32 'DATA', got: $($l -join '; ')" }
+            Run .\build\fat32_test.exe @($pm, "--fsck") | Out-Null
+            Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\particoes_apagar.txt", "--out", "build\shots") | Out-Null
+            $l = @(& .\build\install_test.exe "$ft\src" $pm 1000 --list | Where-Object { $_ -match "FAT32" })
+            if ($l.Count) { throw "partition manager (screen): the partition was not deleted: $($l -join '; ')" }
+        } finally { $env:FOLIO_DISKS = $null; $env:FOLIO_PLATFORM_LANG = $ol }
+        Remove-Item $pm
+        Ok "partition manager: create, resize, format, delete (engine), and create, shrink, delete on the screen - OK"
         # uninstall through the screen: texts to the USB drive, FolioOS's partition and \EFI\FolioOS gone, the NTFS back
         # to the size Windows made; the table and the NTFS boot sector must be byte for byte the original ones
         # (the disk installed by the engine from the full USB drive: it has texts in DOCUMENTS to copy back)

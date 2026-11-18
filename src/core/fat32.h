@@ -51,4 +51,5 @@ int  fat_rename(Fat *f, FatNode *n, const uint16_t *newname);
 int  fat_flush(Fat *f);
 uint32_t fat_free_clusters(Fat *f);
 bool fat32_format(FatIo io, void *ctx, uint64_t part_lba, uint64_t nsec, const char *label, uint32_t serial);
+bool fat32_format2(FatIo io, void *ctx, uint64_t part_lba, uint64_t nsec, uint64_t plan, const char *label, uint32_t serial);   /* FAT com folga para crescer até plan */
 #endif

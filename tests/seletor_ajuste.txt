@@ -10,7 +10,8 @@ key tab
 key right
 key right
 wait 200
-# do fim para cima: "Desligar", "Reiniciar", "Instalar o FolioOS…", a espera do seletor
+# do fim para cima: "Desligar", "Reiniciar", "Discos e partições…", "Instalar o FolioOS…", a espera do seletor
+key shift+tab
 key shift+tab
 key shift+tab
 key shift+tab

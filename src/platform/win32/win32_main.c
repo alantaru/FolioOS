@@ -111,6 +111,7 @@ bool pal_boot_entry_add(const char *desc, int part_num, u64 part_lba, u64 part_c
     (void)desc; (void)part_num; (void)part_lba; (void)part_count; (void)part_guid; (void)path; return false;
 }
 bool pal_boot_entry_remove(void) { printf("boot entry removed\n"); fflush(stdout); return true; }
+bool pal_chain_mbr(const u8 *code) { printf("chain other mbr: %02x %02x\n", code[0], code[1]); fflush(stdout); ExitProcess(0); }
 bool pal_boot_other(char *name, int cap) { const char *e = getenv("FOLIO_OTHER_OS"); if (!e || !*e) return false; snprintf(name, cap, "%s", e); return true; }
 void pal_boot_other_start(void) { printf("boot other: %s\n", getenv("FOLIO_OTHER_OS")); fflush(stdout); ExitProcess(0); }
 

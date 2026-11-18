@@ -33,7 +33,7 @@ typedef struct {
 
 enum { INST_OK, INST_ERR_READ, INST_ERR_WRITE, INST_ERR_SMALL, INST_ERR_BACKUP, INST_ERR_FORMAT,
        INST_ERR_COPY, INST_ERR_VERIFY, INST_ERR_BOOTCODE, INST_ERR_SOURCE,
-       INST_ERR_NOTGPT, INST_ERR_NOESP, INST_ERR_ESPFULL, INST_ERR_REGION, INST_ERR_SHRINK, INST_ERR_GROW };
+       INST_ERR_NOTGPT, INST_ERR_NOESP, INST_ERR_ESPFULL, INST_ERR_REGION, INST_ERR_SHRINK, INST_ERR_GROW, INST_ERR_RESIZE };
 typedef struct {
     int code; char path[160];
     uint64_t part_lba, part_count; uint8_t part_guid[16]; uint8_t disk_guid[16];   /* a partição do FolioOS */
@@ -59,9 +59,11 @@ typedef struct {
     int kind;                         /* FOUND_ALONGSIDE ou FOUND_WHOLE (o FolioOS é o único sistema do disco) */
     char version[16];                 /* do FOLIO/INSTALLED.ID ("" = instalação anterior a esse arquivo) */
     bool marked;                      /* tem o FOLIO/INSTALLED.ID (senão foi reconhecido pelo conteúdo) */
+    bool bios;                        /* ao lado num PC só BIOS: o MBR original está em FOLIO/OTHERMBR.BIN (fase 3) */
     uint64_t part_start, part_count; uint8_t part_guid[16];   /* a partição de dados do FolioOS */
     uint64_t esp_start;
-    int ntfs;                         /* o NTFS logo antes dela, que pode crescer de volta (-1 = nenhum) */
+    int ntfs;                         /* a partição logo antes dela (NTFS, FAT32 ou exFAT), que pode crescer de volta (-1 = nenhuma) */
+    int grow_fs;                      /* o sistema de arquivos dela (FS_*) */
     uint64_t ntfs_start, ntfs_count, ntfs_grow_to;   /* em setores; grow_to = o tamanho depois de crescer */
     int docs_files; uint64_t docs_bytes;               /* textos em DOCUMENTS (para a prévia) */
 } InstallFound;
@@ -74,5 +76,13 @@ void install_remove(const BlkDev *dev, const InstallSrc *src, const InstallOpts 
 /* Atualizar por um pendrive mais novo: só o programa, as fontes, os idiomas, os temas e os teclados; os textos, a
  * música e os ajustes ficam. Cada arquivo é trocado inteiro (grava "<nome>.~new", confere, renomeia). */
 void install_update(const BlkDev *dev, const InstallSrc *src, const InstallOpts *o, const InstallFound *f, InstallResult *r);
+/* Gerenciador de partições: cada operação guarda antes o começo do disco no pendrive (src->backup), e grava na
+ * ordem que sobrevive a uma queda de energia. create: FAT32 novo num espaço livre (alinhado a 1 MiB); delete: tira
+ * a entrada e zera o começo do volume; format: FAT32 (o tipo da entrada passa a ser de dados, a EFI fica EFI);
+ * resize: NTFS, FAT32 ou exFAT sem mover dados (crescer só para o espaço livre logo depois). */
+void part_op_create(const BlkDev *dev, const InstallSrc *src, uint64_t start, uint64_t count, const char *label, InstallResult *r);
+void part_op_delete(const BlkDev *dev, const InstallSrc *src, uint64_t part_start, InstallResult *r);
+void part_op_format(const BlkDev *dev, const InstallSrc *src, uint64_t part_start, const char *label, InstallResult *r);
+void part_op_resize(const BlkDev *dev, const InstallSrc *src, uint64_t part_start, uint64_t new_count, InstallResult *r);
 const char *install_error(int code);           /* texto em inglês (a interface traduz) */
 #endif

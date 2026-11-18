@@ -385,6 +385,97 @@ if ((-not $Only -or $dc.name -match $Only) -and (Test-Path build\install_test.ex
 }
 }
 
+# ------------------------------------------------------------ dual boot on a PC with BIOS only (ROADMAP phase 3)
+# A disk like an old PC with Windows (MBR, the active partition at the start, free space): its MBR code is
+# build\fakeother.bin, which prints FAKE OTHER STARTED on the serial port. A: from the USB drive, install next to it
+# (FolioOS's MBR boots FolioOS's partition, the original code is kept in FOLIO\OTHERMBR.BIN); B: only the disk, no
+# key: FolioOS's chooser starts the original MBR; C: a key: the editor; D: remove from the USB drive; E: only the disk:
+# the original MBR runs directly (no chooser) and the table is the one before.
+if ((-not $Only -or "dual-bios-ide" -match $Only) -and (Test-Path build\install_test.exe) -and (Test-Path build\fakeother.bin)) {
+    $dd = "$lab\dual-bios-ide"; if (Test-Path $dd) { Remove-Item -Recurse -Force $dd }; New-Item -ItemType Directory $dd | Out-Null
+    $dualRes = [ordered]@{ name = "dual-bios-ide"; install = "FAIL"; other = "FAIL"; writer = "FAIL"; untouched = "FAIL"; removed = "FAIL"; after = "FAIL" }
+    & .\build\install_test.exe $stage "$dd\win.img" 1400 --windows-bios build\fakeother.bin | Out-Null
+    Copy-Item "$dd\win.img" "$dd\before.img"
+    Copy-Item "$lab\base.img" "$dd\stick.img"
+    function Start-Bios([bool]$stick, [string]$tag) {
+        $script:port++
+        $a = @("-machine", "pc", "-m", "1024", "-accel", "tcg", "-display", "none", "-no-shutdown",
+               "-qmp", "tcp:127.0.0.1:$script:port,server=on,wait=off", "-serial", "file:$dd\serial-$tag.txt", "-vga", "std")
+        if ($stick) { $a += @("-drive", "if=none,id=stick,format=raw,file=$dd\stick.img", "-device", "ide-hd,drive=stick,bus=ide.0,bootindex=0",
+                              "-drive", "if=none,id=hd,format=raw,file=$dd\win.img", "-device", "ide-hd,drive=hd,bus=ide.1,bootindex=1") }
+        else { $a += @("-drive", "if=none,id=hd,format=raw,file=$dd\win.img", "-device", "ide-hd,drive=hd,bus=ide.0,bootindex=0") }
+        $argline = ($a | ForEach-Object { if ($_ -match '\s') { "`"$_`"" } else { $_ } }) -join " "
+        $pp = Start-Process -FilePath "$QemuDir\qemu-system-x86_64.exe" -ArgumentList $argline -PassThru -WindowStyle Hidden -RedirectStandardError "$dd\qemu-$tag.txt"
+        return @($pp, [Qmp]::new($script:port))
+    }
+    function Wait-Paper2($q, [string]$tag, [int]$secs, [scriptblock]$each) {
+        for ($i = 0; $i -lt $secs / 3; $i++) {
+            Start-Sleep 3; if ($each) { & $each }
+            $q.Shot("$dd\$tag.png"); if (Test-Path "$dd\$tag.png") { $s = Read-Shot "$dd\$tag.png"; if ($s.paper -gt 0.25) { return $true }; Remove-Item "$dd\$tag.png" }
+        }
+        return $false
+    }
+    function Wait-Serial([string]$tag, [string]$pattern, [int]$secs) {
+        for ($i = 0; $i -lt $secs / 3; $i++) { Start-Sleep 3; if ((Test-Path "$dd\serial-$tag.txt") -and (Select-String -Quiet -Path "$dd\serial-$tag.txt" -Pattern $pattern)) { return $true } }
+        return $false
+    }
+    Write-Host "[dual-bios-ide]" -ForegroundColor Cyan
+    try {
+        # A: install next to it from the USB drive
+        $pq = Start-Bios $true "A"; $p = $pq[0]; $q = $pq[1]
+        if (Wait-Paper2 $q "A1-boot" 180 $null) {
+            $q.Key(@("ctrl", "k")); Start-Sleep 1; $q.Write("install folioos"); Start-Sleep 1; $q.Key(@("ret")); Start-Sleep 3
+            $q.Shot("$dd\A2-options.png")
+            $q.Key(@("shift", "tab")); Start-Sleep 1; $q.Key(@("ret")); Start-Sleep 2; $q.Shot("$dd\A3-confirm.png")
+            $q.Key(@("shift", "tab")); Start-Sleep 1; $q.Key(@("ret")); Start-Sleep 180
+            $q.Shot("$dd\A4-installed.png")
+        }
+        $q.Quit(); if (-not $p.WaitForExit(15000)) { Stop-Process -Id $p.Id -Force }
+        $ErrorActionPreference = "Continue"
+        $null = & .\build\fat32_test.exe "$dd\win.img" --fsck 2>&1; $fsok = $LASTEXITCODE -eq 0
+        & .\build\fatcat.exe "$dd\win.img" "FOLIO/OTHERMBR.BIN" "$dd\OTHERMBR.BIN" 2>$null
+        $ErrorActionPreference = "Stop"
+        if ($fsok -and (Test-Path "$dd\OTHERMBR.BIN") -and (Get-Item "$dd\OTHERMBR.BIN").Length -ge 440) { $dualRes.install = "OK" }
+        $b0 = [IO.File]::ReadAllBytes("$dd\before.img")[446..509]; $b1 = New-Object byte[] 512; $fs = [IO.File]::OpenRead("$dd\win.img"); [void]$fs.Read($b1, 0, 512); $fs.Close()
+        $same = $true; for ($k = 0; $k -lt 64; $k++) { if ($b0[$k] -ne 0 -and $b0[$k] -ne $b1[446 + $k]) { $same = $false } }   # the old entries, byte for byte
+        if ($same) { $dualRes.untouched = "OK" }
+        # B: only the disk, no key: FolioOS's chooser, then the original MBR
+        $pq = Start-Bios $false "B"; $p = $pq[0]; $q = $pq[1]
+        $null = Wait-Serial "B" "FAKE OTHER STARTED" 180
+        $q.Shot("$dd\B-other.png"); $q.Quit(); if (-not $p.WaitForExit(15000)) { Stop-Process -Id $p.Id -Force }
+        $ser = Get-Content -Raw "$dd\serial-B.txt" -ErrorAction SilentlyContinue
+        if ($ser -and $ser.IndexOf("boot chooser: no key") -ge 0 -and $ser.IndexOf("FAKE OTHER STARTED") -gt $ser.IndexOf("boot chooser: no key")) { $dualRes.other = "OK" }
+        # C: only the disk, a key during the wait: the editor
+        $pq = Start-Bios $false "C"; $p = $pq[0]; $q = $pq[1]
+        $ok = Wait-Paper2 $q "C-writer" 180 { $q.Key(@("spc")) }
+        $q.Quit(); if (-not $p.WaitForExit(15000)) { Stop-Process -Id $p.Id -Force }
+        $ser = Get-Content -Raw "$dd\serial-C.txt" -ErrorAction SilentlyContinue
+        if ($ok -and $ser -and $ser.IndexOf("boot chooser: key, writing") -ge 0 -and $ser.IndexOf("FAKE OTHER") -lt 0) { $dualRes.writer = "OK" }
+        # D: remove from the USB drive (the first option); E: only the disk: the original MBR directly, the table as before
+        $pq = Start-Bios $true "D"; $p = $pq[0]; $q = $pq[1]
+        if (Wait-Paper2 $q "D1-boot" 180 $null) {
+            $q.Key(@("ctrl", "k")); Start-Sleep 1; $q.Write("remove folioos"); Start-Sleep 1; $q.Key(@("ret")); Start-Sleep 3
+            $q.Shot("$dd\D2-options.png")
+            $q.Key(@("shift", "tab")); Start-Sleep 1; $q.Key(@("ret")); Start-Sleep 2; $q.Shot("$dd\D3-confirm.png")
+            $q.Key(@("shift", "tab")); Start-Sleep 1; $q.Key(@("ret")); Start-Sleep 90
+            $q.Shot("$dd\D4-removed.png")
+        }
+        $q.Quit(); if (-not $p.WaitForExit(15000)) { Stop-Process -Id $p.Id -Force }
+        $ErrorActionPreference = "Continue"
+        $null = & .\build\install_test.exe $stage "$dd\win.img" 1400 --same-table "$dd\before.img" 2>&1; if ($LASTEXITCODE -eq 0) { $dualRes.removed = "OK" }
+        $ErrorActionPreference = "Stop"
+        $pq = Start-Bios $false "E"; $p = $pq[0]; $q = $pq[1]
+        $null = Wait-Serial "E" "FAKE OTHER STARTED" 60
+        $q.Shot("$dd\E-other.png"); $q.Quit(); if (-not $p.WaitForExit(15000)) { Stop-Process -Id $p.Id -Force }
+        $ser = Get-Content -Raw "$dd\serial-E.txt" -ErrorAction SilentlyContinue
+        if ($ser -and $ser.IndexOf("FAKE OTHER STARTED") -ge 0 -and $ser.IndexOf("boot chooser") -lt 0) { $dualRes.after = "OK" }
+    } catch { Write-Host "  $_" -ForegroundColor Red }
+    "  install {0} | other entries untouched {1} | no key: other system {2} | key: FolioOS {3}" -f $dualRes.install, $dualRes.untouched, $dualRes.other, $dualRes.writer
+    "  removed: table and MBR as before {0} | then the original MBR starts directly {1}" -f $dualRes.removed, $dualRes.after
+    if (-not $Keep) { Remove-Item "$dd\win.img", "$dd\before.img", "$dd\stick.img" -ErrorAction SilentlyContinue }
+    $dualAll += $dualRes
+}
+
 $md = "# FolioOS QEMU lab - $(Get-Date -Format 'yyyy-MM-dd HH:mm')`n`n| Config | Boot | s | Keyboard | Mouse | Sound | Save | Volume | Diagnostics | Disks | Install | Video |`n|---|---|---|---|---|---|---|---|---|---|---|---|`n"
 foreach ($r in $results) { $md += "| $($r.config) | $($r.boot) | $($r.seconds) | $($r.keyboard) | $($r.mouse) | $($r.sound) | $($r.save) | $($r.fs) | $($r.diag) | $($r.disks) | $($r.install) | $($r.video) |`n" }
 if ($dualAll.Count) {

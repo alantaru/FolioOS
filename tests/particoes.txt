@@ -1,0 +1,40 @@
+# Gerenciador de partições (FOLIO_DISKS = um disco vazio de 1000 MB), só pelo teclado, em pt-BR:
+# cria uma partição FAT32 no espaço livre (o tamanho todo) e depois a encolhe pelo deslizante.
+# O build confere com install_test --list e fat32_test --fsck.
+wait 300
+key esc
+wait 200
+key ctrl+k
+type Discos e parti
+key enter
+wait 400
+assert_keywin Disks and partitions
+shot particoes1_lista.png
+# o espaço livre já vem marcado; Shift+Tab = "Criar uma partição FAT32"
+key shift+tab
+key enter
+wait 200
+shot particoes2_criar.png
+# Shift+Tab = "Criar"
+key shift+tab
+key enter
+wait 1500
+shot particoes3_criada.png
+# a partição nova vem marcada; Tab = ela, Tab = "Redimensionar"
+key tab
+key tab
+key enter
+wait 200
+# Tab = o deslizante; ← três vezes (menor); Tab, Tab = "Voltar", "Aplicar"
+key tab
+key left
+key left
+key left
+wait 100
+shot particoes4_redimensionar.png
+key tab
+key tab
+key enter
+wait 1500
+shot particoes5_pronto.png
+assert_keywin Disks and partitions
