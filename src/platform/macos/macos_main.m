@@ -135,6 +135,18 @@ static bool to_p(int vol, const char *path, char *out, size_t cap) {
     while (n > 1 && out[n - 1] == '/') out[--n] = 0;
     return true;
 }
+/* discos: o simulador nunca toca nos discos do Mac */
+int pal_disk_count(void) { return 0; }
+bool pal_disk_info(int k, DiskInfo *o) { (void)k; (void)o; return false; }
+bool pal_disk_io(int k, u64 lba, u32 n, void *buf, bool w) { (void)k; (void)lba; (void)n; (void)buf; (void)w; return false; }
+bool pal_disk_flush(int k) { (void)k; return false; }
+bool pal_boot_entry_add(const char *desc, int part_num, u64 part_lba, u64 part_count, const u8 part_guid[16], const char *path) {
+    (void)desc; (void)part_num; (void)part_lba; (void)part_count; (void)part_guid; (void)path; return false;
+}
+bool pal_boot_entry_remove(void) { return false; }
+bool pal_boot_other(char *name, int cap) { (void)name; (void)cap; return false; }
+void pal_boot_other_start(void) {}
+
 int pal_vol_count(void) { return nroots; }
 bool pal_vol_info(int v, VolInfo *o) {
     if (v < 0 || v >= nroots) return false;

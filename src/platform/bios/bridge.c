@@ -14,7 +14,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "../uefi/efi.h"
-#include "fat32.h"
+#include "../../core/fat32.h"
 
 typedef uint8_t u8; typedef uint16_t u16; typedef uint32_t u32; typedef uint64_t u64; typedef int32_t i32;
 #define NOT_FOUND   EFI_ERR(14)
@@ -295,7 +295,7 @@ static EFI_STATUS EFIAPI bs_watchdog(UINTN a, UINT64 b, UINTN c, CHAR16 *d) { (v
 
 /* ============================================================ protocolos e handles */
 typedef struct { void *handle; const EFI_GUID *guid; void *iface; } Reg;
-static Reg regs[32]; static int nregs;
+static Reg regs[48]; static int nregs;
 static int h_image, h_con, h_gop, h_mouse, h_fs, h_pci, h_serial;
 static void reg(void *h, const EFI_GUID *g, void *i) { if (nregs < COUNT(regs)) { regs[nregs].handle = h; regs[nregs].guid = g; regs[nregs].iface = i; nregs++; } }
 static EFI_STATUS EFIAPI bs_handleprotocol(EFI_HANDLE h, EFI_GUID *g, void **i) {
@@ -325,6 +325,7 @@ static const EFI_GUID G_SFS    = { 0x964e5b22, 0x6459, 0x11d2, { 0x8e, 0x39, 0x0
 static const EFI_GUID G_FINFO  = { 0x09576e92, 0x6d3f, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b } };
 static const EFI_GUID G_FSINFO = { 0x09576e93, 0x6d3f, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b } };
 static const EFI_GUID G_DP     = { 0x09576e91, 0x6d3f, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b } };
+static const EFI_GUID G_BIO    = { 0x964e5b21, 0x6459, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b } };
 static const EFI_GUID G_RBIO   = { 0x2f707ebb, 0x4a1a, 0x11d4, { 0x9a, 0x38, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d } };
 static const EFI_GUID G_SERIAL = { 0xBB25CF6F, 0xF1D4, 0x11D2, { 0x9A, 0x0C, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0xFD } };
 
@@ -430,19 +431,61 @@ static void EFIAPI rt_reset(EFI_RESET_TYPE t, EFI_STATUS s, UINTN n, void *d) {
 }
 
 /* ============================================================ disco (INT 13h) */
-static u8 drive; static bool lba_ok; static u32 heads, spt;
-static bool disk_init(void) {
+/* Cada disco do BIOS (o de boot e os discos rígidos 80h…) vira um EFI_BLOCK_IO, para o instalador.
+ * Caminho de dispositivo: nó de fabricante com o número do drive + nó do barramento (EDD 3.0: ATA, SATA,
+ * USB, SCSI), assim o FolioOS sabe o tipo do disco e qual é o de boot (o volume tem o mesmo começo). */
+#define LOW_EDD 0x5700
+typedef struct {
+    EFI_BLOCK_IO_PROTOCOL bio;             /* primeiro campo: o ponteiro do protocolo é o do disco */
+    EFI_BLOCK_IO_MEDIA media;
+    u8 drive; bool lba_ok; u32 heads, spt;
+    u8 dp[21 + 10 + 4]; int handle;
+} BDisk;
+static BDisk bdisks[8]; static int nbdisks;
+static BDisk *bootd;
+static bool bdisk_init(BDisk *d, u8 drv) {
+    memset(d, 0, sizeof *d); d->drive = drv;
     RmRegs r; memset(&r, 0, sizeof r);
-    r.eax = 0x4100; r.ebx = 0x55AA; r.edx = drive;
+    r.eax = 0x4100; r.ebx = 0x55AA; r.edx = drv;
     rm(0x13, &r);
-    lba_ok = !(r.eflags & 1) && (r.ebx & 0xFFFF) == 0xAA55 && (r.ecx & 1);
+    d->lba_ok = !(r.eflags & 1) && (r.ebx & 0xFFFF) == 0xAA55 && (r.ecx & 1);
+    u64 nsec = 0;
     memset(&r, 0, sizeof r);
-    r.eax = 0x0800; r.edx = drive;
+    r.eax = 0x0800; r.edx = drv;
     rm(0x13, &r);
-    if (!(r.eflags & 1)) { heads = ((r.edx >> 8) & 0xFF) + 1; spt = r.ecx & 0x3F; }
-    return lba_ok || spt;
+    if (!(r.eflags & 1)) {
+        d->heads = ((r.edx >> 8) & 0xFF) + 1; d->spt = r.ecx & 0x3F;
+        u32 cyl = (((r.ecx & 0xC0) << 2) | ((r.ecx >> 8) & 0xFF)) + 1;
+        nsec = (u64)cyl * d->heads * d->spt;
+    }
+    if (!d->lba_ok && !d->spt) return false;
+    /* parâmetros estendidos: tamanho real, removível e (EDD 3.0) o barramento */
+    u8 *p = (u8 *)LOW_EDD; memset(p, 0, 0x4A); *(u16 *)p = 0x4A;
+    char bus[9] = "";
+    if (d->lba_ok) {
+        memset(&r, 0, sizeof r); r.eax = 0x4800; r.edx = drv; r.esi = LOW_EDD; r.ds = 0;
+        rm(0x13, &r);
+        if (!(r.eflags & 1)) {
+            u64 tot = *(u64 *)(p + 0x10);
+            if (tot && tot < (1ull << 40)) nsec = tot;
+            d->media.RemovableMedia = (*(u16 *)(p + 2) & 4) != 0;
+            if (*(u16 *)p >= 0x42 && *(u16 *)(p + 0x1E) == 0xBEDD) { memcpy(bus, p + 0x28, 8); bus[8] = 0; }
+            puts_("  drive "); putn(drv, 16); puts_("h: EDD size "); putn(*(u16 *)p, 16); puts_(" key "); putn(*(u16 *)(p + 0x1E), 16); puts_(" bus \""); puts_(bus); puts_("\"\r\n");
+        }
+    }
+    if (!nsec) return false;
+    d->media.MediaId = drv; d->media.MediaPresent = 1; d->media.BlockSize = 512; d->media.LastBlock = nsec - 1;
+    /* caminho: fabricante (GUID do FolioOS + drive), barramento, fim */
+    static const u8 vguid[16] = { 0x46, 0x4F, 0x4C, 0x49, 0x4F, 0x42, 0x49, 0x4F, 0x53, 0x44, 0x52, 0x49, 0x56, 0x45, 0x00, 0x01 };
+    u8 *q = d->dp;
+    q[0] = 1; q[1] = 4; q[2] = 21; q[3] = 0; memcpy(q + 4, vguid, 16); q[20] = drv; q += 21;
+    u8 sub = !memcmp(bus, "SATA", 4) ? 0x12 : !memcmp(bus, "ATAPI", 5) || !memcmp(bus, "ATA", 3) ? 0x01 : !memcmp(bus, "USB", 3) ? 0x05 : !memcmp(bus, "SCSI", 4) ? 0x02 : 0;
+    if (sub) { u8 len = sub == 0x12 ? 10 : sub == 0x05 ? 6 : 8; q[0] = 3; q[1] = sub; q[2] = len; q[3] = 0; memset(q + 4, 0, len - 4u); q += len; }
+    q[0] = 0x7F; q[1] = 0xFF; q[2] = 4; q[3] = 0;
+    return true;
 }
-static bool disk_rw(u64 lba, u32 n, u8 *buf, bool w) {
+static bool drive_rw(BDisk *d, u64 lba, u32 n, u8 *buf, bool w) {
+    u8 drive = d->drive; bool lba_ok = d->lba_ok; u32 heads = d->heads, spt = d->spt;
     while (n) {
         u32 k = n > BOUNCE_SECS ? BOUNCE_SECS : n;
         if (!lba_ok) k = 1;
@@ -470,10 +513,40 @@ static bool disk_rw(u64 lba, u32 n, u8 *buf, bool w) {
     }
     return true;
 }
+static bool disk_rw(u64 lba, u32 n, u8 *buf, bool w) { return drive_rw(bootd, lba, n, buf, w); }
 static bool fat_io(void *ctx, u64 lba, u32 n, void *buf, bool w) { (void)ctx; return disk_rw(lba, n, buf, w); }
 
-/* ============================================================ sistema de arquivos (FAT32 -> EFI_FILE_PROTOCOL) */
 static Fat fat;
+static EFI_STATUS bio_rw(EFI_BLOCK_IO_PROTOCOL *b, UINT32 m, UINT64 lba, UINTN sz, void *buf, bool w) {
+    BDisk *d = (BDisk *)b;
+    if (m != d->media.MediaId) return EFI_ERR(13);
+    if (sz % 512 || lba + sz / 512 > d->media.LastBlock + 1) return EFI_ERR(2);
+    if (w && d == bootd) fat_flush(&fat);           /* o cache do FAT32 do volume de boot vai antes */
+    return drive_rw(d, lba, (u32)(sz / 512), buf, w) ? EFI_SUCCESS : DEV_ERROR;
+}
+static EFI_STATUS EFIAPI bio_read(EFI_BLOCK_IO_PROTOCOL *b, UINT32 m, UINT64 lba, UINTN sz, void *buf) { return bio_rw(b, m, lba, sz, buf, false); }
+static EFI_STATUS EFIAPI bio_write(EFI_BLOCK_IO_PROTOCOL *b, UINT32 m, UINT64 lba, UINTN sz, void *buf) { return bio_rw(b, m, lba, sz, buf, true); }
+static EFI_STATUS EFIAPI bio_flush(EFI_BLOCK_IO_PROTOCOL *b) { (void)b; return EFI_SUCCESS; }
+static EFI_STATUS EFIAPI bio_reset(EFI_BLOCK_IO_PROTOCOL *b, BOOLEAN x) { (void)b; (void)x; return EFI_SUCCESS; }
+/* disco de boot + discos rígidos que o BIOS informa (BDA 0x475) */
+static bool disks_scan(u8 boot) {
+    if (!bdisk_init(&bdisks[0], boot)) return false;
+    bootd = &bdisks[0]; nbdisks = 1;
+    u8 nhd = *(u8 *)0x475; if (nhd > 8) nhd = 8;
+    for (u8 k = 0; k < nhd && nbdisks < COUNT(bdisks); k++) {
+        u8 drv = (u8)(0x80 + k);
+        if (drv == boot) continue;
+        if (bdisk_init(&bdisks[nbdisks], drv)) nbdisks++;
+    }
+    for (int i = 0; i < nbdisks; i++) {
+        BDisk *d = &bdisks[i];
+        d->bio.Revision = 0x10000; d->bio.Media = &d->media;
+        d->bio.Reset = bio_reset; d->bio.ReadBlocks = bio_read; d->bio.WriteBlocks = bio_write; d->bio.FlushBlocks = bio_flush;
+    }
+    return true;
+}
+
+/* ============================================================ sistema de arquivos (FAT32 -> EFI_FILE_PROTOCOL) */
 static void fat_now(u16 *d, u16 *t) {
     EFI_TIME e; rt_gettime(&e, 0);
     if (e.Year < 1980) return;
@@ -798,13 +871,13 @@ __attribute__((section(".text.entry"))) void bridge_main(BootInfo *info) {
     ser_init();
     puts_("FolioOS BIOS bridge: protected mode\r\n");
     if (bi->magic != 0x464F4C49) fatal("bad BootInfo");
-    drive = *bi->drive;
+    u8 boot_drive = *bi->drive;
     calibrate();
     mem_init(); pool_init();
     { u32 total = 0; for (int i = 0; i < nranges; i++) total += ranges[i].pages / 256; puts_("memory: "); putn(total, 10); puts_(" MB, CPU "); putn((u32)(tsc_per_us), 10); puts_(" MHz\r\n"); }
     numlock = (*(u8 *)0x417 & 0x20) != 0;
-    if (!disk_init()) fatal("the BIOS gives no access to the boot disk (INT 13h)");
-    puts_(lba_ok ? "disk: LBA\r\n" : "disk: CHS\r\n");
+    if (!disks_scan(boot_drive)) fatal("the BIOS gives no access to the boot disk (INT 13h)");
+    puts_(bootd->lba_ok ? "disk: LBA, " : "disk: CHS, "); putn((u32)nbdisks, 10); puts_(" disk(s) found\r\n");
     if (!mount_boot_volume()) fatal("FAT32 volume with FOLIO\\BIOS.SYS not found");
     fat.now = fat_now;
     puts_("volume: "); puts_(fat.label[0] ? fat.label : "(no label)"); puts_("\r\n");
@@ -847,7 +920,8 @@ __attribute__((section(".text.entry"))) void bridge_main(BootInfo *info) {
     st.ConIn = &ci; st.ConOut = &co; st.StdErr = &co; st.ConsoleInHandle = &h_con; st.ConsoleOutHandle = &h_gop; st.StandardErrorHandle = &h_gop;
     st.RuntimeServices = &rt; st.BootServices = &bs;
     reg(&h_con, &G_TIEX, &cix);
-    reg(&h_fs, &G_SFS, &sfs); reg(&h_fs, &G_DP, (void *)dp_end);
+    reg(&h_fs, &G_SFS, &sfs); reg(&h_fs, &G_DP, bootd->dp);   /* o volume fica "dentro" do disco de boot */
+    for (int i = 0; i < nbdisks; i++) { reg(&bdisks[i].handle, &G_BIO, &bdisks[i].bio); reg(&bdisks[i].handle, &G_DP, bdisks[i].dp); }
     reg(&h_image, &G_LIMG, &li);
     reg(&h_pci, &G_RBIO, rbio_marker);
     if (com1) reg(&h_serial, &G_SERIAL, &sio);

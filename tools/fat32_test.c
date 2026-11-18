@@ -7,7 +7,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../src/platform/bios/fat32.h"
+#include "../src/core/fat32.h"
+#include "../src/core/part.h"
 
 typedef uint8_t u8; typedef uint16_t u16; typedef uint32_t u32; typedef uint64_t u64;
 static FILE *img;
@@ -131,10 +132,18 @@ static void fsck(void) {
     free(seen);
 }
 
+/* volumes FAT32 da imagem (MBR, GPT ou sem tabela), pela mesma leitura de tabelas do instalador */
+static int fat_volumes(u64 *lba, int cap) {
+    _fseeki64(img, 0, SEEK_END); u64 size = (u64)_ftelli64(img);
+    BlkDev d = { io, 0, size / 512, 512, 0 };
+    static PartTable t; int n = 0;
+    if (!part_read(&d, &t)) return 0;
+    for (int i = 0; i < t.n && n < cap; i++) if (t.p[i].fs == FS_FAT32) lba[n++] = t.p[i].start;
+    return n;
+}
 static bool mount(void) {
-    u8 mbr[512]; io(0, 0, 1, mbr, false);
-    u64 part = rd32(mbr + 0x1C6);
-    if (!fat_mount(&fat, io, 0, part) && !fat_mount(&fat, io, 0, 0)) { fprintf(stderr, "não montou\n"); return false; }
+    u64 lba[8];
+    if (fat_volumes(lba, 8) < 1 || !fat_mount(&fat, io, 0, lba[0])) { fprintf(stderr, "não montou\n"); return false; }
     return open_dirs();
 }
 
@@ -144,9 +153,12 @@ int main(int argc, char **argv) {
     if (argc > 3) rng = (u32)atoi(argv[3]);
     if (argc > 2 && !strcmp(argv[2], "--fsck")) {          /* só confere o volume (depois de uma sessão no laboratório) */
         img = fopen(argv[1], "rb"); if (!img) { perror(argv[1]); return 2; }
-        u8 mbr[512]; io(0, 0, 1, mbr, false);
-        if (!fat_mount(&fat, io, 0, rd32(mbr + 0x1C6)) && !fat_mount(&fat, io, 0, 0)) { fprintf(stderr, "não montou\n"); return 1; }
-        fsck();
+        u64 lba[8]; int nv = fat_volumes(lba, 8);
+        if (!nv) { fprintf(stderr, "nenhum volume FAT32\n"); return 1; }
+        for (int v = 0; v < nv; v++) {                       /* confere todos os volumes FAT32 do disco */
+            if (!fat_mount(&fat, io, 0, lba[v])) { fprintf(stderr, "não montou o volume em %llu\n", (unsigned long long)lba[v]); return 1; }
+            fsck();
+        }
         return fails ? 1 : 0;
     }
     img = fopen(argv[1], "r+b"); if (!img) { perror(argv[1]); return 2; }

@@ -1,0 +1,14 @@
+# Um PC com Linux sem espaço livre (FOLIO_DISKS = tests\fixtures\ext-linux: EFI + ext4 feito pelo Linux): o
+# FolioOS não encolhe ext4, então só há "o disco inteiro" e a dica de como abrir espaço pelo próprio Linux.
+# Nada é gravado (o build confere o disco byte a byte).
+wait 300
+key esc
+wait 200
+key ctrl+k
+type Instalar o FolioOS neste
+key enter
+wait 300
+assert_keywin Install FolioOS on this computer
+shot linux1_dica.png
+key esc
+wait 300

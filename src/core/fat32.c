@@ -4,7 +4,8 @@
 #include "fat32.h"
 #include <stddef.h>
 void *memcpy(void *, const void *, size_t); void *memset(void *, int, size_t);
-int memcmp(const void *, const void *, size_t); char *strchr(const char *, int);
+int memcmp(const void *, const void *, size_t);
+static bool in_set(const char *set, int c) { for (; *set; set++) if (*set == c) return true; return false; }
 
 typedef uint8_t u8; typedef uint16_t u16; typedef uint32_t u32; typedef uint64_t u64;
 #define EOC 0x0FFFFFFFu
@@ -13,8 +14,6 @@ static u32 rd32(const u8 *p) { return (u32)p[0] | (u32)p[1] << 8 | (u32)p[2] << 
 static void wr16(u8 *p, u16 v) { p[0] = (u8)v; p[1] = (u8)(v >> 8); }
 static void wr32(u8 *p, u32 v) { p[0] = (u8)v; p[1] = (u8)(v >> 8); p[2] = (u8)(v >> 16); p[3] = (u8)(v >> 24); }
 
-static u32 free_count = 0xFFFFFFFFu;
-static u32 memo_d, memo_i, memo_c;          /* última posição achada numa pasta */
 
 /* ------------------------------------------------------------ cache de setores (write-through) */
 static u8 *cache_get(Fat *f, u64 lba) {
@@ -74,18 +73,18 @@ static u32 alloc_cluster(Fat *f, u32 prev, bool zero) {
         if (prev && !fat_set(f, prev, c)) return 0;
         if (zero && !zero_cluster(f, c)) return 0;
         f->hint = c + 1;
-        if (free_count != 0xFFFFFFFFu && free_count) free_count--;
+        if (f->free_count != 0xFFFFFFFFu && f->free_count) f->free_count--;
         f->dirty_info = true;
         return c;
     }
     return 0;
 }
 static void free_chain(Fat *f, u32 c) {
-    memo_d = 0; memo_c = 0;
+    f->memo_d = 0; f->memo_c = 0;
     for (u32 guard = 0; !is_eoc(c) && guard < f->nclus; guard++) {
         u32 n = fat_get(f, c);
         fat_set(f, c, 0);
-        if (free_count != 0xFFFFFFFFu) free_count++;
+        if (f->free_count != 0xFFFFFFFFu) f->free_count++;
         if (c < f->hint) f->hint = c;
         c = n;
     }
@@ -104,7 +103,7 @@ static u32 nth(Fat *f, FatNode *n, u32 idx) {
 /* ------------------------------------------------------------ montagem */
 bool fat_mount(Fat *f, FatIo io, void *ctx, u64 part_lba) {
     memset(f, 0, sizeof *f);
-    memo_d = 0; memo_c = 0;
+    f->memo_d = 0; f->memo_c = 0;
     f->io = io; f->ctx = ctx; f->part = part_lba;
     u8 *b = cache_get(f, part_lba);
     if (!b || b[510] != 0x55 || b[511] != 0xAA) return false;
@@ -121,12 +120,12 @@ bool fat_mount(Fat *f, FatIo io, void *ctx, u64 part_lba) {
     f->fsinfo = rd16(b + 48);
     memcpy(f->label, b + 71, 11); f->label[11] = 0;
     for (int i = 10; i >= 0 && f->label[i] == ' '; i--) f->label[i] = 0;
-    free_count = 0xFFFFFFFFu; f->hint = 2;
+    f->free_count = 0xFFFFFFFFu; f->hint = 2;
     if (f->fsinfo && f->fsinfo < f->fat_lba) {
         u8 *s = cache_get(f, part_lba + f->fsinfo);
         if (s && rd32(s) == 0x41615252u && rd32(s + 484) == 0x61417272u) {
             u32 fc = rd32(s + 488), nx = rd32(s + 492);
-            if (fc <= f->nclus) free_count = fc;
+            if (fc <= f->nclus) f->free_count = fc;
             if (nx >= 2 && nx < f->nclus + 2) f->hint = nx;
         } else f->fsinfo = 0;
     } else f->fsinfo = 0;
@@ -136,7 +135,7 @@ bool fat_mount(Fat *f, FatIo io, void *ctx, u64 part_lba) {
 void fat_root(Fat *f, FatNode *n) { memset(n, 0, sizeof *n); n->clus = f->root; n->attr = 0x10; n->ent = -1; n->first = -1; }
 
 uint32_t fat_free_clusters(Fat *f) {
-    if (free_count != 0xFFFFFFFFu) return free_count;
+    if (f->free_count != 0xFFFFFFFFu) return f->free_count;
     static u8 buf[32 * 512];
     u32 cnt = 0;
     for (u32 s = 0; s < f->fat_secs; s += 32) {
@@ -147,14 +146,14 @@ uint32_t fat_free_clusters(Fat *f) {
             if (c >= 2 && c < f->nclus + 2 && (rd32(buf + i * 4) & 0x0FFFFFFFu) == 0) cnt++;
         }
     }
-    free_count = cnt;
+    f->free_count = cnt;
     return cnt;
 }
 int fat_flush(Fat *f) {
     if (!f->dirty_info || !f->fsinfo) return FAT_OK;
     u64 lba = f->part + f->fsinfo;
     u8 *s = cache_get(f, lba); if (!s) return FAT_IO;
-    wr32(s + 488, free_count); wr32(s + 492, f->hint);
+    wr32(s + 488, f->free_count); wr32(s + 492, f->hint);
     f->dirty_info = false;
     return cache_write(f, lba) ? FAT_OK : FAT_IO;
 }
@@ -164,7 +163,7 @@ int fat_flush(Fat *f) {
 static u8 *dirent(Fat *f, u32 dclus, u32 idx, u64 *lba, bool grow) {
     u32 per = f->bpc / 32, ci = idx / per;
     u32 c = dclus, i = 0;
-    if (memo_d == dclus && memo_c >= 2 && memo_i <= ci) { c = memo_c; i = memo_i; }
+    if (f->memo_d == dclus && f->memo_c >= 2 && f->memo_i <= ci) { c = f->memo_c; i = f->memo_i; }
     while (i < ci) {
         u32 nx = fat_get(f, c);
         if (is_eoc(nx)) {
@@ -173,13 +172,13 @@ static u8 *dirent(Fat *f, u32 dclus, u32 idx, u64 *lba, bool grow) {
         }
         c = nx; i++;
     }
-    memo_d = dclus; memo_i = ci; memo_c = c;
+    f->memo_d = dclus; f->memo_i = ci; f->memo_c = c;
     u32 off = (idx % per) * 32;
     *lba = clus_lba(f, c) + off / 512;
     u8 *s = cache_get(f, *lba);
     return s ? s + off % 512 : 0;
 }
-static void invalidate_memo(void) { memo_d = 0; memo_c = 0; }
+static void invalidate_memo(Fat *f) { f->memo_d = 0; f->memo_c = 0; }
 static u8 sfn_sum(const u8 *n) { u8 s = 0; for (int i = 0; i < 11; i++) s = (u8)(((s & 1) << 7) + (s >> 1) + n[i]); return s; }
 static u16 fold(u16 c) {
     if (c >= 'a' && c <= 'z') return (u16)(c - 32);
@@ -236,18 +235,20 @@ int fat_readdir(Fat *f, const FatNode *dir, uint32_t *cookie, uint16_t name[256]
 
 int fat_lookup(Fat *f, const FatNode *dir, const uint16_t *name, FatNode *out) {
     if (!(dir->attr & 0x10)) return FAT_NOTFOUND;
+    FatNode d = *dir;                                  /* out pode ser a própria pasta (fat_lookup(f, &n, w, &n)) */
     u16 nm[256]; u32 ck = 0;
-    while (fat_readdir(f, dir, &ck, nm, out) == 1) if (name_eq(nm, name)) return FAT_OK;
+    while (fat_readdir(f, &d, &ck, nm, out) == 1) if (name_eq(nm, name)) return FAT_OK;
     return FAT_NOTFOUND;
 }
 
 /* ------------------------------------------------------------ criação de entradas */
-static bool sfn_char(u16 c) { return (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || (c < 128 && c > 32 && strchr("!#$%&'()-@^_`{}~", (int)c)); }
+static bool sfn_char(u16 c) { return (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || (c < 128 && c > 32 && in_set("!#$%&'()-@^_`{}~", (int)c)); }
 static bool sfn_taken(Fat *f, u32 dclus, const u8 *sfn) {
     for (u32 idx = 0; ; idx++) {
         u64 lba; u8 *e = dirent(f, dclus, idx, &lba, false);
         if (!e || e[0] == 0) return false;
-        if (e[0] != 0xE5 && e[11] != 0x0F && !memcmp(e, sfn, 11)) return true;
+        /* o rótulo do volume não é um nome: a pasta FOLIO convive com o rótulo "FOLIO" (como no Windows) */
+        if (e[0] != 0xE5 && e[11] != 0x0F && !(e[11] & 0x08) && !memcmp(e, sfn, 11)) return true;
     }
 }
 /* nome curto 8.3; devolve true se o nome inteiro cabe nele (então não precisa de nome longo) */
@@ -290,7 +291,7 @@ static int check_name(const u16 *name) {
     if (n == 0 || n > 255) return FAT_BADNAME;
     if (name[0] == '.' && (n == 1 || (n == 2 && name[1] == '.'))) return FAT_BADNAME;
     if (name[n - 1] == '.' || name[n - 1] == ' ') return FAT_BADNAME;
-    for (int i = 0; i < n; i++) { u16 c = name[i]; if (c < 32 || (c < 128 && strchr("\"*/:<>?\\|", (int)c))) return FAT_BADNAME; }
+    for (int i = 0; i < n; i++) { u16 c = name[i]; if (c < 32 || (c < 128 && in_set("\"*/:<>?\\|", (int)c))) return FAT_BADNAME; }
     return FAT_OK;
 }
 /* grava a sequência (nome longo + entrada curta) numa pasta; tmpl traz os campos da entrada curta */
@@ -490,7 +491,7 @@ int fat_delete(Fat *f, FatNode *n) {
     }
     int r = mark_deleted(f, n->dir_clus, (u32)n->first, (u32)n->ent); if (r) return r;
     if (n->clus >= 2 && n->clus != f->root) free_chain(f, n->clus);
-    invalidate_memo();
+    invalidate_memo(f);
     return FAT_OK;
 }
 int fat_rename(Fat *f, FatNode *n, const uint16_t *newname) {
@@ -514,4 +515,55 @@ int fat_rename(Fat *f, FatNode *n, const uint16_t *newname) {
     }
     n->ent = nn.ent; n->first = nn.first;
     return FAT_OK;
+}
+
+/* ------------------------------------------------------------ formatação */
+/* Formata a região [part_lba, part_lba + nsec) como FAT32 (setores de 512 bytes). Grava o setor de boot
+ * (e a cópia no setor 6), o FSInfo, as duas FATs zeradas e a pasta raiz vazia com o rótulo. */
+bool fat32_format(FatIo io, void *ctx, uint64_t part_lba, uint64_t nsec, const char *label, uint32_t serial) {
+    static u8 z[64 * 512];
+    if (nsec > 0xFFFFFFFFull) nsec = 0xFFFFFFFFull;
+    u64 bytes = nsec * 512;
+    u32 spc = bytes <= 8ull << 30 ? 8 : bytes <= 16ull << 30 ? 16 : bytes <= 32ull << 30 ? 32 : 64;
+    const u32 rsvd = 32;
+    u32 fatsz = 0, nclus = 0;
+    for (;; spc /= 2) {
+        u32 t2 = (256 * spc + 2) / 2;
+        fatsz = (u32)((nsec - rsvd + t2 - 1) / t2);
+        nclus = (u32)((nsec - rsvd - 2ull * fatsz) / spc);
+        if (nclus >= 65525 || spc == 1) break;
+    }
+    if (nclus < 65525 || nclus > 0x0FFFFFF5) return false;
+    memset(z, 0, sizeof z);
+    for (u64 s = 0; s < rsvd + 2ull * fatsz; s += 64) {            /* reservados e FATs zerados */
+        u32 k = rsvd + 2ull * fatsz - s < 64 ? (u32)(rsvd + 2ull * fatsz - s) : 64;
+        if (!io(ctx, part_lba + s, k, z, true)) return false;
+    }
+    u64 data = rsvd + 2ull * fatsz;
+    for (u32 s = 0; s < spc; s++) if (!io(ctx, part_lba + data + s, 1, z, true)) return false;   /* raiz (cluster 2) */
+    u8 bs[512]; memset(bs, 0, 512);
+    bs[0] = 0xEB; bs[1] = 0x58; bs[2] = 0x90; memcpy(bs + 3, "MSWIN4.1", 8);
+    wr16(bs + 11, 512); bs[13] = (u8)spc; wr16(bs + 14, (u16)rsvd); bs[16] = 2; bs[21] = 0xF8;
+    wr16(bs + 24, 63); wr16(bs + 26, 255); wr32(bs + 28, part_lba > 0xFFFFFFFFull ? 0 : (u32)part_lba); wr32(bs + 32, (u32)nsec);
+    wr32(bs + 36, fatsz); wr32(bs + 44, 2); wr16(bs + 48, 1); wr16(bs + 50, 6);
+    bs[64] = 0x80; bs[66] = 0x29; wr32(bs + 67, serial);
+    u8 lab[11]; memset(lab, ' ', 11);
+    for (int i = 0; label && label[i] && i < 11; i++) { char c = label[i]; lab[i] = (u8)(c >= 'a' && c <= 'z' ? c - 32 : c); }
+    memcpy(bs + 71, lab, 11); memcpy(bs + 82, "FAT32   ", 8);
+    /* sem sistema: o código só avisa (o instalador grava o código de boot BIOS depois, se for o caso) */
+    static const u8 code[] = { 0xFB, 0x31, 0xC0, 0x8E, 0xD8, 0xBE, 0x77, 0x7C, 0xFC, 0xAC, 0x84, 0xC0, 0x74, 0x06, 0xB4, 0x0E, 0xCD, 0x10, 0xEB, 0xF5, 0xF4, 0xEB, 0xFD };
+    memcpy(bs + 90, code, sizeof code);
+    static const char msg[] = "This volume has no system to start.\r\n";
+    memcpy(bs + 0x77, msg, sizeof msg);
+    bs[510] = 0x55; bs[511] = 0xAA;
+    u8 fsi[512]; memset(fsi, 0, 512);
+    wr32(fsi, 0x41615252); wr32(fsi + 484, 0x61417272); wr32(fsi + 488, nclus - 1); wr32(fsi + 492, 3); wr32(fsi + 508, 0xAA550000);
+    u8 fat0[512]; memset(fat0, 0, 512);
+    wr32(fat0, 0x0FFFFFF8); wr32(fat0 + 4, 0x0FFFFFFF); wr32(fat0 + 8, 0x0FFFFFFF);
+    u8 root[512]; memset(root, 0, 512);
+    if (label && label[0]) { memcpy(root, lab, 11); root[11] = 0x08; }
+    return io(ctx, part_lba + 1, 1, fsi, true) && io(ctx, part_lba + 7, 1, fsi, true) &&
+           io(ctx, part_lba + rsvd, 1, fat0, true) && io(ctx, part_lba + rsvd + fatsz, 1, fat0, true) &&
+           io(ctx, part_lba + data, 1, root, true) &&
+           io(ctx, part_lba + 6, 1, bs, true) && io(ctx, part_lba, 1, bs, true);   /* o setor de boot por último */
 }

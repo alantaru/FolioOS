@@ -1,0 +1,23 @@
+# Remover o FolioOS instalado ao lado do Windows (o disco de tests\instalar_encolher.txt), só pelo teclado, em pt-BR:
+# a 1ª opção já é "remover"; os textos vão para o pendrive (ligado por padrão); o NTFS volta ao tamanho de antes.
+# O build confere: tabela e setor de boot do NTFS iguais aos que o Windows fez, textos no pendrive, entrada de boot removida.
+wait 300
+key esc
+wait 200
+key ctrl+k
+type Remover o FolioOS
+key enter
+wait 300
+assert_keywin Install FolioOS on this computer
+shot remover1_opcoes.png
+# Shift+Tab = Next
+key shift+tab
+key enter
+wait 200
+shot remover2_previa.png
+# Shift+Tab = "Remover o FolioOS" (o último item)
+key shift+tab
+key enter
+wait 4000
+shot remover3_pronto.png
+assert_keywin Install FolioOS on this computer

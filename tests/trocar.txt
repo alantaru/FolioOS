@@ -1,0 +1,11 @@
+# Textos "nos dois" (docs_place=both): a troca com o pendrive (--vol2), pela paleta, em pt-BR. O build prepara:
+# a.md só no computador, b.md só no pendrive, c.md nos dois (o do pendrive mais novo). Depois confere: cada um nos
+# dois lados, c.md com a versão do pendrive, e a versão antiga do computador guardada em FOLIO\VERSIONS.
+wait 300
+key esc
+wait 200
+key ctrl+k
+type Trocar os textos
+key enter
+wait 600
+shot trocar1_feito.png

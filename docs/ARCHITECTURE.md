@@ -14,18 +14,25 @@ no libc and no driver model: the UEFI firmware provides the hardware access it n
                 │ gfx.c      2D raster (AA shapes, masks)  font.c TrueType + kerning + fallback fonts         │
   FAT volume ◄─►│ export.c   DOCX/ODT/EPUB/HTML/RTF/TXT    filedlg.c file manager    music.c MP3 (minimp3)  │
                 │ settings.c CONFIG.INI                    preview.c reading mode   splash.c base.c         │
+                │ disks.c    the PC's disks   part.c GPT/MBR tables   fat32.c own FAT32 (format too)        │
+                │ install.c  install, update, uninstall (copy + CRC check, safe file swap, texts to USB)    │
+                │ installer.c installer screen: next to another system (or shrinking NTFS), whole disk      │
+                │ fscheck.c  other systems' partitions: refusals, NTFS read/shrink/grow without moving data │
+                │ chooser.c  boot chooser next to another system: "press a key to write", else BootNext     │
                 └───────────────────────────────────┬────────────────────────────────────────────────────┘
                                                     │  pal_* (platform abstraction, folio.h)
                        ┌────────────────────────────┴─────────────────────────────┐
                        │ src/platform/uefi        GOP/UGA video, SimpleTextInputEx, │
                        │   uefi_main.c, hda.c     Simple/Absolute Pointer, SimpleFS,│
+                       │                          Block I/O + Disk Info (disks),    │
                        │   usbhid.c, ps2mouse.c   PCI I/O → HD Audio / AC'97; own   │
                        │                          USB HID and PS/2 pointer drivers  │
                        │   x64 · IA32 · ARM64     when the firmware has none        │
                        ├────────────────────────────────────────────────────────────┤
                        │ src/platform/bios        BIOS-only PCs: boot sectors, then │
                        │   boot.asm, stub.asm     a 32-bit BIOS→UEFI bridge (VBE,   │
-                       │   bridge.c, fat32.c      i8042, INT 13h + own FAT32, CMOS, │
+                       │   bridge.c               i8042, INT 13h → Block I/O for    │
+                       │                          every disk + core FAT32, CMOS,    │
                        │                          ACPI) that runs BOOTIA32.EFI      │
                        ├────────────────────────────────────────────────────────────┤
                        │ src/platform/win32       simulator: GDI window, folders as │
@@ -68,14 +75,27 @@ no libc and no driver model: the UEFI firmware provides the hardware access it n
 a tiny UEFI implementation for Windows that loads and runs the real `BOOTX64.EFI`. Scripts in
 `tests/` type, click, switch languages and keyboards, export files and take screenshots; the
 build checks exports (valid ZIP/XML), translations (placeholders, with a negative control) and
-several framebuffer formats. `tools/fat32_test.c` hammers the bridge's FAT32 driver with
+several framebuffer formats. `tools/fat32_test.c` hammers the FAT32 driver with
 thousands of random operations against an in-memory model and then checks the whole volume.
+`tools/part_test.c` covers the GPT/MBR tables and FAT32 formatting; `tools/install_test.c` runs the
+installer onto empty GPT and MBR disk images, and `efi_host.exe --disk <image>` lets the real
+`BOOTX64.EFI` see those images as SATA disks through Block I/O. The installer screen is driven from
+the keyboard in the simulator (`FOLIO_DISKS=a.img;b.img`) and in the real `BOOTX64.EFI`: a wrong
+confirmation word must leave the disk untouched, the right one must produce a verified volume.
+`install_test --windows` builds a disk like a PC with Windows (EFI partition, MSR, a hole in the
+table, C:, recovery at the end); after installing next to it, `--compare` checks that every entry,
+every other partition and the Windows files on the EFI partition are unchanged.
 
-`tools/qemu-lab.ps1` is the hardware lab: it boots the real binaries in QEMU on 13 machines
+`tools/qemu-lab.ps1` is the hardware lab: it boots the real binaries in QEMU on 15 machines
 (UEFI x64/IA32/ARM64 with OVMF/AAVMF, BIOS-only with SeaBIOS; 8 graphics cards; PS/2, USB mouse
-and tablet; HDA and AC'97; USB and IDE disks) and drives each one over QMP: boot, keyboard,
+and tablet; HDA and AC'97; USB, IDE, SATA and NVMe disks; two of them start FolioOS installed on
+the internal disk, with no USB drive, and use the installer screen to install onto a second NVMe or
+IDE disk; a dual-boot run installs next to a stand-in Windows, `build\fakewin.efi`, then starts the
+disk twice: without a key the firmware ends up in "Windows", with a key in the FolioOS editor) and
+drives each one over QMP: boot, keyboard,
 mouse click, sound (captured to WAV), typing and saving a document, and afterwards reads the
-disk image back to check the saved text, `DIAGNOSTICS.TXT` and the consistency of the volume.
+disk image back to check the saved text, `DIAGNOSTICS.TXT` (including the list of disks) and the
+consistency of the volume.
 `debug_serial=1` in `CONFIG.INI` sends a debug log to the serial port (captured by the lab).
 On macOS, `build_macos.sh --test` builds the AppKit simulator and runs the same simulator scripts headless.
 

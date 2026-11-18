@@ -16,7 +16,7 @@ void prefs_defaults(void) {
     prefs.volume = 60; prefs.goal = 1000; prefs.sprint_min = 25; prefs.read_wpm = 200;
     prefs.autosave_s = 20; prefs.ui_scale = 0; prefs.pointer_speed = 1.0f; prefs.touch_mode = 0; prefs.audio_gpio = true; prefs.video_fast = true;
     prefs.shuffle = false; prefs.repeat = true;
-    prefs.tabs = false; prefs.splash = true; prefs.splash_secs = SPLASH_SECS_DEFAULT;
+    prefs.tabs = false; prefs.splash = true; prefs.splash_secs = SPLASH_SECS_DEFAULT; prefs.boot_wait = 3;
 }
 static char theme_name[48], font_name[64];
 bool prefs_had_file;          /* havia um CONFIG.INI (instalação já em uso) */
@@ -131,6 +131,8 @@ void prefs_load(void) {
         else if (str_eq(k, "tabs")) prefs.tabs = bv;
         else if (str_eq(k, "splash")) prefs.splash = bv;
         else if (str_eq(k, "splash_seconds")) prefs.splash_secs = CLAMP(iv, 1, 60);
+        else if (str_eq(k, "boot_wait")) prefs.boot_wait = CLAMP(iv, 0, 60);
+        else if (str_eq(k, "docs_place")) prefs.docs_place = str_eq(v, "usb") ? DOCS_USB : str_eq(v, "both") ? DOCS_BOTH : DOCS_COMPUTER;
         else if (str_eq(k, "active_tab")) prefs.tab_active = MAX(0, iv - 1);
         else if (numbered(k, "recent", &r, 6)) str_copy(prefs.recent[r], v, sizeof prefs.recent[0]);
         else if (numbered(k, "position", &r, 6)) {
@@ -190,7 +192,9 @@ void prefs_save(void) {
         if (prefs.recent[i][0]) buf_printf(&b, "recent%d=%s\r\nposition%d=%d,%d\r\n", i + 1, prefs.recent[i], i + 1, prefs.recent_pos[i][0], prefs.recent_pos[i][1]);
     /* abas: com elas desligadas a lista anterior continua guardada, para voltar igual ao religar */
     if (prefs.tabs) app_tabs_to_prefs();
-    buf_printf(&b, "splash=%d\r\nsplash_seconds=%d\r\ntabs=%d\r\nactive_tab=%d\r\n", prefs.splash, prefs.splash_secs, prefs.tabs, prefs.tab_active + 1);
+    buf_printf(&b, "splash=%d\r\nsplash_seconds=%d\r\nboot_wait=%d\r\ntabs=%d\r\nactive_tab=%d\r\n", prefs.splash, prefs.splash_secs, prefs.boot_wait, prefs.tabs, prefs.tab_active + 1);
+    buf_printf(&b, "docs_place=%s\r\n", prefs.docs_place == DOCS_USB ? "usb" : prefs.docs_place == DOCS_BOTH ? "both" : "computer");
+    if (dbg_on) buf_puts(&b, "debug_serial=1\r\n");   /* ligado à mão para diagnóstico: continua ligado depois de gravar */
     for (int i = 0, n = 0; i < prefs.ntab_saved; i++)
         if (prefs.tab_list[i][0]) { n++; buf_printf(&b, "tab%d=%s\r\ntabpos%d=%d,%d\r\n", n, prefs.tab_list[i], n, prefs.tab_pos[i][0], prefs.tab_pos[i][1]); }
     paths_ensure(app_boot_vol(), DIR_FOLIO);

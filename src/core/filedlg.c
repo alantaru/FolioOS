@@ -132,8 +132,8 @@ void filedlg_show(int m) {
         if (dot && app.syntax != SYN_TEX) *dot = 0;     /* fonte LaTeX: o nome fica com a extensão (.tex, .bib…) */
     } else {
         bool isdir;
-        (void)isdir; paths_ensure(app_boot_vol(), DIR_DOCS);
-        go(app_boot_vol(), paths_dir(DIR_DOCS));
+        (void)isdir; if (!pal_exists(app_docs_vol(), app_docs_dir(), &isdir)) pal_mkdir(app_docs_vol(), app_docs_dir());
+        go(app_docs_vol(), app_docs_dir());              /* com docs_place=usb, a pasta de textos do pendrive */
         /* sugere o nome a partir do primeiro título do texto */
         MdDoc m; md_parse(&app.doc, &m);
         str_copy(fname, m.title && m.title[0] ? m.title : L("Untitled"), sizeof fname);
@@ -243,17 +243,18 @@ static void files_body(Window *w, Rect r) {
     }
     cur.y += SI(10);
     ui_section(&cur, L("PLACES"));
-    struct { const char *n, *p; int ic; } places[] = { { L("Documents"), paths_dir(DIR_DOCS), IC_DOC }, { L("Music"), paths_dir(DIR_MUSIC), IC_MUSIC }, { L("Root"), "/", IC_HOME } };
+    struct { const char *n, *p; int ic; } places[] = { { L("Documents"), app_docs_dir(), IC_DOC }, { L("Music"), paths_dir(DIR_MUSIC), IC_MUSIC }, { L("Root"), "/", IC_HOME } };
     for (int i = 0; i < 3; i++) {
         Rect it = rect(cur.x - SI(6), cur.y, cur.w + SI(12), SI(34));
         bool fire = ui_item(it);
-        bool on = vol == app_boot_vol() && str_ieq(cwd, places[i].p), hv = ui_hover(it);
+        int pv = i == 0 ? app_docs_vol() : app_boot_vol();
+        bool on = vol == pv && str_ieq(cwd, places[i].p), hv = ui_hover(it);
         if (on) gfx_rrect(it, S(8), col_alpha(T->accent, 0.14f)); else if (hv) gfx_rrect(it, S(8), col_alpha(T->text, 0.06f));
         icon_draw(places[i].ic, it.x + S(18), it.y + it.h * 0.5f, S(18), on ? T->accent : col_alpha(T->panel_text, 0.7f));
         draw_text(f, px, it.x + S(36), it.y + it.h * 0.5f + face_ascent(f, px) * 0.36f, places[i].n, -1, T->panel_text);
         if (fire) {
-            bool d; if (!pal_exists(app_boot_vol(), places[i].p, &d) && i < 2) pal_mkdir(app_boot_vol(), places[i].p);
-            go(app_boot_vol(), places[i].p);
+            bool d; if (!pal_exists(pv, places[i].p, &d) && i < 2) pal_mkdir(pv, places[i].p);
+            go(pv, places[i].p);
         }
         cur.y += SI(36);
     }

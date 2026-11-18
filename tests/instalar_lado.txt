@@ -1,0 +1,21 @@
+# Instalador ao lado de outro sistema (FOLIO_DISKS = disco GPT com "Windows" e espaço livre), só pelo teclado, em pt-BR
+wait 300
+key esc
+wait 200
+key ctrl+k
+type Instalar o FolioOS neste
+key enter
+wait 300
+assert_keywin Install FolioOS on this computer
+shot lado1_opcoes.png
+# "ao lado" vem primeiro e já marcado; Shift+Tab = Next
+key shift+tab
+key enter
+wait 200
+shot lado2_confirmar.png
+# sem palavra para digitar: nada é apagado. Shift+Tab = "Instalar ao lado"
+key shift+tab
+key enter
+wait 3000
+shot lado3_pronto.png
+assert_keywin Install FolioOS on this computer

@@ -18,39 +18,73 @@ Status: ✅ done · 🔨 in progress · ⏳ planned
 ## FolioOS (offline edition)
 
 ### Phase 1 — Disk tools and installing as the only system 🔨
-- Disk access through UEFI (`BlockIo`) and through the BIOS bridge (INT 13h). SATA, NVMe, USB and IDE
+- ✅ Disk access through UEFI (`BlockIo`) and through the BIOS bridge (INT 13h). SATA, NVMe, USB and IDE
   disks are listed with their model and size.
-- GPT and MBR partition tables, read and written in full (CRC32, backup GPT header, protective MBR).
+- ✅ GPT and MBR partition tables, read and written in full (CRC32, backup GPT header, protective MBR).
+  Rewriting a GPT keeps every entry in its slot, so partition numbers never change.
 - **Partition manager.** It can create, delete, format and resize partitions, with the safety rules
   below. In this phase it handles FAT32 (create, format, grow, shrink) and deletes any partition.
-- **Install on this computer as the only system.** The installer erases the disk only after the
+- ✅ **Install on this computer as the only system.** The installer erases the disk only after the
   user types a confirmation word. It then creates GPT with one FAT32 partition on UEFI PCs (the
   partition is also the EFI system partition) or MBR with FAT32 and the BIOS bridge on BIOS-only
   PCs, copies FolioOS and adds a firmware boot entry.
-- **Where your texts live:** on the disk, on the USB drive, or on both, with a button that
-  exchanges the texts with the USB drive locally.
-- **Backup, restore and uninstall.** Before anything is written, the partition table and the boot
-  sectors are saved to the USB drive (`FOLIO\BACKUP\`). One action restores them. Uninstalling
-  offers to copy the texts to the USB drive first.
-- **Update this computer from a newer USB drive.**
+- ✅ **Where your texts live:** chosen when installing, changeable in Settings → System: on this
+  computer, on the USB drive (they go with you; without the drive, new texts are saved on the computer),
+  or on both, with a button that exchanges them with the USB drive (the newest version of each text wins,
+  the replaced one is kept in `FOLIO\VERSIONS`, nothing is deleted).
+- ✅ **Backup and uninstall.** Before anything is written, the partition table and the boot sectors
+  are saved to the USB drive (`FOLIO\BACKUP\`). Uninstalling copies the texts to the USB drive first
+  (checked file by file):
+  - next to another system: `\EFI\FolioOS` and FolioOS's boot entry are removed and the space goes
+    back to Windows; tested on a real UEFI firmware in the QEMU lab (afterwards the computer starts
+    Windows directly);
+  - as the only system: the disk is left empty, ready for another system (always asks for the
+    confirmation word).
+- ✅ **Update this computer from a newer USB drive.** Only the program, fonts, languages, themes and
+  keyboards are replaced; texts, music and settings stay. Each file is replaced only after its new copy
+  has been checked, so a power cut leaves either the old or the new file. `FOLIO\INSTALLED.ID` records
+  the installed version.
 
-### Phase 2 — Dual boot on UEFI PCs ⏳
-- FolioOS gets a FAT32 partition of its own. The existing EFI system partition receives only a
-  ~600 KB file (`\EFI\FolioOS\`); fonts, settings and texts stay on FolioOS's partition.
-- **Boot chooser.** Every start shows "press a key to write" for 3 seconds, then hands over to the
-  other system: Windows Boot Manager, GRUB, systemd-boot, rEFInd or the macOS boot on Intel Macs.
+### Phase 2 — Dual boot on UEFI PCs 🔨
+- ✅ FolioOS gets a FAT32 partition of its own in the free space. The existing EFI system partition
+  receives only `\EFI\FolioOS\` (the program and `FOLIO.ID`, which names FolioOS's partition); fonts,
+  settings and texts stay on FolioOS's partition. Nothing else on the disk changes: the table gains one
+  entry, and every other partition stays byte-for-byte the same (checked by the build and the lab).
+- ✅ **Boot chooser.** Every start shows "press a key to write" for 3 seconds (set in Settings → System,
+  saved as `boot_wait=` in `CONFIG.INI`; 0 always starts FolioOS), then hands over to the other system: the next entry of the firmware's boot order
+  (Windows Boot Manager, GRUB, systemd-boot, rEFInd…). The other system is started by the firmware
+  (`BootNext` and a restart), never from inside FolioOS, so Windows starts exactly as before and
+  BitLocker sees nothing different.
 - **Resizing the other system to make room:**
-  - NTFS: shrink and grow;
-  - ext4: shrink and grow;
+  - ✅ NTFS: shrink without moving any data. When there is no free space, the installer offers to take
+    space from the end of an NTFS partition in good order. The other system keeps what it uses plus 10%,
+    and the size for FolioOS is chosen with the arrow keys, with a before/after preview. Checked by
+    Windows itself: `chkdsk` finds nothing, every file stays byte-for-byte the same, and the new
+    FolioOS partition is readable from Windows (`tools\ntfs-shrink-check.ps1`).
+  - ✅ NTFS: grow back on uninstall, to exactly the size Windows had made (recorded at install time);
+    Windows' `chkdsk` finds nothing, and the partition table, protective MBR and NTFS boot sector come
+    back byte for byte the originals;
+  - ✅ ext4: **not resized by FolioOS (decided).** Linux spreads folders over the whole volume and
+    `mkfs.ext4` puts the journal in the middle, so shrinking without moving data frees almost nothing, and
+    moving blocks is the risky part the rules forbid. When there is no free space, the installer explains
+    how to shrink the partition from Linux (GParted) and then uses the free space. The ext4 checks are
+    tested against volumes made by Linux itself (Alpine in QEMU, `tools\ext-fixtures.ps1`);
   - FAT32 and exFAT.
-- **Refused with a clear explanation** of how to fix it in the owning system:
+- ✅ **Refused with a clear explanation** of how to fix it in the owning system. Each partition shows
+  its state in the installer:
   - volumes encrypted with BitLocker or LUKS;
   - LVM;
   - APFS/HFS+;
   - Windows hibernated or with Fast Startup;
-  - any file system marked as needing a check.
-- **BitLocker warning.** Turning off Secure Boot makes Windows ask for the recovery key, so the
-  installer asks the user to confirm they have it. That prompt goes away with phase 7.
+  - NTFS marked dirty or with an unfinished `$LogFile`, FAT16/FAT32/exFAT marked dirty, ext4 with errors or
+    a pending journal. Nothing is written to an EFI system partition that is marked dirty.
+
+  The NTFS reader is tested against volumes formatted by Windows (`tests\fixtures`). The QEMU lab
+  installs next to a disk made by Windows (EFI + NTFS, no free space) by shrinking it, then starts both
+  systems (`dual-ntfs-shrink`).
+- ✅ **BitLocker warning.** Changing the startup settings (and, later, turning off Secure Boot) can make
+  Windows ask once for the recovery key. On a disk with BitLocker, the installer does not write anything
+  until the user confirms they have the key. Phase 7 removes the Secure Boot part.
 
 ### Phase 3 — Dual boot on BIOS-only PCs ⏳
 - Our MBR starts FolioOS, and the BIOS bridge shows the same chooser. To start the other system
