@@ -55,6 +55,7 @@ static int s_read(void *ctx, const char *path, u64 off, void *buf, u32 n) {
 /* desinstalar: grava na "origem" (a pasta que faz o papel do pendrive), criando as pastas do caminho */
 static bool s_save(void *ctx, const char *path, const void *data, u32 n) {
     (void)ctx; char part[1024]; int k = 0;
+    if (strlen(root) + 1 + strlen(path) >= 1024) return false;   /* raiz, separador e caminho cabem em full() (e em part): senão um erro de cópia, não um caminho cortado */
     for (const char *p = path; *p; p++) {
         if (*p == '/') { part[k] = 0; wchar_t w[1024]; full(part, w); CreateDirectoryW(w, 0); }
         part[k++] = *p;
@@ -63,7 +64,9 @@ static bool s_save(void *ctx, const char *path, const void *data, u32 n) {
     FILE *f = _wfopen(w, L"wb"); if (!f) return false;
     bool ok = fwrite(data, 1, n, f) == n; fclose(f); return ok;
 }
+static u8 last_bk[1 << 17]; static u32 last_bk_n;   /* a última cópia de segurança, para conferir (--mbr-logical) */
 static bool s_backup(void *ctx, const char *name, const void *data, u32 n) {
+    if (n <= sizeof last_bk) { memcpy(last_bk, data, n); last_bk_n = n; }
     (void)ctx; wchar_t w[1024]; full("FOLIO/BACKUP", w); CreateDirectoryW(w, 0);
     char rel[256]; snprintf(rel, sizeof rel, "FOLIO/BACKUP/%s", name); full(rel, w);
     FILE *f = _wfopen(w, L"wb"); if (!f) return false;
@@ -223,7 +226,8 @@ static u32 crc_range(u64 lba, u64 count) {
     static u8 b[1 << 16]; u32 c = 0;
     for (u64 done = 0; done < count; ) {
         u32 n = count - done < sizeof b / 512 ? (u32)(count - done) : (u32)(sizeof b / 512);
-        dio(0, lba + done, n, b, false); c = crc32_buf(c, b, n * 512); done += n;
+        if (!dio(0, lba + done, n, b, false)) { fprintf(stderr, "FALHA: não deu para ler o setor %llu\n", (unsigned long long)(lba + done)); exit(1); }   /* nunca um CRC de dados velhos */
+        c = crc32_buf(c, b, n * 512); done += n;
     }
     return c;
 }
@@ -255,6 +259,14 @@ static int compare(const BlkDev *d, const char *before) {
     static PartTable a, b; int fails = 0;
     if (!part_read(&db, &b) || !part_read(d, &a)) { fprintf(stderr, "FALHA: tabela ilegível\n"); return 1; }
     if (a.n != b.n + 1) { fprintf(stderr, "FALHA: %d entradas antes, %d depois (devia ser uma a mais)\n", b.n, a.n); fails++; }
+    if (b.scheme == SCHEME_MBR) {                     /* cada entrada que existia: os 16 bytes iguais (ativa, tipo, CHS…) */
+        static u8 m0[512], m1[512];
+        if (!dio_b(0, 0, 1, m0, false) || !dio(0, 0, 1, m1, false)) { fprintf(stderr, "FALHA: ler o MBR\n"); fails++; }
+        else for (int s = 0; s < 4; s++) {
+            const u8 *e0 = m0 + 446 + 16 * s, *e1 = m1 + 446 + 16 * s;
+            if (e0[4] && memcmp(e0, e1, 16)) { fprintf(stderr, "FALHA: a entrada %d do MBR mudou (ativa, tipo ou posição)\n", s + 1); fails++; }
+        }
+    }
     for (int i = 0; i < b.n; i++) {
         const Part *o = &b.p[i], *n = 0;
         for (int k = 0; k < a.n; k++) if (b.scheme == SCHEME_MBR ? a.p[k].start == o->start : !memcmp(a.p[k].guid, o->guid, 16)) n = &a.p[k];   /* MBR: sem GUID */
@@ -272,7 +284,7 @@ static int compare(const BlkDev *d, const char *before) {
         static u8 x[1 << 16], y[1 << 16];
         for (u64 done = 0; done < o->count; ) {
             u32 m = o->count - done < sizeof x / 512 ? (u32)(o->count - done) : (u32)(sizeof x / 512);
-            dio_b(0, o->start + done, m, x, false); dio(0, o->start + done, m, y, false);
+            if (!dio_b(0, o->start + done, m, x, false) || !dio(0, o->start + done, m, y, false)) { fprintf(stderr, "FALHA: não deu para ler a partição %d (setor %llu)\n", o->slot + 1, (unsigned long long)(o->start + done)); fails++; break; }
             if (memcmp(x, y, m * 512)) { fprintf(stderr, "FALHA: o conteúdo da partição %d mudou (setor %llu)\n", o->slot + 1, (unsigned long long)(o->start + done)); fails++; break; }
             done += m;
         }
@@ -286,9 +298,11 @@ int main(int argc, char **argv) {
     SetConsoleOutputCP(CP_UTF8);
     if (argc < 4) { fprintf(stderr, "uso: install_test <origem> <imagem> <MB> [--bios] [--docs-stick] [--windows] [--alongside]\n"); return 2; }
     GetFullPathNameA(argv[1], MAX_PATH, root, 0);
-    u64 mb = (u64)atoll(argv[3]);
+    { char bk[MAX_PATH + 32]; snprintf(bk, sizeof bk, "%s\\FOLIO", root); CreateDirectoryA(bk, 0); strcat(bk, "\\BACKUP"); CreateDirectoryA(bk, 0); }   /* o motor lista FOLIO/BACKUP antes da cópia de segurança */
+    char *mend; u64 mb = strtoull(argv[3], &mend, 10);
+    if (!argv[3][0] || *mend || !mb || mb > (16ull << 20)) { fprintf(stderr, "tamanho inválido: \"%s\" (MB)\n", argv[3]); return 2; }
     InstallOpts o = { 0 }; o.label = "FOLIO"; o.efi_name = "BOOTX64.EFI"; o.version = "test";
-    bool windows = false, alongside = false, shrink = false, remove_mode = false, update_mode = false;
+    bool windows = false, alongside = false, shrink = false, remove_mode = false, update_mode = false, mbr_logical = false;
     for (int i = 4; i < argc; i++) {
         if (!strcmp(argv[i], "--bios")) o.bios = true;
         if (!strcmp(argv[i], "--docs-stick")) o.docs = INST_DOCS_STICK;
@@ -299,14 +313,49 @@ int main(int argc, char **argv) {
         if (!strcmp(argv[i], "--shrink-ntfs")) alongside = shrink = true;
         if (!strcmp(argv[i], "--remove")) remove_mode = true;
         if (!strcmp(argv[i], "--update")) update_mode = true;
+        if (!strcmp(argv[i], "--mbr-logical")) mbr_logical = true;
         if (!strcmp(argv[i], "--winefi") && i + 1 < argc) winefi = argv[++i];
         if (!strcmp(argv[i], "--windows-bios") && i + 1 < argc) winbios = argv[++i];
         if (!strcmp(argv[i], "--mbr-fat32") && i + 1 < argc) mbrfat = argv[++i];
     }
-    img = fopen(argv[2], "r+b");
+    /* só leitura (--list, --compare, --same-table): a imagem como está, nada muda de tamanho. Nos outros modos uma
+     * imagem que já existe nunca encolhe (isso apagaria o fim dela): só uma nova (ou menor) ganha o tamanho pedido. */
+    bool readonly = false;
+    for (int i = 4; i < argc; i++) if (!strcmp(argv[i], "--list") || !strcmp(argv[i], "--compare") || !strcmp(argv[i], "--same-table")) readonly = true;
+    img = fopen(argv[2], readonly ? "rb" : "r+b");
+    if (!img && readonly) { perror(argv[2]); return 2; }
     if (!img) { img = fopen(argv[2], "w+b"); if (!img) { perror(argv[2]); return 2; } }
-    _chsize_s(_fileno(img), (long long)(mb << 20));
-    BlkDev d = { dio, 0, (mb << 20) / 512, 512, 0 };
+    _fseeki64(img, 0, SEEK_END); u64 have = (u64)_ftelli64(img);
+    if (!readonly && have < (mb << 20) && _chsize_s(_fileno(img), (long long)(mb << 20))) { fprintf(stderr, "não deu para criar a imagem de %llu MB\n", (unsigned long long)mb); fclose(img); return 2; }
+    u64 bytes = readonly || have > (mb << 20) ? have : (mb << 20);   /* o tamanho real do disco */
+    mb = bytes >> 20;
+    BlkDev d = { dio, 0, bytes / 512, 512, 0 };
+    /* --set-version <v>: o FOLIO/INSTALLED.ID da instalação passa a dizer version=<v> (o teste da atualização pela tela
+     * parte de uma versão antiga: se a atualização não rodar, a versão nova não aparece) */
+    for (int i = 4; i + 1 < argc; i++) if (!strcmp(argv[i], "--set-version")) {
+        static PartTable st; static Fat sv; static char id[1024], out[1100];
+        if (!part_read(&d, &st)) { fprintf(stderr, "FALHA: tabela\n"); return 1; }
+        for (int k = 0; k < st.n; k++) {
+            if (st.p[k].fs != FS_FAT32 || !fat_mount(&sv, dio, 0, st.p[k].start)) continue;
+            FatNode root, folio, idn; fat_root(&sv, &root);
+            u16 w1[8] = { 'F', 'O', 'L', 'I', 'O', 0 }, w2[16] = { 'I', 'N', 'S', 'T', 'A', 'L', 'L', 'E', 'D', '.', 'I', 'D', 0 };
+            if (fat_lookup(&sv, &root, w1, &folio) != FAT_OK || fat_lookup(&sv, &folio, w2, &idn) != FAT_OK || idn.size >= sizeof id) continue;
+            int n = fat_read(&sv, &idn, 0, id, idn.size); if (n != (int)idn.size) { fprintf(stderr, "FALHA: ler INSTALLED.ID\n"); return 1; }
+            id[n] = 0; int o = 0;
+            for (char *line = id; *line; ) {               /* troca só a linha version= */
+                char *e = line; while (*e && *e != '\n') e++;
+                int add = !strncmp(line, "version=", 8) ? snprintf(0, 0, "version=%s\r\n", argv[i + 1]) : (int)(e - line) + (*e ? 1 : 0);
+                if (add < 0 || (size_t)o + (size_t)add >= sizeof out) { fprintf(stderr, "FALHA: INSTALLED.ID novo grande demais\n"); return 1; }
+                if (!strncmp(line, "version=", 8)) snprintf(out + o, sizeof out - o, "version=%s\r\n", argv[i + 1]);
+                else memcpy(out + o, line, (size_t)add);
+                o += add;
+                line = *e ? e + 1 : e;
+            }
+            if (fat_truncate(&sv, &idn, 0) != FAT_OK || fat_write(&sv, &idn, 0, out, (u32)o) != o || fat_flush(&sv) != FAT_OK) { fprintf(stderr, "FALHA: gravar INSTALLED.ID\n"); return 1; }
+            fclose(img); printf("versão instalada: %s\n", argv[i + 1]); return 0;
+        }
+        fprintf(stderr, "FALHA: nenhum FOLIO/INSTALLED.ID\n"); return 1;
+    }
     for (int i = 4; i + 1 < argc; i++) if (!strcmp(argv[i], "--compare")) { int rc = compare(&d, argv[i + 1]); fclose(img); return rc; }
     for (int i = 4; i + 1 < argc; i++) if (!strcmp(argv[i], "--put-winefi")) { int rc = put_winefi(&d, argv[i + 1]); fclose(img); return rc; }
     for (int i = 4; i + 1 < argc; i++) if (!strcmp(argv[i], "--same-table")) { int rc = same_table(&d, argv[i + 1]); fclose(img); return rc; }
@@ -437,9 +486,35 @@ int main(int argc, char **argv) {
                f.ntfs >= 0 ? "a partição de antes cresceu de volta" : "o espaço ficou livre");
         return 0;
     }
+    /* --mbr-logical: o disco tem um MBR com uma estendida e duas partições lógicas (dois EBRs, em 2048 e 3072); a cópia
+     * de segurança do disco inteiro tem de levar os dois EBRs, com os LBAs, para a tabela antiga poder voltar */
+    static u8 ebr[2][512];
+    if (!alongside && mbr_logical) {
+        static u8 m[512]; memset(m, 0, sizeof m);
+        u8 *e = m + 446; e[4] = 0x0F; e[8] = 0x00; e[9] = 0x08; e[12] = 0x00; e[13] = 0x10;            /* estendida: 2048, 4096 setores */
+        m[510] = 0x55; m[511] = 0xAA;
+        for (int k = 0; k < 2; k++) {
+            u8 *b = ebr[k]; memset(b, 0, 512);
+            b[446 + 4] = 0x07; b[446 + 8] = 63; b[446 + 12] = 100;                                        /* a lógica, 63 setores depois do EBR */
+            if (!k) { b[462 + 4] = 0x05; b[462 + 9] = 0x04; b[462 + 13] = 0x04; }                         /* o próximo EBR: estendida + 1024 */
+            b[510] = 0x55; b[511] = 0xAA;
+            if (!dio(0, 2048 + 1024 * (u64)k, 1, b, true)) { fprintf(stderr, "FALHA: montar o EBR\n"); return 1; }
+        }
+        if (!dio(0, 0, 1, m, true)) { fprintf(stderr, "FALHA: montar o MBR\n"); return 1; }
+    }
     if (!alongside) {
         install_whole_disk(&d, &s, &o, &r);
         if (r.code) { fclose(img); fprintf(stderr, "FALHA: %s: %s\n", install_error(r.code), r.path); return 1; }
+        if (mbr_logical) {
+            const u8 *h = last_bk; u32 want = 512 + 67 * 512 + 2 * 512;
+            bool ok = last_bk_n == want && !memcmp(h + 16, "EBR", 3) && h[20] == 2;
+            for (int k = 0; ok && k < 2; k++) {
+                u64 at = 0; for (int j = 0; j < 8; j++) at |= (u64)h[24 + 8 * k + j] << (8 * j);
+                ok = at == 2048 + 1024 * (u64)k && !memcmp(h + 512 + 67 * 512 + 512 * k, ebr[k], 512);
+            }
+            if (!ok) { fclose(img); fprintf(stderr, "FALHA: a cópia de segurança não tem os dois EBRs das partições lógicas (%u bytes)\n", last_bk_n); return 1; }
+            printf("cópia de segurança com os 2 EBRs das partições lógicas\n");
+        }
         {   /* onde ficam os textos: docs_place= no CONFIG.INI instalado; no pendrive, DOCUMENTS não vai para o disco */
             static Fat v; static char cfg[16384]; int fails = 0;
             const char *want = o.docs == INST_DOCS_STICK ? "docs_place=usb" : o.docs == INST_DOCS_BOTH ? "docs_place=both" : "docs_place=computer";
@@ -523,7 +598,8 @@ int main(int argc, char **argv) {
         return 0;
     }
     u32 crcs[PART_MAX];
-    for (int i = 0; i < before.n; i++) crcs[i] = memcmp(before.p[i].type, GPT_ESP, 16) ? crc_range(before.p[i].start, before.p[i].count) : 0;
+    static bool has_crc[PART_MAX];                       /* 0 é um CRC válido: "tem" fica à parte */
+    for (int i = 0; i < before.n; i++) { has_crc[i] = memcmp(before.p[i].type, GPT_ESP, 16) != 0; crcs[i] = has_crc[i] ? crc_range(before.p[i].start, before.p[i].count) : 0; }
     Region fr[8]; int nf = part_free(&d, &before, fr, 8), big = -1;
     for (int i = 0; i < nf; i++) if (big < 0 || fr[i].count > fr[big].count) big = i;
     if (big < 0) { fprintf(stderr, "sem espaço livre\n"); return 2; }
@@ -537,7 +613,7 @@ int main(int argc, char **argv) {
         if (!b || b->slot != a->slot || b->start != a->start || b->count != a->count || memcmp(b->type, a->type, 16) || memcmp(b->name, a->name, sizeof a->name) || b->attrs != a->attrs) {
             fprintf(stderr, "FALHA: a entrada %d da tabela mudou\n", a->slot + 1); fails++; continue;
         }
-        if (crcs[i] && crc_range(a->start, a->count) != crcs[i]) { fprintf(stderr, "FALHA: o conteúdo da partição %d mudou\n", a->slot + 1); fails++; }
+        if (has_crc[i] && crc_range(a->start, a->count) != crcs[i]) { fprintf(stderr, "FALHA: o conteúdo da partição %d mudou\n", a->slot + 1); fails++; }
     }
     fclose(img);
     if (fails) return 1;

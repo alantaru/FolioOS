@@ -4,6 +4,117 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [4.4.1-beta] — 2026-11-19
+
+**Beta.** Fixes from a full review of the 4.4.0 beta installer; please use this one instead. Like
+4.4.0, it passes every test on emulated machines but has not run on real hardware yet: back up first.
+
+### Fixed — firmware and boot
+- A failure to read `BootOrder` could make the installer write a new boot order with FolioOS only,
+  and a failed read of a `Boot####` variable could let it reuse a number that was in use. Only "not
+  found" now counts as absent; any other read error stops before anything is written.
+- Uninstalling removed every boot entry with "FolioOS" in its path, including another installation's.
+  It now removes only the entries that point to the partition of the installation being removed.
+- If the other system's boot entry failed to load, every unattended start tried it again. A failed
+  attempt (FolioOS back in the very boot the entry was tried, by the firmware's boot counter) is no longer repeated automatically.
+- Retrying a boot-entry registration no longer creates a duplicate entry.
+- If the attempt record cannot be saved, FolioOS does not ask the firmware to start the other system
+  automatically (it stays in FolioOS) instead of risking a loop.
+- Disk writes are tied to the medium that was listed: if it changes (another stick in the same slot),
+  nothing is read or written until the disks are scanned again. Buffers respect the firmware's I/O
+  alignment. BIOS disks with sectors other than 512 bytes are no longer offered.
+- An NVMe disk no longer shows garbage as its model.
+
+### Fixed — disks and file systems
+- NTFS: both `$LogFile` restart pages are read and the newest one decides; version 2.0 pages (Windows
+  8+ with a pending journal) are refused. A restart page that is neither valid nor blank counts as
+  "not clean". A damaged `$Volume` attribute (also one whose size would wrap around) can no longer make FolioOS
+  read or write outside its record. The resize direction comes from the volume's own size.
+- A failed flush is now an error in every resize, install, update, uninstall and partition-manager path
+  (it used to report success).
+- GPT: entries can no longer overlap the GPT itself; when only the backup GPT was valid, the primary
+  is rewritten first; the backup reaches the disk before the primary is touched.
+- exFAT: a shrink never frees the bitmap's own clusters (so the volume can always grow back), and the
+  order of the writes keeps the bitmap at least as large as the volume after an interruption. A retry
+  finishes a shrink interrupted before the bitmap's size was updated.
+- FAT32: the free-cluster count is marked "unknown" instead of being adjusted, so a retried resize
+  cannot apply the change twice.
+- Deleting a partition shorter than 32 sectors no longer zeroes the start of the next one.
+- Installing on a whole disk stops if the current partition table cannot be read (a blank disk or a
+  damaged table still reads fine). Over an MBR with logical partitions, the safety copy also keeps
+  their EBR sectors (with their positions), so the old table can be restored.
+- Installing next to another system checks that the new partition fits in the table (MBR with four
+  primaries) before shrinking anything.
+- Uninstalling only grows back a partition the installer itself shrank (recorded at install time); a
+  free-space install leaves the neighbour exactly as it was. Updating keeps that record, so an
+  updated installation still gives the space back. Before anything is written, uninstalling
+  checks that this partition can grow (a hibernated Windows or Fast Startup stops it with a message). `\EFI\FolioOS\FOLIO.ID` is removed only
+  after the table changed, so an interrupted uninstall can be run again.
+- The texts are copied before uninstalling also from the old `TEXTOS` folder, are always listed again,
+  and any read error, long path or failed copy stops the uninstall before anything is deleted.
+- Updating replaces each file recoverably (`<name>.~old` is restored if an update was interrupted); a
+  failed final step is reported; an unreadable `CONFIG.INI` is never replaced with defaults; the source
+  must contain the right boot program, not empty.
+- Update and uninstall check that the disk still holds the installation shown on the screen.
+- A retry after an interrupted grow (the table larger than the volume) finishes growing the volume, in
+  the engine and in *Disks and partitions* (a *Finish resizing* button). A retry after a shrink
+  whose table update failed only writes the table. This also works for an NTFS volume already marked for `chkdsk`,
+  and exFAT finishes a pending bitmap update first. In *Disks and partitions*, *Finish resizing* is shown next to
+  *Resize*, not instead of it. In a narrow window, *Format* and *Delete* move to a second row so all
+  four buttons stay visible.
+- The safety copy in `FOLIO/BACKUP` never overwrites an earlier one, and if the folder cannot be
+  listed nothing is written. A directory read error is no longer taken for a missing `CONFIG.INI`.
+
+### Fixed — your texts
+- Exchanging texts with the USB drive skips a text with unsaved changes, never replaces a file whose
+  previous version could not be saved first (nor one whose existence could not be checked), and reports
+  the texts it could not copy (before the ones it skipped, so the warning is never cut off). If the
+  previous version cannot be confirmed, the file is not replaced.
+- Versions of documents with the same name in different folders no longer overwrite each other in
+  `FOLIO/VERSIONS`, nor do two versions saved in the same minute. Pruning old versions never removes the
+  one just saved.
+- Tabs, recent documents and the last document reopen only from the volume they came from (by its
+  identity), never from another volume that took the same number. A drive without a GPT partition ID
+  (label and size only) is matched only at its recorded number; recent documents keep their place.
+- With `docs_place=usb`, only a removable drive is taken for the USB drive.
+
+### Fixed — screens
+- The installer's options and the partition list scroll, so every option and partition can be seen and
+  reached; the "Do not turn off" warning appears before the partition manager starts writing. A click
+  on a button never selects a card hidden under it.
+- Texts that promised more than the code does (a fully atomic update, a backup of every boot sector,
+  zero-second wait) now say what really happens; messages are no longer cut off (long translations).
+- The installer's shrink offer follows the same EFI partition rule as the engine; no false
+  "firmware did not accept a boot entry" warning after a BIOS install; partition sizes use the disk's
+  sector size; the LVM hint gives the whole safe order, partition included. On a BIOS PC, the 0-second
+  wait text says how to reach the other system.
+
+### Changed
+- Documentation brought up to date with 4.4: the READMEs in all 15 languages (installer, keep
+  proportions, 20 lab runs, platform badge with ARM64 and BIOS), the guides on the USB drive
+  (`README.txt`, `LEIA-ME.txt`, `INSTALL.txt`, `COMO-INSTALAR.txt`), `ARCHITECTURE.md`,
+  `ROADMAP.md`, `CONTRIBUTING.md`, `SECURITY.md` and the issue and pull request templates. They
+  now say that the partition manager writes to disks too, that copying the texts on uninstall is
+  optional, that only a partition the installer shrank grows back, where the safety copy goes when
+  FolioOS started from a disk, and where to download the beta. Saving a text is named as the
+  other way FolioOS writes to an internal volume. The installer and the guides say the safety copy is
+  made before any partition changes (open texts are saved first).
+- Tests and tools are stricter: refusals are checked on the whole disk, file inventories fail on any
+  missing, extra or unreadable file, read errors fail comparisons, test tools are built without
+  clang/nasm, the build uses a work folder of its own, the lab counts video failures and stops its
+  VMs on errors, and the stand-in BIOS system checks the drive number it was started with.
+
+### Fixed (documentation and tools)
+- `COMO-INSTALAR.txt` and `ROADMAP.md` had paths garbled by lost backslashes, and
+  `COMO-INSTALAR.txt` lacked the BIOS step. The guides said FolioOS takes 7 MB; it takes about 60 MB.
+- `tools/readmes.pl` dropped the previous translation of a changed README block on its second
+  run; it now keeps it as a `#~` entry, as `TRANSLATING.md` describes. A fuzzy translation stays fuzzy when
+  it is archived and restored.
+- `tools/linux-run.ps1` reported the exit code of an `echo` instead of the script's; `fatcat` reaches the
+  backup GPT when the primary entries cannot be read; the file inventory keeps non-ASCII names apart;
+  `fscheck_test` resize retries finish the table update; `--set-version` checks its buffer.
+- `qemu-lab.ps1 -List` also lists the three dual-boot scenarios.
+
 ## [4.4.0-beta] — 2026-11-18
 
 **Beta.** The installer writes to the computer's own disk. It passes every test on emulated
@@ -23,8 +134,9 @@ and Linux `fsck`), but it has not run on real hardware yet. Back up your disk be
     that needs `chkdsk`, or a dirty EFI partition is refused with an explanation. BitLocker disks
     ask you to confirm you have the recovery key. ext4 is never resized: the screen explains how to
     make room from Linux (GParted).
-  - Every file is checked by CRC after copying; the partition table and boot sectors are backed up
-    to the USB drive first (`FOLIO\BACKUP`).
+  - Every file is checked by CRC after copying; the partition table (the first 34 and last 33
+    sectors of the disk, not each volume's boot sector) is backed up to the USB drive first
+    (`FOLIO\BACKUP`).
   - A partition table FolioOS cannot read is never treated as an empty disk, and one it could not
     write back exactly (a GPT with a non-standard number or size of entries, an MBR with an extended
     partition) is shown but never changed. FAT32 volumes without mirrored FATs and exFAT volumes
@@ -43,19 +155,24 @@ and Linux `fsck`), but it has not run on real hardware yet. Back up your disk be
   `CONFIG.INI`.
 - **Disks and partitions** window (Settings → System, or the palette): create a FAT32 partition in
   free space, format, shrink/grow NTFS, FAT32 and exFAT, delete (with the confirmation word).
-- **Keep proportions** (Settings → System → Display, `keep_aspect=` in `CONFIG.INI`): when the
+- **Keep proportions** (Settings → System → Display and pointer, `keep_aspect=` in `CONFIG.INI`): when the
   only video mode available has another shape than the screen (e.g. 1024×768 on a widescreen) and
   the screen stretches it, FolioOS draws at the screen's shape and the stretch evens out. Choose
   *Monitor* (the shape the monitor reports, 16:9 if it reports none), 16:9, 16:10 or 4:3.
-  Ctrl+Alt+Home turns it off. Works with UEFI and BIOS, also on rotated screens.
+  Works with UEFI and BIOS, also on rotated screens. Ctrl+Alt+Home turns it off and also resets
+  rotation and resolution to automatic (and saves that); to turn off only the proportions, use the
+  control in Settings.
 - `DIAGNOSTICS.TXT` lists the computer's disks (bus, model, size, partitions and their state).
-- Hardware lab: 20 QEMU machines, including installed disks, dual boot next to a fake Windows
+- Hardware lab: 17 QEMU machines (`-List`) plus 3 dual-boot scenarios (20 runs), including installed disks, dual boot next to a fake Windows
   (UEFI) and a fake other system (BIOS), shrinking an NTFS made by Windows, and keep proportions.
 
 ### Fixed
 - `CONFIG.INI` lost `debug_serial` when the settings were saved.
 - Video settings from `CONFIG.INI` (rotation, resolution) are applied before the boot diagnostics
   are written, so `DIAGNOSTICS.TXT` shows the screen actually in use.
+- Build: the BIOS bridge is linked with `ld.lld` directly. On the CI runner the clang driver handed
+  the link to gcc, whose lld ran in MinGW mode and rejected the linker script, so CI and the 4.3.0
+  release workflow had failed since 4.3.0.
 
 ## [4.3.0] — 2026-11-17
 

@@ -72,7 +72,9 @@ static void scan(void) {
         int prim = 0; for (int p = 0; table && p < t.n; p++) if (!t.p[p].logical) prim++;
         bool mbr_ok = table && is_bios() && t.scheme == SCHEME_MBR && !t.has_extended && prim < 4;
         if (table && !t.locked && ((t.scheme == SCHEME_GPT && !is_bios()) || mbr_ok) && !why[i][0] && !found[i].found) {
-            bool esp = mbr_ok; for (int p = 0; !mbr_ok && p < t.n; p++) if (!memcmp(t.p[p].type, GPT_ESP, 16) && t.p[p].fs == FS_FAT32 && cv[p].verdict == SAFE_OK) esp = true;   /* a EFI recebe a pasta EFI/FolioOS: só se estiver em ordem */
+            /* a EFI recebe a pasta EFI/FolioOS: a primeira partição EFI do disco (a mesma regra do motor), FAT32 e em ordem */
+            bool esp = mbr_ok;
+            if (!mbr_ok) { int fe = -1; for (int p = 0; p < t.n && fe < 0; p++) if (!memcmp(t.p[p].type, GPT_ESP, 16)) fe = p; esp = fe >= 0 && t.p[fe].fs == FS_FAT32 && cv[fe].verdict == SAFE_OK; }
             Region fr[16]; int nf = part_free(&b, &t, fr, 16), big = -1;
             for (int f = 0; f < nf; f++) if (big < 0 || fr[f].count > fr[big].count) big = f;
             if (esp && big >= 0 && fr[big].count * d.bs >= ALONGSIDE_MIN_BYTES && t.n > 0 && nopt < MAXD * 4) {
@@ -140,7 +142,7 @@ void installer_open_remove(void) { open_with(MODE_REMOVE); }
 void installer_open_update(void) { open_with(MODE_UPDATE); }
 
 /* ------------------------------------------------------------ origem: o pendrive, pela PAL */
-static PalFile *rf; static char rf_path[200];
+static PalFile *rf; static char rf_path[1200];
 static void abs_path(const char *rel, char *o, int cap) { fmt(o, cap, "/%s", rel); }
 static bool s_list(void *ctx, const char *dir, void (*cb)(void *, const char *, bool, u64), void *u) {
     UNUSED(ctx); char p[200]; abs_path(dir, p, sizeof p);
@@ -154,7 +156,7 @@ static int s_read(void *ctx, const char *path, u64 off, void *buf, u32 n) {
     UNUSED(ctx);
     if (!rf || !str_eq(rf_path, path)) {
         if (rf) pal_fclose(rf);
-        char p[200]; abs_path(path, p, sizeof p); u64 sz;
+        char p[1200]; abs_path(path, p, sizeof p); u64 sz;
         rf = pal_fopen(app_boot_vol(), p, &sz);
         if (!rf) return -1;
         str_copy(rf_path, path, sizeof rf_path);
@@ -167,7 +169,7 @@ static int s_read(void *ctx, const char *path, u64 off, void *buf, u32 n) {
 /* remover: grava no pendrive pelo caminho relativo ("DOCUMENTS/computer-.../a.md"), criando as pastas */
 static bool s_save(void *ctx, const char *path, const void *data, u32 n) {
     UNUSED(ctx);
-    char p[400]; abs_path(path, p, sizeof p);
+    char p[1200]; abs_path(path, p, sizeof p);
     for (int i = 1; p[i]; i++) if (p[i] == '/') { p[i] = 0; pal_mkdir(app_boot_vol(), p); p[i] = '/'; }
     return pal_write(app_boot_vol(), p, data, n);
 }
@@ -177,8 +179,9 @@ static bool s_backup(void *ctx, const char *name, const void *data, u32 n) {
     char d[200], p[260]; fmt(d, sizeof d, "%s/BACKUP", paths_dir(DIR_FOLIO));
     pal_mkdir(app_boot_vol(), d);
     fmt(p, sizeof p, "%s/%s", d, name);
-    str_copy(backup_name, p, sizeof backup_name);
-    return pal_write(app_boot_vol(), p, data, n);
+    if (!pal_write(app_boot_vol(), p, data, n)) return false;
+    str_copy(backup_name, p, sizeof backup_name);      /* só depois de gravada: a tela não anuncia uma cópia que não existe */
+    return true;
 }
 static u64 last_draw;
 static void s_progress(void *ctx, int percent, const char *what) {
@@ -206,10 +209,12 @@ void installer_poll(void) {
     app_flush_all(); prefs_save();                  /* os textos abertos vão para o pendrive antes da cópia */
     BlkDev b; InstallSrc s; InstallOpts o;
     memset(&s, 0, sizeof s); memset(&o, 0, sizeof o);
+    backup_name[0] = 0; entry_ok = false;            /* antes de qualquer saída: nada velho na tela de erro */
+    { paths_ensure(app_boot_vol(), DIR_FOLIO); char bd[200]; fmt(bd, sizeof bd, "%s/BACKUP", paths_dir(DIR_FOLIO)); pal_mkdir(app_boot_vol(), bd); }   /* o motor lista essa pasta antes da cópia de segurança */
     int d = opt[sel].d;
     if (!disk_dev(dk[d], &b)) { res.code = INST_ERR_WRITE; str_copy(res.path, "", sizeof res.path); st = ST_FAIL; running = false; return; }
     DateTime t; pal_now(&t);
-    fmt(s.date, sizeof s.date, "%04d-%02d-%02d-%02d%02d", t.year, t.month, t.day, t.hour, t.min);
+    fmt(s.date, sizeof s.date, "%04d-%02d-%02d-%02d%02d%02d", t.year, t.month, t.day, t.hour, t.min, t.sec);
     s.list = s_list; s.read = s_read; s.backup = s_backup; s.progress = s_progress; s.save = s_save;
     s.seed = pal_ms() * 0x9E3779B97F4A7C15ull ^ ((u64)t.sec << 32 | (u64)t.min << 40 | (u64)t.day << 48);
     s.bufsize = 2u << 20; s.buf = mem_alloc(s.bufsize);   /* cabe o programa inteiro (a cópia para a partição EFI vai de uma vez) */
@@ -229,10 +234,11 @@ void installer_poll(void) {
     if (rf) { pal_fclose(rf); rf = 0; }
     mem_free(s.buf);
     /* entrada de boot no firmware (UEFI): ao lado é ela que faz o FolioOS iniciar primeiro; ao remover, ela sai */
-    if (res.code == INST_OK && opt[sel].mode == MODE_REMOVE) entry_ok = pal_boot_entry_remove() || o.bios;   /* PC só BIOS: não há entrada */
+    if (res.code == INST_OK && opt[sel].mode == MODE_REMOVE) entry_ok = o.bios || pal_boot_entry_remove(found[d].kind == FOUND_WHOLE ? found[d].part_guid : found[d].esp_guid);   /* PC só BIOS: não há entrada */
     else if (res.code == INST_OK && opt[sel].mode == MODE_UPDATE) entry_ok = true;   /* a entrada de boot continua a mesma */
     else if (res.code == INST_OK && !o.bios)
         entry_ok = pal_boot_entry_add("FolioOS", res.esp_num, res.esp_lba, res.esp_count, res.esp_guid, res.boot_path);
+    else if (res.code == INST_OK) entry_ok = true;     /* PC só BIOS: não há entrada de firmware a registrar */
     running = false;
     st = res.code == INST_OK ? ST_DONE : ST_FAIL;
     ui.redraw = true;
@@ -288,11 +294,19 @@ static void installer_body(Window *w, Rect r) {
         y = wrap(f, S(14), x, y, wd, L("Install FolioOS next to the system you already have, in the free space, or as the only system on a disk."), T->panel_text);
         y = wrap(f, S(13), x, y + S(4), wd, L("Choose where:"), dim) + S(4);
         if (!nopt) wrap(f, S(14), x, y + S(10), wd, L("No disk was found besides the USB drive FolioOS started from."), T->panel_text);
+        /* os cartões rolam acima dos botões (roda, barra; o teclado leva o cartão focado para dentro da área): nada
+         * fica escondido atrás do rodapé, e cada cartão é visto inteiro, com o disco e as partições, antes de ser escolhido */
+        static float opt_scroll;
+        Rect area = rect(r.x, (int)y, r.w, by - SI(12) - (int)y);
+        if (ui_hover(area) && ui.in.wheel) opt_scroll -= ui.in.wheel * SI(60);
+        if (opt_scroll < 0) opt_scroll = 0;
+        gfx_push_clip(area);
+        float y0 = y; y -= opt_scroll;
         for (int i = 0; i < nopt; i++) {
             int d = opt[i].d; bool al = opt[i].mode != MODE_WHOLE;
             float hgt = S(64) + S(19) * (float)n_on[d] + (why[d][0] ? S(20) : 0);
             Rect it = rect(x, (int)y, wd, (int)hgt);
-            bool fire = ui_item(it), on = i == sel;
+            bool fire = ui_item_in(it, area), on = i == sel;   /* clique só na parte visível do cartão */
             if (on) gfx_rrect(it, S(10), col_alpha(T->accent, 0.14f));
             else if (ui_hover(it)) gfx_rrect(it, S(10), col_alpha(T->text, 0.06f));
             gfx_rrect_line(it, S(10), on ? S(2) : S(1), on ? T->accent : col_alpha(T->border, 0.9f));
@@ -316,6 +330,13 @@ static void installer_body(Window *w, Rect r) {
             y += hgt + S(10);
             if (!al && hint[d][0]) y = wrap(f, S(13), x + S(12), y - S(2), wd - S(24), hint[d], T->accent) + S(10);   /* como manter o outro sistema */
         }
+        {
+            float content = y + opt_scroll - y0;
+            ui_reveal(&opt_scroll, area);
+            gfx_pop_clip();
+            if (content > area.h) ui_scrollbar(rect(r.x + r.w - SI(8), area.y + SI(4), SI(5), area.h - SI(8)), &opt_scroll, content, (float)area.h);
+            else opt_scroll = 0;
+        }
         if (ui_button(rect(x, by, SI(140), SI(40)), L("Cancel"), BTN_GHOST)) wm_close(w);
         if (ui_button(rect(x + wd - SI(180), by, SI(180), SI(40)), L("Next"), sel >= 0 ? BTN_PRIMARY : BTN_SUBTLE) && sel >= 0) {
             st = ST_CONFIRM; confirm[0] = 0; has_key = false; copy_texts = true; docs_choice = 0;
@@ -335,8 +356,8 @@ static void installer_body(Window *w, Rect r) {
         fmt(line, sizeof line, L("Version %s → %s"), fo->version[0] ? fo->version : "?", FOLIO_VERSION);
         y = wrap(fb, S(13), x + S(24), y, wd - S(24), line, T->accent) + S(8);
         y = wrap(f, S(13.5f), x, y, wd, L("Only the program, fonts, languages, themes and keyboards are replaced. Your texts, music and settings stay as they are, and fonts or themes you added are kept."), T->panel_text);
-        y = wrap(f, S(13.5f), x, y + S(4), wd, L("Each file is replaced only after the new copy has been checked, so a power cut never leaves FolioOS half updated."), T->panel_text);
-        fmt(line, sizeof line, L("Before anything is written, the start of the disk (partition table and boot sectors) is saved to %s on this USB drive."), "FOLIO/BACKUP");
+        y = wrap(f, S(13.5f), x, y + S(4), wd, L("Each file is replaced only after its new copy has been checked, and the old copy is kept until the new one is in place. If the update stops in the middle, some files may already be new: start the update again from this USB drive to finish it."), T->panel_text);
+        fmt(line, sizeof line, L("Before any partition changes, the partition table (the first and last sectors of the disk) is saved to %s on this USB drive."), "FOLIO/BACKUP");
         wrap(f, S(13.5f), x, y + S(4), wd, line, dim);
         if (ui_button(rect(x, by, SI(140), SI(40)), L("Back"), BTN_GHOST)) { st = ST_CHOOSE; ui.focus = 0; w->nav = -1; }
         if (ui_button(rect(x + wd - SI(220), by, SI(220), SI(40)), L("Update"), BTN_PRIMARY)) { st = ST_RUN; pct = 0; step[0] = 0; run_pending = true; ui.focus = 0; w->nav = -1; }
@@ -368,7 +389,7 @@ static void installer_body(Window *w, Rect r) {
         else y = wrap(f, S(13.5f), x, y, wd, fo->bios ? L("The start of the disk gets the other system's original boot code back, and the computer starts it directly again.")
                                                        : L("The EFI system partition loses only the folder EFI/FolioOS, and the computer starts the other system directly again."), T->panel_text);
         if (fo->ntfs >= 0 && fo->grow_fs == FS_NTFS) y = wrap(f, S(13.5f), x, y + S(4), wd, L("The next time Windows starts, it checks its partition (chkdsk) once; this is expected."), T->panel_text);
-        fmt(line, sizeof line, L("Before anything is written, the start of the disk (partition table and boot sectors) is saved to %s on this USB drive."), "FOLIO/BACKUP");
+        fmt(line, sizeof line, L("Before any partition changes, the partition table (the first and last sectors of the disk) is saved to %s on this USB drive."), "FOLIO/BACKUP");
         y = wrap(f, S(13.5f), x, y + S(4), wd, line, dim) + S(8);
         const char *word = L("ERASE");
         bool whole = fo->kind == FOUND_WHOLE;                   /* o disco inteiro fica vazio: sempre a palavra */
@@ -417,10 +438,12 @@ static void installer_body(Window *w, Rect r) {
             y = wrap(f, S(13.5f), x, y, wd, is_bios() ? L("The start of the disk gets FolioOS's boot code; the other system's original code is kept, and FolioOS starts it. Your texts, fonts and settings are copied from this USB drive to the new partition.")
                                                       : L("The EFI system partition only receives the folder EFI/FolioOS. Your texts, fonts and settings are copied from this USB drive to the new partition."), T->panel_text);
         }
-        fmt(line, sizeof line, LN("When the computer starts, FolioOS waits %d second for a key; without one, the other system starts as usual.",
-                                  "When the computer starts, FolioOS waits %d seconds for a key; without one, the other system starts as usual.", prefs.boot_wait), prefs.boot_wait);
+        if (prefs.boot_wait > 0)
+            fmt(line, sizeof line, LN("When the computer starts, FolioOS waits %d second for a key; without one, the other system starts as usual.",
+                                      "When the computer starts, FolioOS waits %d seconds for a key; without one, the other system starts as usual.", prefs.boot_wait), prefs.boot_wait);
+        else str_copy(line, L("The wait for a key is set to 0 seconds: the computer starts straight into FolioOS. To start the other system, use the computer's boot menu (or set a wait in Settings › System › Startup)."), sizeof line);
         y = wrap(f, S(13.5f), x, y + S(4), wd, line, T->panel_text);
-        fmt(line, sizeof line, L("Before anything is written, the start of the disk (partition table and boot sectors) is saved to %s on this USB drive."), "FOLIO/BACKUP");
+        fmt(line, sizeof line, L("Before any partition changes, the partition table (the first and last sectors of the disk) is saved to %s on this USB drive."), "FOLIO/BACKUP");
         y = wrap(f, S(13.5f), x, y + S(4), wd, line, dim);
         /* BitLocker: o FolioOS não toca na partição, mas a mudança na ordem de boot pode fazer o Windows pedir a
          * chave de recuperação uma vez; sem a chave a pessoa perde o acesso aos próprios arquivos */
@@ -448,7 +471,7 @@ static void installer_body(Window *w, Rect r) {
         for (int k = 0; k < n_on[d]; k++) y = wrap(f, S(13), x + S(24), y, wd - S(24), what_on[d][k], dim);
         y += S(8);
         y = wrap(f, S(13.5f), x, y, wd, L("FolioOS gets one partition that fills the disk, with your texts, fonts and settings copied from this USB drive."), T->panel_text);
-        fmt(line, sizeof line, L("Before anything is written, the start of the disk (partition table and boot sectors) is saved to %s on this USB drive."), "FOLIO/BACKUP");
+        fmt(line, sizeof line, L("Before any partition changes, the partition table (the first and last sectors of the disk) is saved to %s on this USB drive."), "FOLIO/BACKUP");
         y = wrap(f, S(13.5f), x, y + S(4), wd, line, T->panel_text) + S(10);
         fmt(line, sizeof line, L("To confirm, type %s:"), word);
         y = wrap(fb, S(14), x, y, wd, line, T->panel_text) + S(4);
@@ -480,12 +503,15 @@ static void installer_body(Window *w, Rect r) {
             y = wrap(f, S(14), x, y, wd, L("Remove the USB drive and restart. Your texts and settings are where they were."), T->panel_text);
         } else         if (removing) {
             y = wrap(fb, S(16), x + S(44), y + S(18), wd - S(44), L("FolioOS was removed from this computer."), T->panel_text) + S(10);
-            if (copy_texts && found[opt[sel].d].docs_files) { fmt(line, sizeof line, L("The texts from the computer are on this USB drive, in %s."), res.path); y = wrap(f, S(14), x, y, wd, line, T->panel_text) + S(4); }
+            if (copy_texts && found[opt[sel].d].docs_files) { VolInfo bv; bool usb = pal_vol_info(app_boot_vol(), &bv) && bv.removable;
+                fmt(line, sizeof line, usb ? L("The texts from the computer are on this USB drive, in %s.") : L("The texts from the computer are on the drive FolioOS started from, in %s."), res.path); y = wrap(f, S(14), x, y, wd, line, T->panel_text) + S(4); }
             y = wrap(f, S(14), x, y, wd, found[opt[sel].d].kind == FOUND_WHOLE ? L("The disk is empty now: install another system on it, or FolioOS again from this USB drive.") : L("Remove the USB drive and restart: the computer starts the other system as before."), T->panel_text);
             if (!entry_ok) y = wrap(fb, S(13.5f), x, y + S(8), wd, L("The firmware did not let FolioOS remove its boot entry; if the computer still lists FolioOS at startup, remove it in the firmware settings."), 0xFFC0392B);
         } else if (along) {
             y = wrap(fb, S(16), x + S(44), y + S(18), wd - S(44), L("FolioOS is installed next to the other system."), T->panel_text) + S(10);
-            y = wrap(f, S(14), x, y, wd, L("Remove the USB drive and restart. FolioOS starts first and waits a few seconds for a key; without one, the other system starts as usual."), T->panel_text);
+            y = wrap(f, S(14), x, y, wd, prefs.boot_wait > 0 ? L("Remove the USB drive and restart. FolioOS starts first and waits a few seconds for a key; without one, the other system starts as usual.")
+                                                         : is_bios() ? L("Remove the USB drive and restart. FolioOS starts directly (the wait for a key is 0 seconds); to be able to start the other system, set a wait of a few seconds in Settings → System.")
+                                                         : L("Remove the USB drive and restart. FolioOS starts directly (the wait for a key is 0 seconds); to start the other system, use the computer's boot menu."), T->panel_text);
         } else {
             y = wrap(fb, S(16), x + S(44), y + S(18), wd - S(44), L("FolioOS is installed on this computer."), T->panel_text) + S(10);
             y = wrap(f, S(14), x, y, wd, L("Remove the USB drive and restart. From now on the computer starts straight into FolioOS; your texts are in DOCUMENTS on the disk."), T->panel_text);
@@ -497,8 +523,8 @@ static void installer_body(Window *w, Rect r) {
         return;
     }
     /* ST_FAIL */
-    y = wrap(fb, S(16), x, y + S(18), wd, removing ? L("The removal did not finish.") : updating ? L("The update did not finish. FolioOS on the disk still works: every file is either the old or the new one.") : L("The installation did not finish."), 0xFFC0392B) + S(8);
-    fmt(line, sizeof line, res.path[0] ? "%s: %s" : "%s", L(install_error(res.code)), res.path);
+    y = wrap(fb, S(16), x, y + S(18), wd, removing ? L("The removal did not finish.") : updating ? L("The update did not finish. Some files on the disk may already be the new ones: start the update again from this USB drive to finish it.") : L("The installation did not finish."), 0xFFC0392B) + S(8);
+    fmt(line, sizeof line, res.path[0] ? "%s: %s" : "%s", L(install_error(res.code)), L(res.path));   /* um motivo (fs_safety_short) sai traduzido; um caminho fica como é */
     y = wrap(f, S(14), x, y, wd, line, T->panel_text) + S(8);
     if (backup_name[0]) { fmt(line, sizeof line, L("The previous start of the disk is saved in %s."), backup_name); y = wrap(f, S(13), x, y, wd, line, dim); }
     wrap(f, S(13), x, y + S(6), wd, L("Your texts on this USB drive were not touched. You can try again, or keep using FolioOS from the USB drive."), dim);

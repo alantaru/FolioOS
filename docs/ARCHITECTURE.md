@@ -18,7 +18,7 @@ no libc and no driver model: the UEFI firmware provides the hardware access it n
                 │ install.c  install, update, uninstall (copy + CRC check, safe file swap, texts to USB)    │
                 │ installer.c installer screen: next to another system (or shrinking it), whole disk        │
                 │ fscheck.c  other systems' partitions: refusals, NTFS/FAT32/exFAT shrink/grow in place     │
-                │ chooser.c  boot chooser: "press a key to write", else BootNext or the original MBR        │
+                │ chooser.c  boot chooser: "Press any key to write", else BootNext or the original MBR      │
                 │ partitions.c disks and partitions window: create, delete, format, resize                  │
                 └───────────────────────────────────┬────────────────────────────────────────────────────┘
                                                     │  pal_* (platform abstraction, folio.h)
@@ -56,6 +56,28 @@ no libc and no driver model: the UEFI firmware provides the hardware access it n
   of saved files, and the session restored on every boot.
 - **Immediate-mode UI.** Each frame redraws from state; widgets are function calls. This keeps
   the UI code small and the simulator deterministic for tests.
+- **Never risk someone else's disk.** Nothing is written to a disk before its first sectors are
+  backed up to the USB drive, and writes are ordered so a power cut never leaves a volume larger than
+  its partition. `part.c` marks a table it cannot read as `SCHEME_UNREADABLE` (never "empty") and
+  one it could not write back byte for byte as `locked` (`part_write` refuses it; every operation
+  stops before writing). `fscheck.c` reads other systems' volumes only to decide: it resizes NTFS,
+  FAT32 and exFAT without moving data, and refuses anything it cannot fully verify.
+
+## Video
+
+`uefi_main.c` picks the output (the one with an active EDID and a framebuffer; the console output
+when there are several monitors) and the mode (the panel's native one, or the largest with the same
+shape), then draws a logical screen that may differ from the mode:
+
+- **Rotation** (portrait tablets, `rotation=`): the logical screen is the mode turned 90/180/270°.
+- **Keep proportions** (`keep_aspect=`): when the only mode has another shape than the panel and
+  the monitor stretches it, the logical screen takes the panel's shape (e.g. 1024×576 inside
+  1024×768) and `emit_scaled` enlarges it to the mode with linear interpolation, so the monitor's
+  stretch evens out. The picture still fills the screen, so absolute pointer coordinates (0..1)
+  need no change.
+- Only what changed since the last frame is sent (a shadow copy of the logical screen); the
+  framebuffer is mapped write-combining when the CPU allows it. The BIOS bridge exposes VESA/VBE as
+  a GOP, so all of this also runs on BIOS-only PCs.
 
 ## Boot sequence
 
@@ -65,8 +87,14 @@ no libc and no driver model: the UEFI firmware provides the hardware access it n
    on the BIOS (it drops back to real mode only for INT 13h disk and INT 10h VBE calls).
 1. `efi_main` sets up memory, video (GOP, falling back to UGA), input and volumes.
 2. `app_init`: resolve folder names (`paths.c`), load the embedded font, show the splash,
-   scan fonts and themes, read `CONFIG.INI`, pick the language (setting, or UEFI
-   `PlatformLang`, or English) and the keyboard layout, restore the last session.
+   scan fonts and themes, read `CONFIG.INI`, apply the video settings (rotation, resolution,
+   keep proportions) before writing `DIAGNOSTICS.TXT`, pick the language (setting, or UEFI
+   `PlatformLang`, or English) and the keyboard layout, restore the last session. When FolioOS
+   runs from a disk where it was installed, it finds its own partition through `FOLIO.ID` (UEFI)
+   or `FOLIO\OTHERMBR.BIN` (BIOS); next to another system, `chooser.c` first shows "Press any key
+   to write" for `boot_wait` seconds and otherwise hands over: on UEFI through `BootNext` and a
+   restart (Windows and BitLocker see the usual boot), on BIOS by running the original MBR code
+   through the bridge (`FOLIO_BIOS_CHAIN`).
 3. Main loop: poll events → `app_frame` → present dirty regions.
 
 ## Testing
@@ -85,14 +113,28 @@ the keyboard in the simulator (`FOLIO_DISKS=a.img;b.img`) and in the real `BOOTX
 confirmation word must leave the disk untouched, the right one must produce a verified volume.
 `install_test --windows` builds a disk like a PC with Windows (EFI partition, MSR, a hole in the
 table, C:, recovery at the end); after installing next to it, `--compare` checks that every entry,
-every other partition and the Windows files on the EFI partition are unchanged.
+every other partition and the Windows files on the EFI partition are unchanged. `--windows-bios`
+and `--mbr-fat32` do the same on MBR disks, and `--op-*` drive the partition manager's engine.
+Refusals are tested too: a locked or unreadable table, a dirty or non-mirrored FAT32, a scattered
+exFAT bitmap, BitLocker without confirmation — each must leave the disk byte for byte the same.
 
-`tools/qemu-lab.ps1` is the hardware lab: it boots the real binaries in QEMU on 15 machines
+The file-system code is judged by the systems that own the formats, not only by FolioOS:
+`tests/fixtures` holds NTFS, FAT32 and exFAT volumes formatted by Windows and ext4 volumes made by
+Linux (with the facts each system reports), `tools/fscheck_test.c` must agree with them, and
+`tools/ntfs-shrink-check.ps1` / `tools/vhd-chkdsk.ps1` (Windows `chkdsk`, as administrator) and
+`tools/linux-run.ps1` (Alpine Linux in QEMU: `fsck.vfat`, `fsck.exfat`, `e2fsck`) check what FolioOS
+wrote. Regenerating the fixtures needs administrator rights; the build only reads them.
+
+`tools/qemu-lab.ps1` is the hardware lab: it boots the real binaries in QEMU on 17 machines (`-List`)
 (UEFI x64/IA32/ARM64 with OVMF/AAVMF, BIOS-only with SeaBIOS; 8 graphics cards; PS/2, USB mouse
 and tablet; HDA and AC'97; USB, IDE, SATA and NVMe disks; two of them start FolioOS installed on
 the internal disk, with no USB drive, and use the installer screen to install onto a second NVMe or
-IDE disk; a dual-boot run installs next to a stand-in Windows, `build\fakewin.efi`, then starts the
-disk twice: without a key the firmware ends up in "Windows", with a key in the FolioOS editor) and
+IDE disk; two start with `keep_aspect=16:9` in a 1024×768 mode, on UEFI and on BIOS; three dual-boot
+runs install from the screen next to another system — a stand-in Windows, `build\fakewin.efi`
+(`dual-uefi-sata`), an NTFS made by Windows with no free space, shrunk by the installer
+(`dual-ntfs-shrink`), and a stand-in BIOS system, `tools\fakeother.asm` (`dual-bios-ide`) — then
+start the disk without a key (the other system) and with one (the FolioOS editor), uninstall from
+the screen and check that the firmware or the original MBR starts the other system directly) and
 drives each one over QMP: boot, keyboard,
 mouse click, sound (captured to WAV), typing and saving a document, and afterwards reads the
 disk image back to check the saved text, `DIAGNOSTICS.TXT` (including the list of disks) and the

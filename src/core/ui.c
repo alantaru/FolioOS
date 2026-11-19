@@ -207,6 +207,12 @@ bool ui_item(Rect r) {
     if (hv) ui.cursor = 2;
     return (ui.in.pressed && hv) || (f && ui.nav_fire);
 }
+/* o mesmo, numa lista que rola: o clique só conta na parte visível (vis); o teclado alcança o item inteiro */
+bool ui_item_in(Rect r, Rect vis) {
+    bool f = ui_nav(r, NAV_ITEM), hv = ui_hover(rect_clip(r, vis));
+    if (hv) ui.cursor = 2;
+    return (ui.in.pressed && hv) || (f && ui.nav_fire);
+}
 void ui_reveal(float *scroll, Rect view) {
     if (!ui.nav_reveal || !ui.nav_found || !ui.cur_win || ui.cur_win != ui.key_win) return;
     Rect r = ui.nav_r; int pad = SI(14);
@@ -344,7 +350,8 @@ void ui_tooltip(const void *id, Rect r, const char *text) {
     ui.tip = text; ui.tip_r = r;
 }
 
-typedef struct { char msg[160]; u64 t; } Toast;
+typedef struct { char msg[1024]; u64 t; } Toast;   /* cabe uma mensagem longa traduzida; desenhada em várias linhas */
+static float toast_secs(const char *m) { float s = 3.2f + (float)str_len(m) / 40.0f; return s > 12.0f ? 12.0f : s; }
 static Toast toasts[4]; static int ntoasts;
 void ui_toast(const char *msg) {
     /* um aviso por vez: o novo substitui o anterior (menos ruído visual) */
@@ -359,20 +366,33 @@ void ui_draw_toasts(void) {
     Face *f = ui_font(false); float px = S(14);
     float y = ui.H - S(84);
     for (int i = ntoasts - 1; i >= 0; i--) {
-        float age = (float)(ui.in.now - toasts[i].t) / 1000.0f;
-        if (age > 3.2f) { memmove(toasts + i, toasts + i + 1, sizeof(Toast) * (usize)(ntoasts - i - 1)); ntoasts--; continue; }
-        float a = age < 0.25f ? age / 0.25f : age > 2.7f ? (3.2f - age) / 0.5f : 1.0f;
-        float w = text_width(f, px, toasts[i].msg, -1) + S(44);
-        Rect r = rect((int)((ui.W - w) / 2), (int)(y + (1 - ease_out(MIN(1.0f, age * 4))) * S(10)), (int)w, SI(38));
+        float age = (float)(ui.in.now - toasts[i].t) / 1000.0f, life = toast_secs(toasts[i].msg);
+        if (age > life) { memmove(toasts + i, toasts + i + 1, sizeof(Toast) * (usize)(ntoasts - i - 1)); ntoasts--; continue; }
+        float a = age < 0.25f ? age / 0.25f : age > life - 0.5f ? (life - age) / 0.5f : 1.0f;
+        /* em linhas que cabem na tela (no máximo 12) */
+        const char *m = toasts[i].msg; int len = str_len(m), st[12], ln[12], nl = 0; float maxw = (float)ui.W - S(120), w = 0;
+        for (int p = 0; p < len && nl < 12; ) {
+            int n = text_fit(f, px, m + p, len - p, maxw);
+            if (n <= 0) n = utf8_next(m + p, len - p, 0);
+            if (p + n < len) { int k = n; while (k > 0 && m[p + k] != ' ') k--; if (k > 0) n = k; }
+            st[nl] = p; ln[nl] = n; nl++;
+            float lw = text_width(f, px, m + p, n); if (lw > w) w = lw;
+            p += n; while (p < len && m[p] == ' ') p++;
+        }
+        if (!nl) { st[0] = 0; ln[0] = 0; nl = 1; }
+        w += S(44);
+        float lh = px * 1.45f; int h = (int)(SI(38) + (nl - 1) * lh);
+        Rect r = rect((int)((ui.W - w) / 2), (int)(y - (nl - 1) * lh + (1 - ease_out(MIN(1.0f, age * 4))) * S(10)), (int)w, h);
         gfx_set_opacity(a);
         gfx_shadow(rect(r.x, r.y + SI(4), r.w, r.h), S(19), S(16), 0x40000000);
         Color bg = T->dark ? col_lum_shift(T->panel, 0.08f) : 0xFF2A2724;
         Color fg = T->dark ? T->panel_text : 0xFFF5F2EC;
         gfx_rrect(r, S(19), bg);
-        gfx_circle(r.x + S(18), r.y + r.h * 0.5f, S(3.5f), T->accent);
-        draw_text(f, px, r.x + S(30), r.y + r.h * 0.5f + face_ascent(f, px) * 0.36f, toasts[i].msg, -1, fg);
+        gfx_circle(r.x + S(18), r.y + SI(38) * 0.5f, S(3.5f), T->accent);
+        for (int k = 0; k < nl; k++)
+            draw_text(f, px, r.x + S(30), r.y + SI(38) * 0.5f + face_ascent(f, px) * 0.36f + k * lh, m + st[k], ln[k], fg);
         gfx_set_opacity(1);
-        y -= S(46);
+        y -= (float)h + S(8);
         ui.redraw = true;
     }
     /* tooltip */

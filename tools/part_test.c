@@ -101,7 +101,10 @@ int main(int argc, char **argv) {
     /* 5. MBR: duas primárias, e conversão de GPT para MBR sem restos da GPT */
     snprintf(p, sizeof p, "%s\\mbr.img", argv[1]);
     d = open_img(p, 300);
-    part_new(&t, SCHEME_GPT, 7); part_free(&d, &t, r, 16); part_add(&d, &t, r[0].start, r[0].count, GPT_MSDATA, 0, "old", 8); part_write(&d, &t);
+    part_new(&t, SCHEME_GPT, 7);
+    CHECK(part_free(&d, &t, r, 16) >= 1 && part_add(&d, &t, r[0].start, r[0].count, GPT_MSDATA, 0, "old", 8) >= 0 && part_write(&d, &t), "GPT de partida");
+    io(0, 1, 1, s, false); CHECK(!memcmp(s, "EFI PART", 8), "a GPT de partida não está no setor 1");          /* havia mesmo uma GPT */
+    io(0, d.nsec - 1, 1, s, false); CHECK(!memcmp(s, "EFI PART", 8), "a GPT de partida não está no fim");
     part_new(&t, SCHEME_MBR, 77);
     nf = part_free(&d, &t, r, 16);
     CHECK(nf == 1 && r[0].start == 2048, "MBR livre");
@@ -113,8 +116,8 @@ int main(int argc, char **argv) {
     CHECK(fat32_format(io, 0, t.p[0].start, t.p[0].count, "ONE", 1) && fat32_format(io, 0, t.p[1].start, t.p[1].count, "TWO", 2), "formatar MBR");
     CHECK(part_read(&d, &u) && u.scheme == SCHEME_MBR && u.n == 2 && u.p[0].active && u.p[0].mbr_type == 0x0C, "reler MBR: esquema %d n %d", u.scheme, u.n);
     CHECK(u.n == 2 && !strcmp(u.p[0].label, "ONE") && !strcmp(u.p[1].label, "TWO"), "rótulos MBR");
-    io(0, 1, 1, s, false); CHECK(memcmp(s, "EFI PART", 8) != 0, "restos da GPT no setor 1");
-    io(0, d.nsec - 1, 1, s, false); CHECK(memcmp(s, "EFI PART", 8) != 0, "restos da GPT no fim");
+    CHECK(io(0, 1, 1, s, false) && memcmp(s, "EFI PART", 8) != 0, "restos da GPT no setor 1 (ou não deu para ler)");
+    CHECK(io(0, d.nsec - 1, 1, s, false) && memcmp(s, "EFI PART", 8) != 0, "restos da GPT no fim (ou não deu para ler)");
     CHECK(fat_mount(&f, io, 0, u.p[1].start), "montar TWO"); put_file(&f, "two.txt", "second");
 
     /* 6. pendrive sem tabela (FAT32 desde o setor 0) */

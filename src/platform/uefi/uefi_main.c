@@ -974,7 +974,7 @@ void pal_wait(int ms) {
 }
 
 /* ------------------------------------------------------------ arquivos */
-typedef struct { EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *fs; EFI_FILE_PROTOCOL *root; bool boot; char label[64]; bool has_guid; u8 guid[16]; } Vol;
+typedef struct { EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *fs; EFI_FILE_PROTOCOL *root; bool boot; char label[64]; bool has_guid; u8 guid[16]; bool removable, readonly; u64 size; } Vol;
 static Vol vols[16]; static int nvols;
 
 static void w_to_utf8(const CHAR16 *w, char *o, int cap) {
@@ -993,6 +993,7 @@ static void path_w(const char *p, CHAR16 *o, int cap) {
     o[n] = 0;
 }
 
+static EFI_GUID bio_guid;                          /* definida mais abaixo (discos inteiros) */
 static void fs_init(void) {
     EFI_LOADED_IMAGE_PROTOCOL *li = 0;
     BS->HandleProtocol(image, &limg_guid, (void **)&li);
@@ -1006,19 +1007,29 @@ static void fs_init(void) {
             Vol *v = &vols[nvols];
             if (EFI_ERROR(BS->HandleProtocol(hs[i], &sfs_guid, (void **)&v->fs))) continue;
             if (EFI_ERROR(v->fs->OpenVolume(v->fs, &v->root))) continue;
-            v->boot = isboot; v->has_guid = false;
+            v->boot = isboot; v->has_guid = false; v->removable = false; v->readonly = false; v->size = 0;
+            {   /* mídia removível (pendrive, cartão), pelo Block I/O da própria partição */
+                EFI_BLOCK_IO_PROTOCOL *bb = 0;
+                if (!EFI_ERROR(BS->HandleProtocol(hs[i], &bio_guid, (void **)&bb)) && bb && bb->Media) { if (bb->Media->RemovableMedia) v->removable = true; if (bb->Media->ReadOnly) v->readonly = true; }
+            }
             {   /* partição GPT do volume: nó de disco rígido do caminho, com assinatura GUID */
                 u8 *dp = 0;
                 if (!EFI_ERROR(BS->HandleProtocol(hs[i], &dp_guid, (void **)&dp)) && dp)
                     for (int k = 0; k < 64 && dp[0] != 0x7F; k++) {
                         u32 l = dp[2] | dp[3] << 8; if (l < 4) break;
                         if (dp[0] == 4 && dp[1] == 1 && l >= 42 && dp[41] == 2) { memcpy(v->guid, dp + 24, 16); v->has_guid = true; }
+                        if (dp[0] == 3 && (dp[1] == 5 || dp[1] == 0x0F)) v->removable = true;   /* no barramento USB */
                         dp += l;
                     }
             }
             u8 buf[512]; UINTN sz = sizeof buf;
             v->label[0] = 0;
-            if (!EFI_ERROR(v->root->GetInfo(v->root, &fsinfo_guid, &sz, buf))) w_to_utf8(((EFI_FILE_SYSTEM_INFO *)buf)->VolumeLabel, v->label, 64);
+            if (!EFI_ERROR(v->root->GetInfo(v->root, &fsinfo_guid, &sz, buf))) {
+                EFI_FILE_SYSTEM_INFO *fi = (EFI_FILE_SYSTEM_INFO *)buf;
+                w_to_utf8(fi->VolumeLabel, v->label, 64);
+                v->size = fi->VolumeSize;                    /* parte da identidade de um volume sem GPT (ver app.c, vol_ident) */
+                if (fi->ReadOnly) v->readonly = true;
+            }
             nvols++;
         }
     BS->FreePool(hs);
@@ -1028,7 +1039,7 @@ static void fs_init(void) {
 static EFI_GUID bio_guid   = { 0x964e5b21, 0x6459, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b } };
 static EFI_GUID dinfo_guid = { 0xd432a67f, 0x14dc, 0x484b, { 0xb3, 0xbb, 0x3f, 0x02, 0x91, 0x84, 0x93, 0x27 } };
 static EFI_GUID dpath_guid = { 0x09576e91, 0x6d3f, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b } };
-typedef struct { EFI_BLOCK_IO_PROTOCOL *bio; DiskInfo info; } Disk;
+typedef struct { EFI_BLOCK_IO_PROTOCOL *bio; DiskInfo info; UINT32 media_id; } Disk;   /* media_id: a mídia que foi listada (e escolhida) */
 static Disk disks[16]; static int ndisks; static bool disks_done;
 void *pal_dma_alloc(usize bytes);
 static u8 *disk_bounce;            /* 64 KB alinhados a 4 KB, para firmwares que exigem IoAlign */
@@ -1073,8 +1084,8 @@ static void disk_model(EFI_HANDLE h, Disk *d) {
     memset(b, 0, sizeof b);
     if ((d->info.kind == DISK_SATA || d->info.kind == DISK_IDE) && di->Identify && !EFI_ERROR(di->Identify(di, b, &sz)) && sz >= 94)
         id_str(d->info.model, sizeof d->info.model, &n, b + 54, 40, true);           /* ATA IDENTIFY, palavras 27..46 */
-    else if (d->info.kind == DISK_NVME && di->Identify && !EFI_ERROR(di->Identify(di, b, &sz)) && sz >= 64 && b[4] && b[24] >= 32)
-        id_str(d->info.model, sizeof d->info.model, &n, b + 24, 40, false);          /* NVMe: dados do controlador, se vierem */
+    /* NVMe: a DiskInfo devolve os dados do namespace, não os do controlador (onde fica o modelo): não interpretar */
+    else if (d->info.kind == DISK_NVME) return;
     else { sz = sizeof b; if (di->Inquiry && !EFI_ERROR(di->Inquiry(di, b, &sz)) && sz >= 32) {
         id_str(d->info.model, sizeof d->info.model, &n, b + 8, 8, false);            /* SCSI/USB: fabricante + produto */
         id_str(d->info.model, sizeof d->info.model, &n, b + 16, 16, false); } }
@@ -1095,6 +1106,7 @@ static void disks_init(void) {
         if (m->LogicalPartition || !m->MediaPresent || !m->BlockSize || m->BlockSize > 4096) continue;
         Disk *d = &disks[ndisks]; memset(d, 0, sizeof *d);
         d->bio = b;
+        d->media_id = m->MediaId;
         d->info.nsec = m->LastBlock + 1; d->info.bs = m->BlockSize;
         d->info.removable = m->RemovableMedia; d->info.readonly = m->ReadOnly;
         EFI_DEVICE_PATH *dp = 0;
@@ -1115,13 +1127,18 @@ bool pal_disk_io(int k, u64 lba, u32 count, void *buf, bool write) {
     if (k < 0 || k >= ndisks) return false;
     Disk *d = &disks[k]; EFI_BLOCK_IO_PROTOCOL *b = d->bio; u32 bs = d->info.bs;
     if (lba + count > d->info.nsec || (write && d->info.readonly)) return false;
+    /* a mesma mídia que foi listada e escolhida: trocada (outro pendrive, outro cartão no mesmo leitor), nenhuma
+     * leitura ou gravação acontece até uma nova varredura */
+    EFI_BLOCK_IO_MEDIA *md = b->Media;
+    if (!md || !md->MediaPresent || md->MediaId != d->media_id || md->BlockSize != bs || md->LastBlock + 1 != d->info.nsec) return false;
     if (!disk_bounce) disk_bounce = pal_dma_alloc(DISK_CHUNK * 512);
     u32 align = b->Media->IoAlign;
     u8 *p = buf;
     while (count) {
         u32 k2 = count > DISK_CHUNK ? DISK_CHUNK : count;
         if (k2 * bs > DISK_CHUNK * 512 && bs > 512) k2 = DISK_CHUNK * 512 / bs;
-        bool bounce = align > 1 && ((uintptr_t)p & (align - 1)) && disk_bounce;
+        bool bounce = align > 1 && ((uintptr_t)p & (align - 1));
+        if (bounce && (!disk_bounce || ((uintptr_t)disk_bounce & (align - 1)))) return false;   /* sem um buffer alinhado: não */
         u8 *io = bounce ? disk_bounce : p;
         if (bounce && write) memcpy(io, p, (usize)k2 * bs);
         EFI_STATUS s = write ? b->WriteBlocks(b, b->Media->MediaId, lba, (UINTN)k2 * bs, io) : b->ReadBlocks(b, b->Media->MediaId, lba, (UINTN)k2 * bs, io);
@@ -1144,6 +1161,7 @@ bool pal_vol_info(int v, VolInfo *o) {
     o->boot = vols[v].boot;
     str_copy(o->label, vols[v].label[0] ? vols[v].label : (vols[v].boot ? "FOLIO" : "Disco"), sizeof o->label);
     o->has_guid = vols[v].has_guid; memcpy(o->part_guid, vols[v].guid, 16);
+    o->removable = vols[v].removable; o->readonly = vols[v].readonly; o->size = vols[v].size;
     return true;
 }
 
@@ -1390,15 +1408,21 @@ static void boot_var_name(CHAR16 *o, const char *pfx, int num) {
     if (num >= 0) for (int s = 12; s >= 0; s -= 4) o[k++] = (CHAR16)"0123456789ABCDEF"[(num >> s) & 15];
     o[k] = 0;
 }
-static u8 *var_get(CHAR16 *name, UINTN *size) {
+/* *missing = true só quando o firmware diz que a variável não existe (EFI_NOT_FOUND); qualquer outra falha de
+ * leitura não é "ausente": quem grava tem de parar (senão trocaria a BootOrder inteira, ou uma Boot#### que existe) */
+static u8 *var_get2(CHAR16 *name, EFI_GUID *g, UINTN *size, bool *missing) {
     EFI_RUNTIME_SERVICES *rt = ST->RuntimeServices;
+    *missing = false;
     if (!rt || !rt->GetVariable) return 0;
     UINT32 attr; UINTN n = 0;
-    if (rt->GetVariable(name, &gvar, &attr, &n, 0) != EFI_BUFFER_TOO_SMALL || !n) return 0;
+    EFI_STATUS st = rt->GetVariable(name, g, &attr, &n, 0);
+    if (st == EFI_NOT_FOUND) { *missing = true; return 0; }
+    if (st != EFI_BUFFER_TOO_SMALL || !n) return 0;
     u8 *b = mem_alloc(n + 2);
-    if (!b || EFI_ERROR(rt->GetVariable(name, &gvar, &attr, &n, b))) { mem_free(b); return 0; }
+    if (!b || EFI_ERROR(rt->GetVariable(name, g, &attr, &n, b))) { mem_free(b); return 0; }
     *size = n; return b;
 }
+static u8 *var_get(CHAR16 *name, UINTN *size) { bool m; return var_get2(name, &gvar, size, &m); }
 static bool var_set(CHAR16 *name, const void *d, UINTN n) {
     EFI_RUNTIME_SERVICES *rt = ST->RuntimeServices;
     return rt && rt->SetVariable && !EFI_ERROR(rt->SetVariable(name, &gvar, 7 /* NV | BS | RT */, n, (void *)d));
@@ -1468,19 +1492,22 @@ bool pal_boot_entry_add(const char *desc, int part_num, u64 part_lba, u64 part_c
     #undef P16
     #undef P32
     #undef P64
-    /* uma entrada com o mesmo caminho já existe? (reinstalação) */
-    CHAR16 nm[16]; UINTN osz = 0; boot_var_name(nm, "BootOrder", -1);
-    u16 *order = (u16 *)var_get(nm, &osz); int on = order ? (int)(osz / 2) : 0;
+    /* a ordem atual: só "não existe" vale como vazia; outra falha de leitura para tudo antes de gravar qualquer coisa */
+    CHAR16 nm[16]; UINTN osz = 0; bool missing; boot_var_name(nm, "BootOrder", -1);
+    u16 *order = (u16 *)var_get2(nm, &gvar, &osz, &missing); int on = order ? (int)(osz / 2) : 0;
+    if (!order && !missing) return false;
+    /* uma entrada com o mesmo caminho já existe, dentro ou fora da ordem? (reinstalação, ou uma tentativa anterior que
+     * gravou a Boot#### e não chegou a gravar a BootOrder): é ela que se usa, sem criar outra */
     int num = -1;
-    for (int i = 0; i < on && num < 0; i++) {
-        boot_var_name(nm, "Boot", order[i]); UINTN n; u8 *v = var_get(nm, &n);
+    for (int c = 0; c < 0x1000 && num < 0; c++) {
+        boot_var_name(nm, "Boot", c); UINTN n; u8 *v = var_get2(nm, &gvar, &n, &missing);
         u32 at; const CHAR16 *d; const u8 *dp; u32 dl;
-        if (v && opt_parse(v, n, &at, &d, &dp, &dl) && dl == dplen && !memcmp(dp, opt + dp_at, dplen)) num = order[i];
+        if (v && opt_parse(v, n, &at, &d, &dp, &dl) && dl == dplen && !memcmp(dp, opt + dp_at, dplen)) num = c;
         mem_free(v);
     }
-    for (int c = 0; num < 0 && c < 0x1000; c++) {    /* número livre */
-        boot_var_name(nm, "Boot", c); UINTN n; u8 *v = var_get(nm, &n);
-        if (!v) num = c; else mem_free(v);
+    for (int c = 0; num < 0 && c < 0x1000; c++) {    /* número livre: só um que o firmware diz não existir */
+        boot_var_name(nm, "Boot", c); UINTN n; u8 *v = var_get2(nm, &gvar, &n, &missing);
+        if (!v && missing) num = c; else mem_free(v);
     }
     bool ok = num >= 0;
     if (ok) { boot_var_name(nm, "Boot", num); ok = var_set(nm, opt, k); }
@@ -1495,22 +1522,54 @@ bool pal_boot_entry_add(const char *desc, int part_num, u64 part_lba, u64 part_c
     mem_free(order);
     return ok;
 }
-/* a entrada é do FolioOS: o caminho passa por \EFI\FolioOS (ao lado) ou a descrição é "FolioOS" (disco inteiro) */
-static bool entry_is_folio(const CHAR16 *d, const u8 *dp, u32 dl) {
-    static const char nm[] = "FolioOS"; int i = 0;
-    for (; nm[i] && d[i] == (CHAR16)nm[i]; i++) {}
-    return dp_is_folio(dp, dl) || (!nm[i] && !d[i]);
+/* o nó de arquivo do caminho começa por \EFI\FolioOS\ (sem diferenciar maiúsculas)? */
+static bool dp_file_folio(const u8 *dp, u32 len) {
+    for (u32 k = 0; k + 4 <= len; ) {
+        u32 l = dp[k + 2] | dp[k + 3] << 8; if (l < 4 || k + l > len) break;
+        if (dp[k] == 4 && dp[k + 1] == 4) {
+            static const char w[] = "\\efi\\folioos\\"; u32 nch = (l - 4) / 2; const u8 *s = dp + k + 4;
+            if (nch < 13) return false;
+            for (int j = 0; j < 13; j++) { u16 c = (u16)(s[2 * j] | s[2 * j + 1] << 8); if (c == '/') c = '\\'; if (c >= 'A' && c <= 'Z') c += 32; if (c != (u16)w[j]) return false; }
+            return true;
+        }
+        if (dp[k] == 0x7F) break;
+        k += l;
+    }
+    return false;
 }
-/* desinstalar: as entradas Boot#### do FolioOS somem, e a BootOrder fica com o resto, na mesma ordem; o firmware
- * volta a iniciar o outro sistema direto */
-bool pal_boot_entry_remove(void) {
+/* o GUID da partição no nó de disco rígido (GPT) do caminho */
+static bool dp_part_guid(const u8 *dp, u32 len, u8 g[16]) {
+    for (u32 k = 0; k + 4 <= len; ) {
+        u32 l = dp[k + 2] | dp[k + 3] << 8; if (l < 4 || k + l > len) break;
+        if (dp[k] == 4 && dp[k + 1] == 1 && l >= 42 && dp[k + 41] == 2) { memcpy(g, dp + k + 24, 16); return true; }
+        if (dp[k] == 0x7F) break;
+        k += l;
+    }
+    return false;
+}
+/* a entrada é a DESTA instalação: aponta para a partição dela (pelo GUID) e para o programa do FolioOS —
+ * \EFI\FolioOS\... (ao lado de outro sistema) ou a descrição exata "FolioOS" (disco inteiro, \EFI\BOOT\...).
+ * Sem GUID (part_guid nulo), nada casa: outras instalações e carregadores com "FolioOS" no nome ficam. */
+static const u8 *rm_guid;
+static bool entry_is_folio(const CHAR16 *d, const u8 *dp, u32 dl) {
+    static const char nm[] = "FolioOS"; int i = 0; u8 g[16];
+    if (!rm_guid || !dp_part_guid(dp, dl, g) || memcmp(g, rm_guid, 16)) return false;
+    for (; nm[i] && d[i] == (CHAR16)nm[i]; i++) {}
+    return dp_file_folio(dp, dl) || (!nm[i] && !d[i]);
+}
+/* desinstalar: as entradas Boot#### desta instalação somem, e a BootOrder fica com o resto, na mesma ordem; o
+ * firmware volta a iniciar o outro sistema direto */
+bool pal_boot_entry_remove(const u8 part_guid[16]) {
     EFI_RUNTIME_SERVICES *rt = ST->RuntimeServices;
     if (!rt || !rt->SetVariable || !rt->GetVariable) return false;
-    CHAR16 nm[16]; UINTN osz = 0; boot_var_name(nm, "BootOrder", -1);
-    u16 *order = (u16 *)var_get(nm, &osz); int on = order ? (int)(osz / 2) : 0;
+    rm_guid = part_guid;
+    CHAR16 nm[16]; UINTN osz = 0; bool missing; boot_var_name(nm, "BootOrder", -1);
+    u16 *order = (u16 *)var_get2(nm, &gvar, &osz, &missing); int on = order ? (int)(osz / 2) : 0;
+    if (!order && !missing) return false;              /* não deu para ler a ordem: não regrava nada */
     u16 *keep = mem_alloc((usize)on * 2 + 2); int nk = 0; bool ok = true;
     for (int i = 0; i < on; i++) {
-        boot_var_name(nm, "Boot", order[i]); UINTN n; u8 *v = var_get(nm, &n);
+        boot_var_name(nm, "Boot", order[i]); UINTN n; u8 *v = var_get2(nm, &gvar, &n, &missing);
+        if (!v && !missing) { mem_free(keep); mem_free(order); return false; }   /* entrada ilegível: não mexe na ordem */
         u32 at; const CHAR16 *d; const u8 *dp; u32 dl;
         char dn[64] = "?";
         bool parsed = v && opt_parse(v, n, &at, &d, &dp, &dl);
@@ -1548,11 +1607,38 @@ bool pal_chain_mbr(const u8 *code) {
     c->Chain(code);
     return false;
 }
+/* a última tentativa automática de iniciar o outro sistema (variável do próprio FolioOS, não volátil: sobrevive
+ * ao reinício): número da entrada e o contador de boots da plataforma (os 32 bits altos do contador monotônico
+ * da UEFI, que avançam uma vez a cada boot; o serviço de boot só lê, não avança a parte alta) no momento do
+ * pedido. Se o FolioOS volta a iniciar no boot seguinte (contador + 1: o firmware não conseguiu carregar a
+ * entrada e seguiu a BootOrder no mesmo boot), a mesma entrada não é pedida de novo sozinha — senão o PC
+ * ficaria preso num ciclo sem nunca chegar ao outro sistema. Se o outro sistema rodou, já houve pelo menos mais
+ * um boot (contador + 2 ou mais), e tudo segue normal. Sem o serviço no firmware, nada é suprimido (como antes). */
+static EFI_GUID folio_var = { 0x464f4c49, 0x4f43, 0x4841, { 0x49, 0x4e, 0x42, 0x4f, 0x4f, 0x54, 0x00, 0x01 } };
+static bool boot_count(u32 *c) {
+    UINT64 m;
+    if (!BS || !BS->GetNextMonotonicCount || EFI_ERROR(BS->GetNextMonotonicCount(&m))) return false;
+    *c = (u32)(m >> 32); return true;
+}
 static int other_num = -1;
 bool pal_boot_other(char *name, int cap) {
     CHAR16 nm[16]; UINTN osz = 0; boot_var_name(nm, "BootOrder", -1);
     u16 *order = (u16 *)var_get(nm, &osz); int on = order ? (int)(osz / 2) : 0;
     other_num = -1;
+    int failed = -1;                                   /* a entrada que acabou de falhar (o FolioOS voltou em < 3 min) */
+    {
+        CHAR16 tn[24]; boot_var_name(tn, "FolioOSBootTry", -1); UINTN n = 0; bool miss;
+        u8 *v = var_get2(tn, &folio_var, &n, &miss);
+        u32 now;
+        if (v && n == 6 && boot_count(&now)) {
+            u32 then = (u32)v[2] | (u32)v[3] << 8 | (u32)v[4] << 16 | (u32)v[5] << 24;
+            if (now == then + 1) failed = v[0] | v[1] << 8;   /* de volta no mesmo boot em que a entrada foi tentada */
+        }
+        mem_free(v);
+        EFI_RUNTIME_SERVICES *rt = ST->RuntimeServices;
+        if (rt && rt->SetVariable && (v || !miss)) rt->SetVariable(tn, &folio_var, 7, 0, 0);   /* consumida */
+        if (failed >= 0) dbg("boot chooser: Boot%04X did not start last time; not trying it again automatically", failed);
+    }
     for (int i = 0; i < on && other_num < 0; i++) {
         boot_var_name(nm, "Boot", order[i]); UINTN n; u8 *v = var_get(nm, &n);
         u32 at; const CHAR16 *d; const u8 *dp; u32 dl;
@@ -1566,10 +1652,20 @@ bool pal_boot_other(char *name, int cap) {
         mem_free(v);
     }
     mem_free(order);
+    if (other_num >= 0 && other_num == failed) other_num = -1;   /* fica no FolioOS; a pessoa decide o que fazer */
     return other_num >= 0;
 }
 void pal_boot_other_start(void) {
     if (other_num < 0) return;
+    {   /* registra a tentativa antes de pedir o BootNext */
+        /* sem o registro, uma entrada que falha seria pedida de novo a cada início: então nada de pedido automático
+         * nem pelo Esc (fica no FolioOS; o menu de boot do firmware continua valendo). Gravar uma variável NV quase nunca falha. */
+        CHAR16 tn[24]; boot_var_name(tn, "FolioOSBootTry", -1); u32 now;
+        EFI_RUNTIME_SERVICES *rt = ST->RuntimeServices;
+        if (!boot_count(&now) || !rt || !rt->SetVariable) { dbg("boot chooser: cannot record the attempt; staying in FolioOS"); return; }
+        u8 rec[6] = { (u8)other_num, (u8)(other_num >> 8), (u8)now, (u8)(now >> 8), (u8)(now >> 16), (u8)(now >> 24) };
+        if (EFI_ERROR(rt->SetVariable(tn, &folio_var, 7, sizeof rec, rec))) { dbg("boot chooser: cannot record the attempt; staying in FolioOS"); return; }
+    }
     CHAR16 nm[16]; boot_var_name(nm, "BootNext", -1);
     u16 n = (u16)other_num;
     if (!var_set(nm, &n, 2)) return;

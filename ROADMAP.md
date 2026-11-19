@@ -6,12 +6,16 @@ FolioOS splits into two editions that share the same editor (`src/core`): the sa
 | | **FolioOS** | **FolioOS Sync** |
 |---|---|---|
 | Philosophy | **Zero internet, ever.** Instant and minimal. | Writing first; the network is off until you ask for it, and is used only to sync your texts |
-| What it is | Today's freestanding program (~600 KB) on UEFI or BIOS | A minimal Alpine Linux that starts straight into the FolioOS editor |
+| What it is | Today's freestanding program (~800 KB) on UEFI or BIOS | A minimal Alpine Linux that starts straight into the FolioOS editor |
 | Hardware | Universal, down to very old PCs (BIOS-only, 32-bit UEFI) | Modern laptops (Wi-Fi, I2C touchpads, DSP audio), Raspberry Pi |
 | Runs from | USB drive, or installed as the only system or next to any other | USB drive, or installed as the only system or next to any other |
 | Secure Boot | Supported (phase 7) | Supported from the start |
 
 Status: ✅ done · 🔨 in progress · ⏳ planned
+
+Phases 1–3 shipped in **FolioOS 4.4.0 beta**, with the review fixes in **4.4.1 beta**. Everything below marked ✅ passes on every build and
+in the QEMU lab, but the installer has not yet run on real hardware: until reports come in, it stays
+a beta (back up first, or use a spare disk).
 
 ---
 
@@ -34,8 +38,9 @@ Status: ✅ done · 🔨 in progress · ⏳ planned
   computer, on the USB drive (they go with you; without the drive, new texts are saved on the computer),
   or on both, with a button that exchanges them with the USB drive (the newest version of each text wins,
   the replaced one is kept in `FOLIO\VERSIONS`, nothing is deleted).
-- ✅ **Backup and uninstall.** Before anything is written, the partition table and the boot sectors
-  are saved to the USB drive (`FOLIO\BACKUP\`). Uninstalling copies the texts to the USB drive first
+- ✅ **Backup and uninstall.** Before anything is written, the partition table — the first 34 and the
+  last 33 sectors of the disk (MBR and both GPT copies), not each volume's boot sector — is saved to the
+  USB drive (`FOLIO\BACKUP\`). Uninstalling copies the texts to the USB drive first
   (checked file by file):
   - next to another system: `\EFI\FolioOS` and FolioOS's boot entry are removed and the space goes
     back to Windows; tested on a real UEFI firmware in the QEMU lab (afterwards the computer starts
@@ -52,7 +57,7 @@ Status: ✅ done · 🔨 in progress · ⏳ planned
   receives only `\EFI\FolioOS\` (the program and `FOLIO.ID`, which names FolioOS's partition); fonts,
   settings and texts stay on FolioOS's partition. Nothing else on the disk changes: the table gains one
   entry, and every other partition stays byte-for-byte the same (checked by the build and the lab).
-- ✅ **Boot chooser.** Every start shows "press a key to write" for 3 seconds (set in Settings → System,
+- ✅ **Boot chooser.** Every start shows "Press any key to write" for 3 seconds (set in Settings → System,
   saved as `boot_wait=` in `CONFIG.INI`; 0 always starts FolioOS), then hands over to the other system: the next entry of the firmware's boot order
   (Windows Boot Manager, GRUB, systemd-boot, rEFInd…). The other system is started by the firmware
   (`BootNext` and a restart), never from inside FolioOS, so Windows starts exactly as before and
@@ -73,7 +78,7 @@ Status: ✅ done · 🔨 in progress · ⏳ planned
     tested against volumes made by Linux itself (Alpine in QEMU, `tools\ext-fixtures.ps1`);
   - ✅ FAT32 and exFAT: shrink and grow back the same way (only the end moves; the FAT or the allocation
     bitmap is sized so the volume can grow back). Checked by Windows' `chkdsk` and by Linux's `fsck.vfat` and
-    `fsck.exfat` against volumes formatted by Windows (`testsixtures`).
+    `fsck.exfat` against volumes formatted by Windows (`tests\fixtures`).
 - ✅ **Refused with a clear explanation** of how to fix it in the owning system. Each partition shows
   its state in the installer:
   - volumes encrypted with BitLocker or LUKS;
@@ -96,10 +101,10 @@ Status: ✅ done · 🔨 in progress · ⏳ planned
   stays the active one.
 - ✅ Our MBR starts FolioOS's partition (its entry number is kept in the MBR), and the BIOS bridge shows the
   same chooser. To start the other system it runs the original MBR code, saved at install time in
-  `FOLIOOTHERMBR.BIN`, exactly as the BIOS would have.
+  `FOLIO\OTHERMBR.BIN`, exactly as the BIOS would have.
 - ✅ Uninstalling puts the original MBR code back, removes FolioOS's entry and grows the other partition
   back: the table, the MBR and the boot sectors come back byte for byte the originals. The QEMU lab checks it
-  on SeaBIOS with a stand-in for the other system (`dual-bios-ide`, `toolsakeother.asm`).
+  on SeaBIOS with a stand-in for the other system (`dual-bios-ide`, `tools\fakeother.asm`).
 
 ### Phase 7 — Secure Boot ⏳
 - FolioOS is signed with the project's key and started through a shim signed by Microsoft.
@@ -112,14 +117,28 @@ Status: ✅ done · 🔨 in progress · ⏳ planned
 1. **Nothing happens without a preview.** Every change is shown as before/after, in plain words
    ("Windows (C:) 237 GB → 180 GB, new FolioOS 57 GB"), and applied together with one confirmation.
 2. **Never lose data.**
-   - The partition table and boot sectors are backed up first.
+   - The partition table (the first and last sectors of the disk) is backed up first.
    - Every operation is ordered so a power cut leaves a usable disk: a volume is shrunk before its table
      entry, and the entry grows before its volume, so a volume is never larger than its partition.
-     (This replaces the journal first planned: with this order there is nothing to resume.)
+     (This replaces the journal first planned.) The order keeps the data safe, but an interrupted
+     operation is not finished by itself; these are the states it can leave, and how each is finished:
+     - shrink stopped after the volume and before the table: the partition is larger than its volume
+       (normal, nothing to do; shrinking again works);
+     - grow stopped after the table and before the volume: *Disks and partitions* → Resize, with the same
+       size, finishes growing the volume;
+     - uninstall stopped before the table changed: the installation is still found, so Remove can be run
+       again; stopped after it: the space is back in the table, and if the volume did not grow, Resize
+       finishes it as above;
+     - update stopped in the middle: each file is either the old or the new one (a file being replaced is
+       restored from `<name>.~old` on the next attempt); running the update again finishes it.
    - Each file system is checked before it is resized and verified afterwards.
 3. **Only what is safe.** Moving the start of a partition copies data and stays off until it is as
    well tested as everything else. File systems that cannot be resized safely are refused, with
-   instructions instead of a risk.
+   instructions instead of a risk. A partition table FolioOS cannot read is never taken for an empty
+   disk, and one it could not write back exactly (a GPT with a non-standard number or size of entries,
+   an MBR with an extended partition) is shown but never changed. FAT32 without mirrored FATs and exFAT
+   with a scattered allocation bitmap are never resized (formatting or deleting such a partition, after
+   a typed confirmation, still works).
 4. **The same FolioOS.** Fully usable from the keyboard, translated into every language, and with
    the same calm interface.
 5. **Tested on every build.** In the QEMU lab, virtual disks with Windows-like (NTFS), Linux
@@ -188,6 +207,8 @@ Status: ✅ done · 🔨 in progress · ⏳ planned
 - [x] PCs with BIOS only (Legacy/CSM) and ARM64 (Raspberry Pi with UEFI firmware, ARM laptops) — 4.3.0
 - [x] Korean input (2-set Hangul) and Japanese kana input (romaji → hiragana/katakana) — 4.2.0
 - [x] LaTeX source editing — 4.3.0
+- [x] Install on the computer's disk, alone or next to any other system, with a partition manager — 4.4.0 beta
+- [x] Keep proportions when the screen stretches a 4:3 video mode — 4.4.0 beta
 - [ ] Japanese kanji conversion and Chinese pinyin input (need dictionaries)
 - [ ] Text shaping and right-to-left scripts (Arabic, Hebrew, Devanagari…)
 - [ ] Spell checking with Hunspell-compatible dictionaries

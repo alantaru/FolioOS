@@ -11,7 +11,7 @@ Windows なし。Linux なし。インターネットなし。通知なし。あ
 [![Build](https://github.com/alantaru/FolioOS/actions/workflows/build.yml/badge.svg)](https://github.com/alantaru/FolioOS/actions/workflows/build.yml)
 [![Latest release](https://img.shields.io/github/v/release/alantaru/FolioOS?label=download&color=b4561f)](https://github.com/alantaru/FolioOS/releases/latest)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
-[![Platform: UEFI x64 | IA32](https://img.shields.io/badge/platform-UEFI%20x64%20%7C%20IA32-555)](#hardware-compatibility)
+[![Platform: UEFI x64 | IA32 | ARM64 | BIOS](https://img.shields.io/badge/platform-UEFI%20x64%20%7C%20IA32%20%7C%20ARM64%20%7C%20BIOS-555)](#hardware-compatibility)
 [![Languages: 15](https://img.shields.io/badge/languages-15-success)](#13-15-languages-and-counting)
 [![Translations welcome](https://img.shields.io/badge/translations-welcome-ff69b4)](docs/TRANSLATING.md)
 
@@ -44,7 +44,8 @@ macOS、Linux で開けます。共有が必要になったら Word、LibreOffic
 
 - **小説家、記者、学生、ブロガー**：新しいハードウェアを買わずに *writerdeck*——気が散らない執筆専用機——が欲しい人。
 - **NaNoWriMo の参加者**や、時間を区切った執筆スプリントやモーニングページを書く人。
-- **引き出しに古いノートパソコンが眠っている人**：FolioOS はディスクに触れずにそれを生き返らせます。
+- **引き出しに古いノートPCが眠っている人**：FolioOS がそれに第二の人生を与えます。USB メモリーから
+  そのまま起動するか、ディスクにインストールして、単独で、または今あるシステムと並べて使えます。
 - **学校や図書館**：シンプルなオフラインの執筆端末が必要な場所。
 - **プライバシーを大切にする書き手**：ネットワークもテレメトリーもクラウドもありません。
 
@@ -302,12 +303,43 @@ USB メモリ（FAT32）
 │   ├── THEMES/         あなたのテーマ（.INI）
 │   ├── LANGUAGES/      翻訳（.po）
 │   ├── KEYBOARDS/      キーボード配列（.txt）
-│   └── VERSIONS/       保存したファイルの以前のバージョン（自動）
-└── EFI/BOOT/           FolioOS 本体（BOOTX64.EFI、BOOTIA32.EFI）
+│   ├── VERSIONS/       保存したファイルの以前のバージョン（自動）
+│   └── BACKUP/         インストーラーが書き込む前に保存したパーティションテーブル
+└── EFI/BOOT/           FolioOS 本体（BOOTX64.EFI、BOOTIA32.EFI、BOOTAA64.EFI）
 ```
 
 データベースも、隠しパーティションも、独自形式もありません。USB メモリをどのコンピューターに持って行っても、あなたの文章は
 そこにあります。
+
+<a id="15-install-it-on-the-computer-beta"></a>
+
+### 15. コンピューターにインストール（ベータ版）
+
+USB メモリーだけで十分ですが、FolioOS はコンピューター自身のディスクに置くこともでき、ノートPC を起動すると
+すぐに書き始められます。**Ctrl+K › このコンピューターに FolioOS をインストール**（または *設定 › システム*）を開きます：
+
+- **唯一のシステムとして**：空のディスク、または消去すると決めたディスクに。単語を入力して確認します。
+- **Windows や Linux と並べて**：空き領域に入れ、ほかのパーティションには触れません。起動のたびに数秒間
+  *何かキーを押すと書き始められます* と表示し、その後いつもどおりもう一方のシステムを起動します。
+  Windows はこれまでと同じようにファームウェア自身が起動します。
+- **空き領域がない？** FolioOS は NTFS、FAT32、exFAT のパーティションを、データを一切動かさずに縮小できます。
+  安全でないもの（休止状態や高速スタートアップの Windows、`chkdsk` が必要なボリューム、回復キーのない
+  BitLocker、LUKS、LVM、Apple のボリューム）は断り、代わりにどうすればよいかを説明します。ext4 のサイズは
+  決して変更しません。Linux 側で空きを作り（GParted）、インストーラーを開き直してください。
+- パーティションを変更する前に、パーティションテーブル（ディスクの先頭と末尾のセクター）を、FolioOS を起動したドライブ（通常は USB メモリー）の `FOLIO/BACKUP` に保存します。
+  文章はコンピューター、USB メモリー、またはその両方に置けます。
+- 新しい USB メモリーから**アップデート**：置き換わるのは FolioOS 自身のファイルだけで、文章とパーティションはそのままです。
+- **アンインストール**：先に文章を FolioOS を起動したドライブにコピーできます。インストーラーが場所を空けるために
+  パーティションを縮小していた場合、その後ろの領域がまだ空いていれば、そのパーティションは元のサイズに戻ります。そうでなければ領域は空きになります。
+  そのパーティションを元に戻す必要があり、そこにある Windows が休止状態（または高速スタートアップを使用中）の場合、FolioOS はまず完全にシャットダウンするよう求め、どのパーティションも変更しません。
+- *設定 › システム › ディスクとパーティション* は小さなパーティション管理ツールです：FAT32 パーティションの
+  作成、フォーマット、NTFS/FAT32/exFAT の縮小・拡大、削除。
+- 4.4 ベータ版はプレリリースです。「latest」ではなく
+  [そのリリースページ](https://github.com/alantaru/FolioOS/releases/tag/v4.4.1-beta)からダウンロードしてください。
+
+UEFI の PC と BIOS のみの PC で動きます。**これはベータ版です：** Windows と Linux が作成したディスクを使い、
+エミュレートしたマシンですべてのテストに合格していますが、実機ではまだ動かしていません。先にバックアップを
+取るか、予備のディスクを使ってください。
 
 ---
 
@@ -332,11 +364,12 @@ USB メモリ（FAT32）
 | | |
 |---|---|
 | **ファームウェア** | UEFI 2.x——64 ビット（`BOOTX64.EFI`）、32 ビット（`BOOTIA32.EFI`、Atom タブレットやネットブック）または ARM64（`BOOTAA64.EFI`：コミュニティ製 UEFI ファームウェアを入れた Raspberry Pi 3/4/5、ARM ノートパソコン）。**BIOS のみの PC**（Legacy/CSM）は、`FOLIO\TOOLS\biosboot.exe` を一度実行すると FolioOS 独自の BIOS ブリッジで起動します。Secure Boot はオフにする必要があります。 |
-| **画面** | あらゆる UEFI GOP フレームバッファー（RGB、BGR、ビットマスク、Blt のみ）または旧式の UGA。BIOS の PC では VESA/VBE。ネイティブ解像度、HiDPI の自動拡大、縦長の画面は自動で回転。 |
+| **画面** | あらゆる UEFI GOP フレームバッファー（RGB、BGR、ビットマスク、Blt のみ）または旧式の UGA。BIOS の PC では VESA/VBE。ネイティブ解像度、HiDPI の自動拡大、縦長の画面は自動で回転。 使えるモードが 4:3 だけでワイド画面がそれを引き伸ばす場合は、*設定 › システム › 画面とポインター* で縦横比を保てます（モニター、16:9、16:10、4:3）。 |
 | **入力** | キーボードはファームウェア経由（BIOS の PC では PS/2 を直接）。マウス、タッチパッド、ペンタブレット、タッチスクリーンはファームウェア経由で、ファームウェアにドライバーがない場合は FolioOS 独自の USB HID と PS/2 のドライバーで動作。 |
 | **サウンド** | Intel HD Audio と AC'97（音楽プレーヤーにのみ必要）。 |
+| **ディスク（インストーラー、ベータ版）** | 512 バイトセクターの SATA、NVMe、IDE、USB ディスク、GPT または MBR。NTFS、FAT32、exFAT はデータを動かさずに縮小・再拡大できます。BitLocker、LUKS、LVM、APFS/HFS+、ext4 のサイズは決して変更しません。 |
 | **非対応** | Secure Boot（現時点）、Apple シリコン搭載の Mac。Wi-Fi と Bluetooth は意図的に外しています。 |
-| **テスト環境** | リリースごとに 13 台のエミュレートしたマシン：UEFI x64、IA32、ARM64、USB と IDE から起動する BIOS のみの PC。グラフィックカード 8 種、PS/2 と USB のマウス、USB タブレット、HD Audio と AC'97。それぞれで画面、キーボード、マウス、音、保存、ファイルシステムの整合性を確認します。 |
+| **テスト環境** | リリースごとに 20 台のエミュレートしたマシンで確認：UEFI x64・IA32・ARM64、USB と IDE から起動する BIOS のみの PC、8 種類のグラフィックカード、PS/2 と USB のマウス、USB タブレット、HD Audio と AC'97、SATA と IDE ディスクへのインストール、Windows（UEFI）や別のシステム（BIOS）とのデュアルブート、Windows が作成した NTFS の縮小、縦横比の維持。それぞれで画面、キーボード、マウス、音、保存、ファイルシステムの整合性を確認します。 |
 
 起動のたびに、FolioOS は見つけたものを `FOLIO/DIAGNOSTICS.TXT` に書き込みます。
 [ハードウェア報告](https://github.com/alantaru/FolioOS/issues/new/choose)で共有してください——「問題なく動いた」だけでも、
@@ -349,8 +382,19 @@ USB メモリ（FAT32）
 <details>
 <summary><b>コンピューターや USB メモリの中身が消えませんか？</b></summary>
 
-消えません。FolioOS は内蔵ディスクに一切触れず、インストールしても USB メモリにファイルを追加するだけです——もともとあった
-ものは残ります。USB メモリを抜けば、PC はいつものシステムで起動します。
+いいえ。USB メモリーから起動している間、FolioOS が内蔵ディスクに書き込むのは頼まれたときだけです。そのボリュームに
+文章を保存すればそのファイルが書き込まれ、パーティションを変更するのはインストーラーと*ディスクとパーティション*だけです。
+その場合も、確認してパーティションテーブルが FolioOS を起動したドライブに保存されるまではどのパーティションも変更しません（開いている文章は先にその場所に保存されます）。
+USB メモリーへのインストールもファイルを追加するだけで、既存のファイルはそのまま残ります。USB メモリーを抜けば、
+PC はいつものシステムで起動します。
+</details>
+
+<details>
+<summary><b>ノートPC に、Windows や Linux と並べてインストールできますか？</b></summary>
+
+はい、4.4（ベータ版）から可能です：**Ctrl+K › このコンピューターに FolioOS をインストール**。空き領域を使うか、
+NTFS、FAT32、exFAT のパーティションをデータを動かさずに縮小し、起動のたびに FolioOS かもう一方のシステムを
+選べます。アンインストールすると、後ろの領域がまだ空いていれば、インストーラーが縮小したパーティションが元に戻ります（そうでなければ領域は空きになります）。[コンピューターにインストール](#15-install-it-on-the-computer-beta)を参照してください。
 </details>
 
 <details>
@@ -427,7 +471,7 @@ Intel の Mac は UEFI ドライブから起動できます（電源を入れる
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
 .\build.ps1                                  # UEFI x64 + IA32 + ARM64、BIOS、シミュレーター、パッケージ——とテストスイート
-.\tools\qemu-lab.ps1                         # 本物のバイナリを 13 台のエミュレートしたマシンで起動し、1 台ずつ確認
+.\tools\qemu-lab.ps1                         # 本物のバイナリを 20 台のエミュレートしたマシンで起動し、1 台ずつ確認
 .\build\folio_sim.exe                        # FolioOS をウィンドウで実行
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # 本物の UEFI プログラムをウィンドウで実行
 .\flash_usb.ps1 -DriveLetter E:              # FAT32 の USB メモリにインストール／更新（ファイルは残す）
@@ -438,7 +482,8 @@ cd FolioOS
 
 テストスイートは、スクリプト化したキー入力とマウス操作でシミュレーターと本物の `BOOTX64.EFI`（小さな UEFI ホストの中）を
 動かし、画面を撮影し、すべての書き出し（ZIP + XML）、すべての翻訳（検証器の否定対照つき）、6 種類のフレームバッファー形式、
-そして BIOS ブリッジの FAT32 ドライバー（何千ものランダム操作を 1 バイトずつ照合）を検証します。
+そして BIOS ブリッジの FAT32 ドライバー（何千ものランダム操作を 1 バイトずつ照合）を検証します。インストーラーとパーティション管理は、Windows と Linux が作成したディスクイメージ上で実行し、その結果を
+Windows の `chkdsk` と Linux の `fsck` で確認します（`tools/ntfs-shrink-check.ps1`、`tools/linux-run.ps1`）。
 
 <a id="macos-simulator"></a>
 
@@ -466,7 +511,8 @@ macOS のスクリプトが作るのはシミュレーターだけです。UEFI 
 
 ```
 src/core/       移植可能なコア（フリースタンディング C、libc なし）：エディター、Markdown、TrueType ラスタライザー、
-                UI ツールキットとウィンドウマネージャー、書き出し、MP3、i18n、キーボード配列、テーマ
+                UI ツールキットとウィンドウマネージャー、書き出し、MP3、i18n、キーボード配列、テーマ,
+                パーティションテーブル、ファイルシステムの検査とサイズ変更、インストーラー、起動選択
 src/platform/   uefi/  GOP/UGA 表示、入力、FAT 入出力、HD Audio/AC'97、USB HID と PS/2 のドライバー——ファームウェアの上で動作
                 bios/  起動セクター + BIOS→UEFI ブリッジ（VBE、PS/2、独自の FAT32 ドライバー）——BIOS のみの PC 用
                 win32/ 開発と自動テストに使うシミュレーター
@@ -476,7 +522,7 @@ assets/         フォント、翻訳（.po）、キーボード配列、テー�
 tests/          スクリプトによるエンドツーエンドのテスト
 ```
 
-約 600 KB のプログラムが、薄いプラットフォーム層を通じてマシン全体を動かします。詳しくは
+約 800 KB のプログラムが、薄いプラットフォーム層を通じてマシン全体を動かします。詳しくは
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) をご覧ください。
 
 <a id="roadmap"></a>
@@ -488,7 +534,7 @@ FolioOS は同じエディターを共有する 2 つのエディションに分
 
 - [x] BIOS のみの PC（Legacy/CSM）と ARM64（UEFI ファームウェアの Raspberry Pi、ARM ノートパソコン）
 - [x] 韓国語入力（2 ボル式ハングル）と日本語のかな入力（ローマ字 → ひらがな／カタカナ）
-- [ ] コンピューターのディスクへのインストール——単独のシステムとして、またはほかのどのシステムとも並べて——パーティション管理ツールつき
+- [x] コンピューターのディスクへのインストール——単独のシステムとして、またはほかのどのシステムとも並べて——パーティション管理ツールつき (4.4 beta)
 - [ ] FolioOS Sync：Wi-Fi と、WebDAV、SFTP、Git、Dropbox、Google Drive、OneDrive、Syncthing による同期
 - [ ] 日本語の漢字変換と中国語のピンイン入力（辞書が必要）
 - [ ] 複雑な文字の組版と右から左に書く文字（アラビア文字、ヘブライ文字、デーヴァナーガリー…）

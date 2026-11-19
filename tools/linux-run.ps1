@@ -25,7 +25,7 @@ $Disk = (Resolve-Path $Disk).Path
 $body = (Get-Content -Raw $Script) -replace "`r", ""
 
 $a = @("-machine", "pc", "-m", "512", "-accel", "tcg", "-display", "none", "-no-reboot",
-       "-cdrom", $iso, "-boot", "d", "-drive", "file=$Disk,format=raw,if=virtio,cache=writeback",
+       "-cdrom", $iso, "-boot", "d", "-drive", "file=$($Disk -replace ',', ',,'),format=raw,if=virtio,cache=writeback",   # QEMU: ",," is a literal comma
        "-serial", "tcp:127.0.0.1:${Port},server=on,wait=on")
 $argline = ($a | ForEach-Object { if ($_ -match '\s') { "`"$_`"" } else { $_ } }) -join " "
 $p = Start-Process -FilePath "$QemuDir\qemu-system-x86_64.exe" -ArgumentList $argline -PassThru -WindowStyle Hidden
@@ -59,12 +59,17 @@ try {
     $b64 = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($body))
     Send "rm -f /tmp/s.b64"
     for ($i = 0; $i -lt $b64.Length; $i += 600) { Send ("echo " + $b64.Substring($i, [Math]::Min(600, $b64.Length - $i)) + " >> /tmp/s.b64") }
-    Send "base64 -d /tmp/s.b64 > /tmp/s.sh; echo ===BEGIN===; sh /tmp/s.sh 2>&1; echo ===END=`$?==="
-    $r = Read-Until "===END=\d+===" 900
-    $rc = [int]([regex]::Match($r, "===END=(\d+)===").Groups[1].Value)
-    $outText = [regex]::Match($r, "===BEGIN===\r?\n([\s\S]*?)===END=").Groups[1].Value -replace "`r", ""
+    # markers unique to this run, each on a line of its own: what the script prints can never be taken for them
+    $tok = [guid]::NewGuid().ToString("N").Substring(0, 16)
+    Send "base64 -d /tmp/s.b64 > /tmp/s.sh; echo; echo ===BEGIN-$tok===; sh /tmp/s.sh 2>&1; rc=`$?; echo; echo ===END-$tok=`$rc==="
+    $r = Read-Until "(?m)^===END-$tok=\d+===\r?$" 900
+    $mEnd = [regex]::Match($r, "(?m)^===END-$tok=(\d+)===\r?$"); $mBeg = [regex]::Match($r, "(?m)^===BEGIN-$tok===\r?$")
+    if (-not $mEnd.Success -or -not $mBeg.Success -or $mBeg.Index -gt $mEnd.Index) { throw "guest output without the run's BEGIN/END markers" }
+    $rc = [int]$mEnd.Groups[1].Value
+    $outText = $r.Substring($mBeg.Index + $mBeg.Length, $mEnd.Index - $mBeg.Index - $mBeg.Length).TrimStart("`r", "`n") -replace "`r", ""
     Send "sync; poweroff"
-    if (-not $p.WaitForExit(60000)) { Stop-Process -Id $p.Id -Force }
+    # the image is only good if the guest finished writing and powered off by itself
+    if (-not $p.WaitForExit(60000)) { Stop-Process -Id $p.Id -Force; Write-Host "the guest did not power off: the image may be incomplete" -ForegroundColor Red; $rc = 99 }
 } finally {
     if ($tc) { $tc.Close() }
     if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force }

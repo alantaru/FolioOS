@@ -20,9 +20,16 @@ documentation and code.
 ## Development setup
 
 - Windows 10/11, PowerShell 5.1+, [MinGW-w64](https://winlibs.com) `gcc` (x86_64) on `PATH`.
+  The ARM64 and BIOS targets also use [LLVM](https://llvm.org) (`clang`, `ld.lld`) and `nasm`;
+  the hardware lab uses [QEMU](https://www.qemu.org). All three install with `winget`.
 - `.\build.ps1` builds everything and runs the full test suite (simulator, real UEFI binary
-  inside `efi_host`, exports, translations). It must pass before a pull request is merged.
+  inside `efi_host`, exports, translations, partition tables, installer, file-system checks).
+  It must pass before a pull request is merged; CI runs it on every pull request.
+- `.\tools\qemu-lab.ps1` boots the real binaries on 17 emulated machines and runs 3 dual-boot
+  scenarios (`-List` shows them all, `-Only <regex>` runs some). Set `FOLIO_WORK` to a folder on a roomy disk if `C:` is short on
+  space: the lab and the disk-image tests write large images there.
 - `.\build\folio_sim.exe` is the fastest way to work: the same core code in a window.
+- On a Mac, `./build_macos.sh --test` builds the simulator and runs the same scripted tests.
 
 ## Code guidelines
 
@@ -35,6 +42,12 @@ documentation and code.
 - **The USB drive stays plain FAT32.** No hidden partitions, no proprietary formats; user files
   are never renamed, moved or deleted by updates.
 - **Never lose text.** Saves are atomic, drafts are recovered after power loss; keep it that way.
+- **Code that writes to disks** (`part.c`, `install.c`, `fscheck.c`, `fat32.c`) follows the rules
+  in [ROADMAP.md › Rules of the partition manager](ROADMAP.md#rules-of-the-partition-manager-both-editions):
+  back up before writing, order writes so a power cut leaves a usable disk, and refuse whatever
+  cannot be verified. Every refusal needs a test that the disk stays byte for byte the same, and
+  file-system changes are checked by the owning system (Windows `chkdsk`, Linux `fsck`) on the
+  fixtures in `tests/fixtures`.
 - **Tests.** New behavior gets a scripted test in `tests/` (see existing scripts and the
   commands in `src/platform/win32/win32_main.c`). For a new check, show that it fails without
   the change (a negative control) before relying on it.

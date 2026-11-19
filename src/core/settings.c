@@ -124,6 +124,7 @@ void prefs_load(void) {
         else if (str_eq(k, "repeat")) prefs.repeat = bv;
         else if (str_eq(k, "last_file")) str_copy(prefs.last_path, v, sizeof prefs.last_path);
         else if (str_eq(k, "last_volume")) prefs.last_vol = iv;
+        else if (str_eq(k, "last_volume_id")) str_copy(prefs.last_vol_id, v, sizeof prefs.last_vol_id);
         else if (str_eq(k, "last_paragraph")) prefs.last_p = iv;
         else if (str_eq(k, "last_column")) prefs.last_o = iv;
         else if (str_eq(k, "today_date")) prefs.today_date = iv;
@@ -188,6 +189,7 @@ void prefs_save(void) {
     }
     if (app.has_path) {
         buf_printf(&b, "last_file=%s\r\nlast_volume=%d\r\nlast_paragraph=%d\r\nlast_column=%d\r\n", app.path, app.vol, preview_top_para(), preview_active() ? 0 : app.caret.o);
+        { char id[80]; app_last_vol_id(id, sizeof id); buf_printf(&b, "last_volume_id=%s\r\n", id); }
         buf_printf(&b, "reading=%d\r\n", preview_active());
     }
     buf_printf(&b, "today_date=%d\r\ntoday_words=%d\r\n", prefs.today_date, app_words_today());
