@@ -55,6 +55,7 @@ static int s_read(void *ctx, const char *path, u64 off, void *buf, u32 n) {
 /* desinstalar: grava na "origem" (a pasta que faz o papel do pendrive), criando as pastas do caminho */
 static bool s_save(void *ctx, const char *path, const void *data, u32 n) {
     (void)ctx; char part[1024]; int k = 0;
+    if (strlen(path) >= sizeof part) return false;   /* longo demais: um erro de cópia, não um estouro */
     for (const char *p = path; *p; p++) {
         if (*p == '/') { part[k] = 0; wchar_t w[1024]; full(part, w); CreateDirectoryW(w, 0); }
         part[k++] = *p;

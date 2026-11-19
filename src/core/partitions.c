@@ -188,7 +188,20 @@ static void parts_body(Window *w, Rect r) {
         /* a lista rola (roda do mouse, barra, e o teclado leva o item focado para dentro da área): todas as linhas
          * são alcançáveis, mesmo com muitos discos e partições */
         static float list_scroll;
-        Rect area = rect(r.x, (int)y, r.w, by - SI(12) - (int)y);
+        /* os botões da partição escolhida: "Terminar de redimensionar" (um crescimento interrompido: a partição maior
+         * que o volume; o NTFS ocupa a partição inteira, então qualquer diferença conta; FAT32/exFAT a partir de 1 MiB,
+         * por causa das sobras de alinhamento) e "Redimensionar" (o volume verificado, com o mínimo conhecido). Com
+         * os quatro numa janela estreita, "Formatar" e "Apagar" vão para uma 2ª linha. */
+        bool fin = false, rsz = false, two = false;
+        if (cur >= 0 && cur < nrows && !dsk[rows[cur].d].why[0] && !rows[cur].none && !rows[cur].free) {
+            const Row *sr = &rows[cur]; const Part *sp = &tab[sr->d].p[sr->part]; const FsCheck *sc = &cv[sr->d][sr->part];
+            u64 vsz = (sc->verdict == SAFE_OK || (sc->verdict == SAFE_DIRTY && sp->fs == FS_NTFS)) ? vsz_of[sr->d][sr->part] : 0;
+            fin = vsz && (sp->fs == FS_NTFS ? vsz < sr->count : vsz + 2048 <= sr->count);
+            rsz = fs_resizable(sp->fs) && sc->verdict == SAFE_OK && sc->min_bytes;
+            two = fin && rsz && SI(230 + 160 + 190 + 140) > wd;
+        }
+        int by1 = two ? by - SI(50) : by;
+        Rect area = rect(r.x, (int)y, r.w, by1 - SI(12) - (int)y);
         if (ui_hover(area) && ui.in.wheel) list_scroll -= ui.in.wheel * SI(60);
         if (list_scroll < 0) list_scroll = 0;
         gfx_push_clip(area);
@@ -222,27 +235,24 @@ static void parts_body(Window *w, Rect r) {
                     st = PS_CREATE; size_lo = 64; size_hi = (float)(rw->count >> 11); size_mb = size_hi; str_copy(label, "DATA", sizeof label); w->nav = -1;
                 }
             } else {
-                Part *p = &tab[rw->d].p[rw->part]; FsCheck *c = &cv[rw->d][rw->part];
-                /* um crescimento interrompido: a partição já maior que o volume (o NTFS fica marcado para o chkdsk, e o
-                 * mínimo não é calculado). Oferece terminar, com o mesmo tamanho; o motor confere o resto */
-                u64 vsz = (c->verdict == SAFE_OK || (c->verdict == SAFE_DIRTY && p->fs == FS_NTFS)) ? vsz_of[rw->d][rw->part] : 0;
-                /* NTFS ocupa a partição inteira (o volume conta a cópia do boot no fim): qualquer diferença é um crescimento
-                 * interrompido. FAT32/exFAT podem sobrar uns setores de alinhamento: só a partir de 1 MiB */
-                if (vsz && (p->fs == FS_NTFS ? vsz < rw->count : vsz + 2048 <= rw->count)) {
-                    if (ui_button(rect(bx, by, SI(220), SI(40)), L("Finish resizing"), BTN_PRIMARY)) {
+                FsCheck *c = &cv[rw->d][rw->part];
+                /* um crescimento interrompido: oferece terminar, com o mesmo tamanho; o motor confere o resto */
+                if (fin) {
+                    if (ui_button(rect(bx, by1, SI(220), SI(40)), L("Finish resizing"), BTN_PRIMARY)) {
                         st = PS_RESIZE; size_lo = size_hi = size_mb = (float)(rw->count >> 11); finish_count = rw->count; w->nav = -1;
                     }
                     bx += SI(230);
                 }
                 /* um NTFS com setores sobrando no fim da partição (sem ter sido um crescimento interrompido) continua
                  * podendo ser redimensionado: os dois botões aparecem */
-                if (fs_resizable(p->fs) && c->verdict == SAFE_OK && c->min_bytes) {
-                    if (ui_button(rect(bx, by, SI(150), SI(40)), L("Resize"), BTN_PRIMARY)) {
+                if (rsz) {
+                    if (ui_button(rect(bx, by1, SI(150), SI(40)), L("Resize"), BTN_PRIMARY)) {
                         u64 lim = grow_limit(rw);
                         st = PS_RESIZE; finish_count = 0; size_lo = (float)((c->min_bytes + (1 << 20) - 1) >> 20); size_hi = (float)(lim >> 11); size_mb = (float)(rw->count >> 11); w->nav = -1;
                     }
                     bx += SI(160);
                 }
+                if (two) bx = x;                                  /* a 2ª linha: Formatar e Apagar */
                 if (ui_button(rect(bx, by, SI(180), SI(40)), L("Format as FAT32"), BTN_GHOST)) { st = PS_FORMAT; word[0] = 0; str_copy(label, "DATA", sizeof label); w->nav = -1; }
                 bx += SI(190);
                 if (ui_button(rect(bx, by, SI(140), SI(40)), L("Delete"), BTN_DANGER)) { st = PS_DELETE; word[0] = 0; w->nav = -1; }

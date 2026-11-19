@@ -348,15 +348,15 @@ açılır. **Ctrl+K › FolioOS’u bu bilgisayara kur** komutunu açın (ya da 
   Güvenli olmayanı reddeder (hazırda bekleyen ya da Hızlı Başlatma açık Windows, `chkdsk` gerektiren bir birim,
   kurtarma anahtarı olmadan BitLocker, LUKS, LVM, Apple birimleri) ve bunun yerine ne yapılacağını açıklar.
   ext4 asla yeniden boyutlandırılmaz: Linux’tan yer açın (GParted) ve kurulumu yeniden çalıştırın.
-- Herhangi bir şey yazılmadan önce bölüm tablosu (diskin ilk ve son sektörleri), FolioOS’un başladığı
+- Herhangi bir bölüm değişmeden önce bölüm tablosu (diskin ilk ve son sektörleri), FolioOS’un başladığı
   sürücüdeki (genellikle USB bellek) `FOLIO/BACKUP` klasörüne kaydedilir. Metinleriniz bilgisayarda, USB
   bellekte ya da her ikisinde durabilir.
 - Daha yeni bir USB bellekten **güncelleyin**: yalnızca FolioOS’un kendi dosyaları değiştirilir; metinleriniz
   ve bölümler olduğu gibi kalır.
 - **Kaldırın**: önce metinlerinizi FolioOS’un başladığı sürücüye kopyalatabilirsiniz. Kurulum yer açmak için
   bir bölümü küçülttüyse, arkasındaki alan hâlâ boşsa o bölüm eski boyutuna geri büyür; aksi hâlde alan boş
-  kalır. O bölüm geri büyüyecekse ve Windows hazırda bekletmedeyse (ya da Hızlı Başlatma kullanıyorsa)
-  FolioOS önce onu tamamen kapatmanızı ister ve hiçbir şeyi değiştirmez.
+  kalır. O bölüm geri büyüyecekse ve üzerindeki Windows hazırda bekletmedeyse (ya da Hızlı Başlatma
+  kullanıyorsa) FolioOS önce onu tamamen kapatmanızı ister ve hiçbir bölümü değiştirmez.
 - *Ayarlar › Sistem › Diskler ve bölümler* küçük bir bölüm yöneticisidir: FAT32 bölümü oluşturma, biçimlendirme,
   NTFS/FAT32/exFAT küçültme veya büyütme, silme.
 - 4.4 beta bir ön sürümdür: onu “latest” yerine

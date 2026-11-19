@@ -301,15 +301,15 @@ straight into your writing. Open **Ctrl+K › Install FolioOS on this computer**
   refuses what is not safe — hibernated Windows or Fast Startup, a volume that needs `chkdsk`, BitLocker
   without the recovery key, LUKS, LVM, Apple volumes — and explains what to do instead. ext4 is never
   resized: make room from Linux (GParted) and run the installer again.
-- Before anything is written, the partition table (the first and last sectors of the disk) is saved to
+- Before any partition changes, the partition table (the first and last sectors of the disk) is saved to
   `FOLIO/BACKUP` on the drive FolioOS started from — normally the USB drive. Your texts can live on the
   computer, on the USB drive, or on both.
 - **Update** from a newer USB drive: only FolioOS's own files are replaced; your texts and the partitions
   stay as they are.
 - **Uninstall**: you can have your texts copied to the drive FolioOS started from first. If the installer
   shrank a partition to make room, that partition grows back to the size it had, as long as the space
-  after it is still free; otherwise the space becomes free. If that partition has to grow back and Windows
-  is hibernated (or uses Fast Startup), FolioOS asks you to shut it down fully first and changes nothing.
+  after it is still free; otherwise the space becomes free. If that partition has to grow back and the Windows on
+  it is hibernated (or uses Fast Startup), FolioOS asks you to shut it down fully first and changes no partition.
 - *Settings › System › Disks and partitions* is a small partition manager: create a FAT32 partition,
   format, shrink or grow NTFS/FAT32/exFAT, delete.
 - The 4.4 beta is a pre-release: download it from

@@ -350,15 +350,16 @@ direttamente nella tua scrittura. Apri **Ctrl+K › Installa FolioOS su questo c
   Rifiuta ciò che non è sicuro (Windows in ibernazione o con l’avvio rapido, un volume che ha bisogno di
   `chkdsk`, BitLocker senza la chiave di ripristino, LUKS, LVM, volumi Apple) e spiega cosa fare invece.
   ext4 non viene mai ridimensionato: fai spazio da Linux (GParted) e riapri l’installer.
-- Prima di scrivere qualsiasi cosa, la tabella delle partizioni (i primi e gli ultimi settori del disco)
+- Prima di qualsiasi modifica alle partizioni, la tabella delle partizioni (i primi e gli ultimi settori del disco)
   viene salvata in `FOLIO/BACKUP` sull’unità da cui è partito FolioOS, di solito la chiavetta USB. I tuoi
   testi possono stare sul computer, sulla chiavetta o su entrambi.
 - **Aggiorna** da una chiavetta più recente: vengono sostituiti solo i file di FolioOS; i tuoi testi e le
   partizioni restano come sono.
 - **Disinstalla**: puoi far copiare prima i tuoi testi sull’unità da cui è partito FolioOS. Se l’installer
   ha ridotto una partizione per fare spazio, quella partizione torna alla dimensione che aveva, purché lo
-  spazio dopo di essa sia ancora libero; altrimenti lo spazio diventa libero. Se quella partizione deve ricrescere e Windows è
-  in ibernazione (o usa l’avvio rapido), FolioOS ti chiede prima di spegnerlo del tutto e non cambia nulla.
+  spazio dopo di essa sia ancora libero; altrimenti lo spazio diventa libero. Se quella partizione deve ricrescere e il Windows che
+  contiene è in ibernazione (o usa l’avvio rapido), FolioOS ti chiede prima di spegnerlo del tutto e non cambia
+  nessuna partizione.
 - *Impostazioni › Sistema › Dischi e partizioni* è un piccolo gestore delle partizioni: creare una partizione
   FAT32, formattare, ridurre o allargare NTFS/FAT32/exFAT, eliminare.
 - La 4.4 beta è una versione preliminare: scaricala dalla

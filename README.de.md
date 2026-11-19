@@ -353,15 +353,16 @@ in dein Schreiben startet. Öffne **Strg+K › FolioOS auf diesem Computer insta
   das `chkdsk` braucht, BitLocker ohne Wiederherstellungsschlüssel, LUKS, LVM, Apple-Volumes – und erklärt,
   was stattdessen zu tun ist. ext4 wird nie in der Größe geändert: Schaffe unter Linux Platz (GParted) und
   starte den Installer erneut.
-- Bevor irgendetwas geschrieben wird, wird die Partitionstabelle (die ersten und letzten Sektoren des
+- Bevor sich irgendeine Partition ändert, wird die Partitionstabelle (die ersten und letzten Sektoren des
   Datenträgers) in `FOLIO/BACKUP` auf dem Laufwerk gesichert, von dem FolioOS gestartet wurde – normalerweise
   dem USB-Stick. Deine Texte können auf dem Computer, auf dem USB-Stick oder auf beiden liegen.
 - **Aktualisieren** von einem neueren USB-Stick: Nur die Dateien von FolioOS selbst werden ersetzt; deine
   Texte und die Partitionen bleiben, wie sie sind.
 - **Deinstallieren**: Deine Texte können vorher auf das Laufwerk kopiert werden, von dem FolioOS gestartet
   wurde. Hat der Installer eine Partition verkleinert, um Platz zu schaffen, wächst sie wieder auf ihre frühere
-  Größe, sofern der Platz dahinter noch frei ist; sonst wird der Platz frei. Muss diese Partition wieder wachsen und ist
-  Windows im Ruhezustand (oder nutzt den Schnellstart), bittet FolioOS dich, es zuerst vollständig herunterzufahren, und ändert nichts.
+  Größe, sofern der Platz dahinter noch frei ist; sonst wird der Platz frei. Muss diese Partition wieder wachsen und ist das
+  Windows darauf im Ruhezustand (oder nutzt den Schnellstart), bittet FolioOS dich, es zuerst vollständig
+  herunterzufahren, und ändert keine Partition.
 - *Einstellungen › System › Datenträger und Partitionen* ist eine kleine Partitionsverwaltung: FAT32-Partition
   anlegen, formatieren, NTFS/FAT32/exFAT verkleinern oder vergrößern, löschen.
 - Die 4.4 Beta ist eine Vorabversion: Lade sie von

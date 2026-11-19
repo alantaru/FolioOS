@@ -349,15 +349,16 @@ meteen in je tekst opstart. Open **Ctrl+K › FolioOS op deze computer installer
   verplaatsen. Wat niet veilig is, weigert het (Windows in sluimerstand of met Snel opstarten, een volume dat
   `chkdsk` nodig heeft, BitLocker zonder herstelsleutel, LUKS, LVM, Apple-volumes), met uitleg wat je wel kunt
   doen. ext4 wordt nooit van grootte veranderd: maak ruimte vanuit Linux (GParted) en start de installatie opnieuw.
-- Voordat er iets wordt geschreven, wordt de partitietabel (de eerste en laatste sectoren van de schijf)
+- Voordat er iets aan de partities verandert, wordt de partitietabel (de eerste en laatste sectoren van de schijf)
   bewaard in `FOLIO/BACKUP` op het station waarvan FolioOS is gestart, normaal de USB-stick. Je teksten
   kunnen op de computer staan, op de USB-stick of op allebei.
 - **Bijwerken** vanaf een nieuwere USB-stick: alleen de bestanden van FolioOS zelf worden vervangen; je teksten
   en de partities blijven zoals ze zijn.
 - **Verwijderen**: je kunt je teksten eerst laten kopiëren naar het station waarvan FolioOS is gestart. Als de
   installatie een partitie heeft verkleind om ruimte te maken, groeit die terug naar de grootte die ze had,
-  zolang de ruimte erachter nog vrij is; anders komt de ruimte vrij. Moet die partitie terug groeien en staat Windows in
-  sluimerstand (of gebruikt het Snel opstarten), dan vraagt FolioOS je het eerst volledig af te sluiten en verandert het niets.
+  zolang de ruimte erachter nog vrij is; anders komt de ruimte vrij. Moet die partitie terug groeien en staat de Windows
+  daarop in sluimerstand (of gebruikt het Snel opstarten), dan vraagt FolioOS je het eerst volledig af te sluiten
+  en verandert het geen enkele partitie.
 - *Instellingen › Systeem › Schijven en partities* is een klein partitiebeheer: een FAT32-partitie maken,
   formatteren, NTFS/FAT32/exFAT verkleinen of vergroten, verwijderen.
 - De 4.4 bèta is een voorlopige versie: download hem via

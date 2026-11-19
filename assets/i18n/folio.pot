@@ -1206,7 +1206,7 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: src/core/app.c:1694 src/core/app.c:1695 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:248 src/core/partitions.c:290
+#: src/core/app.c:1694 src/core/app.c:1695 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:258 src/core/partitions.c:300
 msgid "Delete"
 msgstr ""
 
@@ -1962,7 +1962,7 @@ msgstr ""
 msgid "Delete \"%s\"? This cannot be undone."
 msgstr ""
 
-#: src/core/filedlg.c:327 src/core/partitions.c:268
+#: src/core/filedlg.c:327 src/core/partitions.c:278
 msgid "Size"
 msgstr ""
 
@@ -2350,10 +2350,10 @@ msgstr ""
 
 #: src/core/installer.c:360 src/core/installer.c:392 src/core/installer.c:446 src/core/installer.c:474
 #, c-format
-msgid "Before anything is written, the partition table (the first and last sectors of the disk) is saved to %s on this USB drive."
+msgid "Before any partition changes, the partition table (the first and last sectors of the disk) is saved to %s on this USB drive."
 msgstr ""
 
-#: src/core/installer.c:362 src/core/installer.c:403 src/core/installer.c:458 src/core/installer.c:481 src/core/partitions.c:289
+#: src/core/installer.c:362 src/core/installer.c:403 src/core/installer.c:458 src/core/installer.c:481 src/core/partitions.c:299
 msgid "Back"
 msgstr ""
 
@@ -2370,7 +2370,7 @@ msgstr ""
 msgid "− FolioOS · FAT32 · %s"
 msgstr ""
 
-#: src/core/installer.c:378 src/core/installer.c:426 src/core/partitions.c:266
+#: src/core/installer.c:378 src/core/installer.c:426 src/core/partitions.c:276
 #, c-format
 msgid "%s%s: %s → %s"
 msgstr ""
@@ -2402,7 +2402,7 @@ msgstr ""
 msgid "The next time Windows starts, it checks its partition (chkdsk) once; this is expected."
 msgstr ""
 
-#: src/core/installer.c:394 src/core/installer.c:466 src/core/partitions.c:260
+#: src/core/installer.c:394 src/core/installer.c:466 src/core/partitions.c:270
 msgid "ERASE"
 msgstr ""
 
@@ -2411,7 +2411,7 @@ msgstr ""
 msgid "Your texts on this computer will be lost. To confirm, type %s:"
 msgstr ""
 
-#: src/core/installer.c:398 src/core/installer.c:406 src/core/installer.c:476 src/core/installer.c:484 src/core/partitions.c:284 src/core/partitions.c:293
+#: src/core/installer.c:398 src/core/installer.c:406 src/core/installer.c:476 src/core/installer.c:484 src/core/partitions.c:294 src/core/partitions.c:303
 #, c-format
 msgid "To confirm, type %s:"
 msgstr ""
@@ -2433,11 +2433,11 @@ msgstr ""
 msgid "Size for FolioOS"
 msgstr ""
 
-#: src/core/installer.c:433 src/core/partitions.c:270
+#: src/core/installer.c:433 src/core/partitions.c:280
 msgid "No file is moved: FolioOS only takes free space from the end of that partition. The next time Windows starts, it checks the partition (chkdsk) once; this is expected."
 msgstr ""
 
-#: src/core/installer.c:433 src/core/partitions.c:270
+#: src/core/installer.c:433 src/core/partitions.c:280
 msgid "No file is moved: FolioOS only takes free space from the end of that partition."
 msgstr ""
 
@@ -2692,48 +2692,48 @@ msgstr ""
 msgid "Choose a partition or a free space, then an action. Before anything is written, the start of the disk is saved to FOLIO/BACKUP on this USB drive."
 msgstr ""
 
-#: src/core/partitions.c:221
+#: src/core/partitions.c:234
 msgid "Create a FAT32 partition"
 msgstr ""
 
-#: src/core/partitions.c:232
+#: src/core/partitions.c:241
 msgid "Finish resizing"
 msgstr ""
 
-#: src/core/partitions.c:240
+#: src/core/partitions.c:249
 msgid "Resize"
 msgstr ""
 
-#: src/core/partitions.c:246
+#: src/core/partitions.c:256
 msgid "Format as FAT32"
 msgstr ""
 
-#: src/core/partitions.c:265
+#: src/core/partitions.c:275
 #, c-format
 msgid "+ FAT32 · %s, in this free space"
 msgstr ""
 
-#: src/core/partitions.c:277
+#: src/core/partitions.c:287
 msgid "Name of the new volume:"
 msgstr ""
 
-#: src/core/partitions.c:281
+#: src/core/partitions.c:291
 msgid "Everything on this partition will be erased; it becomes an empty FAT32 volume."
 msgstr ""
 
-#: src/core/partitions.c:282
+#: src/core/partitions.c:292
 msgid "This partition and everything on it will be erased; its space becomes free."
 msgstr ""
 
-#: src/core/partitions.c:290
+#: src/core/partitions.c:300
 msgid "Create"
 msgstr ""
 
-#: src/core/partitions.c:290
+#: src/core/partitions.c:300
 msgid "Apply"
 msgstr ""
 
-#: src/core/partitions.c:290
+#: src/core/partitions.c:300
 msgid "Format"
 msgstr ""
 

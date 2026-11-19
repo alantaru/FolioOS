@@ -110,7 +110,7 @@ INSTALLING ON THIS COMPUTER (beta)
      Startup, a volume that needs chkdsk, LUKS, LVM, Apple volumes) and says what
      to do instead. On a disk with BitLocker it asks you to confirm you have the
      recovery key. ext4 is never resized: make room from Linux (GParted) first.
-   - Before anything is written, the partition table (the first and last sectors
+   - Before any partition changes, the partition table (the first and last sectors
      of the disk) is saved to FOLIO\BACKUP on the drive FolioOS started from
      (normally this one). Your texts can live on the computer, on this drive, or
      on both (Settings > System > TEXTS).
@@ -118,7 +118,7 @@ INSTALLING ON THIS COMPUTER (beta)
      files are replaced. Uninstall: you can have your texts copied to this drive
      first. If the installer shrank a partition to make room, it grows back
      when the space after it is still free; otherwise the space becomes free.
-     If it has to grow back and Windows is hibernated (or uses Fast Startup),
+     If it has to grow back and the Windows on it is hibernated (or uses Fast Startup),
      shut Windows down fully first.
    - Settings > System > "Disks and partitions" is a small partition manager.
    This is a beta: it passes every test on emulated machines, but has not run on

@@ -353,15 +353,16 @@ directement sur votre texte. Ouvrez **Ctrl+K › Installer FolioOS sur cet ordin
   Il refuse ce qui n’est pas sûr (Windows en veille prolongée ou avec le démarrage rapide, un volume qui a besoin
   de `chkdsk`, BitLocker sans la clé de récupération, LUKS, LVM, volumes Apple) et explique quoi faire à la place.
   ext4 n’est jamais redimensionné : faites de la place depuis Linux (GParted) et relancez l’installateur.
-- Avant toute écriture, la table de partitions (les premiers et les derniers secteurs du
+- Avant toute modification des partitions, la table de partitions (les premiers et les derniers secteurs du
   disque) est enregistrée dans `FOLIO/BACKUP` sur le support depuis lequel FolioOS a démarré, normalement la
   clé USB. Vos textes peuvent vivre sur l’ordinateur, sur la clé USB ou sur les deux.
 - **Mettez à jour** depuis une clé plus récente : seuls les fichiers de FolioOS sont remplacés ; vos textes et
   les partitions restent tels quels.
 - **Désinstallez** : vous pouvez d’abord faire copier vos textes sur le support depuis lequel FolioOS a démarré.
   Si l’installateur a réduit une partition pour faire de la place, elle retrouve la taille qu’elle avait, tant
-  que l’espace qui la suit est encore libre ; sinon, l’espace devient libre. Si cette partition doit être agrandie et que
-  Windows est en veille prolongée (ou utilise le démarrage rapide), FolioOS vous demande d’abord de l’arrêter complètement et ne change rien.
+  que l’espace qui la suit est encore libre ; sinon, l’espace devient libre. Si cette partition doit être agrandie et que le
+  Windows qu’elle contient est en veille prolongée (ou utilise le démarrage rapide), FolioOS vous demande d’abord
+  de l’arrêter complètement et ne modifie aucune partition.
 - *Réglages › Système › Disques et partitions* est un petit gestionnaire de partitions : créer une partition
   FAT32, formater, réduire ou agrandir NTFS/FAT32/exFAT, supprimer.
 - La 4.4 bêta est une préversion : téléchargez-la depuis

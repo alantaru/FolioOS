@@ -348,15 +348,16 @@ uruchamiał się w twoim tekście. Otwórz **Ctrl+K › Zainstaluj FolioOS na ty
   Odmawia tego, co nie jest bezpieczne (Windows w hibernacji lub z szybkim uruchamianiem, wolumin wymagający
   `chkdsk`, BitLocker bez klucza odzyskiwania, LUKS, LVM, woluminy Apple) i wyjaśnia, co zrobić zamiast tego.
   ext4 nigdy nie zmienia rozmiaru: zrób miejsce z poziomu Linuksa (GParted) i uruchom instalator ponownie.
-- Zanim cokolwiek zostanie zapisane, tablica partycji (pierwsze i ostatnie sektory dysku) trafia do
+- Zanim zmieni się jakakolwiek partycja, tablica partycji (pierwsze i ostatnie sektory dysku) trafia do
   `FOLIO/BACKUP` na nośniku, z którego uruchomił się FolioOS – zwykle na pendrivie. Twoje teksty mogą być na
   komputerze, na pendrivie albo w obu miejscach.
 - **Aktualizuj** z nowszego pendrive’a: wymieniane są tylko pliki samego FolioOS; twoje teksty i partycje
   zostają bez zmian.
 - **Odinstaluj**: najpierw możesz skopiować swoje teksty na nośnik, z którego uruchomił się FolioOS. Jeśli
   instalator zmniejszył partycję, żeby zrobić miejsce, wraca ona do swojego poprzedniego rozmiaru, o ile
-  miejsce za nią jest nadal wolne; w przeciwnym razie miejsce staje się wolne. Jeśli ta partycja ma się powiększyć, a Windows jest
-  w hibernacji (lub używa szybkiego uruchamiania), FolioOS prosi, by najpierw całkowicie go wyłączyć, i niczego nie zmienia.
+  miejsce za nią jest nadal wolne; w przeciwnym razie miejsce staje się wolne. Jeśli ta partycja ma się powiększyć, a Windows na niej
+  jest w hibernacji (lub używa szybkiego uruchamiania), FolioOS prosi, by najpierw całkowicie go wyłączyć, i nie
+  zmienia żadnej partycji.
 - *Ustawienia › System › Dyski i partycje* to mały menedżer partycji: utworzenie partycji FAT32, formatowanie,
   zmniejszanie lub powiększanie NTFS/FAT32/exFAT, usuwanie.
 - 4.4 beta to wersja przedpremierowa: pobierz ją ze

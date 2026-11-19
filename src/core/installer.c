@@ -357,7 +357,7 @@ static void installer_body(Window *w, Rect r) {
         y = wrap(fb, S(13), x + S(24), y, wd - S(24), line, T->accent) + S(8);
         y = wrap(f, S(13.5f), x, y, wd, L("Only the program, fonts, languages, themes and keyboards are replaced. Your texts, music and settings stay as they are, and fonts or themes you added are kept."), T->panel_text);
         y = wrap(f, S(13.5f), x, y + S(4), wd, L("Each file is replaced only after its new copy has been checked, and the old copy is kept until the new one is in place. If the update stops in the middle, some files may already be new: start the update again from this USB drive to finish it."), T->panel_text);
-        fmt(line, sizeof line, L("Before anything is written, the partition table (the first and last sectors of the disk) is saved to %s on this USB drive."), "FOLIO/BACKUP");
+        fmt(line, sizeof line, L("Before any partition changes, the partition table (the first and last sectors of the disk) is saved to %s on this USB drive."), "FOLIO/BACKUP");
         wrap(f, S(13.5f), x, y + S(4), wd, line, dim);
         if (ui_button(rect(x, by, SI(140), SI(40)), L("Back"), BTN_GHOST)) { st = ST_CHOOSE; ui.focus = 0; w->nav = -1; }
         if (ui_button(rect(x + wd - SI(220), by, SI(220), SI(40)), L("Update"), BTN_PRIMARY)) { st = ST_RUN; pct = 0; step[0] = 0; run_pending = true; ui.focus = 0; w->nav = -1; }
@@ -389,7 +389,7 @@ static void installer_body(Window *w, Rect r) {
         else y = wrap(f, S(13.5f), x, y, wd, fo->bios ? L("The start of the disk gets the other system's original boot code back, and the computer starts it directly again.")
                                                        : L("The EFI system partition loses only the folder EFI/FolioOS, and the computer starts the other system directly again."), T->panel_text);
         if (fo->ntfs >= 0 && fo->grow_fs == FS_NTFS) y = wrap(f, S(13.5f), x, y + S(4), wd, L("The next time Windows starts, it checks its partition (chkdsk) once; this is expected."), T->panel_text);
-        fmt(line, sizeof line, L("Before anything is written, the partition table (the first and last sectors of the disk) is saved to %s on this USB drive."), "FOLIO/BACKUP");
+        fmt(line, sizeof line, L("Before any partition changes, the partition table (the first and last sectors of the disk) is saved to %s on this USB drive."), "FOLIO/BACKUP");
         y = wrap(f, S(13.5f), x, y + S(4), wd, line, dim) + S(8);
         const char *word = L("ERASE");
         bool whole = fo->kind == FOUND_WHOLE;                   /* o disco inteiro fica vazio: sempre a palavra */
@@ -443,7 +443,7 @@ static void installer_body(Window *w, Rect r) {
                                       "When the computer starts, FolioOS waits %d seconds for a key; without one, the other system starts as usual.", prefs.boot_wait), prefs.boot_wait);
         else str_copy(line, L("The wait for a key is set to 0 seconds: the computer starts straight into FolioOS. To start the other system, use the computer's boot menu (or set a wait in Settings › System › Startup)."), sizeof line);
         y = wrap(f, S(13.5f), x, y + S(4), wd, line, T->panel_text);
-        fmt(line, sizeof line, L("Before anything is written, the partition table (the first and last sectors of the disk) is saved to %s on this USB drive."), "FOLIO/BACKUP");
+        fmt(line, sizeof line, L("Before any partition changes, the partition table (the first and last sectors of the disk) is saved to %s on this USB drive."), "FOLIO/BACKUP");
         y = wrap(f, S(13.5f), x, y + S(4), wd, line, dim);
         /* BitLocker: o FolioOS não toca na partição, mas a mudança na ordem de boot pode fazer o Windows pedir a
          * chave de recuperação uma vez; sem a chave a pessoa perde o acesso aos próprios arquivos */
@@ -471,7 +471,7 @@ static void installer_body(Window *w, Rect r) {
         for (int k = 0; k < n_on[d]; k++) y = wrap(f, S(13), x + S(24), y, wd - S(24), what_on[d][k], dim);
         y += S(8);
         y = wrap(f, S(13.5f), x, y, wd, L("FolioOS gets one partition that fills the disk, with your texts, fonts and settings copied from this USB drive."), T->panel_text);
-        fmt(line, sizeof line, L("Before anything is written, the partition table (the first and last sectors of the disk) is saved to %s on this USB drive."), "FOLIO/BACKUP");
+        fmt(line, sizeof line, L("Before any partition changes, the partition table (the first and last sectors of the disk) is saved to %s on this USB drive."), "FOLIO/BACKUP");
         y = wrap(f, S(13.5f), x, y + S(4), wd, line, T->panel_text) + S(10);
         fmt(line, sizeof line, L("To confirm, type %s:"), word);
         y = wrap(fb, S(14), x, y, wd, line, T->panel_text) + S(4);

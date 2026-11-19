@@ -60,7 +60,8 @@ All notable changes to this project are documented here. The format follows
   the engine and in *Disks and partitions* (a *Finish resizing* button). A retry after a shrink
   whose table update failed only writes the table. This also works for an NTFS volume already marked for `chkdsk`,
   and exFAT finishes a pending bitmap update first. In *Disks and partitions*, *Finish resizing* is shown next to
-  *Resize*, not instead of it.
+  *Resize*, not instead of it. In a narrow window, *Format* and *Delete* move to a second row so all
+  four buttons stay visible.
 - The safety copy in `FOLIO/BACKUP` never overwrites an earlier one, and if the folder cannot be
   listed nothing is written. A directory read error is no longer taken for a missing `CONFIG.INI`.
 
@@ -96,7 +97,8 @@ All notable changes to this project are documented here. The format follows
   now say that the partition manager writes to disks too, that copying the texts on uninstall is
   optional, that only a partition the installer shrank grows back, where the safety copy goes when
   FolioOS started from a disk, and where to download the beta. Saving a text is named as the
-  other way FolioOS writes to an internal volume.
+  other way FolioOS writes to an internal volume. The installer and the guides say the safety copy is
+  made before any partition changes (open texts are saved first).
 - Tests and tools are stricter: refusals are checked on the whole disk, file inventories fail on any
   missing, extra or unreadable file, read errors fail comparisons, test tools are built without
   clang/nasm, the build uses a work folder of its own, the lab counts video failures and stops its
