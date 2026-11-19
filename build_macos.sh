@@ -40,8 +40,15 @@ step 2 "App bundle -> $OUT/FolioOS Simulator.app"
 VERSION=$(sed -n 's/^#define FOLIO_VERSION "\(.*\)".*/\1/p' src/core/folio.h)
 APP="$OUT/FolioOS Simulator.app"
 rm -rf "$APP"
-mkdir -p "$APP/Contents/MacOS"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$OUT/folio_sim" "$APP/Contents/MacOS/folio_sim"
+# icon: drawn by tools/mkicon_macos.m (the splash mark), packed with the system's iconutil
+"$CC" -O2 -Wall -fobjc-arc tools/mkicon_macos.m -framework Foundation -framework CoreGraphics -framework ImageIO \
+    -o "$OUT/mkicon_macos" || die "compiling tools/mkicon_macos.m"
+rm -rf "$OUT/FolioOS.iconset"
+"$OUT/mkicon_macos" "$OUT/FolioOS.iconset" || die "drawing the icon"
+iconutil -c icns "$OUT/FolioOS.iconset" -o "$OUT/FolioOS.icns" || die "packing FolioOS.icns"
+cp "$OUT/FolioOS.icns" "$APP/Contents/Resources/FolioOS.icns"
 cat > "$APP/Contents/Info.plist" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -51,6 +58,7 @@ cat > "$APP/Contents/Info.plist" <<EOF
     <key>CFBundleDisplayName</key><string>FolioOS Simulator</string>
     <key>CFBundleIdentifier</key><string>org.folioos.simulator</string>
     <key>CFBundleExecutable</key><string>folio_sim</string>
+    <key>CFBundleIconFile</key><string>FolioOS</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleShortVersionString</key><string>${VERSION}</string>
     <key>CFBundleVersion</key><string>${VERSION}</string>

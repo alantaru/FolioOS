@@ -9,6 +9,10 @@ All notable changes to this project are documented here. The format follows
 **Beta.** Fixes from a full review of the 4.4.0 beta installer; please use this one instead. Like
 4.4.0, it passes every test on emulated machines but has not run on real hardware yet: back up first.
 
+### Added
+- macOS simulator: app icon (the splash mark), drawn by `tools/mkicon_macos.m` at build time and
+  packed with `iconutil`, so no image file is kept in the repository (#11, thanks to jagalindo).
+
 ### Fixed — firmware and boot
 - A failure to read `BootOrder` could make the installer write a new boot order with FolioOS only,
   and a failed read of a `Boot####` variable could let it reuse a number that was in use. Only "not
@@ -114,6 +118,7 @@ All notable changes to this project are documented here. The format follows
   backup GPT when the primary entries cannot be read; the file inventory keeps non-ASCII names apart;
   `fscheck_test` resize retries finish the table update; `--set-version` checks its buffer.
 - `qemu-lab.ps1 -List` also lists the three dual-boot scenarios.
+- macOS simulator: builds again (`pal_log` was missing from `src/platform/macos`) (#11).
 
 ## [4.4.0-beta] — 2026-11-18
 
