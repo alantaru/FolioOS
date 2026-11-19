@@ -312,6 +312,7 @@ static void alongside(const BlkDev *dev, const InstallSrc *src, Region fr, Insta
     static PartTable t;
     prog(2, "partition");
     if (!part_read(dev, &t) || t.scheme != SCHEME_GPT) { set_err(r, INST_ERR_NOTGPT, ""); return; }
+    if (t.locked) { set_err(r, INST_ERR_TABLE, ""); return; }               /* tabela que não regravaríamos exatamente */
     /* a partição EFI do disco (a primeira, como o firmware faz) tem de ser FAT32 */
     int esp = -1;
     for (int i = 0; i < t.n && esp < 0; i++) if (!memcmp(t.p[i].type, GPT_ESP, 16)) esp = i;
@@ -376,6 +377,7 @@ static void alongside_mbr(const BlkDev *dev, const InstallSrc *src, Region fr, I
     static PartTable t; static u8 mbrc[512], vbrc[512], s[512], orig[512];
     prog(2, "partition");
     if (!part_read(dev, &t) || t.scheme != SCHEME_MBR) { set_err(r, INST_ERR_REGION, "MBR"); return; }
+    if (t.locked) { set_err(r, INST_ERR_TABLE, ""); return; }               /* tabela que não regravaríamos exatamente */
     if (src->read(src->ctx, "FOLIO/TOOLS/bios/mbr.bin", 0, mbrc, 440) != 440 || src->read(src->ctx, "FOLIO/TOOLS/bios/vbr.bin", 0, vbrc, 512) != 512) { set_err(r, INST_ERR_BOOTCODE, "FOLIO/TOOLS/bios"); return; }
     if (!dev->rw(dev->ctx, 0, 1, orig, false)) { set_err(r, INST_ERR_READ, "MBR"); return; }
     if (!memcmp(orig, mbrc, 400)) { set_err(r, INST_ERR_REGION, "FolioOS MBR already"); return; }   /* reinstalar: desinstale antes */
@@ -438,6 +440,7 @@ void install_shrink_alongside(const BlkDev *dev, const InstallSrc *src, const In
     prog(2, "shrink");
     bool mbr = o->bios;                                          /* PC só BIOS: disco MBR (fase 3) */
     if (!part_read(dev, &t) || t.scheme != (mbr ? SCHEME_MBR : SCHEME_GPT)) { set_err(r, mbr ? INST_ERR_REGION : INST_ERR_NOTGPT, mbr ? "MBR" : ""); return; }
+    if (t.locked) { set_err(r, INST_ERR_TABLE, ""); return; }               /* tabela que não regravaríamos exatamente */
     int k = -1;
     for (int i = 0; i < t.n; i++) if (t.p[i].start == part_start) k = i;
     if (k < 0 || !fs_resizable(t.p[k].fs) || (!mbr && !memcmp(t.p[k].type, GPT_ESP, 16))) { set_err(r, INST_ERR_SHRINK, "partition"); return; }
@@ -733,11 +736,13 @@ void install_remove(const BlkDev *dev, const InstallSrc *src, const InstallOpts 
         prog(60, "MBR");
         if (!fat_mount(&fd, dio, 0, f->part_start) || fat_get(&fd, "FOLIO/OTHERMBR.BIN", om, sizeof om) < 440) { set_err(r, INST_ERR_READ, "FOLIO/OTHERMBR.BIN"); return; }
         if (!part_read(dev, &t) || t.scheme != SCHEME_MBR) { set_err(r, INST_ERR_REGION, "MBR"); return; }
+        if (t.locked) { set_err(r, INST_ERR_TABLE, ""); return; }               /* tabela que não regravaríamos exatamente */
         memcpy(t.mbr_code, om, 440);
     } else {
     /* 2. a partição EFI perde só \EFI\FolioOS (o programa e o FOLIO.ID) */
     prog(60, "EFI system partition");
     if (!part_read(dev, &t) || t.scheme != SCHEME_GPT) { set_err(r, INST_ERR_NOTGPT, ""); return; }
+    if (t.locked) { set_err(r, INST_ERR_TABLE, ""); return; }               /* tabela que não regravaríamos exatamente */
     int esp = -1;
     for (int i = 0; i < t.n && esp < 0; i++) if (!memcmp(t.p[i].type, GPT_ESP, 16)) esp = i;
     if (esp < 0 || t.p[esp].start != f->esp_start || !fat_mount(&ef, dio, 0, f->esp_start)) { set_err(r, INST_ERR_NOESP, ""); return; }
@@ -794,6 +799,7 @@ static bool op_begin(const BlkDev *dev, const InstallSrc *src, InstallResult *r,
     if (dev->bs != 512) { set_err(r, INST_ERR_WRITE, "4K sectors"); return false; }
     if (!part_read(dev, t)) { set_err(r, INST_ERR_READ, "partition table"); return false; }
     if (t->has_extended) { set_err(r, INST_ERR_REGION, "extended partition"); return false; }   /* lógicas: só leitura nesta fase */
+    if (t->scheme != SCHEME_NONE && !part_editable(t)) { set_err(r, INST_ERR_TABLE, ""); return false; }   /* tabela que não regravaríamos exatamente */
     *k = -1;
     for (int i = 0; i < t->n; i++) if (t->p[i].start == part_start) *k = i;
     if (!save_disk_start(dev, src, r)) return false;
@@ -897,6 +903,7 @@ const char *install_error(int code) {
     case INST_ERR_SHRINK: return N_("Could not shrink the other system's partition");
     case INST_ERR_GROW: return N_("Could not give the space back to the other system's partition");
     case INST_ERR_RESIZE: return N_("This partition cannot change to that size without moving data");
+    case INST_ERR_TABLE: return N_("FolioOS cannot change this disk's partition table safely: it is left as it is");
     default: return N_("Error");
     }
 }

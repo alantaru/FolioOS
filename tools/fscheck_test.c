@@ -281,6 +281,7 @@ static int check_shrunk(const char *path, unsigned long long mib_before) {
  * recusa abaixo do mínimo sem mudar nada; encolhe até perto do mínimo (todos os arquivos com o mesmo CRC); cresce de
  * volta ao tamanho original (o volume volta byte a byte, fora o FSInfo) */
 static FILE *ff;
+static u32 rd32le(const u8 *p) { return p[0] | p[1] << 8 | p[2] << 16 | (u32)p[3] << 24; }
 static bool file_rw(void *ctx, u64 lba, u32 n, void *buf, bool w) {
     (void)ctx;
     if (_fseeki64(ff, (long long)(lba * 512), SEEK_SET)) return false;
@@ -346,6 +347,20 @@ static int fat32_cycle(const char *path) {
     }
     CHECK(!diffs, "fat32: depois de crescer, %llu setores diferentes do original (o 1º: %llu)", (unsigned long long)diffs, (unsigned long long)first);
     if (!diffs) printf("  fat32  crescido de volta: igual ao original, fora o FSInfo\n");
+    /* FATs sem espelhamento (BPB_ExtFlags bit 7): só a FAT ativa vale, e o FolioOS lê a FAT 0 — não redimensiona,
+     * e nada muda */
+    {
+        static u8 bb[512]; d.rw(0, p->start, 1, bb, false);
+        bb[40] |= 0x80; bb[40] = (u8)((bb[40] & 0xF0) | 1); d.rw(0, p->start, 1, bb, true);   /* espelhamento desligado, FAT 1 ativa */
+        CHECK(fat32_min_sectors(&d, p->start) == 0 && fat32_max_sectors(&d, p->start) == 0, "fat32: sem espelhamento devia impedir redimensionar");
+        _fseeki64(ff, (long long)(p->start * 512), SEEK_SET); if (fread(now, 1, vb, ff) != vb) return 2;
+        int rc2 = fat32_resize(&d, p->start, p->count, mn + 8 * 1024);
+        CHECK(rc2 == NTFS_SHRINK_UNREADABLE, "fat32: sem espelhamento: rc %d", rc2);
+        u8 *after = malloc(vb); _fseeki64(ff, (long long)(p->start * 512), SEEK_SET); if (fread(after, 1, vb, ff) != vb) return 2;
+        CHECK(!memcmp(now, after, vb), "fat32: uma recusa (sem espelhamento) mudou bytes");
+        free(after);
+        bb[40] = b0[40]; d.rw(0, p->start, 1, bb, true);
+    }
     free(orig); free(now); fclose(ff);
     return fails ? 1 : 0;
 }
@@ -383,6 +398,31 @@ static int exfat_cycle(const char *path) {
     CHECK(!diffs, "exfat: depois de crescer, %llu setores diferentes (o 1º: %llu)", (unsigned long long)diffs, (unsigned long long)first);
     CHECK(!memcmp(orig + 0x48, now + 0x48, 0x70 - 0x48), "exfat: o setor de boot não voltou ao original");
     if (!diffs) printf("  exfat  crescido de volta: igual ao original, fora as regiões de boot\n");
+    /* bitmap de alocação que não é contíguo (sem NoFatChain e a FAT apontando para outro lugar): o volume não é
+     * redimensionado e nada muda (antes, o 2º cluster do bitmap era lido como se viesse logo depois do 1º) */
+    {
+        u32 heap = rd32le(b0 + 0x58), root = rd32le(b0 + 0x60), fat_off = rd32le(b0 + 0x50), spc = 1u << b0[0x6D];
+        static u8 s[512], f[512]; u64 at = p->start + heap + (u64)(root - 2) * spc; int e = -1; u32 sec = 0;
+        for (u32 k = 0; k < spc && e < 0; k++) { d.rw(0, at + k, 1, s, false); for (int i = 0; i < 512; i += 32) if (s[i] == 0x81) { e = i; sec = k; break; } }
+        CHECK(e >= 0, "exfat: entrada do bitmap não encontrada");
+        if (e >= 0) {
+            static u8 s0[512], f0[512]; memcpy(s0, s, 512);
+            u32 bmc = rd32le(s + e + 20); u64 fs = p->start + fat_off + bmc / 128;
+            d.rw(0, fs, 1, f, false); memcpy(f0, f, 512);
+            s[e + 1] &= (u8)~0x02;                                             /* sem NoFatChain: vale a FAT */
+            u64 two = (u64)spc * 512 + 1; for (int i = 0; i < 8; i++) s[e + 24 + i] = (u8)(two >> (8 * i));   /* 2 clusters */
+            f[(bmc % 128) * 4] = 0xFF; f[(bmc % 128) * 4 + 1] = 0xFF; f[(bmc % 128) * 4 + 2] = 0xFF; f[(bmc % 128) * 4 + 3] = 0xFF;   /* fim de cadeia */
+            d.rw(0, at + sec, 1, s, true); d.rw(0, fs, 1, f, true);
+            CHECK(exfat_min_sectors(&d, p->start) == 0 && exfat_max_sectors(&d, p->start) == 0, "exfat: bitmap espalhado devia impedir redimensionar");
+            _fseeki64(ff, (long long)(p->start * 512), SEEK_SET); if (fread(now, 1, vb, ff) != vb) return 2;
+            int rc2 = exfat_resize(&d, p->start, p->count, len0 - 64 * 1024);
+            CHECK(rc2 == NTFS_SHRINK_UNREADABLE, "exfat: bitmap espalhado: rc %d", rc2);
+            u8 *after = malloc(vb); _fseeki64(ff, (long long)(p->start * 512), SEEK_SET); if (fread(after, 1, vb, ff) != vb) return 2;
+            CHECK(!memcmp(now, after, vb), "exfat: uma recusa (bitmap espalhado) mudou bytes");
+            free(after);
+            d.rw(0, at + sec, 1, s0, true); d.rw(0, fs, 1, f0, true);
+        }
+    }
     free(orig); free(now); fclose(ff);
     return fails ? 1 : 0;
 }

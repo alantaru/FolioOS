@@ -41,9 +41,9 @@ void disks_diag(Buf *o) {
                    di.bs, di.removable ? " · removable" : "", di.readonly ? " · read-only" : "", di.boot ? " · FolioOS started from here" : "");
         if (di.bs != 512 && di.bs != 4096) continue;
         if (!part_read(&d, t)) { buf_puts(o, "     partition table: unreadable\r\n"); continue; }
-        static const char *sch[] = { "none (empty disk)", "MBR", "GPT", "none (whole-disk volume)" };
-        buf_printf(o, "     partition table: %s%s%s\r\n", sch[t->scheme], t->gpt_backup_used ? " (main header damaged, backup used)" : "",
-                   t->has_extended ? " · extended partition" : "");
+        static const char *sch[] = { "none (empty disk)", "MBR", "GPT", "none (whole-disk volume)", "unreadable" };
+        buf_printf(o, "     partition table: %s%s%s%s\r\n", sch[t->scheme], t->gpt_backup_used ? " (main header damaged, backup used)" : "",
+                   t->has_extended ? " · extended partition" : "", t->locked && t->scheme != SCHEME_UNREADABLE ? " · FolioOS will not change it" : "");
         for (int i = 0; i < t->n; i++) {
             Part *p = &t->p[i];
             disk_size_text(p->count * di.bs, sz, sizeof sz);

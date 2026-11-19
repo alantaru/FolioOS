@@ -1195,7 +1195,7 @@ msgstr "Temayı kaydet"
 msgid "Cancel"
 msgstr "İptal"
 
-#: src/core/app.c:1601 src/core/app.c:1602 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:200 src/core/partitions.c:239
+#: src/core/app.c:1601 src/core/app.c:1602 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:204 src/core/partitions.c:243
 msgid "Delete"
 msgstr "Sil"
 
@@ -1966,7 +1966,7 @@ msgstr "“%s” klasörü ve tüm içeriği silinsin mi? Bu işlem geri alınam
 msgid "Delete \"%s\"? This cannot be undone."
 msgstr "“%s” silinsin mi? Bu işlem geri alınamaz."
 
-#: src/core/filedlg.c:327 src/core/partitions.c:220
+#: src/core/filedlg.c:327 src/core/partitions.c:224
 msgid "Size"
 msgstr "Boyut"
 
@@ -2005,79 +2005,79 @@ msgstr[1] "%d öğe"
 msgid "Open"
 msgstr "Aç"
 
-#: src/core/fscheck.c:786
+#: src/core/fscheck.c:812
 msgid "This partition is encrypted with BitLocker. To make room, shrink it in Windows (Disk Management, Shrink Volume) or turn BitLocker off first."
 msgstr "Bu bölüm BitLocker ile şifrelenmiş. Yer açmak için Windows’ta küçültün (Disk Yönetimi, Birimi Küçült) veya önce BitLocker’ı kapatın."
 
-#: src/core/fscheck.c:787
+#: src/core/fscheck.c:813
 msgid "This partition is encrypted (LUKS). To make room, shrink it from Linux with the encryption tools."
 msgstr "Bu bölüm şifrelenmiş (LUKS). Yer açmak için Linux’tan şifreleme araçlarıyla küçültün."
 
-#: src/core/fscheck.c:788
+#: src/core/fscheck.c:814
 msgid "This partition holds LVM volumes. To make room, shrink them from Linux (lvreduce, then pvresize)."
 msgstr "Bu bölüm LVM birimleri içeriyor. Yer açmak için bunları Linux’tan küçültün (önce lvreduce, sonra pvresize)."
 
-#: src/core/fscheck.c:789
+#: src/core/fscheck.c:815
 msgid "This is a Mac partition (APFS or HFS+). To make room, use Disk Utility on the Mac."
 msgstr "Bu bir Mac bölümü (APFS veya HFS+). Yer açmak için Mac’te Disk İzlencesi’ni kullanın."
 
-#: src/core/fscheck.c:790
+#: src/core/fscheck.c:816
 msgid "Windows is hibernated or uses Fast Startup. Start Windows, then shut it down while holding Shift (or turn Fast Startup off in Power Options), and try again."
 msgstr "Windows hazırda bekletmede veya Hızlı başlatma kullanıyor. Windows’u başlatın, Shift tuşunu basılı tutarak kapatın (veya Güç Seçenekleri’nde Hızlı başlatmayı kapatın) ve yeniden deneyin."
 
-#: src/core/fscheck.c:791
+#: src/core/fscheck.c:817
 msgid "Windows marked this partition as needing a check. Start Windows, run chkdsk /f on it, and try again."
 msgstr "Windows bu bölümü denetlenmesi gereken olarak işaretledi. Windows’u başlatın, bu bölümde chkdsk /f çalıştırın ve yeniden deneyin."
 
-#: src/core/fscheck.c:792
+#: src/core/fscheck.c:818
 msgid "This Linux partition was not unmounted cleanly. Start Linux and shut it down normally, then try again."
 msgstr "Bu Linux bölümü düzgün ayrılmamış. Linux’u başlatıp normal şekilde kapatın, sonra yeniden deneyin."
 
-#: src/core/fscheck.c:793
+#: src/core/fscheck.c:819
 msgid "Linux found errors on this partition. Check it with fsck from Linux, then try again."
 msgstr "Linux bu bölümde hatalar buldu. Linux’tan fsck ile denetleyin, sonra yeniden deneyin."
 
-#: src/core/fscheck.c:794
+#: src/core/fscheck.c:820
 msgid "This partition could not be read safely, so FolioOS will not change it."
 msgstr "Bu bölüm güvenle okunamadı; bu yüzden FolioOS onu değiştirmeyecek."
 
-#: src/core/fscheck.c:795
+#: src/core/fscheck.c:821
 msgid "FolioOS cannot resize this file system yet."
 msgstr "FolioOS bu dosya sistemini henüz yeniden boyutlandıramıyor."
 
-#: src/core/fscheck.c:801
+#: src/core/fscheck.c:827
 msgid "encrypted (BitLocker)"
 msgstr "şifreli (BitLocker)"
 
-#: src/core/fscheck.c:802
+#: src/core/fscheck.c:828
 msgid "encrypted (LUKS)"
 msgstr "şifreli (LUKS)"
 
-#: src/core/fscheck.c:804
+#: src/core/fscheck.c:830
 msgid "Mac (APFS/HFS+)"
 msgstr "Mac (APFS/HFS+)"
 
-#: src/core/fscheck.c:805
+#: src/core/fscheck.c:831
 msgid "Windows hibernated or Fast Startup"
 msgstr "Windows hazırda bekletmede veya Hızlı başlatma"
 
-#: src/core/fscheck.c:806
+#: src/core/fscheck.c:832
 msgid "needs a check (chkdsk)"
 msgstr "denetlenmeli (chkdsk)"
 
-#: src/core/fscheck.c:807
+#: src/core/fscheck.c:833
 msgid "not unmounted cleanly"
 msgstr "düzgün ayrılmamış"
 
-#: src/core/fscheck.c:808
+#: src/core/fscheck.c:834
 msgid "has errors (fsck)"
 msgstr "hatalı (fsck)"
 
-#: src/core/fscheck.c:809
+#: src/core/fscheck.c:835
 msgid "unreadable"
 msgstr "okunamıyor"
 
-#: src/core/fscheck.c:810
+#: src/core/fscheck.c:836
 msgid "cannot be resized yet"
 msgstr "henüz yeniden boyutlandırılamaz"
 
@@ -2149,75 +2149,79 @@ msgstr "Giriş: hiragana"
 msgid "Input: Katakana"
 msgstr "Giriş: katakana"
 
-#: src/core/install.c:883
+#: src/core/install.c:889
 msgid "Done"
 msgstr "Tamamlandı"
 
-#: src/core/install.c:884
+#: src/core/install.c:890
 msgid "Could not read"
 msgstr "Okunamadı"
 
-#: src/core/install.c:885
+#: src/core/install.c:891
 msgid "Could not write to the disk"
 msgstr "Diske yazılamadı"
 
-#: src/core/install.c:886
+#: src/core/install.c:892
 msgid "The disk is too small (at least 512 MB)"
 msgstr "Disk çok küçük (en az 512 MB)"
 
-#: src/core/install.c:887
+#: src/core/install.c:893
 msgid "Could not save the safety copy to the USB drive"
 msgstr "Güvenlik kopyası USB belleğe kaydedilemedi"
 
-#: src/core/install.c:888
+#: src/core/install.c:894
 msgid "Could not format the new partition"
 msgstr "Yeni bölüm biçimlendirilemedi"
 
-#: src/core/install.c:889
+#: src/core/install.c:895
 msgid "Could not copy"
 msgstr "Kopyalanamadı"
 
-#: src/core/install.c:890
+#: src/core/install.c:896
 msgid "A copied file did not match the original"
 msgstr "Kopyalanan bir dosya asılıyla eşleşmiyor"
 
-#: src/core/install.c:891
+#: src/core/install.c:897
 msgid "The BIOS boot code is missing from the USB drive"
 msgstr "USB bellekte BIOS önyükleme kodu eksik"
 
-#: src/core/install.c:892
+#: src/core/install.c:898
 msgid "The USB drive does not have a complete FolioOS"
 msgstr "USB bellekte eksiksiz bir FolioOS yok"
 
-#: src/core/install.c:893
+#: src/core/install.c:899
 msgid "This disk does not use a GPT partition table"
 msgstr "Bu disk GPT bölüm tablosu kullanmıyor"
 
-#: src/core/install.c:894
+#: src/core/install.c:900
 msgid "No FAT32 EFI system partition was found on this disk"
 msgstr "Bu diskte FAT32 EFI sistem bölümü bulunamadı"
 
-#: src/core/install.c:895
+#: src/core/install.c:901
 msgid "The EFI system partition is full"
 msgstr "EFI sistem bölümü dolu"
 
-#: src/core/install.c:896
+#: src/core/install.c:902
 msgid "The chosen space is not free"
 msgstr "Seçilen alan boş değil"
 
-#: src/core/install.c:897
+#: src/core/install.c:903
 msgid "Could not shrink the other system's partition"
 msgstr "Diğer sistemin bölümü küçültülemedi"
 
-#: src/core/install.c:898
+#: src/core/install.c:904
 msgid "Could not give the space back to the other system's partition"
 msgstr "Alan diğer sistemin bölümüne geri verilemedi"
 
-#: src/core/install.c:899
+#: src/core/install.c:905
 msgid "This partition cannot change to that size without moving data"
 msgstr "Bu bölüm veri taşımadan o boyuta getirilemez"
 
-#: src/core/install.c:900
+#: src/core/install.c:906 src/core/partitions.c:46
+msgid "FolioOS cannot change this disk's partition table safely: it is left as it is"
+msgstr "FolioOS bu diskin bölüm tablosunu güvenle değiştiremez: olduğu gibi bırakılır"
+
+#: src/core/install.c:907
 msgid "Error"
 msgstr "Hata"
 
@@ -2241,7 +2245,7 @@ msgstr "Linux’u korumak için bölümünü Linux’tan küçültün (örneğin
 msgid "To keep Windows, shrink drive C: in Windows (Disk Management, Shrink Volume) and run the installer again: FolioOS will use the free space."
 msgstr "Windows’u korumak için C: sürücüsünü Windows’ta küçültün (Disk Yönetimi, Birimi Küçült) ve yükleyiciyi yeniden açın: FolioOS boş alanı kullanır."
 
-#: src/core/installer.c:106
+#: src/core/installer.c:106 src/core/partitions.c:44
 msgid "Partition table unreadable"
 msgstr "Bölüm tablosu okunamıyor"
 
@@ -2256,7 +2260,7 @@ msgid_plural "…and %d more partitions"
 msgstr[0] "…ve %d bölüm daha"
 msgstr[1] "…ve %d bölüm daha"
 
-#: src/core/installer.c:124 src/core/partitions.c:127
+#: src/core/installer.c:124 src/core/partitions.c:131
 msgid "disk"
 msgstr "disk"
 
@@ -2284,7 +2288,7 @@ msgstr "FolioOS’u mevcut sisteminizin yanına, boş alana ya da bir diskteki t
 msgid "Choose where:"
 msgstr "Nereye kurulacağını seçin:"
 
-#: src/core/installer.c:290 src/core/partitions.c:165
+#: src/core/installer.c:290 src/core/partitions.c:169
 msgid "No disk was found besides the USB drive FolioOS started from."
 msgstr "FolioOS’un başlatıldığı USB bellek dışında disk bulunamadı."
 
@@ -2353,7 +2357,7 @@ msgstr "Her dosya ancak yeni kopya denetlendikten sonra değiştirilir; bu yüzd
 msgid "Before anything is written, the start of the disk (partition table and boot sectors) is saved to %s on this USB drive."
 msgstr "Herhangi bir şey yazılmadan önce diskin başı (bölüm tablosu ve önyükleme sektörleri) bu USB bellekte %s konumuna kaydedilir."
 
-#: src/core/installer.c:341 src/core/installer.c:382 src/core/installer.c:435 src/core/installer.c:458 src/core/partitions.c:238
+#: src/core/installer.c:341 src/core/installer.c:382 src/core/installer.c:435 src/core/installer.c:458 src/core/partitions.c:242
 msgid "Back"
 msgstr "Geri"
 
@@ -2370,7 +2374,7 @@ msgstr "FolioOS bu diskten kaldırılacak:"
 msgid "− FolioOS · FAT32 · %s"
 msgstr "− FolioOS · FAT32 · %s"
 
-#: src/core/installer.c:357 src/core/installer.c:405 src/core/partitions.c:218
+#: src/core/installer.c:357 src/core/installer.c:405 src/core/partitions.c:222
 #, c-format
 msgid "%s%s: %s → %s"
 msgstr "%s%s: %s → %s"
@@ -2402,7 +2406,7 @@ msgstr "EFI sistem bölümü yalnızca EFI/FolioOS klasörünü kaybeder ve bilg
 msgid "The next time Windows starts, it checks its partition (chkdsk) once; this is expected."
 msgstr "Windows bir sonraki açılışta bölümünü bir kez denetler (chkdsk); bu beklenen bir durumdur."
 
-#: src/core/installer.c:373 src/core/installer.c:443 src/core/partitions.c:212
+#: src/core/installer.c:373 src/core/installer.c:443 src/core/partitions.c:216
 msgid "ERASE"
 msgstr "SİL"
 
@@ -2411,7 +2415,7 @@ msgstr "SİL"
 msgid "Your texts on this computer will be lost. To confirm, type %s:"
 msgstr "Bu bilgisayardaki metinleriniz kaybolacak. Onaylamak için %s yazın:"
 
-#: src/core/installer.c:377 src/core/installer.c:385 src/core/installer.c:453 src/core/installer.c:461 src/core/partitions.c:233 src/core/partitions.c:242
+#: src/core/installer.c:377 src/core/installer.c:385 src/core/installer.c:453 src/core/installer.c:461 src/core/partitions.c:237 src/core/partitions.c:246
 #, c-format
 msgid "To confirm, type %s:"
 msgstr "Onaylamak için %s yazın:"
@@ -2433,11 +2437,11 @@ msgstr "+ FolioOS · FAT32 · %s, açılan alanda"
 msgid "Size for FolioOS"
 msgstr "FolioOS için boyut"
 
-#: src/core/installer.c:412 src/core/partitions.c:222
+#: src/core/installer.c:412 src/core/partitions.c:226
 msgid "No file is moved: FolioOS only takes free space from the end of that partition. The next time Windows starts, it checks the partition (chkdsk) once; this is expected."
 msgstr "Hiçbir dosya taşınmaz: FolioOS yalnızca o bölümün sonundaki boş alanı alır. Windows bir sonraki açılışta bölümü bir kez denetler (chkdsk); bu beklenen bir durumdur."
 
-#: src/core/installer.c:412 src/core/partitions.c:222
+#: src/core/installer.c:412 src/core/partitions.c:226
 msgid "No file is moved: FolioOS only takes free space from the end of that partition."
 msgstr "Hiçbir dosya taşınmaz: FolioOS yalnızca o bölümün sonundaki boş alanı alır."
 
@@ -2658,61 +2662,61 @@ msgid_plural "%d tracks · %s"
 msgstr[0] "%d parça · %s"
 msgstr[1] "%d parça · %s"
 
-#: src/core/partitions.c:103
+#: src/core/partitions.c:107
 msgid "Done. The previous start of the disk is saved on this USB drive."
 msgstr "Tamam. Diskin önceki başlangıcı bu USB belleğe kaydedildi."
 
-#: src/core/partitions.c:131
+#: src/core/partitions.c:135
 #, c-format
 msgid "Free space · %s"
 msgstr "Boş alan · %s"
 
-#: src/core/partitions.c:161
+#: src/core/partitions.c:165
 msgid "Working… Do not turn off the computer or remove the USB drive."
 msgstr "Çalışıyor… Bilgisayarı kapatmayın ve USB belleği çıkarmayın."
 
-#: src/core/partitions.c:164
+#: src/core/partitions.c:168
 msgid "Choose a partition or a free space, then an action. Before anything is written, the start of the disk is saved to FOLIO/BACKUP on this USB drive."
 msgstr "Bir bölüm ya da boş alan, sonra bir işlem seçin. Herhangi bir şey yazılmadan önce diskin başlangıcı bu USB bellekte FOLIO/BACKUP içine kaydedilir."
 
-#: src/core/partitions.c:186
+#: src/core/partitions.c:190
 msgid "Create a FAT32 partition"
 msgstr "FAT32 bölümü oluştur"
 
-#: src/core/partitions.c:192
+#: src/core/partitions.c:196
 msgid "Resize"
 msgstr "Yeniden boyutlandır"
 
-#: src/core/partitions.c:198
+#: src/core/partitions.c:202
 msgid "Format as FAT32"
 msgstr "FAT32 olarak biçimlendir"
 
-#: src/core/partitions.c:217
+#: src/core/partitions.c:221
 #, c-format
 msgid "+ FAT32 · %s, in this free space"
 msgstr "+ FAT32 · %s, bu boş alanda"
 
-#: src/core/partitions.c:226
+#: src/core/partitions.c:230
 msgid "Name of the new volume:"
 msgstr "Yeni birimin adı:"
 
-#: src/core/partitions.c:230
+#: src/core/partitions.c:234
 msgid "Everything on this partition will be erased; it becomes an empty FAT32 volume."
 msgstr "Bu bölümdeki her şey silinecek; boş bir FAT32 birimi olacak."
 
-#: src/core/partitions.c:231
+#: src/core/partitions.c:235
 msgid "This partition and everything on it will be erased; its space becomes free."
 msgstr "Bu bölüm ve içindeki her şey silinecek; alanı boş kalacak."
 
-#: src/core/partitions.c:239
+#: src/core/partitions.c:243
 msgid "Create"
 msgstr "Oluştur"
 
-#: src/core/partitions.c:239
+#: src/core/partitions.c:243
 msgid "Apply"
 msgstr "Uygula"
 
-#: src/core/partitions.c:239
+#: src/core/partitions.c:243
 msgid "Format"
 msgstr "Biçimlendir"
 

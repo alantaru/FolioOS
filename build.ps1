@@ -57,8 +57,13 @@ if ($clang -and $nasm) {
     New-Item -ItemType Directory -Force build\bios | Out-Null
     $b32 = @("--target=i686-unknown-none-elf", "-march=i686", "-O2", "-ffreestanding", "-fno-pic", "-fno-stack-protector", "-mno-sse", "-mno-mmx",
              "-malign-double", "-fshort-wchar", "-fno-strict-aliasing") + $warn
-    Run $clang ($b32 + @("-nostdlib", "-static", "-fuse-ld=lld", "-Wl,-T,src/platform/bios/bridge.ld", "-Wl,--oformat=binary",
-                         "-o", "build\bios\bridge.bin", "src\platform\bios\bridge.c", "src\core\fat32.c"))
+    # compile with clang, link with ld.lld itself: for a bare ELF target the clang driver may hand the link
+    # to gcc, which runs lld in its MinGW (PE) mode and rejects -T (that broke the CI build)
+    $lld = Join-Path (Split-Path ([string]$(if ($clang -is [string]) { $clang } else { $clang.Source }))) "ld.lld.exe"
+    if (-not (Test-Path $lld)) { $lld = (Get-Command ld.lld -ErrorAction Stop).Source }
+    Run $clang ($b32 + @("-c", "-o", "build\bios\bridge.o", "src\platform\bios\bridge.c"))
+    Run $clang ($b32 + @("-c", "-o", "build\bios\fat32.o", "src\core\fat32.c"))
+    Run $lld @("-T", "src/platform/bios/bridge.ld", "--oformat=binary", "-o", "build\bios\bridge.bin", "build\bios\bridge.o", "build\bios\fat32.o")
     Run $nasm @("-f", "bin", "-DMBR", "src\platform\bios\boot.asm", "-o", "build\bios\mbr.bin")
     Run $nasm @("-f", "bin", "-DVBR", "src\platform\bios\boot.asm", "-o", "build\bios\vbr.bin")
     Run $nasm @("-f", "bin", "-i", "build/bios/", "src\platform\bios\stub.asm", "-o", "build\bios\BIOS.SYS")
@@ -303,6 +308,14 @@ if (-not $NoTests) {
         Run .\build\part_test.exe @($ft) | Out-Null
         foreach ($i in "gpt", "mbr") { Run .\build\fat32_test.exe @("$ft\$i.img", "--fsck") | Out-Null }
         Copy-Item -Recurse build\usb_files "$ft\src"
+        # a table FolioOS cannot read or would not rewrite exactly (unreadable GPT, MBR with an extended partition):
+        # the partition manager refuses before writing anything, and the disk stays byte for byte the same
+        foreach ($c in @(@("gpt256.img", "--op-create", "1", "20", "X"), @("mbrext.img", "--op-format", "1", "X"), @("mbrext.img", "--op-delete", "1"))) {
+            $h0 = (Get-FileHash "$ft\$($c[0])").Hash
+            $ErrorActionPreference = "Continue"; $null = & .\build\install_test.exe (@("$ft\src", "$ft\$($c[0])", "64") + $c[1..9]) 2>&1; $ec = $LASTEXITCODE; $ErrorActionPreference = "Stop"
+            if ($ec -ne 1) { throw "partition manager on $($c[0]) $($c[1]): expected a refusal, exit $ec" }
+            if ((Get-FileHash "$ft\$($c[0])").Hash -ne $h0) { throw "partition manager on $($c[0]) $($c[1]): the disk changed although the table is locked" }
+        }
         foreach ($k in @(@("inst-uefi"), @("inst-bios", "--bios"))) {
             Run .\build\install_test.exe (@("$ft\src", "$ft\$($k[0]).img", "600") + $k[1..9]) | Out-Null
             Run .\build\fat32_test.exe @("$ft\$($k[0]).img", "--fsck") | Out-Null

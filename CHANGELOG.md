@@ -25,6 +25,10 @@ and Linux `fsck`), but it has not run on real hardware yet. Back up your disk be
     make room from Linux (GParted).
   - Every file is checked by CRC after copying; the partition table and boot sectors are backed up
     to the USB drive first (`FOLIO\BACKUP`).
+  - A partition table FolioOS cannot read is never treated as an empty disk, and one it could not
+    write back exactly (a GPT with a non-standard number or size of entries, an MBR with an extended
+    partition) is shown but never changed. FAT32 volumes without mirrored FATs and exFAT volumes
+    whose allocation bitmap is not contiguous are not resized.
 - **Boot chooser** next to another system: FolioOS starts first and, without a key, hands over to
   the other system after `boot_wait` seconds (Settings → System; 0 = straight to FolioOS). With
   UEFI it uses `BootNext` and a restart, so BitLocker/TPM measurements stay as Windows expects.

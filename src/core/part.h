@@ -15,7 +15,8 @@ typedef struct {
     bool (*flush)(void *ctx);   /* opcional: esvazia o cache de escrita do disco (pontos seguros, não a cada gravação) */
 } BlkDev;
 
-enum { SCHEME_NONE, SCHEME_MBR, SCHEME_GPT, SCHEME_SUPERFLOPPY };
+/* SCHEME_UNREADABLE: há sinal de uma tabela (MBR de proteção, cabeçalho GPT) que não pôde ser lida — nunca é "vazio" */
+enum { SCHEME_NONE, SCHEME_MBR, SCHEME_GPT, SCHEME_SUPERFLOPPY, SCHEME_UNREADABLE };
 enum { FS_UNKNOWN, FS_EMPTY, FS_FAT12, FS_FAT16, FS_FAT32, FS_EXFAT, FS_NTFS, FS_EXT, FS_BTRFS, FS_XFS,
        FS_BITLOCKER, FS_LUKS, FS_APFS, FS_HFSP, FS_SWAP, FS_LVM, FS_ISO, FS_REFS };
 
@@ -43,6 +44,8 @@ typedef struct {
     Part p[PART_MAX];
     bool gpt_backup_used;   /* o cabeçalho principal estava estragado: lido do reserva */
     bool has_extended;      /* MBR com partição estendida */
+    bool locked;            /* lida, mas o FolioOS não a regravaria fielmente (GPT com outra quantidade ou outro tamanho
+                             * de entrada, mais de PART_MAX partições, MBR com estendida): nada nela é alterado */
 } PartTable;
 
 typedef struct { uint64_t start, count; } Region;
@@ -53,6 +56,7 @@ extern const uint8_t GPT_ESP[16], GPT_MSDATA[16], GPT_MSR[16], GPT_WINRE[16], GP
 
 uint32_t crc32_buf(uint32_t crc, const void *p, uint32_t n);
 bool part_read(const BlkDev *d, PartTable *t);
+bool part_editable(const PartTable *t);   /* GPT ou MBR que o FolioOS sabe regravar exatamente */
 int  part_probe(const BlkDev *d, uint64_t start, uint64_t count, char *label, int cap);   /* FS_* */
 const char *part_fs_name(int fs);
 const char *part_type_name(const Part *p, int scheme);    /* "EFI", "Windows", "Linux"… (inglês; a interface traduz) */

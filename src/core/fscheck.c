@@ -527,6 +527,9 @@ static bool f32_geo(const BlkDev *d, u64 lba, Fat32Geo *g, u8 *b) {
     g->nclus = (g->total - g->data) / g->spc;
     if (g->nclus > g->fatsz * 128 - 2) g->nclus = g->fatsz * 128 - 2;
     g->fsinfo = rd16(b + 48); g->bkboot = rd16(b + 50);
+    /* BPB_ExtFlags bit 7: FATs sem espelhamento (só a FAT dos bits 0–3 vale). Tudo aqui lê a FAT 0, então um volume
+     * assim não é redimensionado (Windows e Linux sempre espelham; um volume diferente fica intocado) */
+    if (rd16(b + 40) & 0x80) return false;
     return g->nclus >= 65525;
 }
 /* o último cluster em uso (o maior número com entrada diferente de zero na FAT); 1 = nenhum */
@@ -621,7 +624,23 @@ static bool ex_geo(const BlkDev *d, u64 lba, ExGeo *g, u8 *b) {
             if (!d->rw(d->ctx, at + k, 1, s, false)) return false;
             for (u32 e = 0; e < 512; e += 32) {
                 if (s[e] == 0) return false;
-                if (s[e] == 0x81) { g->bm_clus = rd32(s + e + 20); g->bm_len = rd64(s + e + 24); g->bm_ent_lba = at + k; g->bm_ent_off = e; return g->bm_clus >= 2; }
+                if (s[e] == 0x81) {
+                    g->bm_clus = rd32(s + e + 20); g->bm_len = rd64(s + e + 24); g->bm_ent_lba = at + k; g->bm_ent_off = e;
+                    if (g->bm_clus < 2 || !g->bm_len) return false;
+                    /* o bitmap é lido e gravado como um trecho contíguo: confirma (NoFatChain, ou a cadeia da FAT
+                     * cluster a cluster); espalhado pelo disco, o volume não é redimensionado */
+                    u64 nb = (g->bm_len + (u64)g->spc * 512 - 1) / ((u64)g->spc * 512);
+                    if ((u64)g->bm_clus - 2 + nb > g->nclus) return false;
+                    if (!(s[e + 1] & 0x02)) {
+                        u8 f[512]; u64 have = ~0ull;
+                        for (u64 i = 0; i + 1 < nb; i++) {
+                            u32 cc = g->bm_clus + (u32)i; u64 fs = lba + g->fat_off + cc / 128;
+                            if (fs != have) { if (!d->rw(d->ctx, fs, 1, f, false)) return false; have = fs; }
+                            if (rd32(f + (cc % 128) * 4) != cc + 1) return false;
+                        }
+                    }
+                    return true;
+                }
             }
         }
         u8 f[512]; u64 fs = lba + g->fat_off + c / 128;            /* o próximo cluster da raiz, pela FAT */
@@ -743,7 +762,14 @@ void fs_check(const BlkDev *d, const Part *p, FsCheck *o) {
             return;
         }
         u32 rsvd = rd16(b + 0x0E), bps = rd16(b + 0x0B);
-        if (bps != d->bs || !rsvd || !d->rw(d->ctx, p->start + rsvd, 1, fat, false)) { o->verdict = SAFE_UNREADABLE; return; }
+        /* FAT32 sem espelhamento (BPB_ExtFlags bit 7): o estado vale na FAT ativa (bits 0–3), não na primeira */
+        u64 fat_at = p->start + rsvd;
+        if (p->fs == FS_FAT32 && (rd16(b + 40) & 0x80)) {
+            u32 act = rd16(b + 40) & 0x0F, nf = b[0x10];
+            if (act >= nf) { o->verdict = SAFE_UNREADABLE; return; }
+            fat_at += (u64)act * rd32(b + 0x24);
+        }
+        if (bps != d->bs || !rsvd || !d->rw(d->ctx, fat_at, 1, fat, false)) { o->verdict = SAFE_UNREADABLE; return; }
         bool dirty;
         if (p->fs == FS_FAT32) { u32 e1 = rd32(fat + 4); dirty = !(e1 & 0x08000000u) || !(e1 & 0x04000000u) || (b[0x41] & 1); }
         else { u16 e1 = rd16(fat + 2); dirty = !(e1 & 0x8000) || !(e1 & 0x4000) || (b[0x25] & 1); }

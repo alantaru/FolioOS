@@ -1195,7 +1195,7 @@ msgstr "Enregistrer le thème"
 msgid "Cancel"
 msgstr "Annuler"
 
-#: src/core/app.c:1601 src/core/app.c:1602 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:200 src/core/partitions.c:239
+#: src/core/app.c:1601 src/core/app.c:1602 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:204 src/core/partitions.c:243
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -1966,7 +1966,7 @@ msgstr "Supprimer le dossier « %s » et tout son contenu ? Cette action est irr
 msgid "Delete \"%s\"? This cannot be undone."
 msgstr "Supprimer « %s » ? Cette action est irréversible."
 
-#: src/core/filedlg.c:327 src/core/partitions.c:220
+#: src/core/filedlg.c:327 src/core/partitions.c:224
 msgid "Size"
 msgstr "Taille"
 
@@ -2005,79 +2005,79 @@ msgstr[1] "%d éléments"
 msgid "Open"
 msgstr "Ouvrir"
 
-#: src/core/fscheck.c:786
+#: src/core/fscheck.c:812
 msgid "This partition is encrypted with BitLocker. To make room, shrink it in Windows (Disk Management, Shrink Volume) or turn BitLocker off first."
 msgstr "Cette partition est chiffrée avec BitLocker. Pour faire de la place, réduisez-la dans Windows (Gestion des disques, Réduire le volume) ou désactivez d’abord BitLocker."
 
-#: src/core/fscheck.c:787
+#: src/core/fscheck.c:813
 msgid "This partition is encrypted (LUKS). To make room, shrink it from Linux with the encryption tools."
 msgstr "Cette partition est chiffrée (LUKS). Pour faire de la place, réduisez-la depuis Linux avec les outils de chiffrement."
 
-#: src/core/fscheck.c:788
+#: src/core/fscheck.c:814
 msgid "This partition holds LVM volumes. To make room, shrink them from Linux (lvreduce, then pvresize)."
 msgstr "Cette partition contient des volumes LVM. Pour faire de la place, réduisez-les depuis Linux (lvreduce, puis pvresize)."
 
-#: src/core/fscheck.c:789
+#: src/core/fscheck.c:815
 msgid "This is a Mac partition (APFS or HFS+). To make room, use Disk Utility on the Mac."
 msgstr "C’est une partition Mac (APFS ou HFS+). Pour faire de la place, utilisez l’Utilitaire de disque sur le Mac."
 
-#: src/core/fscheck.c:790
+#: src/core/fscheck.c:816
 msgid "Windows is hibernated or uses Fast Startup. Start Windows, then shut it down while holding Shift (or turn Fast Startup off in Power Options), and try again."
 msgstr "Windows est en veille prolongée ou utilise le démarrage rapide. Démarrez Windows, puis arrêtez-le en maintenant Maj enfoncée (ou désactivez le démarrage rapide dans Options d’alimentation), et réessayez."
 
-#: src/core/fscheck.c:791
+#: src/core/fscheck.c:817
 msgid "Windows marked this partition as needing a check. Start Windows, run chkdsk /f on it, and try again."
 msgstr "Windows a marqué cette partition comme à vérifier. Démarrez Windows, lancez chkdsk /f dessus, et réessayez."
 
-#: src/core/fscheck.c:792
+#: src/core/fscheck.c:818
 msgid "This Linux partition was not unmounted cleanly. Start Linux and shut it down normally, then try again."
 msgstr "Cette partition Linux n’a pas été démontée proprement. Démarrez Linux et arrêtez-le normalement, puis réessayez."
 
-#: src/core/fscheck.c:793
+#: src/core/fscheck.c:819
 msgid "Linux found errors on this partition. Check it with fsck from Linux, then try again."
 msgstr "Linux a trouvé des erreurs sur cette partition. Vérifiez-la avec fsck depuis Linux, puis réessayez."
 
-#: src/core/fscheck.c:794
+#: src/core/fscheck.c:820
 msgid "This partition could not be read safely, so FolioOS will not change it."
 msgstr "Cette partition n’a pas pu être lue en toute sécurité : FolioOS ne la modifiera donc pas."
 
-#: src/core/fscheck.c:795
+#: src/core/fscheck.c:821
 msgid "FolioOS cannot resize this file system yet."
 msgstr "FolioOS ne sait pas encore redimensionner ce système de fichiers."
 
-#: src/core/fscheck.c:801
+#: src/core/fscheck.c:827
 msgid "encrypted (BitLocker)"
 msgstr "chiffrée (BitLocker)"
 
-#: src/core/fscheck.c:802
+#: src/core/fscheck.c:828
 msgid "encrypted (LUKS)"
 msgstr "chiffrée (LUKS)"
 
-#: src/core/fscheck.c:804
+#: src/core/fscheck.c:830
 msgid "Mac (APFS/HFS+)"
 msgstr "Mac (APFS/HFS+)"
 
-#: src/core/fscheck.c:805
+#: src/core/fscheck.c:831
 msgid "Windows hibernated or Fast Startup"
 msgstr "Windows en veille prolongée ou démarrage rapide"
 
-#: src/core/fscheck.c:806
+#: src/core/fscheck.c:832
 msgid "needs a check (chkdsk)"
 msgstr "à vérifier (chkdsk)"
 
-#: src/core/fscheck.c:807
+#: src/core/fscheck.c:833
 msgid "not unmounted cleanly"
 msgstr "pas démontée proprement"
 
-#: src/core/fscheck.c:808
+#: src/core/fscheck.c:834
 msgid "has errors (fsck)"
 msgstr "contient des erreurs (fsck)"
 
-#: src/core/fscheck.c:809
+#: src/core/fscheck.c:835
 msgid "unreadable"
 msgstr "illisible"
 
-#: src/core/fscheck.c:810
+#: src/core/fscheck.c:836
 msgid "cannot be resized yet"
 msgstr "pas encore redimensionnable"
 
@@ -2149,75 +2149,79 @@ msgstr "Saisie : hiragana"
 msgid "Input: Katakana"
 msgstr "Saisie : katakana"
 
-#: src/core/install.c:883
+#: src/core/install.c:889
 msgid "Done"
 msgstr "Terminé"
 
-#: src/core/install.c:884
+#: src/core/install.c:890
 msgid "Could not read"
 msgstr "Lecture impossible"
 
-#: src/core/install.c:885
+#: src/core/install.c:891
 msgid "Could not write to the disk"
 msgstr "Écriture sur le disque impossible"
 
-#: src/core/install.c:886
+#: src/core/install.c:892
 msgid "The disk is too small (at least 512 MB)"
 msgstr "Le disque est trop petit (au moins 512 Mo)"
 
-#: src/core/install.c:887
+#: src/core/install.c:893
 msgid "Could not save the safety copy to the USB drive"
 msgstr "Impossible d’enregistrer la copie de sécurité sur la clé USB"
 
-#: src/core/install.c:888
+#: src/core/install.c:894
 msgid "Could not format the new partition"
 msgstr "Impossible de formater la nouvelle partition"
 
-#: src/core/install.c:889
+#: src/core/install.c:895
 msgid "Could not copy"
 msgstr "Copie impossible"
 
-#: src/core/install.c:890
+#: src/core/install.c:896
 msgid "A copied file did not match the original"
 msgstr "Un fichier copié ne correspond pas à l’original"
 
-#: src/core/install.c:891
+#: src/core/install.c:897
 msgid "The BIOS boot code is missing from the USB drive"
 msgstr "Le code de démarrage BIOS manque sur la clé USB"
 
-#: src/core/install.c:892
+#: src/core/install.c:898
 msgid "The USB drive does not have a complete FolioOS"
 msgstr "La clé USB ne contient pas un FolioOS complet"
 
-#: src/core/install.c:893
+#: src/core/install.c:899
 msgid "This disk does not use a GPT partition table"
 msgstr "Ce disque n’utilise pas de table de partitions GPT"
 
-#: src/core/install.c:894
+#: src/core/install.c:900
 msgid "No FAT32 EFI system partition was found on this disk"
 msgstr "Aucune partition système EFI en FAT32 n’a été trouvée sur ce disque"
 
-#: src/core/install.c:895
+#: src/core/install.c:901
 msgid "The EFI system partition is full"
 msgstr "La partition système EFI est pleine"
 
-#: src/core/install.c:896
+#: src/core/install.c:902
 msgid "The chosen space is not free"
 msgstr "L’espace choisi n’est pas libre"
 
-#: src/core/install.c:897
+#: src/core/install.c:903
 msgid "Could not shrink the other system's partition"
 msgstr "Impossible de réduire la partition de l’autre système"
 
-#: src/core/install.c:898
+#: src/core/install.c:904
 msgid "Could not give the space back to the other system's partition"
 msgstr "Impossible de rendre l’espace à la partition de l’autre système"
 
-#: src/core/install.c:899
+#: src/core/install.c:905
 msgid "This partition cannot change to that size without moving data"
 msgstr "Cette partition ne peut pas prendre cette taille sans déplacer de données"
 
-#: src/core/install.c:900
+#: src/core/install.c:906 src/core/partitions.c:46
+msgid "FolioOS cannot change this disk's partition table safely: it is left as it is"
+msgstr "FolioOS ne peut pas modifier la table de partitions de ce disque sans risque : elle reste telle quelle"
+
+#: src/core/install.c:907
 msgid "Error"
 msgstr "Erreur"
 
@@ -2241,7 +2245,7 @@ msgstr "Pour garder Linux, réduisez sa partition depuis Linux (avec GParted, pa
 msgid "To keep Windows, shrink drive C: in Windows (Disk Management, Shrink Volume) and run the installer again: FolioOS will use the free space."
 msgstr "Pour garder Windows, réduisez le lecteur C: dans Windows (Gestion des disques, Réduire le volume) et relancez l’installateur : FolioOS utilisera l’espace libre."
 
-#: src/core/installer.c:106
+#: src/core/installer.c:106 src/core/partitions.c:44
 msgid "Partition table unreadable"
 msgstr "Table de partitions illisible"
 
@@ -2256,7 +2260,7 @@ msgid_plural "…and %d more partitions"
 msgstr[0] "…et %d autre partition"
 msgstr[1] "…et %d autres partitions"
 
-#: src/core/installer.c:124 src/core/partitions.c:127
+#: src/core/installer.c:124 src/core/partitions.c:131
 msgid "disk"
 msgstr "disque"
 
@@ -2284,7 +2288,7 @@ msgstr "Installez FolioOS à côté du système existant, dans l’espace libre,
 msgid "Choose where:"
 msgstr "Choisissez où :"
 
-#: src/core/installer.c:290 src/core/partitions.c:165
+#: src/core/installer.c:290 src/core/partitions.c:169
 msgid "No disk was found besides the USB drive FolioOS started from."
 msgstr "Aucun disque trouvé en dehors de la clé USB depuis laquelle FolioOS a démarré."
 
@@ -2353,7 +2357,7 @@ msgstr "Chaque fichier n’est remplacé qu’après vérification de la nouvell
 msgid "Before anything is written, the start of the disk (partition table and boot sectors) is saved to %s on this USB drive."
 msgstr "Avant toute écriture, le début du disque (table de partitions et secteurs de démarrage) est sauvegardé dans %s sur cette clé USB."
 
-#: src/core/installer.c:341 src/core/installer.c:382 src/core/installer.c:435 src/core/installer.c:458 src/core/partitions.c:238
+#: src/core/installer.c:341 src/core/installer.c:382 src/core/installer.c:435 src/core/installer.c:458 src/core/partitions.c:242
 msgid "Back"
 msgstr "Retour"
 
@@ -2370,7 +2374,7 @@ msgstr "FolioOS sera retiré de ce disque :"
 msgid "− FolioOS · FAT32 · %s"
 msgstr "− FolioOS · FAT32 · %s"
 
-#: src/core/installer.c:357 src/core/installer.c:405 src/core/partitions.c:218
+#: src/core/installer.c:357 src/core/installer.c:405 src/core/partitions.c:222
 #, c-format
 msgid "%s%s: %s → %s"
 msgstr "%s%s : %s → %s"
@@ -2402,7 +2406,7 @@ msgstr "La partition système EFI perd seulement le dossier EFI/FolioOS, et l’
 msgid "The next time Windows starts, it checks its partition (chkdsk) once; this is expected."
 msgstr "Au prochain démarrage, Windows vérifie sa partition (chkdsk) une fois ; c’est normal."
 
-#: src/core/installer.c:373 src/core/installer.c:443 src/core/partitions.c:212
+#: src/core/installer.c:373 src/core/installer.c:443 src/core/partitions.c:216
 msgid "ERASE"
 msgstr "EFFACER"
 
@@ -2411,7 +2415,7 @@ msgstr "EFFACER"
 msgid "Your texts on this computer will be lost. To confirm, type %s:"
 msgstr "Vos textes sur cet ordinateur seront perdus. Pour confirmer, tapez %s :"
 
-#: src/core/installer.c:377 src/core/installer.c:385 src/core/installer.c:453 src/core/installer.c:461 src/core/partitions.c:233 src/core/partitions.c:242
+#: src/core/installer.c:377 src/core/installer.c:385 src/core/installer.c:453 src/core/installer.c:461 src/core/partitions.c:237 src/core/partitions.c:246
 #, c-format
 msgid "To confirm, type %s:"
 msgstr "Pour confirmer, tapez %s :"
@@ -2433,11 +2437,11 @@ msgstr "+ FolioOS · FAT32 · %s, dans l’espace libéré"
 msgid "Size for FolioOS"
 msgstr "Taille pour FolioOS"
 
-#: src/core/installer.c:412 src/core/partitions.c:222
+#: src/core/installer.c:412 src/core/partitions.c:226
 msgid "No file is moved: FolioOS only takes free space from the end of that partition. The next time Windows starts, it checks the partition (chkdsk) once; this is expected."
 msgstr "Aucun fichier n’est déplacé : FolioOS prend seulement de l’espace libre à la fin de cette partition. Au prochain démarrage, Windows vérifie la partition (chkdsk) une fois ; c’est normal."
 
-#: src/core/installer.c:412 src/core/partitions.c:222
+#: src/core/installer.c:412 src/core/partitions.c:226
 msgid "No file is moved: FolioOS only takes free space from the end of that partition."
 msgstr "Aucun fichier n’est déplacé : FolioOS prend seulement de l’espace libre à la fin de cette partition."
 
@@ -2658,61 +2662,61 @@ msgid_plural "%d tracks · %s"
 msgstr[0] "%d piste · %s"
 msgstr[1] "%d pistes · %s"
 
-#: src/core/partitions.c:103
+#: src/core/partitions.c:107
 msgid "Done. The previous start of the disk is saved on this USB drive."
 msgstr "Terminé. L’ancien début du disque est enregistré sur cette clé USB."
 
-#: src/core/partitions.c:131
+#: src/core/partitions.c:135
 #, c-format
 msgid "Free space · %s"
 msgstr "Espace libre · %s"
 
-#: src/core/partitions.c:161
+#: src/core/partitions.c:165
 msgid "Working… Do not turn off the computer or remove the USB drive."
 msgstr "Opération en cours… N’éteignez pas l’ordinateur et ne retirez pas la clé USB."
 
-#: src/core/partitions.c:164
+#: src/core/partitions.c:168
 msgid "Choose a partition or a free space, then an action. Before anything is written, the start of the disk is saved to FOLIO/BACKUP on this USB drive."
 msgstr "Choisissez une partition ou un espace libre, puis une action. Avant toute écriture, le début du disque est enregistré dans FOLIO/BACKUP sur cette clé USB."
 
-#: src/core/partitions.c:186
+#: src/core/partitions.c:190
 msgid "Create a FAT32 partition"
 msgstr "Créer une partition FAT32"
 
-#: src/core/partitions.c:192
+#: src/core/partitions.c:196
 msgid "Resize"
 msgstr "Redimensionner"
 
-#: src/core/partitions.c:198
+#: src/core/partitions.c:202
 msgid "Format as FAT32"
 msgstr "Formater en FAT32"
 
-#: src/core/partitions.c:217
+#: src/core/partitions.c:221
 #, c-format
 msgid "+ FAT32 · %s, in this free space"
 msgstr "+ FAT32 · %s, dans cet espace libre"
 
-#: src/core/partitions.c:226
+#: src/core/partitions.c:230
 msgid "Name of the new volume:"
 msgstr "Nom du nouveau volume :"
 
-#: src/core/partitions.c:230
+#: src/core/partitions.c:234
 msgid "Everything on this partition will be erased; it becomes an empty FAT32 volume."
 msgstr "Tout le contenu de cette partition sera effacé ; elle devient un volume FAT32 vide."
 
-#: src/core/partitions.c:231
+#: src/core/partitions.c:235
 msgid "This partition and everything on it will be erased; its space becomes free."
 msgstr "Cette partition et tout son contenu seront effacés ; son espace devient libre."
 
-#: src/core/partitions.c:239
+#: src/core/partitions.c:243
 msgid "Create"
 msgstr "Créer"
 
-#: src/core/partitions.c:239
+#: src/core/partitions.c:243
 msgid "Apply"
 msgstr "Appliquer"
 
-#: src/core/partitions.c:239
+#: src/core/partitions.c:243
 msgid "Format"
 msgstr "Formater"
 

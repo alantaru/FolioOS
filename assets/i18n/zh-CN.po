@@ -1193,7 +1193,7 @@ msgstr "保存主题"
 msgid "Cancel"
 msgstr "取消"
 
-#: src/core/app.c:1601 src/core/app.c:1602 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:200 src/core/partitions.c:239
+#: src/core/app.c:1601 src/core/app.c:1602 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:204 src/core/partitions.c:243
 msgid "Delete"
 msgstr "删除"
 
@@ -1957,7 +1957,7 @@ msgstr "删除文件夹“%s”及其所有内容？此操作无法撤销。"
 msgid "Delete \"%s\"? This cannot be undone."
 msgstr "删除“%s”？此操作无法撤销。"
 
-#: src/core/filedlg.c:327 src/core/partitions.c:220
+#: src/core/filedlg.c:327 src/core/partitions.c:224
 msgid "Size"
 msgstr "大小"
 
@@ -1995,79 +1995,79 @@ msgstr[0] "%d 个项目"
 msgid "Open"
 msgstr "打开"
 
-#: src/core/fscheck.c:786
+#: src/core/fscheck.c:812
 msgid "This partition is encrypted with BitLocker. To make room, shrink it in Windows (Disk Management, Shrink Volume) or turn BitLocker off first."
 msgstr "此分区已用 BitLocker 加密。要腾出空间，请在 Windows 中压缩它（磁盘管理 → 压缩卷），或先关闭 BitLocker。"
 
-#: src/core/fscheck.c:787
+#: src/core/fscheck.c:813
 msgid "This partition is encrypted (LUKS). To make room, shrink it from Linux with the encryption tools."
 msgstr "此分区已加密（LUKS）。要腾出空间，请在 Linux 中用加密工具缩小它。"
 
-#: src/core/fscheck.c:788
+#: src/core/fscheck.c:814
 msgid "This partition holds LVM volumes. To make room, shrink them from Linux (lvreduce, then pvresize)."
 msgstr "此分区包含 LVM 卷。要腾出空间，请在 Linux 中缩小它们（先 lvreduce，再 pvresize）。"
 
-#: src/core/fscheck.c:789
+#: src/core/fscheck.c:815
 msgid "This is a Mac partition (APFS or HFS+). To make room, use Disk Utility on the Mac."
 msgstr "这是 Mac 分区（APFS 或 HFS+）。要腾出空间，请在 Mac 上使用磁盘工具。"
 
-#: src/core/fscheck.c:790
+#: src/core/fscheck.c:816
 msgid "Windows is hibernated or uses Fast Startup. Start Windows, then shut it down while holding Shift (or turn Fast Startup off in Power Options), and try again."
 msgstr "Windows 处于休眠状态或启用了快速启动。请启动 Windows，按住 Shift 键关机（或在电源选项中关闭快速启动），然后重试。"
 
-#: src/core/fscheck.c:791
+#: src/core/fscheck.c:817
 msgid "Windows marked this partition as needing a check. Start Windows, run chkdsk /f on it, and try again."
 msgstr "Windows 已将此分区标记为需要检查。请启动 Windows，对它运行 chkdsk /f，然后重试。"
 
-#: src/core/fscheck.c:792
+#: src/core/fscheck.c:818
 msgid "This Linux partition was not unmounted cleanly. Start Linux and shut it down normally, then try again."
 msgstr "此 Linux 分区未正常卸载。请启动 Linux 并正常关机，然后重试。"
 
-#: src/core/fscheck.c:793
+#: src/core/fscheck.c:819
 msgid "Linux found errors on this partition. Check it with fsck from Linux, then try again."
 msgstr "Linux 在此分区上发现了错误。请在 Linux 中用 fsck 检查它，然后重试。"
 
-#: src/core/fscheck.c:794
+#: src/core/fscheck.c:820
 msgid "This partition could not be read safely, so FolioOS will not change it."
 msgstr "无法安全地读取此分区，因此 FolioOS 不会更改它。"
 
-#: src/core/fscheck.c:795
+#: src/core/fscheck.c:821
 msgid "FolioOS cannot resize this file system yet."
 msgstr "FolioOS 暂时还不能调整此文件系统的大小。"
 
-#: src/core/fscheck.c:801
+#: src/core/fscheck.c:827
 msgid "encrypted (BitLocker)"
 msgstr "已加密（BitLocker）"
 
-#: src/core/fscheck.c:802
+#: src/core/fscheck.c:828
 msgid "encrypted (LUKS)"
 msgstr "已加密（LUKS）"
 
-#: src/core/fscheck.c:804
+#: src/core/fscheck.c:830
 msgid "Mac (APFS/HFS+)"
 msgstr "Mac（APFS/HFS+）"
 
-#: src/core/fscheck.c:805
+#: src/core/fscheck.c:831
 msgid "Windows hibernated or Fast Startup"
 msgstr "Windows 休眠或快速启动"
 
-#: src/core/fscheck.c:806
+#: src/core/fscheck.c:832
 msgid "needs a check (chkdsk)"
 msgstr "需要检查（chkdsk）"
 
-#: src/core/fscheck.c:807
+#: src/core/fscheck.c:833
 msgid "not unmounted cleanly"
 msgstr "未正常卸载"
 
-#: src/core/fscheck.c:808
+#: src/core/fscheck.c:834
 msgid "has errors (fsck)"
 msgstr "有错误（fsck）"
 
-#: src/core/fscheck.c:809
+#: src/core/fscheck.c:835
 msgid "unreadable"
 msgstr "无法读取"
 
-#: src/core/fscheck.c:810
+#: src/core/fscheck.c:836
 msgid "cannot be resized yet"
 msgstr "暂不能调整大小"
 
@@ -2139,75 +2139,79 @@ msgstr "输入：平假名"
 msgid "Input: Katakana"
 msgstr "输入：片假名"
 
-#: src/core/install.c:883
+#: src/core/install.c:889
 msgid "Done"
 msgstr "完成"
 
-#: src/core/install.c:884
+#: src/core/install.c:890
 msgid "Could not read"
 msgstr "无法读取"
 
-#: src/core/install.c:885
+#: src/core/install.c:891
 msgid "Could not write to the disk"
 msgstr "无法写入磁盘"
 
-#: src/core/install.c:886
+#: src/core/install.c:892
 msgid "The disk is too small (at least 512 MB)"
 msgstr "磁盘太小（至少需要 512 MB）"
 
-#: src/core/install.c:887
+#: src/core/install.c:893
 msgid "Could not save the safety copy to the USB drive"
 msgstr "无法把安全副本保存到 U 盘"
 
-#: src/core/install.c:888
+#: src/core/install.c:894
 msgid "Could not format the new partition"
 msgstr "无法格式化新分区"
 
-#: src/core/install.c:889
+#: src/core/install.c:895
 msgid "Could not copy"
 msgstr "无法复制"
 
-#: src/core/install.c:890
+#: src/core/install.c:896
 msgid "A copied file did not match the original"
 msgstr "复制的文件与原文件不一致"
 
-#: src/core/install.c:891
+#: src/core/install.c:897
 msgid "The BIOS boot code is missing from the USB drive"
 msgstr "U 盘上缺少 BIOS 引导代码"
 
-#: src/core/install.c:892
+#: src/core/install.c:898
 msgid "The USB drive does not have a complete FolioOS"
 msgstr "U 盘上的 FolioOS 不完整"
 
-#: src/core/install.c:893
+#: src/core/install.c:899
 msgid "This disk does not use a GPT partition table"
 msgstr "此磁盘没有使用 GPT 分区表"
 
-#: src/core/install.c:894
+#: src/core/install.c:900
 msgid "No FAT32 EFI system partition was found on this disk"
 msgstr "此磁盘上没有 FAT32 格式的 EFI 系统分区"
 
-#: src/core/install.c:895
+#: src/core/install.c:901
 msgid "The EFI system partition is full"
 msgstr "EFI 系统分区已满"
 
-#: src/core/install.c:896
+#: src/core/install.c:902
 msgid "The chosen space is not free"
 msgstr "所选空间不是空闲的"
 
-#: src/core/install.c:897
+#: src/core/install.c:903
 msgid "Could not shrink the other system's partition"
 msgstr "无法缩小另一个系统的分区"
 
-#: src/core/install.c:898
+#: src/core/install.c:904
 msgid "Could not give the space back to the other system's partition"
 msgstr "无法把空间还给另一个系统的分区"
 
-#: src/core/install.c:899
+#: src/core/install.c:905
 msgid "This partition cannot change to that size without moving data"
 msgstr "不移动数据就无法把此分区改成这个大小"
 
-#: src/core/install.c:900
+#: src/core/install.c:906 src/core/partitions.c:46
+msgid "FolioOS cannot change this disk's partition table safely: it is left as it is"
+msgstr "FolioOS 无法安全地更改此磁盘的分区表：将保持原样"
+
+#: src/core/install.c:907
 msgid "Error"
 msgstr "错误"
 
@@ -2231,7 +2235,7 @@ msgstr "要保留 Linux，请在 Linux 中缩小它的分区（例如使用 GPar
 msgid "To keep Windows, shrink drive C: in Windows (Disk Management, Shrink Volume) and run the installer again: FolioOS will use the free space."
 msgstr "要保留 Windows，请在 Windows 中压缩 C: 盘（磁盘管理 → 压缩卷），然后重新打开安装程序：FolioOS 会使用空闲空间。"
 
-#: src/core/installer.c:106
+#: src/core/installer.c:106 src/core/partitions.c:44
 msgid "Partition table unreadable"
 msgstr "分区表无法读取"
 
@@ -2245,7 +2249,7 @@ msgid "…and %d more partition"
 msgid_plural "…and %d more partitions"
 msgstr[0] "…以及另外 %d 个分区"
 
-#: src/core/installer.c:124 src/core/partitions.c:127
+#: src/core/installer.c:124 src/core/partitions.c:131
 msgid "disk"
 msgstr "磁盘"
 
@@ -2273,7 +2277,7 @@ msgstr "把 FolioOS 安装在现有系统旁边的空闲空间里，或作为某
 msgid "Choose where:"
 msgstr "选择位置："
 
-#: src/core/installer.c:290 src/core/partitions.c:165
+#: src/core/installer.c:290 src/core/partitions.c:169
 msgid "No disk was found besides the USB drive FolioOS started from."
 msgstr "除了启动 FolioOS 的 U 盘之外，没有找到其他磁盘。"
 
@@ -2342,7 +2346,7 @@ msgstr "每个文件都在新副本校验通过后才替换，因此断电也不
 msgid "Before anything is written, the start of the disk (partition table and boot sectors) is saved to %s on this USB drive."
 msgstr "在写入任何内容之前，磁盘开头（分区表和引导扇区）会先保存到这个 U 盘上的 %s。"
 
-#: src/core/installer.c:341 src/core/installer.c:382 src/core/installer.c:435 src/core/installer.c:458 src/core/partitions.c:238
+#: src/core/installer.c:341 src/core/installer.c:382 src/core/installer.c:435 src/core/installer.c:458 src/core/partitions.c:242
 msgid "Back"
 msgstr "返回"
 
@@ -2359,7 +2363,7 @@ msgstr "将从此磁盘移除 FolioOS："
 msgid "− FolioOS · FAT32 · %s"
 msgstr "− FolioOS · FAT32 · %s"
 
-#: src/core/installer.c:357 src/core/installer.c:405 src/core/partitions.c:218
+#: src/core/installer.c:357 src/core/installer.c:405 src/core/partitions.c:222
 #, c-format
 msgid "%s%s: %s → %s"
 msgstr "%s%s：%s → %s"
@@ -2390,7 +2394,7 @@ msgstr "EFI 系统分区只会失去 EFI/FolioOS 文件夹，电脑会重新直�
 msgid "The next time Windows starts, it checks its partition (chkdsk) once; this is expected."
 msgstr "下次启动 Windows 时，它会检查一次该分区（chkdsk），这是正常的。"
 
-#: src/core/installer.c:373 src/core/installer.c:443 src/core/partitions.c:212
+#: src/core/installer.c:373 src/core/installer.c:443 src/core/partitions.c:216
 msgid "ERASE"
 msgstr "ERASE"
 
@@ -2399,7 +2403,7 @@ msgstr "ERASE"
 msgid "Your texts on this computer will be lost. To confirm, type %s:"
 msgstr "这台电脑上的文本将会丢失。要确认，请输入 %s："
 
-#: src/core/installer.c:377 src/core/installer.c:385 src/core/installer.c:453 src/core/installer.c:461 src/core/partitions.c:233 src/core/partitions.c:242
+#: src/core/installer.c:377 src/core/installer.c:385 src/core/installer.c:453 src/core/installer.c:461 src/core/partitions.c:237 src/core/partitions.c:246
 #, c-format
 msgid "To confirm, type %s:"
 msgstr "请输入 %s 以确认："
@@ -2421,11 +2425,11 @@ msgstr "+ FolioOS · FAT32 · %s，位于腾出的空间"
 msgid "Size for FolioOS"
 msgstr "FolioOS 的大小"
 
-#: src/core/installer.c:412 src/core/partitions.c:222
+#: src/core/installer.c:412 src/core/partitions.c:226
 msgid "No file is moved: FolioOS only takes free space from the end of that partition. The next time Windows starts, it checks the partition (chkdsk) once; this is expected."
 msgstr "不会移动任何文件：FolioOS 只占用该分区末尾的可用空间。下次启动 Windows 时，它会检查一次该分区（chkdsk），这是正常的。"
 
-#: src/core/installer.c:412 src/core/partitions.c:222
+#: src/core/installer.c:412 src/core/partitions.c:226
 msgid "No file is moved: FolioOS only takes free space from the end of that partition."
 msgstr "不会移动任何文件：FolioOS 只占用该分区末尾的可用空间。"
 
@@ -2644,61 +2648,61 @@ msgid "%d track · %s"
 msgid_plural "%d tracks · %s"
 msgstr[0] "%d 首曲目 · %s"
 
-#: src/core/partitions.c:103
+#: src/core/partitions.c:107
 msgid "Done. The previous start of the disk is saved on this USB drive."
 msgstr "完成。磁盘原来的开头部分已保存在这个 U 盘上。"
 
-#: src/core/partitions.c:131
+#: src/core/partitions.c:135
 #, c-format
 msgid "Free space · %s"
 msgstr "可用空间 · %s"
 
-#: src/core/partitions.c:161
+#: src/core/partitions.c:165
 msgid "Working… Do not turn off the computer or remove the USB drive."
 msgstr "正在处理… 请勿关闭电脑或拔出 U 盘。"
 
-#: src/core/partitions.c:164
+#: src/core/partitions.c:168
 msgid "Choose a partition or a free space, then an action. Before anything is written, the start of the disk is saved to FOLIO/BACKUP on this USB drive."
 msgstr "选择一个分区或一块可用空间，再选择操作。写入任何内容之前，磁盘的开头部分会保存到这个 U 盘的 FOLIO/BACKUP 中。"
 
-#: src/core/partitions.c:186
+#: src/core/partitions.c:190
 msgid "Create a FAT32 partition"
 msgstr "创建 FAT32 分区"
 
-#: src/core/partitions.c:192
+#: src/core/partitions.c:196
 msgid "Resize"
 msgstr "调整大小"
 
-#: src/core/partitions.c:198
+#: src/core/partitions.c:202
 msgid "Format as FAT32"
 msgstr "格式化为 FAT32"
 
-#: src/core/partitions.c:217
+#: src/core/partitions.c:221
 #, c-format
 msgid "+ FAT32 · %s, in this free space"
 msgstr "+ FAT32 · %s，位于这块可用空间"
 
-#: src/core/partitions.c:226
+#: src/core/partitions.c:230
 msgid "Name of the new volume:"
 msgstr "新卷的名称："
 
-#: src/core/partitions.c:230
+#: src/core/partitions.c:234
 msgid "Everything on this partition will be erased; it becomes an empty FAT32 volume."
 msgstr "此分区上的所有内容都将被清除，它会变成一个空的 FAT32 卷。"
 
-#: src/core/partitions.c:231
+#: src/core/partitions.c:235
 msgid "This partition and everything on it will be erased; its space becomes free."
 msgstr "此分区及其所有内容都将被清除，它的空间会变为可用。"
 
-#: src/core/partitions.c:239
+#: src/core/partitions.c:243
 msgid "Create"
 msgstr "创建"
 
-#: src/core/partitions.c:239
+#: src/core/partitions.c:243
 msgid "Apply"
 msgstr "应用"
 
-#: src/core/partitions.c:239
+#: src/core/partitions.c:243
 msgid "Format"
 msgstr "格式化"
 

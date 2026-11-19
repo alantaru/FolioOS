@@ -136,6 +136,52 @@ int main(int argc, char **argv) {
     memset(z, 0, sizeof z); memcpy(z + 32, "NXSB", 4); io(0, 5000, 1, z, true); CHECK(part_probe(&d, 5000, 4096, 0, 0) == FS_APFS, "APFS");
     memset(z, 0, sizeof z); io(0, 6000, 8, z, true); CHECK(part_probe(&d, 6000, 4096, 0, 0) == FS_EMPTY, "vazio");
 
+    /* 8. GPT válida que o FolioOS não regravaria igual (256 entradas, uma delas além da 128ª): lida e listada,
+     *    mas travada — part_write recusa e nada no disco muda; com os cabeçalhos estragados: "ilegível", nunca "vazio" */
+    snprintf(p, sizeof p, "%s\\gpt256.img", argv[1]);
+    d = open_img(p, 64);
+    {
+        static u8 mbr[512], hdr[512], ents[256 * 128];
+        mbr[446 + 4] = 0xEE; mbr[446 + 8] = 1; memset(mbr + 446 + 12, 0xFF, 4); mbr[510] = 0x55; mbr[511] = 0xAA;
+        const u64 first = 2 + 64, last = d.nsec - 1 - 64 - 1;
+        u8 *e0 = ents, *e200 = ents + 200 * 128;
+        memcpy(e0, GPT_MSDATA, 16); e0[16] = 1; *(u64 *)(e0 + 32) = 2048; *(u64 *)(e0 + 40) = 2048 + 20480 - 1;
+        memcpy(e200, GPT_LINUX, 16); e200[16] = 2; *(u64 *)(e200 + 32) = 40960; *(u64 *)(e200 + 40) = 40960 + 20480 - 1;
+        memcpy(hdr, "EFI PART", 8); *(u32 *)(hdr + 8) = 0x10000; *(u32 *)(hdr + 12) = 92;
+        *(u64 *)(hdr + 24) = 1; *(u64 *)(hdr + 32) = d.nsec - 1; *(u64 *)(hdr + 40) = first; *(u64 *)(hdr + 48) = last;
+        *(u64 *)(hdr + 72) = 2; *(u32 *)(hdr + 80) = 256; *(u32 *)(hdr + 84) = 128; *(u32 *)(hdr + 88) = crc32_buf(0, ents, sizeof ents);
+        *(u32 *)(hdr + 16) = crc32_buf(0, hdr, 92);
+        io(0, 0, 1, mbr, true); io(0, 1, 1, hdr, true); io(0, 2, 64, ents, true);
+        CHECK(part_read(&d, &u) && u.scheme == SCHEME_GPT && u.n == 2 && u.locked && !part_editable(&u), "GPT de 256 entradas: esquema %d n %d travada %d", u.scheme, u.n, u.locked);
+        CHECK(u.n == 2 && u.p[1].slot == 200 && u.p[1].start == 40960, "entrada 200 lida: slot %d", u.n == 2 ? u.p[1].slot : -1);
+        CHECK(part_free(&d, &u, r, 16) >= 0, "espaço livre calculável");
+        static u8 before[66 * 512], after[66 * 512];
+        io(0, 0, 66, before, false);
+        CHECK(!part_write(&d, &u), "tabela travada não pode ser regravada");
+        io(0, 0, 66, after, false);
+        CHECK(!memcmp(before, after, sizeof before), "a tabela travada mudou no disco");
+        /* cabeçalho estragado (e sem cópia de reserva) com MBR de proteção: ilegível, não vazio */
+        hdr[16] ^= 0xFF; io(0, 1, 1, hdr, true);
+        CHECK(part_read(&d, &u) && u.scheme == SCHEME_UNREADABLE && u.n == 0 && u.locked && !part_editable(&u), "GPT ilegível: esquema %d", u.scheme);
+        CHECK(!part_write(&d, &u), "tabela ilegível não pode ser regravada");
+        /* sem o MBR de proteção, mas com "EFI PART" no setor 1: também ilegível */
+        memset(mbr, 0, sizeof mbr); io(0, 0, 1, mbr, true);
+        CHECK(part_read(&d, &u) && u.scheme == SCHEME_UNREADABLE, "cabeçalho GPT ilegível sem MBR: esquema %d", u.scheme);
+    }
+    /* 9. MBR com partição estendida: listada, mas travada (a estendida e as lógicas não seriam regravadas) */
+    snprintf(p, sizeof p, "%s\\mbrext.img", argv[1]);
+    d = open_img(p, 64);
+    {
+        static u8 mbr[512], ebr[512];
+        u8 *e = mbr + 446; e[4] = 0x0C; *(u32 *)(e + 8) = 2048; *(u32 *)(e + 12) = 20480;
+        e += 16; e[4] = 0x0F; *(u32 *)(e + 8) = 30720; *(u32 *)(e + 12) = 40960;
+        mbr[510] = 0x55; mbr[511] = 0xAA;
+        e = ebr + 446; e[4] = 0x83; *(u32 *)(e + 8) = 2048; *(u32 *)(e + 12) = 20480; ebr[510] = 0x55; ebr[511] = 0xAA;
+        io(0, 0, 1, mbr, true); io(0, 30720, 1, ebr, true);
+        CHECK(part_read(&d, &u) && u.scheme == SCHEME_MBR && u.has_extended && u.locked && u.n == 2, "MBR com estendida: n %d travada %d", u.n, u.locked);
+        CHECK(!part_write(&d, &u), "MBR com estendida não pode ser regravado");
+    }
+
     fclose(img);
     printf("tabelas de partição e formatação: %s\n", fails ? "COM FALHAS" : "tudo certo");
     return fails ? 1 : 0;

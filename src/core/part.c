@@ -9,6 +9,9 @@
 void *memcpy(void *, const void *, size_t); void *memset(void *, int, size_t); int memcmp(const void *, const void *, size_t);
 
 typedef uint8_t u8; typedef uint16_t u16; typedef uint32_t u32; typedef uint64_t u64;
+#ifndef MIN
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#endif
 static u16 rd16(const u8 *p) { return (u16)(p[0] | p[1] << 8); }
 static u32 rd32(const u8 *p) { return (u32)p[0] | (u32)p[1] << 8 | (u32)p[2] << 16 | (u32)p[3] << 24; }
 static u64 rd64(const u8 *p) { return rd32(p) | (u64)rd32(p + 4) << 32; }
@@ -122,6 +125,8 @@ const char *part_type_name(const Part *p, int scheme) {
 
 /* ------------------------------------------------------------ leitura das tabelas */
 static u32 entry_secs(const BlkDev *d) { return (128 * 128 + d->bs - 1) / d->bs; }
+/* lê as entradas em blocos (qualquer quantidade e tamanho que a UEFI permite); a tabela fica travada
+ * (t->locked) quando o FolioOS não poderia regravá-la exatamente como está */
 static bool read_gpt_at(const BlkDev *d, PartTable *t, u64 hdr_lba) {
     static u8 h[4096], ents[128 * 128 + 4096];
     if (!d->rw(d->ctx, hdr_lba, 1, h, false) || memcmp(h, "EFI PART", 8)) return false;
@@ -131,15 +136,32 @@ static bool read_gpt_at(const BlkDev *d, PartTable *t, u64 hdr_lba) {
     if (crc32_buf(0, h, hs) != crc) return false;
     if (rd64(h + 24) != hdr_lba) return false;
     u64 elba = rd64(h + 72); u32 num = rd32(h + 80), esz = rd32(h + 84), ecrc = rd32(h + 88);
-    if (esz < 128 || esz > 1024 || (esz & 7) || num == 0 || (u64)num * esz > sizeof ents - 4096) return false;
-    u32 secs = (u32)(((u64)num * esz + d->bs - 1) / d->bs);
-    if (elba + secs > d->nsec || !d->rw(d->ctx, elba, secs, ents, false)) return false;
-    if (crc32_buf(0, ents, num * esz) != ecrc) return false;
+    if (esz < 128 || esz > d->bs || (esz & (esz - 1)) || num == 0 || (u64)num * esz > (4u << 20)) return false;
+    u64 total = (u64)num * esz, secs = (total + d->bs - 1) / d->bs;
+    u32 chunk = (u32)((sizeof ents - 4096) / d->bs);                  /* setores por bloco */
+    if (elba < 2 || elba + secs > d->nsec) return false;
+    u32 c = 0;
+    for (u64 s = 0; s < secs; s += chunk) {                            /* soma de verificação de todas as entradas */
+        u32 k = (u32)MIN((u64)chunk, secs - s);
+        if (!d->rw(d->ctx, elba + s, k, ents, false)) return false;
+        c = crc32_buf(c, ents, (u32)MIN((u64)k * d->bs, total - s * d->bs));
+    }
+    if (c != ecrc) return false;
     memcpy(t->disk_guid, h + 56, 16);
     t->n = 0;
-    for (u32 i = 0; i < num && t->n < PART_MAX; i++) {
-        const u8 *e = ents + (u64)i * esz;
+    /* o FolioOS regrava sempre 128 entradas de 128 bytes a partir do LBA 2 (principal) */
+    t->locked = num != 128 || esz != 128 || (hdr_lba == 1 && elba != 2) || rd64(h + 40) < 34;
+    u64 have = ~0ull;                                                  /* bloco que está em ents */
+    for (u32 i = 0; i < num; i++) {
+        u64 byte = (u64)i * esz, blk = byte / ((u64)chunk * d->bs);
+        if (blk != have) {
+            u64 s = blk * chunk; u32 k = (u32)MIN((u64)chunk, secs - s);
+            if (!d->rw(d->ctx, elba + s, k, ents, false)) return false;
+            have = blk;
+        }
+        const u8 *e = ents + (byte - blk * chunk * d->bs);
         if (!memcmp(e, ZERO16, 16)) continue;
+        if (t->n >= PART_MAX) { t->locked = true; break; }             /* mais partições do que cabem: nunca regravar */
         Part *p = &t->p[t->n++]; memset(p, 0, sizeof *p);
         memcpy(p->type, e, 16); memcpy(p->guid, e + 16, 16); p->slot = (int)i;
         u64 a = rd64(e + 32), b = rd64(e + 40);
@@ -164,6 +186,13 @@ bool part_read(const BlkDev *d, PartTable *t) {
     if (prot || !sig) {
         if (read_gpt_at(d, t, 1)) t->scheme = SCHEME_GPT;
         else if (read_gpt_at(d, t, d->nsec - 1)) { t->scheme = SCHEME_GPT; t->gpt_backup_used = true; }
+        else {
+            /* um MBR de proteção ou um cabeçalho "EFI PART" que não pôde ser lido: há uma tabela, só não a entendemos */
+            static u8 g[4096]; bool hdr = false;
+            if (d->rw(d->ctx, 1, 1, g, false) && !memcmp(g, "EFI PART", 8)) hdr = true;
+            if (!hdr && d->rw(d->ctx, d->nsec - 1, 1, g, false) && !memcmp(g, "EFI PART", 8)) hdr = true;
+            if (prot || hdr) { t->scheme = SCHEME_UNREADABLE; t->n = 0; t->locked = true; return true; }
+        }
     }
     if (!t->scheme && sig && is_vbr(m)) {
         t->scheme = SCHEME_SUPERFLOPPY; t->n = 1;
@@ -195,6 +224,7 @@ bool part_read(const BlkDev *d, PartTable *t) {
             Part *p = &t->p[t->n++]; memset(p, 0, sizeof *p);
             p->start = s; p->count = c; p->mbr_type = ty; p->active = e[0] == 0x80; p->slot = i;   /* a posição na tabela (preservada ao regravar) */
         }
+        if (t->has_extended) t->locked = true;      /* a estendida e as lógicas não são regravadas: a tabela fica só para leitura */
     }
     for (int i = 0; i < t->n; i++) {
         Part *p = &t->p[i];
@@ -381,7 +411,9 @@ bool part_guid_parse(const char *s, u8 g[16]) {
     return i == 16;
 }
 
+bool part_editable(const PartTable *t) { return (t->scheme == SCHEME_GPT || t->scheme == SCHEME_MBR) && !t->locked; }
 bool part_write(const BlkDev *d, const PartTable *t) {
+    if (t->locked) return false;                              /* nunca regravar uma tabela que não reproduziríamos exatamente */
     bool ok = t->scheme == SCHEME_GPT ? write_gpt(d, t) : t->scheme == SCHEME_MBR ? write_mbr(d, t) : false;
     if (ok && d->flush && !d->flush(d->ctx)) ok = false;     /* a tabela nova chega ao disco antes de qualquer outra coisa */
     return ok;

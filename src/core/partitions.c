@@ -39,13 +39,17 @@ static void scan(void) {
         if (di.readonly) str_copy(dsk[d].why, L("This disk is read-only."), sizeof dsk[d].why);
         else if (di.bs != 512) str_copy(dsk[d].why, L("Disks with 4096-byte sectors are not supported yet."), sizeof dsk[d].why);
         PartTable *t = &tab[d];
-        if (!part_read(&b, t)) { t->n = 0; t->scheme = SCHEME_NONE; }
+        /* uma tabela ilegível nunca vira "disco vazio"; uma que o FolioOS não regravaria exatamente fica só para ver */
+        if (!part_read(&b, t)) { t->n = 0; t->scheme = SCHEME_UNREADABLE; t->locked = true; }
+        if (!dsk[d].why[0] && t->scheme == SCHEME_UNREADABLE) str_copy(dsk[d].why, L("Partition table unreadable"), sizeof dsk[d].why);
+        else if (!dsk[d].why[0] && t->scheme != SCHEME_NONE && !part_editable(t))
+            str_copy(dsk[d].why, L("FolioOS cannot change this disk's partition table safely: it is left as it is"), sizeof dsk[d].why);
         for (int p = 0; p < t->n; p++) {
             cv[d][p].verdict = SAFE_OK; cv[d][p].min_bytes = 0;
             if (t->p[p].fs == FS_NTFS || t->p[p].fs == FS_EXT || t->p[p].fs == FS_FAT16 || t->p[p].fs == FS_FAT32 || t->p[p].fs == FS_EXFAT) fs_check(&b, &t->p[p], &cv[d][p]);
         }
         /* partições e espaços livres na ordem do disco */
-        Region fr[32]; int nf = di.bs == 512 ? part_free(&b, t, fr, 32) : 0, fi = 0, pi = 0;
+        Region fr[32]; int nf = di.bs == 512 && !t->locked ? part_free(&b, t, fr, 32) : 0, fi = 0, pi = 0;
         int order[PART_MAX]; for (int i = 0; i < t->n; i++) order[i] = i;
         for (int i = 1; i < t->n; i++) for (int j = i; j > 0 && t->p[order[j]].start < t->p[order[j - 1]].start; j--) { int x = order[j]; order[j] = order[j - 1]; order[j - 1] = x; }
         int count = 0;

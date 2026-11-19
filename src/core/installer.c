@@ -71,7 +71,7 @@ static void scan(void) {
         /* UEFI: disco GPT com partição EFI; PC só BIOS (fase 3): disco MBR com uma posição primária livre */
         int prim = 0; for (int p = 0; table && p < t.n; p++) if (!t.p[p].logical) prim++;
         bool mbr_ok = table && is_bios() && t.scheme == SCHEME_MBR && !t.has_extended && prim < 4;
-        if (table && ((t.scheme == SCHEME_GPT && !is_bios()) || mbr_ok) && !why[i][0] && !found[i].found) {
+        if (table && !t.locked && ((t.scheme == SCHEME_GPT && !is_bios()) || mbr_ok) && !why[i][0] && !found[i].found) {
             bool esp = mbr_ok; for (int p = 0; !mbr_ok && p < t.n; p++) if (!memcmp(t.p[p].type, GPT_ESP, 16) && t.p[p].fs == FS_FAT32 && cv[p].verdict == SAFE_OK) esp = true;   /* a EFI recebe a pasta EFI/FolioOS: só se estiver em ordem */
             Region fr[16]; int nf = part_free(&b, &t, fr, 16), big = -1;
             for (int f = 0; f < nf; f++) if (big < 0 || fr[f].count > fr[big].count) big = f;
@@ -103,7 +103,7 @@ static void scan(void) {
         }
         if (nopt < MAXD * 4) { opt[nopt].d = i; opt[nopt].mode = MODE_WHOLE; opt[nopt].fr.start = opt[nopt].fr.count = 0; nopt++; }
         if (d.bs != 512 && d.bs != 4096) continue;
-        if (!table) { str_copy(what_on[i][n_on[i]++], L("Partition table unreadable"), 96); continue; }
+        if (!table || t.scheme == SCHEME_UNREADABLE) { str_copy(what_on[i][n_on[i]++], L("Partition table unreadable"), 96); continue; }
         if (t.scheme == SCHEME_NONE) { str_copy(what_on[i][n_on[i]++], L("Empty: no partitions"), 96); continue; }
         for (int p = 0; p < t.n; p++) if (t.p[p].fs == FS_BITLOCKER) bitlocker[i] = true;
         for (int p = 0; p < t.n && n_on[i] < 6; p++) {

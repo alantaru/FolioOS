@@ -1193,7 +1193,7 @@ msgstr "テーマを保存"
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/core/app.c:1601 src/core/app.c:1602 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:200 src/core/partitions.c:239
+#: src/core/app.c:1601 src/core/app.c:1602 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:204 src/core/partitions.c:243
 msgid "Delete"
 msgstr "削除"
 
@@ -1957,7 +1957,7 @@ msgstr "フォルダー「%s」とその中身をすべて削除しますか？ 
 msgid "Delete \"%s\"? This cannot be undone."
 msgstr "「%s」を削除しますか？ この操作は元に戻せません。"
 
-#: src/core/filedlg.c:327 src/core/partitions.c:220
+#: src/core/filedlg.c:327 src/core/partitions.c:224
 msgid "Size"
 msgstr "サイズ"
 
@@ -1995,79 +1995,79 @@ msgstr[0] "%d 個の項目"
 msgid "Open"
 msgstr "開く"
 
-#: src/core/fscheck.c:786
+#: src/core/fscheck.c:812
 msgid "This partition is encrypted with BitLocker. To make room, shrink it in Windows (Disk Management, Shrink Volume) or turn BitLocker off first."
 msgstr "このパーティションは BitLocker で暗号化されています。空き領域を作るには、Windows で縮小する（ディスクの管理 →「ボリュームの縮小」）か、先に BitLocker をオフにしてください。"
 
-#: src/core/fscheck.c:787
+#: src/core/fscheck.c:813
 msgid "This partition is encrypted (LUKS). To make room, shrink it from Linux with the encryption tools."
 msgstr "このパーティションは暗号化されています（LUKS）。空き領域を作るには、Linux から暗号化ツールで縮小してください。"
 
-#: src/core/fscheck.c:788
+#: src/core/fscheck.c:814
 msgid "This partition holds LVM volumes. To make room, shrink them from Linux (lvreduce, then pvresize)."
 msgstr "このパーティションには LVM ボリュームがあります。空き領域を作るには、Linux から縮小してください（lvreduce のあと pvresize）。"
 
-#: src/core/fscheck.c:789
+#: src/core/fscheck.c:815
 msgid "This is a Mac partition (APFS or HFS+). To make room, use Disk Utility on the Mac."
 msgstr "これは Mac のパーティション（APFS または HFS+）です。空き領域を作るには、Mac のディスクユーティリティを使ってください。"
 
-#: src/core/fscheck.c:790
+#: src/core/fscheck.c:816
 msgid "Windows is hibernated or uses Fast Startup. Start Windows, then shut it down while holding Shift (or turn Fast Startup off in Power Options), and try again."
 msgstr "Windows が休止状態か、高速スタートアップが有効です。Windows を起動し、Shift キーを押しながらシャットダウンして（または電源オプションで高速スタートアップをオフにして）から、もう一度試してください。"
 
-#: src/core/fscheck.c:791
+#: src/core/fscheck.c:817
 msgid "Windows marked this partition as needing a check. Start Windows, run chkdsk /f on it, and try again."
 msgstr "Windows がこのパーティションを要チェックとしています。Windows を起動してこのパーティションに chkdsk /f を実行し、もう一度試してください。"
 
-#: src/core/fscheck.c:792
+#: src/core/fscheck.c:818
 msgid "This Linux partition was not unmounted cleanly. Start Linux and shut it down normally, then try again."
 msgstr "この Linux パーティションは正しくアンマウントされていません。Linux を起動して通常どおりシャットダウンしてから、もう一度試してください。"
 
-#: src/core/fscheck.c:793
+#: src/core/fscheck.c:819
 msgid "Linux found errors on this partition. Check it with fsck from Linux, then try again."
 msgstr "Linux がこのパーティションでエラーを見つけました。Linux から fsck でチェックしてから、もう一度試してください。"
 
-#: src/core/fscheck.c:794
+#: src/core/fscheck.c:820
 msgid "This partition could not be read safely, so FolioOS will not change it."
 msgstr "このパーティションを安全に読み取れなかったため、FolioOS は変更しません。"
 
-#: src/core/fscheck.c:795
+#: src/core/fscheck.c:821
 msgid "FolioOS cannot resize this file system yet."
 msgstr "FolioOS はこのファイルシステムのサイズ変更にまだ対応していません。"
 
-#: src/core/fscheck.c:801
+#: src/core/fscheck.c:827
 msgid "encrypted (BitLocker)"
 msgstr "暗号化（BitLocker）"
 
-#: src/core/fscheck.c:802
+#: src/core/fscheck.c:828
 msgid "encrypted (LUKS)"
 msgstr "暗号化（LUKS）"
 
-#: src/core/fscheck.c:804
+#: src/core/fscheck.c:830
 msgid "Mac (APFS/HFS+)"
 msgstr "Mac（APFS/HFS+）"
 
-#: src/core/fscheck.c:805
+#: src/core/fscheck.c:831
 msgid "Windows hibernated or Fast Startup"
 msgstr "Windows 休止状態または高速スタートアップ"
 
-#: src/core/fscheck.c:806
+#: src/core/fscheck.c:832
 msgid "needs a check (chkdsk)"
 msgstr "要チェック（chkdsk）"
 
-#: src/core/fscheck.c:807
+#: src/core/fscheck.c:833
 msgid "not unmounted cleanly"
 msgstr "正しくアンマウントされていない"
 
-#: src/core/fscheck.c:808
+#: src/core/fscheck.c:834
 msgid "has errors (fsck)"
 msgstr "エラーあり（fsck）"
 
-#: src/core/fscheck.c:809
+#: src/core/fscheck.c:835
 msgid "unreadable"
 msgstr "読み取り不可"
 
-#: src/core/fscheck.c:810
+#: src/core/fscheck.c:836
 msgid "cannot be resized yet"
 msgstr "まだサイズ変更不可"
 
@@ -2139,75 +2139,79 @@ msgstr "入力：ひらがな"
 msgid "Input: Katakana"
 msgstr "入力：カタカナ"
 
-#: src/core/install.c:883
+#: src/core/install.c:889
 msgid "Done"
 msgstr "完了"
 
-#: src/core/install.c:884
+#: src/core/install.c:890
 msgid "Could not read"
 msgstr "読み取れませんでした"
 
-#: src/core/install.c:885
+#: src/core/install.c:891
 msgid "Could not write to the disk"
 msgstr "ディスクに書き込めませんでした"
 
-#: src/core/install.c:886
+#: src/core/install.c:892
 msgid "The disk is too small (at least 512 MB)"
 msgstr "ディスクが小さすぎます（512 MB 以上が必要）"
 
-#: src/core/install.c:887
+#: src/core/install.c:893
 msgid "Could not save the safety copy to the USB drive"
 msgstr "USB メモリに安全用のコピーを保存できませんでした"
 
-#: src/core/install.c:888
+#: src/core/install.c:894
 msgid "Could not format the new partition"
 msgstr "新しいパーティションをフォーマットできませんでした"
 
-#: src/core/install.c:889
+#: src/core/install.c:895
 msgid "Could not copy"
 msgstr "コピーできませんでした"
 
-#: src/core/install.c:890
+#: src/core/install.c:896
 msgid "A copied file did not match the original"
 msgstr "コピーしたファイルが元のファイルと一致しませんでした"
 
-#: src/core/install.c:891
+#: src/core/install.c:897
 msgid "The BIOS boot code is missing from the USB drive"
 msgstr "USB メモリに BIOS 起動コードがありません"
 
-#: src/core/install.c:892
+#: src/core/install.c:898
 msgid "The USB drive does not have a complete FolioOS"
 msgstr "USB メモリの FolioOS が完全ではありません"
 
-#: src/core/install.c:893
+#: src/core/install.c:899
 msgid "This disk does not use a GPT partition table"
 msgstr "このディスクは GPT パーティションテーブルではありません"
 
-#: src/core/install.c:894
+#: src/core/install.c:900
 msgid "No FAT32 EFI system partition was found on this disk"
 msgstr "このディスクに FAT32 の EFI システムパーティションがありません"
 
-#: src/core/install.c:895
+#: src/core/install.c:901
 msgid "The EFI system partition is full"
 msgstr "EFI システムパーティションに空きがありません"
 
-#: src/core/install.c:896
+#: src/core/install.c:902
 msgid "The chosen space is not free"
 msgstr "選んだ領域は空いていません"
 
-#: src/core/install.c:897
+#: src/core/install.c:903
 msgid "Could not shrink the other system's partition"
 msgstr "もう一方のシステムのパーティションを縮小できませんでした"
 
-#: src/core/install.c:898
+#: src/core/install.c:904
 msgid "Could not give the space back to the other system's partition"
 msgstr "もう一方のシステムのパーティションに領域を戻せませんでした"
 
-#: src/core/install.c:899
+#: src/core/install.c:905
 msgid "This partition cannot change to that size without moving data"
 msgstr "データを移動せずにこのパーティションをそのサイズにはできません"
 
-#: src/core/install.c:900
+#: src/core/install.c:906 src/core/partitions.c:46
+msgid "FolioOS cannot change this disk's partition table safely: it is left as it is"
+msgstr "FolioOS はこのディスクのパーティションテーブルを安全に変更できません。そのままにします"
+
+#: src/core/install.c:907
 msgid "Error"
 msgstr "エラー"
 
@@ -2231,7 +2235,7 @@ msgstr "Linux を残すには、Linux 側でそのパーティションを縮小
 msgid "To keep Windows, shrink drive C: in Windows (Disk Management, Shrink Volume) and run the installer again: FolioOS will use the free space."
 msgstr "Windows を残すには、Windows で C: ドライブを縮小して（ディスクの管理 →「ボリュームの縮小」）から、もう一度インストーラーを開いてください。FolioOS は空き領域を使います。"
 
-#: src/core/installer.c:106
+#: src/core/installer.c:106 src/core/partitions.c:44
 msgid "Partition table unreadable"
 msgstr "パーティションテーブルを読み取れません"
 
@@ -2245,7 +2249,7 @@ msgid "…and %d more partition"
 msgid_plural "…and %d more partitions"
 msgstr[0] "…ほか %d 個のパーティション"
 
-#: src/core/installer.c:124 src/core/partitions.c:127
+#: src/core/installer.c:124 src/core/partitions.c:131
 msgid "disk"
 msgstr "ディスク"
 
@@ -2273,7 +2277,7 @@ msgstr "FolioOS を今あるシステムの隣（空き領域）に入れるか�
 msgid "Choose where:"
 msgstr "場所を選んでください："
 
-#: src/core/installer.c:290 src/core/partitions.c:165
+#: src/core/installer.c:290 src/core/partitions.c:169
 msgid "No disk was found besides the USB drive FolioOS started from."
 msgstr "FolioOS を起動した USB メモリ以外にディスクが見つかりません。"
 
@@ -2342,7 +2346,7 @@ msgstr "各ファイルは新しいコピーを確認してから置き換える
 msgid "Before anything is written, the start of the disk (partition table and boot sectors) is saved to %s on this USB drive."
 msgstr "書き込みの前に、ディスクの先頭（パーティションテーブルとブートセクター）をこの USB メモリの %s に保存します。"
 
-#: src/core/installer.c:341 src/core/installer.c:382 src/core/installer.c:435 src/core/installer.c:458 src/core/partitions.c:238
+#: src/core/installer.c:341 src/core/installer.c:382 src/core/installer.c:435 src/core/installer.c:458 src/core/partitions.c:242
 msgid "Back"
 msgstr "戻る"
 
@@ -2359,7 +2363,7 @@ msgstr "このディスクから FolioOS を削除します："
 msgid "− FolioOS · FAT32 · %s"
 msgstr "− FolioOS · FAT32 · %s"
 
-#: src/core/installer.c:357 src/core/installer.c:405 src/core/partitions.c:218
+#: src/core/installer.c:357 src/core/installer.c:405 src/core/partitions.c:222
 #, c-format
 msgid "%s%s: %s → %s"
 msgstr "%s%s: %s → %s"
@@ -2390,7 +2394,7 @@ msgstr "EFI システムパーティションからは EFI/FolioOS フォルダ�
 msgid "The next time Windows starts, it checks its partition (chkdsk) once; this is expected."
 msgstr "次に Windows を起動すると、一度だけパーティションのチェック（chkdsk）が行われます。これは想定どおりです。"
 
-#: src/core/installer.c:373 src/core/installer.c:443 src/core/partitions.c:212
+#: src/core/installer.c:373 src/core/installer.c:443 src/core/partitions.c:216
 msgid "ERASE"
 msgstr "ERASE"
 
@@ -2399,7 +2403,7 @@ msgstr "ERASE"
 msgid "Your texts on this computer will be lost. To confirm, type %s:"
 msgstr "このコンピューターのテキストは失われます。確認のため %s と入力してください："
 
-#: src/core/installer.c:377 src/core/installer.c:385 src/core/installer.c:453 src/core/installer.c:461 src/core/partitions.c:233 src/core/partitions.c:242
+#: src/core/installer.c:377 src/core/installer.c:385 src/core/installer.c:453 src/core/installer.c:461 src/core/partitions.c:237 src/core/partitions.c:246
 #, c-format
 msgid "To confirm, type %s:"
 msgstr "確認のため %s と入力してください："
@@ -2421,11 +2425,11 @@ msgstr "+ FolioOS · FAT32 · %s（空けた領域に）"
 msgid "Size for FolioOS"
 msgstr "FolioOS のサイズ"
 
-#: src/core/installer.c:412 src/core/partitions.c:222
+#: src/core/installer.c:412 src/core/partitions.c:226
 msgid "No file is moved: FolioOS only takes free space from the end of that partition. The next time Windows starts, it checks the partition (chkdsk) once; this is expected."
 msgstr "ファイルは移動しません。FolioOS はそのパーティションの末尾の空き領域だけを使います。次に Windows を起動すると、一度だけパーティションのチェック（chkdsk）が行われます。これは想定どおりです。"
 
-#: src/core/installer.c:412 src/core/partitions.c:222
+#: src/core/installer.c:412 src/core/partitions.c:226
 msgid "No file is moved: FolioOS only takes free space from the end of that partition."
 msgstr "ファイルは移動しません。FolioOS はそのパーティションの末尾の空き領域だけを使います。"
 
@@ -2644,61 +2648,61 @@ msgid "%d track · %s"
 msgid_plural "%d tracks · %s"
 msgstr[0] "%d 曲 · %s"
 
-#: src/core/partitions.c:103
+#: src/core/partitions.c:107
 msgid "Done. The previous start of the disk is saved on this USB drive."
 msgstr "完了しました。ディスクの以前の先頭部分はこの USB メモリに保存されています。"
 
-#: src/core/partitions.c:131
+#: src/core/partitions.c:135
 #, c-format
 msgid "Free space · %s"
 msgstr "空き領域 · %s"
 
-#: src/core/partitions.c:161
+#: src/core/partitions.c:165
 msgid "Working… Do not turn off the computer or remove the USB drive."
 msgstr "処理中… コンピューターの電源を切ったり USB メモリを抜いたりしないでください。"
 
-#: src/core/partitions.c:164
+#: src/core/partitions.c:168
 msgid "Choose a partition or a free space, then an action. Before anything is written, the start of the disk is saved to FOLIO/BACKUP on this USB drive."
 msgstr "パーティションか空き領域を選び、次に操作を選んでください。書き込む前に、ディスクの先頭部分をこの USB メモリの FOLIO/BACKUP に保存します。"
 
-#: src/core/partitions.c:186
+#: src/core/partitions.c:190
 msgid "Create a FAT32 partition"
 msgstr "FAT32 パーティションを作成"
 
-#: src/core/partitions.c:192
+#: src/core/partitions.c:196
 msgid "Resize"
 msgstr "サイズ変更"
 
-#: src/core/partitions.c:198
+#: src/core/partitions.c:202
 msgid "Format as FAT32"
 msgstr "FAT32 でフォーマット"
 
-#: src/core/partitions.c:217
+#: src/core/partitions.c:221
 #, c-format
 msgid "+ FAT32 · %s, in this free space"
 msgstr "+ FAT32 · %s（この空き領域に）"
 
-#: src/core/partitions.c:226
+#: src/core/partitions.c:230
 msgid "Name of the new volume:"
 msgstr "新しいボリュームの名前："
 
-#: src/core/partitions.c:230
+#: src/core/partitions.c:234
 msgid "Everything on this partition will be erased; it becomes an empty FAT32 volume."
 msgstr "このパーティションの内容はすべて消去され、空の FAT32 ボリュームになります。"
 
-#: src/core/partitions.c:231
+#: src/core/partitions.c:235
 msgid "This partition and everything on it will be erased; its space becomes free."
 msgstr "このパーティションとその内容はすべて消去され、領域は空きになります。"
 
-#: src/core/partitions.c:239
+#: src/core/partitions.c:243
 msgid "Create"
 msgstr "作成"
 
-#: src/core/partitions.c:239
+#: src/core/partitions.c:243
 msgid "Apply"
 msgstr "適用"
 
-#: src/core/partitions.c:239
+#: src/core/partitions.c:243
 msgid "Format"
 msgstr "フォーマット"
 
