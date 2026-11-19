@@ -1,0 +1,24 @@
+# Ao lado de um "Windows" com BitLocker: marca "tenho a chave de recuperação" e instala, só pelo teclado
+wait 300
+key esc
+wait 200
+key ctrl+k
+type Instalar o FolioOS neste
+key enter
+wait 300
+assert_keywin Install FolioOS on this computer
+key shift+tab
+key enter
+wait 200
+# Tab = 1º item (o interruptor da chave); Enter liga; Tab, Tab, Tab = "Seus textos", "Voltar", "Instalar ao lado"
+key tab
+key enter
+wait 100
+shot bitlocker3_chave.png
+key tab
+key tab
+key tab
+key enter
+wait 3000
+shot bitlocker4_pronto.png
+assert_keywin Install FolioOS on this computer

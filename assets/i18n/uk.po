@@ -13,749 +13,790 @@ msgstr ""
 "X-Date-Format: {d} {month} {yyyy} р.\n"
 "X-Decimal: ,\n"
 
-#: src/core/app.c:31 src/core/app.c:53 src/core/app.c:273 src/core/filedlg.c:139 src/core/md.c:239
+#: src/core/app.c:34 src/core/app.c:56 src/core/app.c:276 src/core/filedlg.c:139 src/core/md.c:239
 msgid "Untitled"
 msgstr "Без назви"
 
-#: src/core/app.c:161
+#: src/core/app.c:164
 msgid "Could not open the file"
 msgstr "Не вдалося відкрити файл"
 
-#: src/core/app.c:285 src/core/app.c:456
+#: src/core/app.c:288 src/core/app.c:558
 msgid "Limit of 16 tabs — close one (Ctrl+W)"
 msgstr "Не більше 16 вкладок — закрийте одну (Ctrl+W)"
 
-#: src/core/app.c:420
+#: src/core/app.c:423
 msgid "Picking up where you left off"
 msgstr "Продовжуємо з того місця, де ви зупинилися"
 
-#: src/core/app.c:438
+#: src/core/app.c:441
 msgid "Close tab without saving?"
 msgstr "Закрити вкладку без збереження?"
 
-#: src/core/app.c:438
+#: src/core/app.c:441
 msgid "Save changes?"
 msgstr "Зберегти зміни?"
 
-#: src/core/app.c:439
+#: src/core/app.c:442
 msgid "The current document has changes that have not been saved yet."
 msgstr "Поточний документ має незбережені зміни."
 
-#: src/core/app.c:439 src/core/app.c:766 src/core/app.c:897 src/core/filedlg.c:409
+#: src/core/app.c:442 src/core/app.c:868 src/core/app.c:1004 src/core/filedlg.c:410
 msgid "Save"
 msgstr "Зберегти"
 
-#: src/core/app.c:439
+#: src/core/app.c:442
 msgid "Don't save"
 msgstr "Не зберігати"
 
-#: src/core/app.c:446
+#: src/core/app.c:534
+msgid "Connect the USB drive with your texts (a DOCUMENTS folder) first."
+msgstr "Спершу під’єднайте флешку з вашими текстами (тека DOCUMENTS)."
+
+#: src/core/app.c:539
+msgid "The texts on this computer and on the USB drive are already the same."
+msgstr "Тексти на цьому комп’ютері й на флешці вже однакові."
+
+#: src/core/app.c:540
+#, c-format
+msgid "Texts exchanged: %d to the USB drive, %d to this computer."
+msgstr "Обмін текстами: %d на флешку, %d на цей комп’ютер."
+
+#: src/core/app.c:541
+#, c-format
+msgid " %d left as it is (open in another tab, or changed on both sides at the same minute)."
+msgid_plural " %d left as they are (open in another tab, or changed on both sides at the same minute)."
+msgstr[0] " %d залишено як є (відкрито в іншій вкладці або змінено з обох боків у ту саму хвилину)."
+msgstr[1] " %d залишено як є (відкриті в іншій вкладці або змінені з обох боків у ту саму хвилину)."
+msgstr[2] " %d залишено як є (відкриті в іншій вкладці або змінені з обох боків у ту саму хвилину)."
+
+#: src/core/app.c:548
 msgid "This format is export-only. Open the matching .md file."
 msgstr "Цей формат лише для експорту. Відкрийте відповідний файл .md."
 
-#: src/core/app.c:467
+#: src/core/app.c:569
 msgid "Failed to create the file"
 msgstr "Не вдалося створити файл"
 
-#: src/core/app.c:478
+#: src/core/app.c:580
 msgid "Write error — is the USB drive write-protected or full?"
 msgstr "Помилка запису — флешка захищена від запису чи заповнена?"
 
-#: src/core/app.c:491 src/core/app.c:507
+#: src/core/app.c:593 src/core/app.c:609
 #, c-format
 msgid "Saved · %s"
 msgstr "Збережено · %s"
 
-#: src/core/app.c:496 src/core/filedlg.c:197
+#: src/core/app.c:598 src/core/filedlg.c:197
 msgid "Export is not available for LaTeX files"
 msgstr "Експорт недоступний для файлів LaTeX"
 
-#: src/core/app.c:509
+#: src/core/app.c:611
 #, c-format
 msgid "Exported · %s"
 msgstr "Експортовано · %s"
 
-#: src/core/app.c:557
+#: src/core/app.c:659
 msgid "Narrow"
 msgstr "Вузька"
 
-#: src/core/app.c:557
+#: src/core/app.c:659
 msgid "Medium"
 msgstr "Середня"
 
-#: src/core/app.c:557
+#: src/core/app.c:659
 msgid "Wide"
 msgstr "Широка"
 
-#: src/core/app.c:557
+#: src/core/app.c:659
 msgid "Extra"
 msgstr "Дуже широка"
 
-#: src/core/app.c:561
+#: src/core/app.c:663
 msgid "Full screen: the text uses the full width"
 msgstr "На весь екран: текст займає всю ширину"
 
-#: src/core/app.c:561
+#: src/core/app.c:663
 msgid "Page: text in a column, like on a sheet of paper"
 msgstr "Сторінка: текст у колонці, як на аркуші паперу"
 
-#: src/core/app.c:603
+#: src/core/app.c:705
 msgid "Settings"
 msgstr "Налаштування"
 
-#: src/core/app.c:604 src/core/app.c:780 src/core/app.c:908 src/core/app.c:1606
+#: src/core/app.c:706 src/core/app.c:882 src/core/app.c:1015 src/core/app.c:1757
 msgid "Find and replace"
 msgstr "Знайти й замінити"
 
-#: src/core/app.c:605 src/core/app.c:908 src/core/app.c:1618
+#: src/core/app.c:707 src/core/app.c:1015 src/core/app.c:1769
 msgid "Outline"
 msgstr "Структура"
 
-#: src/core/app.c:606 src/core/app.c:797 src/core/app.c:1619
+#: src/core/app.c:708 src/core/app.c:899 src/core/app.c:1770
 msgid "Session and goals"
 msgstr "Сеанс і цілі"
 
-#: src/core/app.c:607 src/core/app.c:801 src/core/app.c:912
+#: src/core/app.c:709 src/core/app.c:903 src/core/app.c:1019
 msgid "Keyboard shortcuts"
 msgstr "Клавіатурні скорочення"
 
-#: src/core/app.c:608
+#: src/core/app.c:710
 msgid "Commands"
 msgstr "Команди"
 
-#: src/core/app.c:609 src/core/app.c:1738
+#: src/core/app.c:711 src/core/app.c:1889
 msgid "Menu"
 msgstr "Меню"
 
-#: src/core/app.c:611
+#: src/core/app.c:713
 msgid "Theme editor"
 msgstr "Редактор тем"
 
-#: src/core/app.c:630
+#: src/core/app.c:732
 #, c-format
 msgid "Tabs on · %d documents open (Ctrl+N new, Ctrl+W close)"
 msgstr "Вкладки увімкнено · відкрито документів: %d (Ctrl+N — нова, Ctrl+W — закрити)"
 
-#: src/core/app.c:630
+#: src/core/app.c:732
 msgid "Tabs on (Ctrl+N new tab, Ctrl+W close)"
 msgstr "Вкладки увімкнено (Ctrl+N — нова вкладка, Ctrl+W — закрити)"
 
-#: src/core/app.c:631
+#: src/core/app.c:733
 msgid "Tabs off — your tabs are kept for when you turn them back on"
 msgstr "Вкладки вимкнено — вони збережуться до наступного ввімкнення"
 
-#: src/core/app.c:634
+#: src/core/app.c:736
 msgid "Turn tabs on to use Ctrl+W (Ctrl+K → Tabs, or the button at the top)"
 msgstr "Увімкніть вкладки, щоб користуватися Ctrl+W (Ctrl+K → Вкладки або кнопка вгорі)"
 
-#: src/core/app.c:646
+#: src/core/app.c:748
 msgid "Focus off"
 msgstr "Фокус вимкнено"
 
-#: src/core/app.c:646
+#: src/core/app.c:748
 msgid "Focus on sentence"
 msgstr "Фокус на реченні"
 
-#: src/core/app.c:646
+#: src/core/app.c:748
 msgid "Focus on paragraph"
 msgstr "Фокус на абзаці"
 
-#: src/core/app.c:646
+#: src/core/app.c:748
 msgid "Focus on line"
 msgstr "Фокус на рядку"
 
-#: src/core/app.c:649
+#: src/core/app.c:751
 msgid "Typewriter: current line always centered"
 msgstr "Друкарська машинка: поточний рядок завжди посередині"
 
-#: src/core/app.c:649
+#: src/core/app.c:751
 msgid "Typewriter off"
 msgstr "Друкарську машинку вимкнено"
 
-#: src/core/app.c:650
+#: src/core/app.c:752
 msgid "Zen mode — Esc or move the mouse to the top to leave"
 msgstr "Режим дзен — Esc або мишу вгору, щоб вийти"
 
-#: src/core/app.c:650
+#: src/core/app.c:752
 msgid "Zen mode off"
 msgstr "Режим дзен вимкнено"
 
-#: src/core/app.c:671
+#: src/core/app.c:773
 #, c-format
 msgid "Theme: %s"
 msgstr "Тема: %s"
 
-#: src/core/app.c:672
+#: src/core/app.c:774
 #, c-format
 msgid "Font: %s"
 msgstr "Шрифт: %s"
 
-#: src/core/app.c:685
+#: src/core/app.c:787
 msgid "Sprint stopped"
 msgstr "Спринт перервано"
 
-#: src/core/app.c:688
+#: src/core/app.c:790
 #, c-format
 msgid "%d-minute sprint started. Happy writing!"
 msgstr "Спринт на %d хв розпочато. Приємного письма!"
 
-#: src/core/app.c:691
+#: src/core/app.c:793
 msgid "Hemingway mode: deleting is disabled"
 msgstr "Режим Гемінґвея: видалення вимкнено"
 
-#: src/core/app.c:691
+#: src/core/app.c:793
 msgid "Hemingway mode off"
 msgstr "Режим Гемінґвея вимкнено"
 
-#: src/core/app.c:692
+#: src/core/app.c:794
 msgid "Markup hidden outside the current paragraph"
 msgstr "Розмітку приховано поза поточним абзацом"
 
-#: src/core/app.c:692
+#: src/core/app.c:794
 msgid "Markup always visible"
 msgstr "Розмітка завжди видима"
 
-#: src/core/app.c:693
+#: src/core/app.c:795
 msgid "Smart typography on (— “ ” …)"
 msgstr "Розумна типографіка ввімкнена (— « » …)"
 
-#: src/core/app.c:693
+#: src/core/app.c:795
 msgid "Smart typography off"
 msgstr "Розумна типографіка вимкнена"
 
-#: src/core/app.c:705
+#: src/core/app.c:807
 #, c-format
 msgid "Page %s"
 msgstr "Сторінка: %s"
 
-#: src/core/app.c:713 src/core/editor.c:757 src/core/preview.c:252
+#: src/core/app.c:815 src/core/editor.c:757 src/core/preview.c:252
 msgid "This is the last chapter"
 msgstr "Це останній розділ"
 
-#: src/core/app.c:730
+#: src/core/app.c:832
 msgid "Mouse and touchpad off: keyboard only (Ctrl+K → Mouse turns them back on)"
 msgstr "Мишу й тачпад вимкнено: лише клавіатура (Ctrl+K → Миша вмикає їх знову)"
 
-#: src/core/app.c:730
+#: src/core/app.c:832
 msgid "Mouse and touchpad on"
 msgstr "Мишу й тачпад увімкнено"
 
-#: src/core/app.c:741
+#: src/core/app.c:843
 msgid "Could not read the language file"
 msgstr "Не вдалося прочитати файл мови"
 
-#: src/core/app.c:745
+#: src/core/app.c:847
 #, c-format
 msgid "This language needs fonts (%s) that are missing from %s. Copy FolioOS.zip to the USB drive again."
 msgstr "Цій мові потрібні шрифти (%s), яких немає в %s. Скопіюйте FolioOS.zip на флешку ще раз."
 
-#: src/core/app.c:758
+#: src/core/app.c:860
 msgid "New document"
 msgstr "Новий документ"
 
-#: src/core/app.c:758 src/core/app.c:896
+#: src/core/app.c:860 src/core/app.c:1003
 msgid "Ctrl+N"
 msgstr "Ctrl+N"
 
-#: src/core/app.c:759
+#: src/core/app.c:861
 msgid "Tabs: several documents (on/off)"
 msgstr "Вкладки: кілька документів (увімк./вимк.)"
 
-#: src/core/app.c:760
+#: src/core/app.c:862
 msgid "Close tab"
 msgstr "Закрити вкладку"
 
-#: src/core/app.c:760
+#: src/core/app.c:862
 msgid "Ctrl+W"
 msgstr "Ctrl+W"
 
-#: src/core/app.c:761
+#: src/core/app.c:863
 msgid "Next tab"
 msgstr "Наступна вкладка"
 
-#: src/core/app.c:761
+#: src/core/app.c:863
 msgid "Ctrl+Tab"
 msgstr "Ctrl+Tab"
 
-#: src/core/app.c:762
+#: src/core/app.c:864
 msgid "Previous tab"
 msgstr "Попередня вкладка"
 
-#: src/core/app.c:762
+#: src/core/app.c:864
 msgid "Ctrl+Shift+Tab"
 msgstr "Ctrl+Shift+Tab"
 
-#: src/core/app.c:763
+#: src/core/app.c:865
 msgid "Create a custom theme (colors and fonts)"
 msgstr "Створити власну тему (кольори й шрифти)"
 
-#: src/core/app.c:764
+#: src/core/app.c:866
 msgid "Edit the current theme"
 msgstr "Змінити поточну тему"
 
-#: src/core/app.c:765 src/core/app.c:896
+#: src/core/app.c:867 src/core/app.c:1003
 msgid "Open…"
 msgstr "Відкрити…"
 
-#: src/core/app.c:765 src/core/app.c:896
+#: src/core/app.c:867 src/core/app.c:1003
 msgid "Ctrl+O"
 msgstr "Ctrl+O"
 
-#: src/core/app.c:766 src/core/app.c:897
+#: src/core/app.c:868 src/core/app.c:1004
 msgid "Ctrl+S"
 msgstr "Ctrl+S"
 
-#: src/core/app.c:767 src/core/app.c:897
+#: src/core/app.c:869 src/core/app.c:1004
 msgid "Save as / Export…"
 msgstr "Зберегти як / Експорт…"
 
-#: src/core/app.c:767 src/core/app.c:897 src/core/app.c:1603
+#: src/core/app.c:869 src/core/app.c:1004 src/core/app.c:1754
 msgid "Ctrl+Shift+S"
 msgstr "Ctrl+Shift+S"
 
-#: src/core/app.c:768
+#: src/core/app.c:870
 msgid "Reading mode (formatted Markdown)"
 msgstr "Режим читання (форматований Markdown)"
 
-#: src/core/app.c:768 src/core/app.c:1605
+#: src/core/app.c:870 src/core/app.c:1756
 msgid "Ctrl+P"
 msgstr "Ctrl+P"
 
-#: src/core/app.c:769
+#: src/core/app.c:871
 msgid "Reading auto-scroll (on/off)"
 msgstr "Автопрокручування під час читання (увімк./вимк.)"
 
-#: src/core/app.c:769 src/core/app.c:1612
+#: src/core/app.c:871 src/core/app.c:1763
 msgid "Enter (reading)"
 msgstr "Enter (читання)"
 
-#: src/core/app.c:770
+#: src/core/app.c:872
 msgid "Next chapter"
 msgstr "Наступний розділ"
 
-#: src/core/app.c:770
+#: src/core/app.c:872
 msgid "Ctrl+PgDn"
 msgstr "Ctrl+PgDn"
 
-#: src/core/app.c:771
+#: src/core/app.c:873
 msgid "Previous chapter"
 msgstr "Попередній розділ"
 
-#: src/core/app.c:771
+#: src/core/app.c:873
 msgid "Ctrl+PgUp"
 msgstr "Ctrl+PgUp"
 
-#: src/core/app.c:772
+#: src/core/app.c:874
 msgid "Go to the last edit"
 msgstr "До останнього редагування"
 
-#: src/core/app.c:772 src/core/app.c:1610
+#: src/core/app.c:874 src/core/app.c:1761
 msgid "Ctrl+J"
 msgstr "Ctrl+J"
 
-#: src/core/app.c:773 src/core/app.c:1609
+#: src/core/app.c:875 src/core/app.c:1760
 msgid "Duplicate paragraph"
 msgstr "Дублювати абзац"
 
-#: src/core/app.c:773 src/core/app.c:1609
+#: src/core/app.c:875 src/core/app.c:1760
 msgid "Ctrl+D"
 msgstr "Ctrl+D"
 
-#: src/core/app.c:774 src/core/app.c:1609
+#: src/core/app.c:876 src/core/app.c:1760
 msgid "Delete paragraph"
 msgstr "Видалити абзац"
 
-#: src/core/app.c:774 src/core/app.c:1609
+#: src/core/app.c:876 src/core/app.c:1760
 msgid "Ctrl+Shift+K"
 msgstr "Ctrl+Shift+K"
 
-#: src/core/app.c:775
+#: src/core/app.c:877
 msgid "Change case"
 msgstr "Регістр літер"
 
-#: src/core/app.c:775 src/core/app.c:1611
+#: src/core/app.c:877 src/core/app.c:1762
 msgid "Shift+F3"
 msgstr "Shift+F3"
 
-#: src/core/app.c:776
+#: src/core/app.c:878
 msgid "Insert today's date"
 msgstr "Вставити сьогоднішню дату"
 
-#: src/core/app.c:777
+#: src/core/app.c:879
 msgid "Focus mode (sentence / paragraph / line)"
 msgstr "Режим фокусу (речення / абзац / рядок)"
 
-#: src/core/app.c:778
+#: src/core/app.c:880
 msgid "Typewriter (centered line)"
 msgstr "Друкарська машинка (рядок посередині)"
 
-#: src/core/app.c:779
+#: src/core/app.c:881
 msgid "Zen mode (no bars)"
 msgstr "Режим дзен (без панелей)"
 
-#: src/core/app.c:780 src/core/app.c:908 src/core/app.c:1606
+#: src/core/app.c:882 src/core/app.c:1015 src/core/app.c:1757
 msgid "Ctrl+F"
 msgstr "Ctrl+F"
 
-#: src/core/app.c:781
+#: src/core/app.c:883
 msgid "Document outline"
 msgstr "Структура документа"
 
-#: src/core/app.c:782
+#: src/core/app.c:884
 msgid "Appearance: themes and typography"
 msgstr "Вигляд: теми й типографіка"
 
-#: src/core/app.c:783 src/core/app.c:1615
+#: src/core/app.c:885 src/core/app.c:1766
 msgid "Next theme"
 msgstr "Наступна тема"
 
-#: src/core/app.c:783 src/core/app.c:1615
+#: src/core/app.c:885 src/core/app.c:1766
 msgid "Ctrl+T"
 msgstr "Ctrl+T"
 
-#: src/core/app.c:784
+#: src/core/app.c:886
 msgid "Next font"
 msgstr "Наступний шрифт"
 
-#: src/core/app.c:784
+#: src/core/app.c:886
 msgid "Ctrl+Shift+T"
 msgstr "Ctrl+Shift+T"
 
-#: src/core/app.c:785
+#: src/core/app.c:887
 msgid "Larger text"
 msgstr "Більший текст"
 
-#: src/core/app.c:785
+#: src/core/app.c:887
 msgid "Ctrl+="
 msgstr "Ctrl+="
 
-#: src/core/app.c:786
+#: src/core/app.c:888
 msgid "Smaller text"
 msgstr "Менший текст"
 
-#: src/core/app.c:786
+#: src/core/app.c:888
 msgid "Ctrl+-"
 msgstr "Ctrl+-"
 
-#: src/core/app.c:787
+#: src/core/app.c:889
 msgid "Page or full screen (text width)"
 msgstr "Сторінка або весь екран (ширина тексту)"
 
-#: src/core/app.c:788
+#: src/core/app.c:890
 msgid "Page size: narrow · medium · wide · extra"
 msgstr "Розмір сторінки: вузька · середня · широка · дуже широка"
 
-#: src/core/app.c:789
+#: src/core/app.c:891
 msgid "Paper sheet (show/hide)"
 msgstr "Аркуш паперу (показати/сховати)"
 
-#: src/core/app.c:790 src/core/app.c:911
+#: src/core/app.c:892 src/core/app.c:1018
 msgid "Writing settings"
 msgstr "Налаштування письма"
 
-#: src/core/app.c:791
+#: src/core/app.c:893
 msgid "Music: play / pause"
 msgstr "Музика: грати / пауза"
 
-#: src/core/app.c:792
+#: src/core/app.c:894
 msgid "Music: next track"
 msgstr "Музика: наступний трек"
 
-#: src/core/app.c:793
+#: src/core/app.c:895
 msgid "Music: previous track"
 msgstr "Музика: попередній трек"
 
-#: src/core/app.c:794 src/core/app.c:1618
+#: src/core/app.c:896 src/core/app.c:1769
 msgid "Music player"
 msgstr "Музичний програвач"
 
-#: src/core/app.c:795
+#: src/core/app.c:897
 msgid "Sound test (chime)"
 msgstr "Перевірка звуку (дзвіночок)"
 
-#: src/core/app.c:796
+#: src/core/app.c:898
 msgid "Start / stop writing sprint"
 msgstr "Почати / зупинити спринт"
 
-#: src/core/app.c:798
+#: src/core/app.c:900
 msgid "Hemingway mode (no deleting)"
 msgstr "Режим Гемінґвея (без видалення)"
 
-#: src/core/app.c:799
+#: src/core/app.c:901
 msgid "Hide markup outside the paragraph"
 msgstr "Приховувати розмітку поза абзацом"
 
-#: src/core/app.c:800
+#: src/core/app.c:902
 msgid "Smart typography (— “ ” …)"
 msgstr "Розумна типографіка (— « » …)"
 
-#: src/core/app.c:802 src/core/app.c:1613
+#: src/core/app.c:904 src/core/app.c:1764
 msgid "Menu and recent documents"
 msgstr "Меню та нещодавні документи"
 
-#: src/core/app.c:802 src/core/app.c:1613
+#: src/core/app.c:904 src/core/app.c:1764
 msgid "Alt+M"
 msgstr "Alt+M"
 
-#: src/core/app.c:803
+#: src/core/app.c:905
 msgid "Keyboard focus: text or the next window"
 msgstr "Фокус клавіатури: текст або наступне вікно"
 
-#: src/core/app.c:803 src/core/app.c:1623
+#: src/core/app.c:905 src/core/app.c:1774
 msgid "Ctrl+F6"
 msgstr "Ctrl+F6"
 
-#: src/core/app.c:804
+#: src/core/app.c:906
 msgid "Mouse and touchpad (on/off)"
 msgstr "Миша й тачпад (увімк./вимк.)"
 
-#: src/core/app.c:805 src/core/app.c:1625
+#: src/core/app.c:907 src/core/app.c:1776
 msgid "Input method on/off (Korean, Japanese)"
 msgstr "Метод введення увімк./вимк. (корейська, японська)"
 
-#: src/core/app.c:805 src/core/app.c:1625
+#: src/core/app.c:907 src/core/app.c:1776
 msgid "Ctrl+Space"
 msgstr "Ctrl+Пробіл"
 
-#: src/core/app.c:806
+#: src/core/app.c:908
 msgid "Language and keyboard"
 msgstr "Мова й клавіатура"
 
-#: src/core/app.c:807
+#: src/core/app.c:909 src/core/installer.c:38
+msgid "Install FolioOS on this computer"
+msgstr "Встановити FolioOS на цей комп’ютер"
+
+#: src/core/app.c:910
+msgid "Update FolioOS on this computer"
+msgstr "Оновити FolioOS на цьому комп’ютері"
+
+#: src/core/app.c:911 src/core/app.c:1315
+msgid "Exchange texts with the USB drive"
+msgstr "Обмінятися текстами з флешкою"
+
+#: src/core/app.c:912
+msgid "Remove FolioOS from this computer"
+msgstr "Видалити FolioOS з цього комп’ютера"
+
+#: src/core/app.c:913 src/core/partitions.c:27
+msgid "Disks and partitions"
+msgstr "Диски й розділи"
+
+#: src/core/app.c:914
 msgid "Restart the computer"
 msgstr "Перезавантажити комп’ютер"
 
-#: src/core/app.c:808
+#: src/core/app.c:915
 msgid "Shut down the computer"
 msgstr "Вимкнути комп’ютер"
 
-#: src/core/app.c:808 src/core/app.c:914 src/core/app.c:1621
+#: src/core/app.c:915 src/core/app.c:1021 src/core/app.c:1772
 msgid "Ctrl+Q"
 msgstr "Ctrl+Q"
 
-#: src/core/app.c:830
+#: src/core/app.c:937
 msgid "Type a command…"
 msgstr "Введіть команду…"
 
-#: src/core/app.c:861
+#: src/core/app.c:968
 msgid "No command found"
 msgstr "Команду не знайдено"
 
-#: src/core/app.c:887
+#: src/core/app.c:994
 msgid "File not found (a different USB drive?)"
 msgstr "Файл не знайдено (інша флешка?)"
 
-#: src/core/app.c:895
+#: src/core/app.c:1002
 msgid "DOCUMENT"
 msgstr "ДОКУМЕНТ"
 
-#: src/core/app.c:896
+#: src/core/app.c:1003
 msgid "New"
 msgstr "Новий"
 
-#: src/core/app.c:903
+#: src/core/app.c:1010
 msgid "RECENT"
 msgstr "НЕЩОДАВНІ"
 
-#: src/core/app.c:907
+#: src/core/app.c:1014
 msgid "WRITING"
 msgstr "ПИСЬМО"
 
-#: src/core/app.c:909
+#: src/core/app.c:1016
 msgid "Session, goals and sprint"
 msgstr "Сеанс, цілі й спринт"
 
-#: src/core/app.c:910
+#: src/core/app.c:1017
 msgid "PREFERENCES"
 msgstr "НАЛАШТУВАННЯ"
 
-#: src/core/app.c:911 src/core/app.c:994 src/core/app.c:1620
+#: src/core/app.c:1018 src/core/app.c:1109 src/core/app.c:1771
 msgid "Appearance"
 msgstr "Вигляд"
 
-#: src/core/app.c:914 src/core/app.c:1194 src/core/app.c:1621
+#: src/core/app.c:1021 src/core/app.c:1345 src/core/app.c:1772
 msgid "Shut down"
 msgstr "Вимкнути"
 
-#: src/core/app.c:978
+#: src/core/app.c:1086
 #, c-format
 msgid "Diagnostics saved to %s"
 msgstr "Діагностику збережено в %s"
 
-#: src/core/app.c:978
+#: src/core/app.c:1086
 msgid "Could not save the diagnostics"
 msgstr "Не вдалося зберегти діагностику"
 
-#: src/core/app.c:988
+#: src/core/app.c:1103
 msgid "Display restored: automatic resolution and rotation"
 msgstr "Екран відновлено: автоматична роздільність і поворот"
 
-#: src/core/app.c:994
+#: src/core/app.c:1109
 msgid "Writing"
 msgstr "Письмо"
 
-#: src/core/app.c:994
+#: src/core/app.c:1109
 msgid "System"
 msgstr "Система"
 
-#: src/core/app.c:1004
+#: src/core/app.c:1119
 msgid "THEMES"
 msgstr "ТЕМИ"
 
-#: src/core/app.c:1011
+#: src/core/app.c:1126
 msgid "+  Create my theme"
 msgstr "+  Створити свою тему"
 
-#: src/core/app.c:1012
+#: src/core/app.c:1127
 msgid "Edit this theme"
 msgstr "Змінити цю тему"
 
-#: src/core/app.c:1014
+#: src/core/app.c:1129
 #, c-format
 msgid "Mix colors and fonts; themes are saved in %s (editable .INI files)."
 msgstr "Поєднуйте кольори й шрифти; теми зберігаються в %s (редаговані файли .INI)."
 
-#: src/core/app.c:1016
+#: src/core/app.c:1131
 msgid "TEXT FONT"
 msgstr "ШРИФТ ТЕКСТУ"
 
-#: src/core/app.c:1025
+#: src/core/app.c:1140
 msgid "The quick brown fox jumps — “Hello!”"
 msgstr "Чуєш їх, доцю, га? Кумедна ж ти, прощайся без ґольфів! — «Привіт!»"
 
-#: src/core/app.c:1031
+#: src/core/app.c:1146
 #, c-format
 msgid "Add .ttf fonts to %s (subfolders work too) and restart."
 msgstr "Додайте шрифти .ttf до %s (підпапки теж підходять) і перезавантажтеся."
 
-#: src/core/app.c:1032
+#: src/core/app.c:1147
 msgid "Included writing fonts: Literata, Lora, EB Garamond, iA Writer, Special Elite and more."
 msgstr "Вбудовані шрифти для письма: Literata, Lora, EB Garamond, iA Writer, Special Elite та інші."
 
-#: src/core/app.c:1034
+#: src/core/app.c:1149
 msgid "TYPOGRAPHY"
 msgstr "ТИПОГРАФІКА"
 
-#: src/core/app.c:1035
+#: src/core/app.c:1150
 #, c-format
 msgid "%d px"
 msgstr "%d пікс."
 
-#: src/core/app.c:1036
+#: src/core/app.c:1151
 msgid "Text size"
 msgstr "Розмір тексту"
 
-#: src/core/app.c:1039
+#: src/core/app.c:1154
 msgid "Line spacing"
 msgstr "Міжрядковий інтервал"
 
-#: src/core/app.c:1041
+#: src/core/app.c:1156
 #, c-format
 msgid "%.2f lines"
 msgstr "%.2f рядка"
 
-#: src/core/app.c:1042
+#: src/core/app.c:1157
 msgid "Space between paragraphs"
 msgstr "Відступ між абзацами"
 
-#: src/core/app.c:1044
+#: src/core/app.c:1159
 msgid "First-line indent for paragraphs (book style)"
 msgstr "Відступ першого рядка абзацу (як у книжці)"
 
-#: src/core/app.c:1046
+#: src/core/app.c:1161
 msgid "PAGE"
 msgstr "СТОРІНКА"
 
-#: src/core/app.c:1048
+#: src/core/app.c:1163
 msgid "Page"
 msgstr "Сторінка"
 
-#: src/core/app.c:1048
+#: src/core/app.c:1163
 msgid "Full screen"
 msgstr "Весь екран"
 
-#: src/core/app.c:1057
+#: src/core/app.c:1172
 #, c-format
 msgid "%d px (~%d characters per line)"
 msgstr "%d пікс. (~%d знаків у рядку)"
 
-#: src/core/app.c:1058
+#: src/core/app.c:1173
 msgid "Page width"
 msgstr "Ширина сторінки"
 
-#: src/core/app.c:1060
+#: src/core/app.c:1175
 msgid "Paper sheet on the desk (light themes)"
 msgstr "Аркуш паперу на столі (світлі теми)"
 
-#: src/core/app.c:1063
+#: src/core/app.c:1178
 msgid "The text fills the whole screen width, with no sheet."
 msgstr "Текст займає всю ширину екрана, без аркуша."
 
-#: src/core/app.c:1067
+#: src/core/app.c:1182
 msgid "FOCUS MODE"
 msgstr "РЕЖИМ ФОКУСУ"
 
-#: src/core/app.c:1068
+#: src/core/app.c:1183
 msgid "Off"
 msgstr "Вимк."
 
-#: src/core/app.c:1068
+#: src/core/app.c:1183
 msgid "Sentence"
 msgstr "Речення"
 
-#: src/core/app.c:1068
+#: src/core/app.c:1183
 msgid "Paragraph"
 msgstr "Абзац"
 
-#: src/core/app.c:1068
+#: src/core/app.c:1183
 msgid "Line"
 msgstr "Рядок"
 
-#: src/core/app.c:1071
+#: src/core/app.c:1186
 msgid "EDITOR"
 msgstr "РЕДАКТОР"
 
-#: src/core/app.c:1073
+#: src/core/app.c:1188
 msgid "Typewriter — current line in the center"
 msgstr "Друкарська машинка — поточний рядок посередині"
 
-#: src/core/app.c:1074
+#: src/core/app.c:1189
 msgid "Live Markdown (headings, bold, lists)"
 msgstr "Markdown наживо (заголовки, жирний, списки)"
 
-#: src/core/app.c:1075
+#: src/core/app.c:1190
 msgid "Hide markup outside the current paragraph"
 msgstr "Приховувати розмітку поза поточним абзацом"
 
-#: src/core/app.c:1076
+#: src/core/app.c:1191
 msgid "Smart typography:  --  →  —   \"\"  →  “”   ...  →  …"
 msgstr "Розумна типографіка:  --  →  —   \"\"  →  «»   ...  →  …"
 
-#: src/core/app.c:1077
+#: src/core/app.c:1192
 msgid "Hemingway mode — deleting is not allowed"
 msgstr "Режим Гемінґвея — видаляти не можна"
 
-#: src/core/app.c:1078
+#: src/core/app.c:1193
 msgid "Hide the bars while writing"
 msgstr "Приховувати панелі під час письма"
 
-#: src/core/app.c:1079
+#: src/core/app.c:1194
 msgid "Blinking cursor"
 msgstr "Блимаючий курсор"
 
-#: src/core/app.c:1080
+#: src/core/app.c:1195
 msgid "Smooth cursor movement"
 msgstr "Плавний рух курсора"
 
-#: src/core/app.c:1087
+#: src/core/app.c:1202
 msgid "Tabs — several open documents, remembered after a restart"
 msgstr "Вкладки — кілька відкритих документів, запам’ятовуються після перезавантаження"
 
-#: src/core/app.c:1090
+#: src/core/app.c:1205
 msgid "GOALS AND SAVING"
 msgstr "ЦІЛІ Й ЗБЕРЕЖЕННЯ"
 
-#: src/core/app.c:1091 src/core/app.c:1563 src/core/app.c:1815
+#: src/core/app.c:1206 src/core/app.c:1714 src/core/app.c:1966
 #, c-format
 msgid "%d word"
 msgid_plural "%d words"
@@ -763,377 +804,437 @@ msgstr[0] "%d слово"
 msgstr[1] "%d слова"
 msgstr[2] "%d слів"
 
-#: src/core/app.c:1092
+#: src/core/app.c:1207
 msgid "Session goal"
 msgstr "Ціль сеансу"
 
-#: src/core/app.c:1094 src/core/app.c:1565 src/core/app.c:1780
+#: src/core/app.c:1209 src/core/app.c:1716 src/core/app.c:1931
 #, c-format
 msgid "%d min"
 msgstr "%d хв"
 
-#: src/core/app.c:1095
+#: src/core/app.c:1210
 msgid "Sprint length"
 msgstr "Тривалість спринту"
 
-#: src/core/app.c:1097
+#: src/core/app.c:1212
 #, c-format
 msgid "every %d s"
 msgstr "кожні %d с"
 
-#: src/core/app.c:1098
+#: src/core/app.c:1213
 msgid "Autosave"
 msgstr "Автозбереження"
 
-#: src/core/app.c:1101
+#: src/core/app.c:1216
 msgid "LANGUAGE AND KEYBOARD"
 msgstr "МОВА Й КЛАВІАТУРА"
 
-#: src/core/app.c:1104
+#: src/core/app.c:1219
 msgid "Language"
 msgstr "Мова"
 
-#: src/core/app.c:1109
+#: src/core/app.c:1224
 msgid "Keyboard"
 msgstr "Клавіатура"
 
-#: src/core/app.c:1118
+#: src/core/app.c:1233
 #, c-format
 msgid "Languages: %s · keyboards: %s (text files anyone can add)"
 msgstr "Мови: %s · клавіатури: %s (текстові файли, які може додати будь-хто)"
 
-#: src/core/app.c:1122
+#: src/core/app.c:1237
 msgid "DISPLAY AND POINTER"
 msgstr "ЕКРАН І ВКАЗІВНИК"
 
-#: src/core/app.c:1123
+#: src/core/app.c:1238
 msgid "Auto"
 msgstr "Авто"
 
-#: src/core/app.c:1128
+#: src/core/app.c:1243
 msgid "Rotate: auto"
 msgstr "Поворот: авто"
 
-#: src/core/app.c:1136
+#: src/core/app.c:1251
 #, c-format
 msgid "Resolution: %dx%d"
 msgstr "Роздільність: %dx%d"
 
-#: src/core/app.c:1137
+#: src/core/app.c:1252
 #, c-format
 msgid "Resolution: automatic (%dx%d)"
 msgstr "Роздільність: автоматично (%dx%d)"
 
-#: src/core/app.c:1147
+#: src/core/app.c:1262
 msgid "Restore display"
 msgstr "Відновити екран"
 
-#: src/core/app.c:1149
+#: src/core/app.c:1265
+msgid "Proportions: off"
+msgstr "Пропорції: вимк."
+
+#: src/core/app.c:1265
+msgid "Monitor"
+msgstr "Монітор"
+
+#: src/core/app.c:1268
+msgid "If circles look like ovals, choose the shape of your screen."
+msgstr "Якщо кола виглядають як овали, виберіть формат свого екрана."
+
+#: src/core/app.c:1270
 msgid "If the picture looks wrong or goes black: Ctrl+Alt+Home restores it; Ctrl+Alt+arrows rotate the screen."
 msgstr "Якщо зображення неправильне чи чорне: Ctrl+Alt+Home відновлює його; Ctrl+Alt+стрілки повертають екран."
 
-#: src/core/app.c:1153
+#: src/core/app.c:1274
 msgid "Mouse / touchpad speed"
 msgstr "Швидкість миші / тачпада"
 
-#: src/core/app.c:1155
+#: src/core/app.c:1276
 msgid "Automatic"
 msgstr "Автоматично"
 
-#: src/core/app.c:1155
+#: src/core/app.c:1276
 msgid "Touchpad"
 msgstr "Тачпад"
 
-#: src/core/app.c:1155
+#: src/core/app.c:1276
 msgid "Touch screen"
 msgstr "Сенсорний екран"
 
-#: src/core/app.c:1158
+#: src/core/app.c:1279
 msgid "If the pointer jumps to the corners when you use the touchpad, choose Touchpad."
 msgstr "Якщо вказівник стрибає в кути під час роботи з тачпадом, виберіть «Тачпад»."
 
-#: src/core/app.c:1161
+#: src/core/app.c:1282
 msgid "Use the mouse and touchpad (off = keyboard only)"
 msgstr "Використовувати мишу й тачпад (вимк. = лише клавіатура)"
 
-#: src/core/app.c:1163
+#: src/core/app.c:1284
 msgid "SOUND"
 msgstr "ЗВУК"
 
-#: src/core/app.c:1164
+#: src/core/app.c:1285
 msgid "Turn on the amplifier through GPIO (some laptops; applies after a restart)"
 msgstr "Вмикати підсилювач через GPIO (деякі ноутбуки; діє після перезавантаження)"
 
-#: src/core/app.c:1166
+#: src/core/app.c:1287
 msgid "Test sound"
 msgstr "Перевірити звук"
 
-#: src/core/app.c:1167
+#: src/core/app.c:1288
 msgid "Save diagnostics"
 msgstr "Зберегти діагностику"
 
-#: src/core/app.c:1169
+#: src/core/app.c:1290
 #, c-format
 msgid "The diagnostics go to %s on the USB drive (it opens on any computer)."
 msgstr "Діагностика зберігається в %s на флешці (відкривається на будь-якому комп’ютері)."
 
-#: src/core/app.c:1171
+#: src/core/app.c:1292
 msgid "STARTUP"
 msgstr "ЗАПУСК"
 
-#: src/core/app.c:1172
+#: src/core/app.c:1293
 msgid "FolioOS splash screen"
 msgstr "Заставка FolioOS"
 
-#: src/core/app.c:1177
+#: src/core/app.c:1298
 msgid "Splash duration (any key skips it)"
 msgstr "Тривалість заставки (будь-яка клавіша пропускає її)"
 
-#: src/core/app.c:1183
+#: src/core/app.c:1305
+msgid "TEXTS"
+msgstr "ТЕКСТИ"
+
+#: src/core/app.c:1306
+msgid "This computer"
+msgstr "Цей комп’ютер"
+
+#: src/core/app.c:1306
+msgid "USB drive"
+msgstr "Флешка"
+
+#: src/core/app.c:1306
+msgid "Both"
+msgstr "Обидва"
+
+#: src/core/app.c:1309
+msgid "Your texts stay on the USB drive and go with you; without it, new texts are saved on this computer."
+msgstr "Ваші тексти зберігаються на флешці й завжди з вами; без неї нові тексти зберігаються на цьому комп’ютері."
+
+#: src/core/app.c:1310
+msgid "Your texts are on this computer; the button copies the newest version of each text in both directions. Nothing is deleted."
+msgstr "Ваші тексти на цьому комп’ютері; кнопка копіює найновішу версію кожного тексту в обидва боки. Нічого не видаляється."
+
+#: src/core/app.c:1311
+msgid "Your texts are on this computer."
+msgstr "Ваші тексти на цьому комп’ютері."
+
+#: src/core/app.c:1322
+msgid "Wait for a key before starting the other system"
+msgstr "Чекати на клавішу перед запуском іншої системи"
+
+#: src/core/app.c:1327
+msgid "Without a key, the other system starts as usual."
+msgstr "Без натискання інша система запуститься як зазвичай."
+
+#: src/core/app.c:1327
+msgid "0 s: the computer always starts FolioOS."
+msgstr "0 с: комп’ютер завжди запускає FolioOS."
+
+#: src/core/app.c:1330
 msgid "ABOUT"
 msgstr "ПРО ПРОГРАМУ"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1333
 #, c-format
 msgid "FolioOS %s · %s · %dx%d"
 msgstr "FolioOS %s · %s · %dx%d"
 
-#: src/core/app.c:1187
+#: src/core/app.c:1334
 #, c-format
 msgid "Memory: %d MB used of %d MB · %d fonts · %d themes"
 msgstr "Пам’ять: використано %d МБ з %d МБ · шрифтів: %d · тем: %d"
 
-#: src/core/app.c:1188
+#: src/core/app.c:1335
 #, c-format
 msgid "Audio: %s"
 msgstr "Звук: %s"
 
-#: src/core/app.c:1193
+#: src/core/app.c:1340
+msgid "Install FolioOS on this computer…"
+msgstr "Встановити FolioOS на цей комп’ютер…"
+
+#: src/core/app.c:1342
+msgid "Disks and partitions…"
+msgstr "Диски й розділи…"
+
+#: src/core/app.c:1344 src/core/installer.c:496
 msgid "Restart"
 msgstr "Перезавантажити"
 
-#: src/core/app.c:1213
+#: src/core/app.c:1364
 msgid "Desk (background)"
 msgstr "Стіл (тло)"
 
-#: src/core/app.c:1213
+#: src/core/app.c:1364
 msgid "Paper"
 msgstr "Папір"
 
-#: src/core/app.c:1213 src/core/app.c:1414
+#: src/core/app.c:1364 src/core/app.c:1565
 msgid "Text"
 msgstr "Текст"
 
-#: src/core/app.c:1213
+#: src/core/app.c:1364
 msgid "Faded text"
 msgstr "Приглушений текст"
 
-#: src/core/app.c:1213
+#: src/core/app.c:1364
 msgid "Subtle lines"
 msgstr "Тонкі лінії"
 
-#: src/core/app.c:1213
+#: src/core/app.c:1364
 msgid "Accent"
 msgstr "Акцент"
 
-#: src/core/app.c:1213
+#: src/core/app.c:1364
 msgid "Selection"
 msgstr "Виділення"
 
-#: src/core/app.c:1213
+#: src/core/app.c:1364
 msgid "Cursor"
 msgstr "Курсор"
 
-#: src/core/app.c:1214
+#: src/core/app.c:1365
 msgid "Bars"
 msgstr "Панелі"
 
-#: src/core/app.c:1214
+#: src/core/app.c:1365
 msgid "Bar text"
 msgstr "Текст панелей"
 
-#: src/core/app.c:1214
+#: src/core/app.c:1365
 msgid "Borders"
 msgstr "Рамки"
 
-#: src/core/app.c:1214
+#: src/core/app.c:1365
 msgid "Panels"
 msgstr "Вікна"
 
-#: src/core/app.c:1214
+#: src/core/app.c:1365
 msgid "Panel text"
 msgstr "Текст вікон"
 
-#: src/core/app.c:1214
+#: src/core/app.c:1365
 msgid "Headings"
 msgstr "Заголовки"
 
-#: src/core/app.c:1214
+#: src/core/app.c:1365
 msgid "Code background"
 msgstr "Тло коду"
 
-#: src/core/app.c:1214
+#: src/core/app.c:1365
 msgid "Highlighter"
 msgstr "Маркер"
 
-#: src/core/app.c:1248
+#: src/core/app.c:1399
 msgid "My theme"
 msgstr "Моя тема"
 
-#: src/core/app.c:1249
+#: src/core/app.c:1400
 #, c-format
 msgid "My theme %d"
 msgstr "Моя тема %d"
 
-#: src/core/app.c:1272
+#: src/core/app.c:1423
 msgid "Give the theme a name"
 msgstr "Дайте темі назву"
 
-#: src/core/app.c:1274
+#: src/core/app.c:1425
 msgid "That name belongs to a built-in theme — choose another"
 msgstr "Це назва вбудованої теми — виберіть іншу"
 
-#: src/core/app.c:1275
+#: src/core/app.c:1426
 msgid "You already have a theme with that name"
 msgstr "У вас уже є тема з такою назвою"
 
-#: src/core/app.c:1278
+#: src/core/app.c:1429
 #, c-format
 msgid "Could not write to %s (is the USB drive write-protected or full?)"
 msgstr "Не вдалося записати в %s (флешка захищена від запису чи заповнена?)"
 
-#: src/core/app.c:1283
+#: src/core/app.c:1434
 #, c-format
 msgid "Theme “%s” saved to %s"
 msgstr "Тему «%s» збережено в %s"
 
-#: src/core/app.c:1295
+#: src/core/app.c:1446
 msgid "Theme deleted"
 msgstr "Тему видалено"
 
-#: src/core/app.c:1326
+#: src/core/app.c:1477
 msgid "THEME NAME"
 msgstr "НАЗВА ТЕМИ"
 
-#: src/core/app.c:1327
+#: src/core/app.c:1478
 msgid "Theme name"
 msgstr "Назва теми"
 
-#: src/core/app.c:1330
+#: src/core/app.c:1481
 msgid "STARTING POINT"
 msgstr "ВИХІДНА ТОЧКА"
 
-#: src/core/app.c:1333
+#: src/core/app.c:1484
 msgid "Colors from"
 msgstr "Кольори з"
 
-#: src/core/app.c:1335
+#: src/core/app.c:1486
 msgid "Use all"
 msgstr "Узяти всі"
 
-#: src/core/app.c:1342
+#: src/core/app.c:1493
 msgid "Or mix: pick a color below and take it from any built-in theme."
 msgstr "Або змішуйте: виберіть колір нижче й візьміть його з будь-якої вбудованої теми."
 
-#: src/core/app.c:1346
+#: src/core/app.c:1497
 msgid "COLORS"
 msgstr "КОЛЬОРИ"
 
-#: src/core/app.c:1375
+#: src/core/app.c:1526
 msgid "hex code"
 msgstr "шістнадцятковий код"
 
-#: src/core/app.c:1379
+#: src/core/app.c:1530
 msgid "Hue"
 msgstr "Тон"
 
-#: src/core/app.c:1382
+#: src/core/app.c:1533
 msgid "Saturation"
 msgstr "Насиченість"
 
-#: src/core/app.c:1385
+#: src/core/app.c:1536
 msgid "Lightness"
 msgstr "Світлість"
 
-#: src/core/app.c:1389
+#: src/core/app.c:1540
 msgid "Take from a built-in theme:"
 msgstr "Узяти з вбудованої теми:"
 
-#: src/core/app.c:1412
+#: src/core/app.c:1563
 msgid "THEME FONTS"
 msgstr "ШРИФТИ ТЕМИ"
 
-#: src/core/app.c:1419
+#: src/core/app.c:1570
 #, c-format
 msgid "Default (%s)"
 msgstr "Типовий (%s)"
 
-#: src/core/app.c:1420
+#: src/core/app.c:1571
 msgid "Interface"
 msgstr "Інтерфейс"
 
-#: src/core/app.c:1428
+#: src/core/app.c:1579
 msgid "Interface = bars, menus and windows."
 msgstr "Інтерфейс = панелі, меню й вікна."
 
-#: src/core/app.c:1432
+#: src/core/app.c:1583
 msgid "DESK AND PAPER"
 msgstr "СТІЛ І ПАПІР"
 
-#: src/core/app.c:1433
+#: src/core/app.c:1584
 msgid "Paper sheet on the desk"
 msgstr "Аркуш паперу на столі"
 
-#: src/core/app.c:1437
+#: src/core/app.c:1588
 msgid "Vignette at the desk edges"
 msgstr "Віньєтка по краях столу"
 
-#: src/core/app.c:1448
+#: src/core/app.c:1599
 msgid "Save theme"
 msgstr "Зберегти тему"
 
-#: src/core/app.c:1449 src/core/filedlg.c:60 src/core/filedlg.c:73 src/core/filedlg.c:410 src/core/filedlg.c:441
+#: src/core/app.c:1600 src/core/filedlg.c:60 src/core/filedlg.c:73 src/core/filedlg.c:411 src/core/filedlg.c:442 src/core/installer.c:319
 msgid "Cancel"
 msgstr "Скасувати"
 
-#: src/core/app.c:1450 src/core/app.c:1451 src/core/filedlg.c:57 src/core/filedlg.c:314 src/core/filedlg.c:317 src/core/filedlg.c:317
+#: src/core/app.c:1601 src/core/app.c:1602 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:208 src/core/partitions.c:247
 msgid "Delete"
 msgstr "Видалити"
 
-#: src/core/app.c:1451
+#: src/core/app.c:1602
 msgid "Delete theme?"
 msgstr "Видалити тему?"
 
-#: src/core/app.c:1451
+#: src/core/app.c:1602
 #, c-format
 msgid "The theme file in %s will be deleted."
 msgstr "Файл теми в %s буде видалено."
 
-#: src/core/app.c:1458
+#: src/core/app.c:1609
 msgid "Find"
 msgstr "Знайти"
 
-#: src/core/app.c:1459
+#: src/core/app.c:1610
 msgid "Previous (Shift+Enter)"
 msgstr "Назад (Shift+Enter)"
 
-#: src/core/app.c:1460
+#: src/core/app.c:1611
 msgid "Next (Enter)"
 msgstr "Далі (Enter)"
 
-#: src/core/app.c:1461
+#: src/core/app.c:1612
 msgid "Replace with"
 msgstr "Замінити на"
 
-#: src/core/app.c:1463 src/core/filedlg.c:204
+#: src/core/app.c:1614 src/core/filedlg.c:204
 msgid "Replace"
 msgstr "Замінити"
 
-#: src/core/app.c:1464
+#: src/core/app.c:1615
 msgid "Replace all"
 msgstr "Замінити все"
 
-#: src/core/app.c:1466
+#: src/core/app.c:1617
 #, c-format
 msgid "%d replacement"
 msgid_plural "%d replacements"
@@ -1141,11 +1242,11 @@ msgstr[0] "%d заміна"
 msgstr[1] "%d заміни"
 msgstr[2] "%d замін"
 
-#: src/core/app.c:1473
+#: src/core/app.c:1624
 msgid "Nothing found"
 msgstr "Нічого не знайдено"
 
-#: src/core/app.c:1480
+#: src/core/app.c:1631
 #, c-format
 msgid "%d match"
 msgid_plural "%d matches"
@@ -1153,79 +1254,79 @@ msgstr[0] "%d збіг"
 msgstr[1] "%d збіги"
 msgstr[2] "%d збігів"
 
-#: src/core/app.c:1518
+#: src/core/app.c:1669
 msgid "(untitled)"
 msgstr "(без назви)"
 
-#: src/core/app.c:1527
+#: src/core/app.c:1678
 msgid "No headings yet."
 msgstr "Заголовків поки немає."
 
-#: src/core/app.c:1528
+#: src/core/app.c:1679
 msgid "Start a line with # to create chapters."
 msgstr "Почніть рядок із #, щоб створити розділи."
 
-#: src/core/app.c:1557
+#: src/core/app.c:1708
 #, c-format
 msgid "goal of %d reached"
 msgstr "ціль у %d досягнуто"
 
-#: src/core/app.c:1557
+#: src/core/app.c:1708
 #, c-format
 msgid "of %d words today"
 msgstr "із %d слів сьогодні"
 
-#: src/core/app.c:1558
+#: src/core/app.c:1709
 msgid "words today"
 msgstr "слів сьогодні"
 
-#: src/core/app.c:1563
+#: src/core/app.c:1714
 msgid "This document"
 msgstr "Цей документ"
 
-#: src/core/app.c:1564
+#: src/core/app.c:1715
 msgid "This session"
 msgstr "Цей сеанс"
 
-#: src/core/app.c:1564
+#: src/core/app.c:1715
 #, c-format
 msgid "+%d in %dh%02d"
 msgstr "+%d за %d год %02d хв"
 
-#: src/core/app.c:1565
+#: src/core/app.c:1716
 msgid "Estimated reading"
 msgstr "Час читання"
 
-#: src/core/app.c:1566
+#: src/core/app.c:1717
 msgid "Pace"
 msgstr "Темп"
 
-#: src/core/app.c:1566
+#: src/core/app.c:1717
 #, c-format
 msgid "%d words/h"
 msgstr "%d слів/год"
 
-#: src/core/app.c:1577
+#: src/core/app.c:1728
 msgid "15 min"
 msgstr "15 хв"
 
-#: src/core/app.c:1577
+#: src/core/app.c:1728
 msgid "25 min"
 msgstr "25 хв"
 
-#: src/core/app.c:1577
+#: src/core/app.c:1728
 msgid "45 min"
 msgstr "45 хв"
 
-#: src/core/app.c:1577
+#: src/core/app.c:1728
 msgid "60 min"
 msgstr "60 хв"
 
-#: src/core/app.c:1582
+#: src/core/app.c:1733
 msgid "Start sprint"
 msgstr "Почати спринт"
 
-#: src/core/app.c:1588
+#: src/core/app.c:1739
 #, c-format
 msgid "+%d word in this sprint"
 msgid_plural "+%d words in this sprint"
@@ -1233,330 +1334,330 @@ msgstr[0] "+%d слово за спринт"
 msgstr[1] "+%d слова за спринт"
 msgstr[2] "+%d слів за спринт"
 
-#: src/core/app.c:1591
+#: src/core/app.c:1742
 msgid "Stop sprint"
 msgstr "Зупинити спринт"
 
-#: src/core/app.c:1603
+#: src/core/app.c:1754
 msgid "Ctrl+N / O / S"
 msgstr "Ctrl+N / O / S"
 
-#: src/core/app.c:1603
+#: src/core/app.c:1754
 msgid "New · Open · Save"
 msgstr "Новий · Відкрити · Зберегти"
 
-#: src/core/app.c:1603 src/core/filedlg.c:122
+#: src/core/app.c:1754 src/core/filedlg.c:122
 msgid "Save as / Export"
 msgstr "Зберегти як / Експорт"
 
-#: src/core/app.c:1604
+#: src/core/app.c:1755
 msgid "Ctrl+W · Ctrl+Tab"
 msgstr "Ctrl+W · Ctrl+Tab"
 
-#: src/core/app.c:1604
+#: src/core/app.c:1755
 msgid "Tabs: close · next"
 msgstr "Вкладки: закрити · наступна"
 
-#: src/core/app.c:1604
+#: src/core/app.c:1755
 msgid "Alt+1…9"
 msgstr "Alt+1…9"
 
-#: src/core/app.c:1604
+#: src/core/app.c:1755
 msgid "Go to tab 1…9"
 msgstr "Перейти до вкладки 1…9"
 
-#: src/core/app.c:1605
+#: src/core/app.c:1756
 msgid "Ctrl+K"
 msgstr "Ctrl+K"
 
-#: src/core/app.c:1605
+#: src/core/app.c:1756
 msgid "Command palette"
 msgstr "Палітра команд"
 
-#: src/core/app.c:1605
+#: src/core/app.c:1756
 msgid "Reading (formatted Markdown)"
 msgstr "Читання (форматований Markdown)"
 
-#: src/core/app.c:1606
+#: src/core/app.c:1757
 msgid "Ctrl+Z / Y"
 msgstr "Ctrl+Z / Y"
 
-#: src/core/app.c:1606
+#: src/core/app.c:1757
 msgid "Undo · Redo"
 msgstr "Скасувати · Повторити"
 
-#: src/core/app.c:1607
+#: src/core/app.c:1758
 msgid "Ctrl+B / I"
 msgstr "Ctrl+B / I"
 
-#: src/core/app.c:1607
+#: src/core/app.c:1758
 msgid "Bold · Italic"
 msgstr "Жирний · Курсив"
 
-#: src/core/app.c:1607
+#: src/core/app.c:1758
 msgid "Ctrl+1…6 / 0"
 msgstr "Ctrl+1…6 / 0"
 
-#: src/core/app.c:1607
+#: src/core/app.c:1758
 msgid "Heading level 1–6 · Text"
 msgstr "Заголовок рівня 1–6 · Текст"
 
-#: src/core/app.c:1608
+#: src/core/app.c:1759
 msgid "Alt+↑ / ↓"
 msgstr "Alt+↑ / ↓"
 
-#: src/core/app.c:1608
+#: src/core/app.c:1759
 msgid "Move paragraph"
 msgstr "Перемістити абзац"
 
-#: src/core/app.c:1608
+#: src/core/app.c:1759
 msgid "Tab / Shift+Tab"
 msgstr "Tab / Shift+Tab"
 
-#: src/core/app.c:1608
+#: src/core/app.c:1759
 msgid "Indent list item"
 msgstr "Відступ елемента списку"
 
-#: src/core/app.c:1610
+#: src/core/app.c:1761
 msgid "Ctrl+PgUp / PgDn"
 msgstr "Ctrl+PgUp / PgDn"
 
-#: src/core/app.c:1610
+#: src/core/app.c:1761
 msgid "Previous · next chapter"
 msgstr "Попередній · наступний розділ"
 
-#: src/core/app.c:1610
+#: src/core/app.c:1761
 msgid "Jump to and back from the last edit"
 msgstr "До останнього редагування й назад"
 
-#: src/core/app.c:1611
+#: src/core/app.c:1762
 msgid "lowercase → Title Case → UPPERCASE"
 msgstr "малі → З Великої → ВЕЛИКІ"
 
-#: src/core/app.c:1611
+#: src/core/app.c:1762
 msgid "Select and type ( \" *"
 msgstr "Виділіть і введіть ( \" *"
 
-#: src/core/app.c:1611
+#: src/core/app.c:1762
 msgid "Wraps the selection"
 msgstr "Обрамлює виділення"
 
-#: src/core/app.c:1612
+#: src/core/app.c:1763
 msgid "← / → · Space (reading)"
 msgstr "← / → · Пробіл (читання)"
 
-#: src/core/app.c:1612
+#: src/core/app.c:1763
 msgid "Previous · next page"
 msgstr "Попередня · наступна сторінка"
 
-#: src/core/app.c:1612
+#: src/core/app.c:1763
 msgid "Auto-scroll on/off"
 msgstr "Автопрокручування увімк./вимк."
 
-#: src/core/app.c:1613
+#: src/core/app.c:1764
 msgid "+ / − (reading)"
 msgstr "+ / − (читання)"
 
-#: src/core/app.c:1613
+#: src/core/app.c:1764
 msgid "Auto-scroll speed"
 msgstr "Швидкість автопрокручування"
 
-#: src/core/app.c:1614
+#: src/core/app.c:1765
 msgid "Ctrl+← / →"
 msgstr "Ctrl+← / →"
 
-#: src/core/app.c:1614
+#: src/core/app.c:1765
 msgid "Previous / next word"
 msgstr "Попереднє / наступне слово"
 
-#: src/core/app.c:1614
+#: src/core/app.c:1765
 msgid "Ctrl+Home / End"
 msgstr "Ctrl+Home / End"
 
-#: src/core/app.c:1614
+#: src/core/app.c:1765
 msgid "Start · end of the text"
 msgstr "Початок · кінець тексту"
 
-#: src/core/app.c:1615
+#: src/core/app.c:1766
 msgid "Ctrl+= / -"
 msgstr "Ctrl+= / -"
 
-#: src/core/app.c:1615
+#: src/core/app.c:1766
 msgid "Larger · smaller text"
 msgstr "Більший · менший текст"
 
-#: src/core/app.c:1616
+#: src/core/app.c:1767
 msgid "This help"
 msgstr "Ця довідка"
 
-#: src/core/app.c:1616
+#: src/core/app.c:1767
 msgid "Focus mode (sentence/paragraph/line)"
 msgstr "Режим фокусу (речення/абзац/рядок)"
 
-#: src/core/app.c:1617
+#: src/core/app.c:1768
 msgid "Typewriter"
 msgstr "Друкарська машинка"
 
-#: src/core/app.c:1617
+#: src/core/app.c:1768
 msgid "Writing sprint"
 msgstr "Спринт письма"
 
-#: src/core/app.c:1619
+#: src/core/app.c:1770
 msgid "F7 / F8 / F9"
 msgstr "F7 / F8 / F9"
 
-#: src/core/app.c:1619
+#: src/core/app.c:1770
 msgid "Previous track · Play/pause · Next"
 msgstr "Попередній трек · Грати/пауза · Наступний"
 
-#: src/core/app.c:1620
+#: src/core/app.c:1771
 msgid "Zen mode"
 msgstr "Режим дзен"
 
-#: src/core/app.c:1621
+#: src/core/app.c:1772
 msgid "Esc"
 msgstr "Esc"
 
-#: src/core/app.c:1621
+#: src/core/app.c:1772
 msgid "Close window · leave zen/reading"
 msgstr "Закрити вікно · вийти з дзену/читання"
 
-#: src/core/app.c:1622
+#: src/core/app.c:1773
 msgid "Tab · ↑ ↓ (windows)"
 msgstr "Tab · ↑ ↓ (вікна)"
 
-#: src/core/app.c:1622
+#: src/core/app.c:1773
 msgid "Move between buttons and options"
 msgstr "Перехід між кнопками й параметрами"
 
-#: src/core/app.c:1622
+#: src/core/app.c:1773
 msgid "Enter · Space · ← →"
 msgstr "Enter · Пробіл · ← →"
 
-#: src/core/app.c:1622
+#: src/core/app.c:1773
 msgid "Press · adjust the focused option"
 msgstr "Натиснути · змінити вибраний параметр"
 
-#: src/core/app.c:1623
+#: src/core/app.c:1774
 msgid "Keyboard between the text and the windows"
 msgstr "Клавіатура: між текстом і вікнами"
 
-#: src/core/app.c:1623
+#: src/core/app.c:1774
 msgid "Ctrl+Shift+← / →"
 msgstr "Ctrl+Shift+← / →"
 
-#: src/core/app.c:1623
+#: src/core/app.c:1774
 msgid "Select word by word"
 msgstr "Виділення по словах"
 
-#: src/core/app.c:1624
+#: src/core/app.c:1775
 msgid "Become — and … (smart typography)"
 msgstr "Перетворюються на — і … (розумна типографіка)"
 
-#: src/core/app.c:1624
+#: src/core/app.c:1775
 msgid "Alt+F7 / Alt+F8"
 msgstr "Alt+F7 / Alt+F8"
 
-#: src/core/app.c:1624
+#: src/core/app.c:1775
 msgid "Move · resize the window (arrows, Enter)"
 msgstr "Перемістити · змінити розмір вікна (стрілки, Enter)"
 
-#: src/core/app.c:1701
+#: src/core/app.c:1852
 #, c-format
 msgid "Untitled — kept in %s until you save it"
 msgstr "Без назви — зберігається в %s, доки ви не збережете"
 
-#: src/core/app.c:1708
+#: src/core/app.c:1859
 msgid "New tab (Ctrl+N)"
 msgstr "Нова вкладка (Ctrl+N)"
 
-#: src/core/app.c:1727
+#: src/core/app.c:1878
 msgid "Not saved yet (Ctrl+S)"
 msgstr "Ще не збережено (Ctrl+S)"
 
-#: src/core/app.c:1742
+#: src/core/app.c:1893
 #, c-format
 msgid "Playing: %s (F6)"
 msgstr "Грає: %s (F6)"
 
-#: src/core/app.c:1743
+#: src/core/app.c:1894
 msgid "Music (F6)"
 msgstr "Музика (F6)"
 
-#: src/core/app.c:1743
+#: src/core/app.c:1894
 #, c-format
 msgid "Music (F6) — put MP3 files in the %s folder"
 msgstr "Музика (F6) — покладіть файли MP3 у папку %s"
 
-#: src/core/app.c:1745
+#: src/core/app.c:1896
 msgid "Tabs on — click to turn off"
 msgstr "Вкладки ввімкнено — клацніть, щоб вимкнути"
 
-#: src/core/app.c:1745
+#: src/core/app.c:1896
 msgid "Tabs: open several documents (like in Sublime Text)"
 msgstr "Вкладки: кілька документів одночасно (як у Sublime Text)"
 
-#: src/core/app.c:1746
+#: src/core/app.c:1897
 msgid "Zen mode (F11)"
 msgstr "Режим дзен (F11)"
 
-#: src/core/app.c:1747
+#: src/core/app.c:1898
 msgid "Typewriter (F3)"
 msgstr "Друкарська машинка (F3)"
 
-#: src/core/app.c:1748
+#: src/core/app.c:1899
 msgid "Reading (Ctrl+P)"
 msgstr "Читання (Ctrl+P)"
 
-#: src/core/app.c:1750
+#: src/core/app.c:1901
 msgid "Appearance (F12)"
 msgstr "Вигляд (F12)"
 
-#: src/core/app.c:1751
+#: src/core/app.c:1902
 msgid "Commands (Ctrl+K)"
 msgstr "Команди (Ctrl+K)"
 
-#: src/core/app.c:1763
+#: src/core/app.c:1914
 msgid "Next track (F9)"
 msgstr "Наступний трек (F9)"
 
-#: src/core/app.c:1765
+#: src/core/app.c:1916
 msgid "Pause (F8)"
 msgstr "Пауза (F8)"
 
-#: src/core/app.c:1765
+#: src/core/app.c:1916
 msgid "Play (F8)"
 msgstr "Грати (F8)"
 
-#: src/core/app.c:1767
+#: src/core/app.c:1918
 msgid "Previous track (F7)"
 msgstr "Попередній трек (F7)"
 
-#: src/core/app.c:1780
+#: src/core/app.c:1931
 #, c-format
 msgid "%d h %02d min"
 msgstr "%d год %02d хв"
 
-#: src/core/app.c:1808
+#: src/core/app.c:1959
 msgid " · end of the text"
 msgstr " · кінець тексту"
 
-#: src/core/app.c:1809
+#: src/core/app.c:1960
 #, c-format
 msgid " · %s · %s to the end of the chapter · %s in total"
 msgstr " · %s · %s до кінця розділу · усього %s"
 
-#: src/core/app.c:1810
+#: src/core/app.c:1961
 #, c-format
 msgid " · %s · %s of reading left"
 msgstr " · %s · залишилося читати %s"
 
-#: src/core/app.c:1811
+#: src/core/app.c:1962
 #, c-format
 msgid " · %s of reading left"
 msgstr " · залишилося читати %s"
 
-#: src/core/app.c:1814
+#: src/core/app.c:1965
 #, c-format
 msgid "%d of %d word"
 msgid_plural "%d of %d words"
@@ -1564,16 +1665,20 @@ msgstr[0] "%d з %d слова"
 msgstr[1] "%d з %d слів"
 msgstr[2] "%d з %d слів"
 
-#: src/core/app.c:1820
+#: src/core/app.c:1971
 #, c-format
 msgid "Today: %d words · %d min reading"
 msgstr "Сьогодні: слів — %d · читання %d хв"
 
-#: src/core/app.c:2038 src/core/app.c:2043
+#: src/core/app.c:2181
+msgid "The USB drive with your texts is not connected: new texts are saved on this computer for now."
+msgstr "Флешку з вашими текстами не під’єднано: поки що нові тексти зберігаються на цьому комп’ютері."
+
+#: src/core/app.c:2212 src/core/app.c:2217
 msgid "Welcome back. Picking up where you left off."
 msgstr "З поверненням. Продовжуємо з того місця, де ви зупинилися."
 
-#: src/core/app.c:2038
+#: src/core/app.c:2212
 #, c-format
 msgid "Welcome back: %d tab reopened."
 msgid_plural "Welcome back: %d tabs reopened."
@@ -1581,15 +1686,15 @@ msgstr[0] "З поверненням: відкрито %d вкладку."
 msgstr[1] "З поверненням: відкрито %d вкладки."
 msgstr[2] "З поверненням: відкрито %d вкладок."
 
-#: src/core/app.c:2042
+#: src/core/app.c:2216
 msgid "Welcome back. Reading continues where you left off."
 msgstr "З поверненням. Читання продовжується з того місця, де ви зупинилися."
 
-#: src/core/app.c:2047
+#: src/core/app.c:2221
 msgid "Unsaved draft recovered"
 msgstr "Відновлено незбережену чернетку"
 
-#: src/core/app.c:2052
+#: src/core/app.c:2226
 msgid ""
 "# Welcome to FolioOS\n"
 "\n"
@@ -1623,13 +1728,34 @@ msgstr ""
 "\n"
 "Видаліть цей текст (Ctrl+A) і почніть свою історію.\n"
 
-#: src/core/app.c:2179
+#: src/core/app.c:2355
 #, c-format
 msgid "Sprint finished: %d word. Breathe and stretch."
 msgid_plural "Sprint finished: %d words. Breathe and stretch."
 msgstr[0] "Спринт завершено: %d слово. Подихайте й потягніться."
 msgstr[1] "Спринт завершено: %d слова. Подихайте й потягніться."
 msgstr[2] "Спринт завершено: %d слів. Подихайте й потягніться."
+
+#: src/core/chooser.c:17
+msgid "the other system"
+msgstr "іншу систему"
+
+#: src/core/chooser.c:34
+msgid "Press any key to write"
+msgstr "Натисніть будь-яку клавішу, щоб писати"
+
+#: src/core/chooser.c:36
+#, c-format
+msgid "Starting %2$s in %1$d second…"
+msgid_plural "Starting %2$s in %1$d seconds…"
+msgstr[0] "Запуск %2$s через %1$d секунду…"
+msgstr[1] "Запуск %2$s через %1$d секунди…"
+msgstr[2] "Запуск %2$s через %1$d секунд…"
+
+#: src/core/chooser.c:38
+#, c-format
+msgid "Esc: start %s now"
+msgstr "Esc: запустити %s зараз"
 
 #: src/core/editor.c:330
 msgid "Cut"
@@ -1719,7 +1845,7 @@ msgstr "Файли"
 msgid "OK"
 msgstr "ОК"
 
-#: src/core/filedlg.c:67 src/core/filedlg.c:326
+#: src/core/filedlg.c:67 src/core/filedlg.c:327
 msgid "Name"
 msgstr "Ім’я"
 
@@ -1795,7 +1921,7 @@ msgstr "ДИСКИ"
 msgid "FolioOS USB drive"
 msgstr "Флешка FolioOS"
 
-#: src/core/filedlg.c:234 src/core/filedlg.c:288
+#: src/core/filedlg.c:234 src/core/filedlg.c:289
 msgid "Drive"
 msgstr "Диск"
 
@@ -1815,69 +1941,69 @@ msgstr "Музика"
 msgid "Root"
 msgstr "Корінь"
 
-#: src/core/filedlg.c:263
+#: src/core/filedlg.c:264
 msgid "All files"
 msgstr "Усі файли"
 
-#: src/core/filedlg.c:274
+#: src/core/filedlg.c:275
 msgid "Parent folder (Alt+↑)"
 msgstr "Папка вище (Alt+↑)"
 
-#: src/core/filedlg.c:309 src/core/filedlg.c:309 src/core/filedlg.c:309
+#: src/core/filedlg.c:310 src/core/filedlg.c:310 src/core/filedlg.c:310
 msgid "New folder"
 msgstr "Нова папка"
 
-#: src/core/filedlg.c:311
+#: src/core/filedlg.c:312
 msgid "Rename (F2)"
 msgstr "Перейменувати (F2)"
 
-#: src/core/filedlg.c:312
+#: src/core/filedlg.c:313
 msgid "Rename"
 msgstr "Перейменувати"
 
-#: src/core/filedlg.c:312 src/core/filedlg.c:318
+#: src/core/filedlg.c:313 src/core/filedlg.c:319
 msgid "Select an item"
 msgstr "Виберіть елемент"
 
-#: src/core/filedlg.c:316
+#: src/core/filedlg.c:317
 #, c-format
 msgid "Delete the folder \"%s\" and everything in it? This cannot be undone."
 msgstr "Видалити папку «%s» з усім вмістом? Цю дію не можна скасувати."
 
-#: src/core/filedlg.c:316
+#: src/core/filedlg.c:317
 #, c-format
 msgid "Delete \"%s\"? This cannot be undone."
 msgstr "Видалити «%s»? Цю дію не можна скасувати."
 
-#: src/core/filedlg.c:326
+#: src/core/filedlg.c:327 src/core/partitions.c:228
 msgid "Size"
 msgstr "Розмір"
 
-#: src/core/filedlg.c:326
+#: src/core/filedlg.c:327
 msgid "Modified"
 msgstr "Змінено"
 
-#: src/core/filedlg.c:367
+#: src/core/filedlg.c:368
 msgid "No .md or .txt documents here"
 msgstr "Тут немає документів .md або .txt"
 
-#: src/core/filedlg.c:367
+#: src/core/filedlg.c:368
 msgid "Empty folder"
 msgstr "Порожня папка"
 
-#: src/core/filedlg.c:407
+#: src/core/filedlg.c:408
 msgid "File name"
 msgstr "Ім’я файлу"
 
-#: src/core/filedlg.c:409
+#: src/core/filedlg.c:410
 msgid "Export"
 msgstr "Експортувати"
 
-#: src/core/filedlg.c:434
+#: src/core/filedlg.c:435
 msgid ". The document stays open as .md."
 msgstr ". Документ лишається відкритим як .md."
 
-#: src/core/filedlg.c:438
+#: src/core/filedlg.c:439
 #, c-format
 msgid "%d item"
 msgid_plural "%d items"
@@ -1885,9 +2011,85 @@ msgstr[0] "%d елемент"
 msgstr[1] "%d елементи"
 msgstr[2] "%d елементів"
 
-#: src/core/filedlg.c:440
+#: src/core/filedlg.c:441
 msgid "Open"
 msgstr "Відкрити"
+
+#: src/core/fscheck.c:815
+msgid "This partition is encrypted with BitLocker. To make room, shrink it in Windows (Disk Management, Shrink Volume) or turn BitLocker off first."
+msgstr "Цей розділ зашифровано BitLocker. Щоб звільнити місце, стисніть його у Windows («Керування дисками», «Стиснути том») або спершу вимкніть BitLocker."
+
+#: src/core/fscheck.c:816
+msgid "This partition is encrypted (LUKS). To make room, shrink it from Linux with the encryption tools."
+msgstr "Цей розділ зашифровано (LUKS). Щоб звільнити місце, зменште його з Linux засобами шифрування."
+
+#: src/core/fscheck.c:817
+msgid "This partition holds LVM volumes. To make room, shrink them from Linux (lvreduce, then pvresize)."
+msgstr "Цей розділ містить томи LVM. Щоб звільнити місце, зменште їх з Linux (lvreduce, потім pvresize)."
+
+#: src/core/fscheck.c:818
+msgid "This is a Mac partition (APFS or HFS+). To make room, use Disk Utility on the Mac."
+msgstr "Це розділ Mac (APFS або HFS+). Щоб звільнити місце, скористайтеся Дисковою утилітою на Mac."
+
+#: src/core/fscheck.c:819
+msgid "Windows is hibernated or uses Fast Startup. Start Windows, then shut it down while holding Shift (or turn Fast Startup off in Power Options), and try again."
+msgstr "Windows перебуває в режимі глибокого сну або використовує швидкий запуск. Запустіть Windows, завершіть роботу, утримуючи Shift (або вимкніть швидкий запуск у розділі «Електроживлення»), і спробуйте ще раз."
+
+#: src/core/fscheck.c:820
+msgid "Windows marked this partition as needing a check. Start Windows, run chkdsk /f on it, and try again."
+msgstr "Windows позначила цей розділ як такий, що потребує перевірки. Запустіть Windows, виконайте для нього chkdsk /f і спробуйте ще раз."
+
+#: src/core/fscheck.c:821
+msgid "This Linux partition was not unmounted cleanly. Start Linux and shut it down normally, then try again."
+msgstr "Цей розділ Linux не було коректно відмонтовано. Запустіть Linux і завершіть роботу звичайним способом, потім спробуйте ще раз."
+
+#: src/core/fscheck.c:822
+msgid "Linux found errors on this partition. Check it with fsck from Linux, then try again."
+msgstr "Linux виявив помилки в цьому розділі. Перевірте його за допомогою fsck з Linux, потім спробуйте ще раз."
+
+#: src/core/fscheck.c:823
+msgid "This partition could not be read safely, so FolioOS will not change it."
+msgstr "Цей розділ не вдалося безпечно прочитати, тому FolioOS не змінюватиме його."
+
+#: src/core/fscheck.c:824
+msgid "FolioOS cannot resize this file system yet."
+msgstr "FolioOS поки що не вміє змінювати розмір цієї файлової системи."
+
+#: src/core/fscheck.c:830
+msgid "encrypted (BitLocker)"
+msgstr "зашифровано (BitLocker)"
+
+#: src/core/fscheck.c:831
+msgid "encrypted (LUKS)"
+msgstr "зашифровано (LUKS)"
+
+#: src/core/fscheck.c:833
+msgid "Mac (APFS/HFS+)"
+msgstr "Mac (APFS/HFS+)"
+
+#: src/core/fscheck.c:834
+msgid "Windows hibernated or Fast Startup"
+msgstr "Windows у глибокому сні або швидкий запуск"
+
+#: src/core/fscheck.c:835
+msgid "needs a check (chkdsk)"
+msgstr "потребує перевірки (chkdsk)"
+
+#: src/core/fscheck.c:836
+msgid "not unmounted cleanly"
+msgstr "відмонтовано некоректно"
+
+#: src/core/fscheck.c:837
+msgid "has errors (fsck)"
+msgstr "має помилки (fsck)"
+
+#: src/core/fscheck.c:838
+msgid "unreadable"
+msgstr "не читається"
+
+#: src/core/fscheck.c:839
+msgid "cannot be resized yet"
+msgstr "розмір поки що не змінити"
 
 #: src/core/i18n.c:435
 msgid "January"
@@ -1957,6 +2159,455 @@ msgstr "Введення: хірагана"
 msgid "Input: Katakana"
 msgstr "Введення: катакана"
 
+#: src/core/install.c:889
+msgid "Done"
+msgstr "Готово"
+
+#: src/core/install.c:890
+msgid "Could not read"
+msgstr "Не вдалося прочитати"
+
+#: src/core/install.c:891
+msgid "Could not write to the disk"
+msgstr "Не вдалося записати на диск"
+
+#: src/core/install.c:892
+msgid "The disk is too small (at least 512 MB)"
+msgstr "Диск замалий (потрібно щонайменше 512 МБ)"
+
+#: src/core/install.c:893
+msgid "Could not save the safety copy to the USB drive"
+msgstr "Не вдалося зберегти страхову копію на флешку"
+
+#: src/core/install.c:894
+msgid "Could not format the new partition"
+msgstr "Не вдалося відформатувати новий розділ"
+
+#: src/core/install.c:895
+msgid "Could not copy"
+msgstr "Не вдалося скопіювати"
+
+#: src/core/install.c:896
+msgid "A copied file did not match the original"
+msgstr "Скопійований файл не збігається з оригіналом"
+
+#: src/core/install.c:897
+msgid "The BIOS boot code is missing from the USB drive"
+msgstr "На флешці немає завантажувального коду BIOS"
+
+#: src/core/install.c:898
+msgid "The USB drive does not have a complete FolioOS"
+msgstr "На флешці немає повного FolioOS"
+
+#: src/core/install.c:899
+msgid "This disk does not use a GPT partition table"
+msgstr "Цей диск не використовує таблицю розділів GPT"
+
+#: src/core/install.c:900
+msgid "No FAT32 EFI system partition was found on this disk"
+msgstr "На цьому диску немає системного розділу EFI у FAT32"
+
+#: src/core/install.c:901
+msgid "The EFI system partition is full"
+msgstr "Системний розділ EFI заповнено"
+
+#: src/core/install.c:902
+msgid "The chosen space is not free"
+msgstr "Вибране місце не вільне"
+
+#: src/core/install.c:903
+msgid "Could not shrink the other system's partition"
+msgstr "Не вдалося зменшити розділ іншої системи"
+
+#: src/core/install.c:904
+msgid "Could not give the space back to the other system's partition"
+msgstr "Не вдалося повернути місце розділу іншої системи"
+
+#: src/core/install.c:905
+msgid "This partition cannot change to that size without moving data"
+msgstr "Цей розділ не можна зробити такого розміру без переміщення даних"
+
+#: src/core/install.c:906 src/core/partitions.c:46
+msgid "FolioOS cannot change this disk's partition table safely: it is left as it is"
+msgstr "FolioOS не може безпечно змінити таблицю розділів цього диска: вона залишається як є"
+
+#: src/core/install.c:907
+msgid "Error"
+msgstr "Помилка"
+
+#: src/core/installer.c:53 src/core/partitions.c:39
+msgid "This disk is read-only."
+msgstr "Цей диск лише для читання."
+
+#: src/core/installer.c:54 src/core/partitions.c:40
+msgid "Disks with 4096-byte sectors are not supported yet."
+msgstr "Диски із секторами по 4096 байт поки не підтримуються."
+
+#: src/core/installer.c:55
+msgid "This disk is too small (at least 512 MB)."
+msgstr "Цей диск замалий (потрібно щонайменше 512 МБ)."
+
+#: src/core/installer.c:99
+msgid "To keep Linux, shrink its partition from Linux (with GParted, for example) and run the installer again: FolioOS will use the free space."
+msgstr "Щоб зберегти Linux, зменште його розділ із самого Linux (наприклад, за допомогою GParted) і знову відкрийте інсталятор: FolioOS займе вільне місце."
+
+#: src/core/installer.c:100
+msgid "To keep Windows, shrink drive C: in Windows (Disk Management, Shrink Volume) and run the installer again: FolioOS will use the free space."
+msgstr "Щоб зберегти Windows, стисніть диск C: у Windows («Керування дисками», «Стиснути том») і знову відкрийте інсталятор: FolioOS займе вільне місце."
+
+#: src/core/installer.c:106 src/core/partitions.c:44
+msgid "Partition table unreadable"
+msgstr "Таблиця розділів не читається"
+
+#: src/core/installer.c:107 src/core/partitions.c:138
+msgid "Empty: no partitions"
+msgstr "Порожньо: розділів немає"
+
+#: src/core/installer.c:113
+#, c-format
+msgid "…and %d more partition"
+msgid_plural "…and %d more partitions"
+msgstr[0] "…і ще %d розділ"
+msgstr[1] "…і ще %d розділи"
+msgstr[2] "…і ще %d розділів"
+
+#: src/core/installer.c:124 src/core/partitions.c:134
+msgid "disk"
+msgstr "диск"
+
+#: src/core/installer.c:268
+msgid "Your texts:"
+msgstr "Ваші тексти:"
+
+#: src/core/installer.c:270
+msgid "They stay on this USB drive and go with you; FolioOS on the computer uses them when the drive is connected."
+msgstr "Залишаються на цій флешці й завжди з вами; FolioOS на комп’ютері використовує їх, коли флешку під’єднано."
+
+#: src/core/installer.c:271
+msgid "They are copied to the computer; a button in Settings exchanges them with this USB drive."
+msgstr "Копіюються на комп’ютер; кнопка в налаштуваннях обмінює їх із цією флешкою."
+
+#: src/core/installer.c:272
+msgid "They are copied to the computer."
+msgstr "Копіюються на комп’ютер."
+
+#: src/core/installer.c:288
+msgid "Install FolioOS next to the system you already have, in the free space, or as the only system on a disk."
+msgstr "Встановіть FolioOS поруч із наявною системою, у вільне місце, або як єдину систему на диску."
+
+#: src/core/installer.c:289
+msgid "Choose where:"
+msgstr "Виберіть, куди:"
+
+#: src/core/installer.c:290 src/core/partitions.c:173
+msgid "No disk was found besides the USB drive FolioOS started from."
+msgstr "Окрім флешки, з якої запущено FolioOS, дисків не знайдено."
+
+#: src/core/installer.c:302
+msgid "Reinstall the FolioOS program on this disk (your texts and settings stay)"
+msgstr "Перевстановити програму FolioOS на цьому диску (тексти й налаштування залишаться)"
+
+#: src/core/installer.c:303
+#, c-format
+msgid "Update FolioOS on this disk (%s → %s)"
+msgstr "Оновити FolioOS на цьому диску (%s → %s)"
+
+#: src/core/installer.c:305
+msgid "Remove FolioOS from this disk (the disk is left empty)"
+msgstr "Видалити FolioOS з цього диска (диск залишиться порожнім)"
+
+#: src/core/installer.c:305
+msgid "Remove FolioOS from this disk (Windows gets the space back)"
+msgstr "Видалити FolioOS з цього диска (Windows отримає місце назад)"
+
+#: src/core/installer.c:305
+msgid "Remove FolioOS from this disk (the partition before it gets the space back)"
+msgstr "Видалити FolioOS з цього диска (попередній розділ отримає місце назад)"
+
+#: src/core/installer.c:305
+msgid "Remove FolioOS from this disk (its space becomes free)"
+msgstr "Видалити FolioOS з цього диска (його місце стане вільним)"
+
+#: src/core/installer.c:306
+#, c-format
+msgid "Next to the other system, making room in its %s partition (up to %s)"
+msgstr "Поруч з іншою системою, звільнивши місце в її розділі %s (до %s)"
+
+#: src/core/installer.c:307
+#, c-format
+msgid "Next to the other system, in %s of free space"
+msgstr "Поруч з іншою системою, у %s вільного місця"
+
+#: src/core/installer.c:308
+msgid "The whole disk (everything on it is erased)"
+msgstr "Увесь диск (усе на ньому буде стерто)"
+
+#: src/core/installer.c:320
+msgid "Next"
+msgstr "Далі"
+
+#: src/core/installer.c:332
+msgid "FolioOS on this disk will be updated:"
+msgstr "FolioOS на цьому диску буде оновлено:"
+
+#: src/core/installer.c:335
+#, c-format
+msgid "Version %s → %s"
+msgstr "Версія %s → %s"
+
+#: src/core/installer.c:337
+msgid "Only the program, fonts, languages, themes and keyboards are replaced. Your texts, music and settings stay as they are, and fonts or themes you added are kept."
+msgstr "Замінюються лише програма, шрифти, мови, теми й розкладки. Ваші тексти, музика й налаштування залишаються як є, а додані вами шрифти чи теми зберігаються."
+
+#: src/core/installer.c:338
+msgid "Each file is replaced only after the new copy has been checked, so a power cut never leaves FolioOS half updated."
+msgstr "Кожен файл замінюється лише після перевірки нової копії, тож вимкнення живлення ніколи не залишить FolioOS оновленою наполовину."
+
+#: src/core/installer.c:339 src/core/installer.c:371 src/core/installer.c:423 src/core/installer.c:451
+#, c-format
+msgid "Before anything is written, the start of the disk (partition table and boot sectors) is saved to %s on this USB drive."
+msgstr "Перш ніж щось записати, початок диска (таблицю розділів і завантажувальні сектори) буде збережено в %s на цій флешці."
+
+#: src/core/installer.c:341 src/core/installer.c:382 src/core/installer.c:435 src/core/installer.c:458 src/core/partitions.c:246
+msgid "Back"
+msgstr "Назад"
+
+#: src/core/installer.c:342
+msgid "Update"
+msgstr "Оновити"
+
+#: src/core/installer.c:348
+msgid "FolioOS will be removed from this disk:"
+msgstr "FolioOS буде видалено з цього диска:"
+
+#: src/core/installer.c:352
+#, c-format
+msgid "− FolioOS · FAT32 · %s"
+msgstr "− FolioOS · FAT32 · %s"
+
+#: src/core/installer.c:357 src/core/installer.c:405 src/core/partitions.c:226
+#, c-format
+msgid "%s%s: %s → %s"
+msgstr "%s%s: %s → %s"
+
+#: src/core/installer.c:363
+#, c-format
+msgid "Copy the %d text from this computer to the USB drive first (%s)"
+msgid_plural "Copy the %d texts from this computer to the USB drive first (%s)"
+msgstr[0] "Спершу скопіювати %d текст із цього комп’ютера на флешку (%s)"
+msgstr[1] "Спершу скопіювати %d тексти з цього комп’ютера на флешку (%s)"
+msgstr[2] "Спершу скопіювати %d текстів із цього комп’ютера на флешку (%s)"
+
+#: src/core/installer.c:366
+msgid "There are no texts on FolioOS's partition."
+msgstr "У розділі FolioOS немає текстів."
+
+#: src/core/installer.c:367
+msgid "The disk will be left empty, with no partitions, ready for another system."
+msgstr "Диск залишиться порожнім, без розділів, готовим для іншої системи."
+
+#: src/core/installer.c:368
+msgid "The start of the disk gets the other system's original boot code back, and the computer starts it directly again."
+msgstr "Початок диска отримує назад оригінальний завантажувальний код іншої системи, і комп’ютер знову запускає її напряму."
+
+#: src/core/installer.c:369
+msgid "The EFI system partition loses only the folder EFI/FolioOS, and the computer starts the other system directly again."
+msgstr "Системний розділ EFI втрачає лише теку EFI/FolioOS, і комп’ютер знову одразу запускає іншу систему."
+
+#: src/core/installer.c:370
+msgid "The next time Windows starts, it checks its partition (chkdsk) once; this is expected."
+msgstr "Під час наступного запуску Windows один раз перевірить свій розділ (chkdsk) — так і має бути."
+
+#: src/core/installer.c:373 src/core/installer.c:443 src/core/partitions.c:220
+msgid "ERASE"
+msgstr "ВИДАЛИТИ"
+
+#: src/core/installer.c:377
+#, c-format
+msgid "Your texts on this computer will be lost. To confirm, type %s:"
+msgstr "Ваші тексти на цьому комп’ютері буде втрачено. Щоб підтвердити, введіть %s:"
+
+#: src/core/installer.c:377 src/core/installer.c:385 src/core/installer.c:453 src/core/installer.c:461 src/core/partitions.c:241 src/core/partitions.c:250
+#, c-format
+msgid "To confirm, type %s:"
+msgstr "Щоб підтвердити, введіть %s:"
+
+#: src/core/installer.c:383
+msgid "Remove FolioOS"
+msgstr "Видалити FolioOS"
+
+#: src/core/installer.c:392
+msgid "Nothing on this disk will be erased."
+msgstr "З цього диска нічого не буде стерто."
+
+#: src/core/installer.c:408
+#, c-format
+msgid "+ FolioOS · FAT32 · %s, in the space this frees"
+msgstr "+ FolioOS · FAT32 · %s, у звільненому місці"
+
+#: src/core/installer.c:410
+msgid "Size for FolioOS"
+msgstr "Розмір для FolioOS"
+
+#: src/core/installer.c:412 src/core/partitions.c:230
+msgid "No file is moved: FolioOS only takes free space from the end of that partition. The next time Windows starts, it checks the partition (chkdsk) once; this is expected."
+msgstr "Файли не переміщуються: FolioOS бере лише вільне місце в кінці цього розділу. Під час наступного запуску Windows один раз перевірить розділ (chkdsk) — так і має бути."
+
+#: src/core/installer.c:412 src/core/partitions.c:230
+msgid "No file is moved: FolioOS only takes free space from the end of that partition."
+msgstr "Файли не переміщуються: FolioOS бере лише вільне місце в кінці цього розділу."
+
+#: src/core/installer.c:415
+#, c-format
+msgid "+ FolioOS · FAT32 · %s, in the free space"
+msgstr "+ FolioOS · FAT32 · %s, у вільному місці"
+
+#: src/core/installer.c:417
+msgid "The start of the disk gets FolioOS's boot code; the other system's original code is kept, and FolioOS starts it. Your texts, fonts and settings are copied from this USB drive to the new partition."
+msgstr "Початок диска отримує завантажувальний код FolioOS; оригінальний код іншої системи зберігається, і FolioOS запускає його. Ваші тексти, шрифти й налаштування копіюються з цієї флешки до нового розділу."
+
+#: src/core/installer.c:418
+msgid "The EFI system partition only receives the folder EFI/FolioOS. Your texts, fonts and settings are copied from this USB drive to the new partition."
+msgstr "До системного розділу EFI потрапляє лише тека EFI/FolioOS. Ваші тексти, шрифти й налаштування копіюються з цієї флешки до нового розділу."
+
+#: src/core/installer.c:420
+#, c-format
+msgid "When the computer starts, FolioOS waits %d second for a key; without one, the other system starts as usual."
+msgid_plural "When the computer starts, FolioOS waits %d seconds for a key; without one, the other system starts as usual."
+msgstr[0] "Під час увімкнення FolioOS чекає на клавішу %d секунду; без неї інша система запуститься як завжди."
+msgstr[1] "Під час увімкнення FolioOS чекає на клавішу %d секунди; без неї інша система запуститься як завжди."
+msgstr[2] "Під час увімкнення FolioOS чекає на клавішу %d секунд; без неї інша система запуститься як завжди."
+
+#: src/core/installer.c:429
+msgid "This disk has a partition encrypted with BitLocker. FolioOS does not touch it, but after the startup settings change, Windows may ask once for the BitLocker recovery key. Make sure you have it (it is in your Microsoft account at aka.ms/myrecoverykey, or where you saved or printed it) before you continue."
+msgstr "На цьому диску є розділ, зашифрований BitLocker. FolioOS його не торкається, але після зміни параметрів завантаження Windows може один раз запитати ключ відновлення BitLocker. Перш ніж продовжити, переконайтеся, що він у вас є (він зберігається у вашому обліковому записі Microsoft на aka.ms/myrecoverykey або там, де ви його зберегли чи надрукували)."
+
+#: src/core/installer.c:430 src/core/installer.c:438
+msgid "I have the BitLocker recovery key"
+msgstr "У мене є ключ відновлення BitLocker"
+
+#: src/core/installer.c:433 src/core/installer.c:463
+msgid "On this computer"
+msgstr "На цьому комп’ютері"
+
+#: src/core/installer.c:433 src/core/installer.c:463
+msgid "On the USB drive"
+msgstr "На флешці"
+
+#: src/core/installer.c:433 src/core/installer.c:463
+msgid "On both"
+msgstr "В обох місцях"
+
+#: src/core/installer.c:436
+msgid "Shrink and install"
+msgstr "Зменшити й установити"
+
+#: src/core/installer.c:436
+msgid "Install next to it"
+msgstr "Встановити поруч"
+
+#: src/core/installer.c:445
+msgid "Everything on this disk will be erased:"
+msgstr "Усе на цьому диску буде стерто:"
+
+#: src/core/installer.c:450
+msgid "FolioOS gets one partition that fills the disk, with your texts, fonts and settings copied from this USB drive."
+msgstr "FolioOS отримає один розділ на весь диск; ваші тексти, шрифти й налаштування буде скопійовано з цієї флешки."
+
+#: src/core/installer.c:459
+msgid "Erase and install"
+msgstr "Стерти й встановити"
+
+#: src/core/installer.c:467
+msgid "Removing FolioOS… Do not turn off the computer or remove the USB drive."
+msgstr "Видалення FolioOS… Не вимикайте комп’ютер і не виймайте флешку."
+
+#: src/core/installer.c:467
+msgid "Updating FolioOS… Do not turn off the computer or remove the USB drive."
+msgstr "Оновлення FolioOS… Не вимикайте комп’ютер і не виймайте флешку."
+
+#: src/core/installer.c:467
+msgid "Installing FolioOS… Do not turn off the computer or remove the USB drive."
+msgstr "Встановлення FolioOS… Не вимикайте комп’ютер і не виймайте флешку."
+
+#: src/core/installer.c:479
+msgid "FolioOS on this disk is up to date."
+msgstr "FolioOS на цьому диску оновлено."
+
+#: src/core/installer.c:480
+msgid "Remove the USB drive and restart. Your texts and settings are where they were."
+msgstr "Вийміть флешку й перезавантажте комп’ютер. Ваші тексти й налаштування там, де були."
+
+#: src/core/installer.c:482
+msgid "FolioOS was removed from this computer."
+msgstr "FolioOS видалено з цього комп’ютера."
+
+#: src/core/installer.c:483
+#, c-format
+msgid "The texts from the computer are on this USB drive, in %s."
+msgstr "Тексти з комп’ютера є на цій флешці, у %s."
+
+#: src/core/installer.c:484
+msgid "The disk is empty now: install another system on it, or FolioOS again from this USB drive."
+msgstr "Тепер диск порожній: установіть на нього іншу систему або знову FolioOS із цієї флешки."
+
+#: src/core/installer.c:484
+msgid "Remove the USB drive and restart: the computer starts the other system as before."
+msgstr "Вийміть флешку й перезавантажте комп’ютер: він запустить іншу систему, як раніше."
+
+#: src/core/installer.c:485
+msgid "The firmware did not let FolioOS remove its boot entry; if the computer still lists FolioOS at startup, remove it in the firmware settings."
+msgstr "Прошивка не дала FolioOS видалити свій завантажувальний запис; якщо комп’ютер під час увімкнення ще показує FolioOS, видаліть його в налаштуваннях прошивки."
+
+#: src/core/installer.c:487
+msgid "FolioOS is installed next to the other system."
+msgstr "FolioOS встановлено поруч з іншою системою."
+
+#: src/core/installer.c:488
+msgid "Remove the USB drive and restart. FolioOS starts first and waits a few seconds for a key; without one, the other system starts as usual."
+msgstr "Вийміть флешку й перезавантажте комп’ютер. Спершу запуститься FolioOS і кілька секунд чекатиме на клавішу; без неї інша система запуститься як завжди."
+
+#: src/core/installer.c:490
+msgid "FolioOS is installed on this computer."
+msgstr "FolioOS встановлено на цей комп’ютер."
+
+#: src/core/installer.c:491
+msgid "Remove the USB drive and restart. From now on the computer starts straight into FolioOS; your texts are in DOCUMENTS on the disk."
+msgstr "Вийміть флешку й перезавантажте комп’ютер. Тепер він одразу запускає FolioOS; ваші тексти лежать у DOCUMENTS на диску."
+
+#: src/core/installer.c:493
+msgid "The firmware did not accept a new boot entry: choose FolioOS in the computer's boot menu (often F12, F8 or Esc right after power-on)."
+msgstr "Прошивка не прийняла новий запис завантаження: виберіть FolioOS у меню завантаження комп’ютера (зазвичай F12, F8 або Esc одразу після ввімкнення)."
+
+#: src/core/installer.c:494 src/core/installer.c:503
+#, c-format
+msgid "The previous start of the disk is saved in %s."
+msgstr "Попередній початок диска збережено в %s."
+
+#: src/core/installer.c:495 src/core/installer.c:505
+msgid "Close"
+msgstr "Закрити"
+
+#: src/core/installer.c:500
+msgid "The removal did not finish."
+msgstr "Видалення не завершено."
+
+#: src/core/installer.c:500
+msgid "The update did not finish. FolioOS on the disk still works: every file is either the old or the new one."
+msgstr "Оновлення не завершено. FolioOS на диску й далі працює: кожен файл — або старий, або новий."
+
+#: src/core/installer.c:500
+msgid "The installation did not finish."
+msgstr "Встановлення не завершилося."
+
+#: src/core/installer.c:504
+msgid "Your texts on this USB drive were not touched. You can try again, or keep using FolioOS from the USB drive."
+msgstr "Ваші тексти на цій флешці не зачеплено. Можна спробувати ще раз або й далі користуватися FolioOS із флешки."
+
+#: src/core/installer.c:506
+msgid "Try again"
+msgstr "Спробувати ще раз"
+
 #: src/core/music.c:131
 #, c-format
 msgid "No sound: %s. Details in %s"
@@ -2024,6 +2675,64 @@ msgid_plural "%d tracks · %s"
 msgstr[0] "%d трек · %s"
 msgstr[1] "%d треки · %s"
 msgstr[2] "%d треків · %s"
+
+#: src/core/partitions.c:110
+msgid "Done. The previous start of the disk is saved on this USB drive."
+msgstr "Готово. Попередній початок диска збережено на цій флешці."
+
+#: src/core/partitions.c:139
+#, c-format
+msgid "Free space · %s"
+msgstr "Вільне місце · %s"
+
+#: src/core/partitions.c:169
+msgid "Working… Do not turn off the computer or remove the USB drive."
+msgstr "Виконується… Не вимикайте комп’ютер і не виймайте флешку."
+
+#: src/core/partitions.c:172
+msgid "Choose a partition or a free space, then an action. Before anything is written, the start of the disk is saved to FOLIO/BACKUP on this USB drive."
+msgstr "Виберіть розділ або вільне місце, потім дію. Перед будь-яким записом початок диска зберігається у FOLIO/BACKUP на цій флешці."
+
+#: src/core/partitions.c:194
+msgid "Create a FAT32 partition"
+msgstr "Створити розділ FAT32"
+
+#: src/core/partitions.c:200
+msgid "Resize"
+msgstr "Змінити розмір"
+
+#: src/core/partitions.c:206
+msgid "Format as FAT32"
+msgstr "Відформатувати у FAT32"
+
+#: src/core/partitions.c:225
+#, c-format
+msgid "+ FAT32 · %s, in this free space"
+msgstr "+ FAT32 · %s, у цьому вільному місці"
+
+#: src/core/partitions.c:234
+msgid "Name of the new volume:"
+msgstr "Назва нового тому:"
+
+#: src/core/partitions.c:238
+msgid "Everything on this partition will be erased; it becomes an empty FAT32 volume."
+msgstr "Усе на цьому розділі буде стерто; він стане порожнім томом FAT32."
+
+#: src/core/partitions.c:239
+msgid "This partition and everything on it will be erased; its space becomes free."
+msgstr "Цей розділ і все на ньому буде стерто; його місце стане вільним."
+
+#: src/core/partitions.c:247
+msgid "Create"
+msgstr "Створити"
+
+#: src/core/partitions.c:247
+msgid "Apply"
+msgstr "Застосувати"
+
+#: src/core/partitions.c:247
+msgid "Format"
+msgstr "Форматувати"
 
 #: src/core/preview.c:46 src/core/preview.c:472
 msgid "The whole text already fits on the screen"

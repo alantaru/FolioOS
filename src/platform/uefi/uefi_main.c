@@ -72,6 +72,8 @@ void pal_power(int a) {
  *  - framebuffer inválido (endereço, tamanho, linha) ou acima de 4 GB no modo 32 bits: Blt;
  *  - tela girada (tablets com painel em retrato): rotação automática, 0/90/180/270 nos ajustes
  *    ou Ctrl+Alt+setas; toque é convertido junto;
+ *  - manter proporção (ajuste): quando o modo tem outra proporção que o painel e o monitor estica
+ *    a imagem, o app desenha numa tela lógica com a proporção do painel, reamostrada para o modo;
  *  - escala automática pelo tamanho físico (DPI) informado pelo EDID. */
 static EFI_GUID uga_guid   = { 0x982c298b, 0xf4fa, 0x41cb, { 0xb8, 0x38, 0x77, 0xaa, 0x68, 0x8f, 0xb8, 0x39 } };
 static EFI_GUID edidd_guid = { 0x1c0c34f6, 0xd380, 0x41fa, { 0xa0, 0x49, 0x8a, 0xd0, 0x6c, 0x1a, 0x66, 0xaa } };
@@ -79,6 +81,9 @@ static EFI_GRAPHICS_OUTPUT_PROTOCOL *gop;
 static EFI_UGA_DRAW_PROTOCOL *uga;
 static Surface screen;
 static int pw, ph;                    /* tamanho físico do modo */
+static int rw, rh;                    /* tela antes da reamostragem (orientação física): = pw×ph sem "manter proporção" */
+static int asp_w, asp_h; static bool pending_asp;   /* proporção pedida: 0 nenhuma, -1 a do monitor */
+static usize tmp_cap;
 static int rot, rot_pref;             /* rotação em uso (0..3 × 90° horário); preferência 0 = automática, 1..4 */
 static int fb_format; static u32 *fb; static u32 fb_stride; static int fb_bpp = 4;
 static u32 *shadow, *tmp;
@@ -218,21 +223,39 @@ static bool video_setup(void) {
     fb_format = format;
     fb = format == PixelBltOnly ? 0 : (u32 *)(uintptr_t)base;
     fb_stride = stride;
+    /* manter proporção: a tela lógica fica com a proporção do painel e cabe no modo (só amplia) */
+    rw = pw; rh = ph;
+    {
+        int tw = asp_w, th = asp_h;
+        if (tw < 0) { if (edid_ok) { tw = edid_w; th = edid_h; } else { tw = 16; th = 9; } }
+        if (tw > 0 && th > 0) {
+            if ((pw >= ph) != (tw >= th)) { int t = tw; tw = th; th = t; }
+            u64 a = (u64)pw * (u64)th, b = (u64)ph * (u64)tw;
+            if (a + b / 100 < b) rh = (int)((u64)pw * (u64)th / (u64)tw);          /* modo mais "alto" que o painel */
+            else if (a > b + b / 100) rw = (int)((u64)ph * (u64)tw / (u64)th);     /* modo mais largo que o painel */
+            rw = CLAMP(rw, 320, pw); rh = CLAMP(rh, 200, ph);
+        }
+    }
     rot = rot_pref ? rot_pref - 1 : (ph > pw ? 1 : 0);    /* painel em retrato (tablet): deita a imagem */
-    int lw = (rot & 1) ? ph : pw, lh = (rot & 1) ? pw : ph;
+    int lw = (rot & 1) ? rh : rw, lh = (rot & 1) ? rw : rh;
     if (screen.w != lw || screen.h != lh || !screen.px) {
-        mem_free(screen.px); mem_free(shadow); mem_free(tmp);
+        mem_free(screen.px); mem_free(shadow);
         screen.w = lw; screen.h = lh; screen.stride = lw;
         screen.px = mem_alloc(sizeof(u32) * (usize)lw * lh);
         shadow = mem_alloc(sizeof(u32) * (usize)lw * lh);       /* cópia do que está na tela: só o que mudou é enviado */
-        tmp = mem_alloc(sizeof(u32) * 64 * (usize)MAX(pw, ph));
-        if (!screen.px || !tmp) return false;
+        if (!screen.px) return false;
         memset(screen.px, 0, sizeof(u32) * (usize)lw * lh);
+    }
+    if (tmp_cap < 64 * (usize)MAX(pw, ph)) {                  /* 64 linhas físicas */
+        mem_free(tmp); tmp_cap = 64 * (usize)MAX(pw, ph);
+        tmp = mem_alloc(sizeof(u32) * tmp_cap);
+        if (!tmp) { tmp_cap = 0; return false; }
     }
     if (shadow) for (usize k = 0, n = (usize)lw * lh; k < n; k++) shadow[k] = 0x5A5A5A5Au;
     static const char *fn[] = { "RGB", "BGR", "bit mask", "Blt only" };
     VL("  in use: %dx%d · %s%s%s · %d bytes/pixel · stride %d px · rotation %d°\r\n", pw, ph, uga ? "UGA " : "", fn[fb_format & 3],
        "", fb_bpp, (int)fb_stride, rot * 90);
+    if (rw != pw || rh != ph) VL("  keep proportions: drawn at %dx%d, stretched to %dx%d\r\n", rw, rh, pw, ph);
     return true;
 }
 
@@ -247,7 +270,7 @@ float pal_display_dpi(void) {
     if (!edid_ok || edid_mmw <= 0 || edid_mmh <= 0) return 0;
     bool same = (pw >= ph) == (edid_w >= edid_h);
     float mm = (float)(same ? edid_mmw : edid_mmh);
-    return (float)pw / (mm / 25.4f);
+    return (float)rw / (mm / 25.4f);
 }
 
 /* ------------------------------------------------------------ memória de vídeo em write-combining
@@ -463,8 +486,10 @@ static void blt_out(u32 *buf, int x, int y, int w, int h) {
     else if (uga) uga->Blt(uga, buf, EfiUgaBltBufferToVideo, 0, 0, (UINTN)x, (UINTN)y, (UINTN)w, (UINTN)h, (UINTN)w * 4);
 }
 /* envia um retângulo lógico (no máximo 64 linhas) girando e convertendo o formato conforme preciso */
+static void emit_scaled(int lx0, int ly0, int lx1, int ly1);
 static void emit_rect(int lx0, int ly0, int lx1, int ly1) {
     if (lx1 <= lx0 || ly1 <= ly0) return;
+    if (rw != pw || rh != ph) { emit_scaled(lx0, ly0, lx1, ly1); return; }
     if (shadow) for (int y = ly0; y < ly1; y++) memcpy(shadow + (usize)y * screen.w + lx0, screen.px + (usize)y * screen.stride + lx0, (usize)(lx1 - lx0) * 4);
     int X0, Y0, w, h;
     switch (rot) {
@@ -489,11 +514,69 @@ static void emit_rect(int lx0, int ly0, int lx1, int ly1) {
     if (!direct) blt_out(tmp, X0, Y0, w, h);
     present_px += (u64)w * (u64)h;
 }
+/* "manter proporção": a tela lógica (rw×rh depois da rotação) é ampliada para o modo pw×ph com
+ * interpolação linear; numa das direções a escala é 1, então na prática só uma direção interpola */
+static inline u32 rot_px(int x, int y) {                       /* pixel (x, y) da tela já girada, rw×rh */
+    const u32 *S = screen.px; usize ss = (usize)screen.stride;
+    switch (rot) {
+    case 0:  return S[(usize)y * ss + (usize)x];
+    case 1:  return S[(usize)(rw - 1 - x) * ss + (usize)y];
+    case 2:  return S[(usize)(rh - 1 - y) * ss + (usize)(rw - 1 - x)];
+    default: return S[(usize)x * ss + (usize)(rh - 1 - y)];
+    }
+}
+static inline u32 lerp_px(u32 a, u32 b, u32 f) {               /* f em 0..256 */
+    if (a == b || !f) return a;
+    u32 rb = ((a & 0xFF00FF) * (256 - f) + (b & 0xFF00FF) * f) >> 8 & 0xFF00FF;
+    u32 g = ((a & 0x00FF00) * (256 - f) + (b & 0x00FF00) * f) >> 8 & 0x00FF00;
+    return rb | g;
+}
+/* centro do pixel físico i (de n) na escala da tela lógica (de m), em 1/256 de pixel */
+static inline int src_pos(int i, int n, int m) {
+    int v = (int)(((2 * (i64)i + 1) * m * 256) / (2 * (i64)n)) - 128;
+    return CLAMP(v, 0, (m - 1) * 256);
+}
+static void emit_scaled(int lx0, int ly0, int lx1, int ly1) {
+    if (lx1 <= lx0 || ly1 <= ly0) return;
+    if (shadow) for (int y = ly0; y < ly1; y++) memcpy(shadow + (usize)y * screen.w + lx0, screen.px + (usize)y * screen.stride + lx0, (usize)(lx1 - lx0) * 4);
+    int a0, b0, a1, b1;                                          /* o retângulo na tela girada */
+    switch (rot) {
+    case 0:  a0 = lx0;      b0 = ly0;      a1 = lx1;      b1 = ly1;      break;
+    case 1:  a0 = rw - ly1; b0 = lx0;      a1 = rw - ly0; b1 = lx1;      break;
+    case 2:  a0 = rw - lx1; b0 = rh - ly1; a1 = rw - lx0; b1 = rh - ly0; break;
+    default: a0 = ly0;      b0 = rh - lx1; a1 = ly1;      b1 = rh - lx0; break;
+    }
+    /* pixels físicos que dependem dele (a interpolação lê um vizinho de cada lado) */
+    int X0 = (int)((i64)(a0 - 1) * pw / rw), X1 = (int)(((i64)(a1 + 1) * pw + rw - 1) / rw);
+    int Y0 = (int)((i64)(b0 - 1) * ph / rh), Y1 = (int)(((i64)(b1 + 1) * ph + rh - 1) / rh);
+    X0 = CLAMP(X0, 0, pw); X1 = CLAMP(X1, X0, pw); Y0 = CLAMP(Y0, 0, ph); Y1 = CLAMP(Y1, Y0, ph);
+    int w = X1 - X0;
+    if (w <= 0 || Y1 <= Y0) return;
+    static int xs[8192]; static u16 xf[8192];
+    for (int i = 0; i < w; i++) { int p = src_pos(X0 + i, pw, rw); xs[i] = p >> 8; xf[i] = (u16)(p & 255); }
+    bool direct = fb_format != PixelBltOnly;
+    for (int Yc = Y0; Yc < Y1; Yc += 64) {
+        int hc = MIN(64, Y1 - Yc);
+        for (int j = 0; j < hc; j++) {
+            int Y = Yc + j, p = src_pos(Y, ph, rh), y0 = p >> 8, fy = p & 255, y1 = MIN(y0 + 1, rh - 1);
+            u32 *row = direct ? tmp : tmp + (usize)j * (usize)w;
+            for (int i = 0; i < w; i++) {
+                int x0 = xs[i], x1 = MIN(x0 + 1, rw - 1);
+                u32 t = lerp_px(rot_px(x0, y0), rot_px(x1, y0), xf[i]);
+                if (fy) t = lerp_px(t, lerp_px(rot_px(x0, y1), rot_px(x1, y1), xf[i]), (u32)fy);
+                row[i] = t;
+            }
+            if (direct) fb_write_row(X0, Y, row, w);
+        }
+        if (!direct) blt_out(tmp, X0, Yc, w, hc);
+    }
+    present_px += (u64)w * (u64)(Y1 - Y0);
+}
 void pal_present(Rect r) {
     r = rect_clip(r, rect(0, 0, screen.w, screen.h));
     if (r.w <= 0 || r.h <= 0 || (!gop && !uga) || !tmp) return;
     u64 t0 = rdtsc();
-    bool fast = rot == 0 && fb_format == PixelBlueGreenRedReserved8BitPerColor && shadow;
+    bool fast = rot == 0 && fb_format == PixelBlueGreenRedReserved8BitPerColor && shadow && rw == pw && rh == ph;
     if (!shadow) {
         for (int y = r.y; y < r.y + r.h; y += 64) emit_rect(r.x, y, r.x + r.w, MIN(y + 64, r.y + r.h));
     } else {
@@ -546,6 +629,7 @@ static void apply_pending(void);
 void pal_set_rotation(int pref) { pref = CLAMP(pref, 0, 4); if (pref != rot_pref) pending_rot = pref; if (!present_n) apply_pending(); }
 int  pal_rotation(void) { return rot; }
 void pal_set_video_mode(const char *pref) { str_copy(mode_pref, pref ? pref : "", sizeof mode_pref); pending_mode = true; if (!present_n) apply_pending(); }
+void pal_set_aspect(int w, int h) { if (w != asp_w || h != asp_h) { asp_w = w; asp_h = h; pending_asp = true; } if (!present_n) apply_pending(); }
 void pal_video_mode(int *w, int *h) { *w = pw; *h = ph; }
 /* modos utilizáveis, do maior para o menor, sem repetições */
 int pal_video_modes(int *ws, int *hs, int max) {
@@ -856,7 +940,8 @@ static void poll_keys(void) {
 
 /* rotação/resolução pedidas nos ajustes: aplicadas aqui, entre um quadro e outro */
 static void apply_pending(void) {
-    if (pending_rot < 0 && !pending_mode) return;
+    if (pending_rot < 0 && !pending_mode && !pending_asp) return;
+    pending_asp = false;
     if (pending_rot >= 0) { rot_pref = pending_rot; pending_rot = -1; }
     if (pending_mode) { pending_mode = false; pick_mode(); }
     if (!video_setup()) return;
@@ -864,6 +949,7 @@ static void apply_pending(void) {
     mx = CLAMP(mx, 0.0f, (float)(screen.w - 1)); my = CLAMP(my, 0.0f, (float)(screen.h - 1));
     emit_move();                               /* acorda o laço principal para redesenhar */
 }
+void pal_video_apply(void) { apply_pending(); }
 bool pal_poll(Event *e) {
     apply_pending();
     if (qh == qt) { poll_keys(); poll_pointers(); }
@@ -888,7 +974,7 @@ void pal_wait(int ms) {
 }
 
 /* ------------------------------------------------------------ arquivos */
-typedef struct { EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *fs; EFI_FILE_PROTOCOL *root; bool boot; char label[64]; } Vol;
+typedef struct { EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *fs; EFI_FILE_PROTOCOL *root; bool boot; char label[64]; bool has_guid; u8 guid[16]; } Vol;
 static Vol vols[16]; static int nvols;
 
 static void w_to_utf8(const CHAR16 *w, char *o, int cap) {
@@ -920,7 +1006,16 @@ static void fs_init(void) {
             Vol *v = &vols[nvols];
             if (EFI_ERROR(BS->HandleProtocol(hs[i], &sfs_guid, (void **)&v->fs))) continue;
             if (EFI_ERROR(v->fs->OpenVolume(v->fs, &v->root))) continue;
-            v->boot = isboot;
+            v->boot = isboot; v->has_guid = false;
+            {   /* partição GPT do volume: nó de disco rígido do caminho, com assinatura GUID */
+                u8 *dp = 0;
+                if (!EFI_ERROR(BS->HandleProtocol(hs[i], &dp_guid, (void **)&dp)) && dp)
+                    for (int k = 0; k < 64 && dp[0] != 0x7F; k++) {
+                        u32 l = dp[2] | dp[3] << 8; if (l < 4) break;
+                        if (dp[0] == 4 && dp[1] == 1 && l >= 42 && dp[41] == 2) { memcpy(v->guid, dp + 24, 16); v->has_guid = true; }
+                        dp += l;
+                    }
+            }
             u8 buf[512]; UINTN sz = sizeof buf;
             v->label[0] = 0;
             if (!EFI_ERROR(v->root->GetInfo(v->root, &fsinfo_guid, &sz, buf))) w_to_utf8(((EFI_FILE_SYSTEM_INFO *)buf)->VolumeLabel, v->label, 64);
@@ -929,12 +1024,126 @@ static void fs_init(void) {
     BS->FreePool(hs);
 }
 
+/* ------------------------------------------------------------ discos inteiros (Block I/O) */
+static EFI_GUID bio_guid   = { 0x964e5b21, 0x6459, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b } };
+static EFI_GUID dinfo_guid = { 0xd432a67f, 0x14dc, 0x484b, { 0xb3, 0xbb, 0x3f, 0x02, 0x91, 0x84, 0x93, 0x27 } };
+static EFI_GUID dpath_guid = { 0x09576e91, 0x6d3f, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b } };
+typedef struct { EFI_BLOCK_IO_PROTOCOL *bio; DiskInfo info; } Disk;
+static Disk disks[16]; static int ndisks; static bool disks_done;
+void *pal_dma_alloc(usize bytes);
+static u8 *disk_bounce;            /* 64 KB alinhados a 4 KB, para firmwares que exigem IoAlign */
+#define DISK_CHUNK 128             /* setores por chamada (64 KB com 512) */
+
+static u32 dp_size(EFI_DEVICE_PATH *p) {   /* bytes até o nó final, sem ele */
+    u32 n = 0;
+    for (int k = 0; k < 64 && p->Type != 0x7F; k++) { u32 l = DP_LEN(p); if (l < 4) break; n += l; p = (EFI_DEVICE_PATH *)((u8 *)p + l); }
+    return n;
+}
+static int dp_kind(EFI_DEVICE_PATH *p) {
+    int kind = DISK_OTHER;
+    for (int k = 0; k < 64 && p->Type != 0x7F; k++) {
+        u32 l = DP_LEN(p); if (l < 4) break;
+        if (p->Type == 3) switch (p->SubType) {       /* nós de mensagem: o barramento do disco */
+            case 0x01: kind = DISK_IDE; break;   case 0x02: kind = DISK_SCSI; break; case 0x05: kind = DISK_USB; break;
+            case 0x12: kind = DISK_SATA; break;  case 0x17: kind = DISK_NVME; break; case 0x1A: kind = DISK_SD; break;
+            case 0x1D: kind = DISK_MMC; break;   case 0x0F: kind = DISK_USB; break;   /* USB por classe */
+        }
+        if (p->Type == 4 && p->SubType == 3 && kind == DISK_OTHER) kind = DISK_VIRTUAL;   /* vendor de mídia (RAM disk etc.) */
+        p = (EFI_DEVICE_PATH *)((u8 *)p + l);
+    }
+    return kind;
+}
+/* texto ASCII de um campo de identificação, sem espaços nas pontas; swap = palavras ATA (bytes trocados) */
+static void id_str(char *o, int cap, int *n, const u8 *s, int len, bool swap) {
+    if (*n && *n < cap - 1) o[(*n)++] = ' ';
+    int st = *n;
+    for (int i = 0; i < len && *n < cap - 1; i++) {
+        u8 c = s[swap ? (i ^ 1) : i];
+        if (c < 32 || c > 126) c = ' ';
+        if (c == ' ' && (*n == st || o[*n - 1] == ' ')) continue;
+        o[(*n)++] = (char)c;
+    }
+    while (*n > 0 && o[*n - 1] == ' ') (*n)--;
+    o[*n] = 0;
+}
+static void disk_model(EFI_HANDLE h, Disk *d) {
+    EFI_DISK_INFO_PROTOCOL *di;
+    if (EFI_ERROR(BS->HandleProtocol(h, &dinfo_guid, (void **)&di)) || !di) return;
+    static u8 b[4096]; UINT32 sz = sizeof b; int n = 0;
+    memset(b, 0, sizeof b);
+    if ((d->info.kind == DISK_SATA || d->info.kind == DISK_IDE) && di->Identify && !EFI_ERROR(di->Identify(di, b, &sz)) && sz >= 94)
+        id_str(d->info.model, sizeof d->info.model, &n, b + 54, 40, true);           /* ATA IDENTIFY, palavras 27..46 */
+    else if (d->info.kind == DISK_NVME && di->Identify && !EFI_ERROR(di->Identify(di, b, &sz)) && sz >= 64 && b[4] && b[24] >= 32)
+        id_str(d->info.model, sizeof d->info.model, &n, b + 24, 40, false);          /* NVMe: dados do controlador, se vierem */
+    else { sz = sizeof b; if (di->Inquiry && !EFI_ERROR(di->Inquiry(di, b, &sz)) && sz >= 32) {
+        id_str(d->info.model, sizeof d->info.model, &n, b + 8, 8, false);            /* SCSI/USB: fabricante + produto */
+        id_str(d->info.model, sizeof d->info.model, &n, b + 16, 16, false); } }
+}
+static void disks_init(void) {
+    if (disks_done) return;
+    disks_done = true;
+    EFI_HANDLE *hs; UINTN n;
+    if (EFI_ERROR(BS->LocateHandleBuffer(ByProtocol, &bio_guid, 0, &n, &hs))) return;
+    /* caminho do volume de boot: o disco cujo caminho é o começo dele é o disco de boot */
+    EFI_LOADED_IMAGE_PROTOCOL *li = 0; EFI_DEVICE_PATH *bootdp = 0;
+    if (!EFI_ERROR(BS->HandleProtocol(image, &limg_guid, (void **)&li)) && li) BS->HandleProtocol(li->DeviceHandle, &dpath_guid, (void **)&bootdp);
+    u32 bootlen = bootdp ? dp_size(bootdp) : 0;
+    for (UINTN i = 0; i < n && ndisks < 16; i++) {
+        EFI_BLOCK_IO_PROTOCOL *b;
+        if (EFI_ERROR(BS->HandleProtocol(hs[i], &bio_guid, (void **)&b)) || !b || !b->Media) continue;
+        EFI_BLOCK_IO_MEDIA *m = b->Media;
+        if (m->LogicalPartition || !m->MediaPresent || !m->BlockSize || m->BlockSize > 4096) continue;
+        Disk *d = &disks[ndisks]; memset(d, 0, sizeof *d);
+        d->bio = b;
+        d->info.nsec = m->LastBlock + 1; d->info.bs = m->BlockSize;
+        d->info.removable = m->RemovableMedia; d->info.readonly = m->ReadOnly;
+        EFI_DEVICE_PATH *dp = 0;
+        if (!EFI_ERROR(BS->HandleProtocol(hs[i], &dpath_guid, (void **)&dp)) && dp) {
+            d->info.kind = dp_kind(dp);
+            u32 l = dp_size(dp);
+            d->info.boot = bootdp && l && l <= bootlen && !memcmp(dp, bootdp, l);
+        }
+        disk_model(hs[i], d);
+        ndisks++;
+    }
+    BS->FreePool(hs);
+}
+int pal_disk_count(void) { disks_init(); return ndisks; }
+bool pal_disk_info(int k, DiskInfo *o) { disks_init(); if (k < 0 || k >= ndisks) return false; *o = disks[k].info; return true; }
+bool pal_disk_io(int k, u64 lba, u32 count, void *buf, bool write) {
+    disks_init();
+    if (k < 0 || k >= ndisks) return false;
+    Disk *d = &disks[k]; EFI_BLOCK_IO_PROTOCOL *b = d->bio; u32 bs = d->info.bs;
+    if (lba + count > d->info.nsec || (write && d->info.readonly)) return false;
+    if (!disk_bounce) disk_bounce = pal_dma_alloc(DISK_CHUNK * 512);
+    u32 align = b->Media->IoAlign;
+    u8 *p = buf;
+    while (count) {
+        u32 k2 = count > DISK_CHUNK ? DISK_CHUNK : count;
+        if (k2 * bs > DISK_CHUNK * 512 && bs > 512) k2 = DISK_CHUNK * 512 / bs;
+        bool bounce = align > 1 && ((uintptr_t)p & (align - 1)) && disk_bounce;
+        u8 *io = bounce ? disk_bounce : p;
+        if (bounce && write) memcpy(io, p, (usize)k2 * bs);
+        EFI_STATUS s = write ? b->WriteBlocks(b, b->Media->MediaId, lba, (UINTN)k2 * bs, io) : b->ReadBlocks(b, b->Media->MediaId, lba, (UINTN)k2 * bs, io);
+        if (EFI_ERROR(s)) return false;
+        if (bounce && !write) memcpy(p, io, (usize)k2 * bs);
+        lba += k2; count -= k2; p += (usize)k2 * bs;
+    }
+    return true;   /* o flush fica para pal_disk_flush, nos pontos seguros (no QEMU cada flush é um fsync no hospedeiro) */
+}
+bool pal_disk_flush(int k) {
+    disks_init();
+    if (k < 0 || k >= ndisks || !disks[k].bio->FlushBlocks) return k >= 0 && k < ndisks;
+    return !EFI_ERROR(disks[k].bio->FlushBlocks(disks[k].bio));
+}
+
 int pal_vol_count(void) { return nvols; }
 bool pal_vol_info(int v, VolInfo *o) {
     if (v < 0 || v >= nvols) return false;
     memset(o, 0, sizeof *o);
     o->boot = vols[v].boot;
     str_copy(o->label, vols[v].label[0] ? vols[v].label : (vols[v].boot ? "FOLIO" : "Disco"), sizeof o->label);
+    o->has_guid = vols[v].has_guid; memcpy(o->part_guid, vols[v].guid, 16);
     return true;
 }
 
@@ -1170,6 +1379,201 @@ EFI_STATUS EFIAPI efi_main(EFI_HANDLE img, EFI_SYSTEM_TABLE *st) {
 
     app_run();
     return EFI_SUCCESS;
+}
+
+/* ------------------------------------------------------------ entradas de boot (Boot####, BootOrder, BootNext)
+ * O outro sistema é iniciado com BootNext + reinício, nunca carregado por dentro do FolioOS: assim o firmware
+ * inicia o Windows do jeito de sempre e o TPM não registra o FolioOS no caminho (o BitLocker não pede a chave). */
+static EFI_GUID gvar = { 0x8BE4DF61, 0x93CA, 0x11d2, { 0xAA, 0x0D, 0x00, 0xE0, 0x98, 0x03, 0x2B, 0x8C } };
+static void boot_var_name(CHAR16 *o, const char *pfx, int num) {
+    int k = 0; while (*pfx) o[k++] = (CHAR16)*pfx++;
+    if (num >= 0) for (int s = 12; s >= 0; s -= 4) o[k++] = (CHAR16)"0123456789ABCDEF"[(num >> s) & 15];
+    o[k] = 0;
+}
+static u8 *var_get(CHAR16 *name, UINTN *size) {
+    EFI_RUNTIME_SERVICES *rt = ST->RuntimeServices;
+    if (!rt || !rt->GetVariable) return 0;
+    UINT32 attr; UINTN n = 0;
+    if (rt->GetVariable(name, &gvar, &attr, &n, 0) != EFI_BUFFER_TOO_SMALL || !n) return 0;
+    u8 *b = mem_alloc(n + 2);
+    if (!b || EFI_ERROR(rt->GetVariable(name, &gvar, &attr, &n, b))) { mem_free(b); return 0; }
+    *size = n; return b;
+}
+static bool var_set(CHAR16 *name, const void *d, UINTN n) {
+    EFI_RUNTIME_SERVICES *rt = ST->RuntimeServices;
+    return rt && rt->SetVariable && !EFI_ERROR(rt->SetVariable(name, &gvar, 7 /* NV | BS | RT */, n, (void *)d));
+}
+/* opção de carga: UINT32 atributos, UINT16 tamanho do caminho, descrição (UTF-16 com 0), caminho */
+static bool opt_parse(const u8 *v, UINTN n, u32 *attrs, const CHAR16 **desc, const u8 **dp, u32 *dplen) {
+    if (n < 8) return false;
+    *attrs = (u32)v[0] | (u32)v[1] << 8 | (u32)v[2] << 16 | (u32)v[3] << 24;
+    u32 fl = (u32)v[4] | (u32)v[5] << 8;
+    UINTN k = 6; *desc = (const CHAR16 *)(v + 6);
+    while (k + 1 < n && (v[k] | v[k + 1])) k += 2;
+    k += 2;
+    if (k + fl > n) return false;
+    *dp = v + k; *dplen = fl;
+    return true;
+}
+/* o caminho tem um nó de arquivo com "FolioOS"? (a nossa entrada, em qualquer partição) */
+static bool dp_is_folio(const u8 *dp, u32 len) {
+    for (u32 k = 0; k + 4 <= len; ) {
+        u32 l = dp[k + 2] | dp[k + 3] << 8; if (l < 4 || k + l > len) break;
+        if (dp[k] == 4 && dp[k + 1] == 4) {
+            const u8 *s = dp + k + 4; u32 nch = (l - 4) / 2;
+            for (u32 i = 0; i + 7 <= nch; i++) {
+                static const char w[] = "folioos"; bool m = true;
+                for (int j = 0; j < 7 && m; j++) { u16 c = (u16)(s[2 * (i + j)] | s[2 * (i + j) + 1] << 8); if (c >= 'A' && c <= 'Z') c += 32; m = c == (u16)w[j]; }
+                if (m) return true;
+            }
+        }
+        if (dp[k] == 0x7F) break;
+        k += l;
+    }
+    return false;
+}
+static bool dp_has(const u8 *dp, u32 len, u8 type, u8 sub) {
+    for (u32 k = 0; k + 4 <= len; ) {
+        u32 l = dp[k + 2] | dp[k + 3] << 8; if (l < 4 || k + l > len) break;
+        if (dp[k] == type && dp[k + 1] == sub) return true;
+        if (dp[k] == 0x7F) break;
+        k += l;
+    }
+    return false;
+}
+bool pal_boot_entry_add(const char *desc, int part_num, u64 part_lba, u64 part_count, const u8 guid[16], const char *path) {
+    EFI_RUNTIME_SERVICES *rt = ST->RuntimeServices;
+    if (!rt || !rt->SetVariable || !rt->GetVariable) return false;
+    static u8 opt[600]; u32 k = 0;
+    #define P8(v) (opt[k++] = (u8)(v))
+    #define P16(v) do { u32 _v = (u32)(v); P8(_v); P8(_v >> 8); } while (0)
+    #define P32(v) do { u32 _w = (u32)(v); P16(_w); P16(_w >> 16); } while (0)
+    #define P64(v) do { u64 _q = (u64)(v); P32(_q); P32(_q >> 32); } while (0)
+    P32(1);                                           /* LOAD_OPTION_ACTIVE */
+    u32 fl_at = k; P16(0);
+    for (int i = 0; desc[i] && k < 200; i++) P16((u8)desc[i]);
+    P16(0);
+    u32 dp_at = k;
+    P8(4); P8(1); P16(42); P32(part_num); P64(part_lba); P64(part_count);   /* nó de disco rígido (GPT) */
+    for (int i = 0; i < 16; i++) P8(guid[i]);
+    P8(2); P8(2);                                     /* MBRType = GPT, SignatureType = GUID */
+    int plen = str_len(path);
+    P8(4); P8(4); P16(4 + 2 * (plen + 1));            /* nó de arquivo */
+    for (int i = 0; i < plen; i++) P16((u8)path[i]);
+    P16(0);
+    P8(0x7F); P8(0xFF); P16(4);
+    u32 dplen = k - dp_at;
+    opt[fl_at] = (u8)dplen; opt[fl_at + 1] = (u8)(dplen >> 8);
+    #undef P8
+    #undef P16
+    #undef P32
+    #undef P64
+    /* uma entrada com o mesmo caminho já existe? (reinstalação) */
+    CHAR16 nm[16]; UINTN osz = 0; boot_var_name(nm, "BootOrder", -1);
+    u16 *order = (u16 *)var_get(nm, &osz); int on = order ? (int)(osz / 2) : 0;
+    int num = -1;
+    for (int i = 0; i < on && num < 0; i++) {
+        boot_var_name(nm, "Boot", order[i]); UINTN n; u8 *v = var_get(nm, &n);
+        u32 at; const CHAR16 *d; const u8 *dp; u32 dl;
+        if (v && opt_parse(v, n, &at, &d, &dp, &dl) && dl == dplen && !memcmp(dp, opt + dp_at, dplen)) num = order[i];
+        mem_free(v);
+    }
+    for (int c = 0; num < 0 && c < 0x1000; c++) {    /* número livre */
+        boot_var_name(nm, "Boot", c); UINTN n; u8 *v = var_get(nm, &n);
+        if (!v) num = c; else mem_free(v);
+    }
+    bool ok = num >= 0;
+    if (ok) { boot_var_name(nm, "Boot", num); ok = var_set(nm, opt, k); }
+    if (ok) {                                         /* o FolioOS vai para o começo da ordem; o resto fica como estava */
+        u16 *no = mem_alloc((usize)(on + 1) * 2); int nn = 0;
+        no[nn++] = (u16)num;
+        for (int i = 0; i < on; i++) if (order[i] != num) no[nn++] = order[i];
+        boot_var_name(nm, "BootOrder", -1);
+        ok = var_set(nm, no, (UINTN)nn * 2);
+        mem_free(no);
+    }
+    mem_free(order);
+    return ok;
+}
+/* a entrada é do FolioOS: o caminho passa por \EFI\FolioOS (ao lado) ou a descrição é "FolioOS" (disco inteiro) */
+static bool entry_is_folio(const CHAR16 *d, const u8 *dp, u32 dl) {
+    static const char nm[] = "FolioOS"; int i = 0;
+    for (; nm[i] && d[i] == (CHAR16)nm[i]; i++) {}
+    return dp_is_folio(dp, dl) || (!nm[i] && !d[i]);
+}
+/* desinstalar: as entradas Boot#### do FolioOS somem, e a BootOrder fica com o resto, na mesma ordem; o firmware
+ * volta a iniciar o outro sistema direto */
+bool pal_boot_entry_remove(void) {
+    EFI_RUNTIME_SERVICES *rt = ST->RuntimeServices;
+    if (!rt || !rt->SetVariable || !rt->GetVariable) return false;
+    CHAR16 nm[16]; UINTN osz = 0; boot_var_name(nm, "BootOrder", -1);
+    u16 *order = (u16 *)var_get(nm, &osz); int on = order ? (int)(osz / 2) : 0;
+    u16 *keep = mem_alloc((usize)on * 2 + 2); int nk = 0; bool ok = true;
+    for (int i = 0; i < on; i++) {
+        boot_var_name(nm, "Boot", order[i]); UINTN n; u8 *v = var_get(nm, &n);
+        u32 at; const CHAR16 *d; const u8 *dp; u32 dl;
+        char dn[64] = "?";
+        bool parsed = v && opt_parse(v, n, &at, &d, &dp, &dl);
+        if (parsed) w_to_utf8(d, dn, sizeof dn);
+        if (parsed && entry_is_folio(d, dp, dl)) {
+            dbg("boot entry remove: Boot%04X \"%s\" (FolioOS)", order[i], dn);
+            if (EFI_ERROR(rt->SetVariable(nm, &gvar, 7, 0, 0))) ok = false;   /* tamanho 0 = apagar a variável */
+        } else { dbg("boot entry keep: Boot%04X \"%s\"", order[i], dn); keep[nk++] = order[i]; }
+        mem_free(v);
+    }
+    if (nk != on) { boot_var_name(nm, "BootOrder", -1); ok = var_set(nm, keep, (UINTN)nk * 2) && ok; }
+    mem_free(keep); mem_free(order);
+    /* o firmware pode ter tirado a entrada da ordem sem apagá-la (o OVMF reescreve a BootOrder a cada boot):
+     * as variáveis Boot#### do FolioOS fora da ordem também somem */
+    for (int c = 0; c < 0x1000; c++) {
+        boot_var_name(nm, "Boot", c); UINTN n; u8 *v = var_get(nm, &n);
+        if (!v) continue;
+        u32 at; const CHAR16 *d; const u8 *dp; u32 dl;
+        if (opt_parse(v, n, &at, &d, &dp, &dl) && entry_is_folio(d, dp, dl)) {
+            dbg("boot entry remove: Boot%04X (outside BootOrder)", c);
+            if (EFI_ERROR(rt->SetVariable(nm, &gvar, 7, 0, 0))) ok = false;
+        }
+        mem_free(v);
+    }
+    return ok;
+}
+/* PC só BIOS (a ponte do FOLIO\BIOS.SYS): ela oferece um protocolo próprio que inicia o MBR original do outro
+ * sistema (ver bridge.c, FOLIO_BIOS_CHAIN). Num firmware UEFI de verdade ele não existe: devolve false. */
+typedef struct { EFI_STATUS (EFIAPI *Chain)(const u8 *code440); } FOLIO_BIOS_CHAIN;
+bool pal_chain_mbr(const u8 *code) {
+    static EFI_GUID g = { 0x464f4c49, 0x4f43, 0x4841, { 0x49, 0x4e, 0x4d, 0x42, 0x52, 0x00, 0x00, 0x01 } };
+    FOLIO_BIOS_CHAIN *c = 0;
+    if (EFI_ERROR(ST->BootServices->LocateProtocol(&g, 0, (void **)&c)) || !c) return false;
+    dbg("boot chooser: starting the other system's MBR (BIOS)");
+    c->Chain(code);
+    return false;
+}
+static int other_num = -1;
+bool pal_boot_other(char *name, int cap) {
+    CHAR16 nm[16]; UINTN osz = 0; boot_var_name(nm, "BootOrder", -1);
+    u16 *order = (u16 *)var_get(nm, &osz); int on = order ? (int)(osz / 2) : 0;
+    other_num = -1;
+    for (int i = 0; i < on && other_num < 0; i++) {
+        boot_var_name(nm, "Boot", order[i]); UINTN n; u8 *v = var_get(nm, &n);
+        u32 at; const CHAR16 *d; const u8 *dp; u32 dl;
+        if (v && opt_parse(v, n, &at, &d, &dp, &dl) && (at & 1) && !dp_is_folio(dp, dl)
+            && !dp_has(dp, dl, 4, 6) && !dp_has(dp, dl, 4, 7)            /* aplicativos do firmware (shell, setup) */
+            && !dp_has(dp, dl, 3, 11) && !dp_has(dp, dl, 3, 12) && !dp_has(dp, dl, 3, 13)   /* rede (PXE, HTTP) */
+            && !dp_has(dp, dl, 3, 24)) {
+            other_num = order[i];
+            w_to_utf8(d, name, cap);
+        }
+        mem_free(v);
+    }
+    mem_free(order);
+    return other_num >= 0;
+}
+void pal_boot_other_start(void) {
+    if (other_num < 0) return;
+    CHAR16 nm[16]; boot_var_name(nm, "BootNext", -1);
+    u16 n = (u16)other_num;
+    if (!var_set(nm, &n, 2)) return;
+    ST->RuntimeServices->ResetSystem(EfiResetWarm, EFI_SUCCESS, 0, 0);
 }
 
 /* ------------------------------------------------------------ idioma do firmware

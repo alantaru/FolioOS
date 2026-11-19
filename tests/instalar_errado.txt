@@ -1,0 +1,24 @@
+# Instalador em pt-BR: palavra de confirmação errada não instala (o build confere que o disco continua vazio)
+wait 300
+key esc
+wait 200
+key ctrl+k
+type Instalar o FolioOS neste
+key enter
+wait 300
+assert_keywin Install FolioOS on this computer
+key shift+tab
+key enter
+wait 200
+type APAGA
+key tab
+key tab
+key enter
+wait 1500
+# Enter no campo também não instala
+key shift+tab
+key shift+tab
+type R
+key enter
+wait 1500
+assert_keywin Install FolioOS on this computer

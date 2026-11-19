@@ -1,0 +1,26 @@
+# Ao lado de outro sistema, com boot_wait=0 (o FolioOS abre direto): Ajustes → Sistema mostra a espera do
+# seletor de boot; → aumenta, e o CONFIG.INI passa a ter boot_wait > 0 (o build confere). Só pelo teclado.
+wait 500
+assert_keywin text
+key f12
+wait 300
+assert_keywin Settings
+# Tab → abas; → → = "System"
+key tab
+key right
+key right
+wait 200
+# do fim para cima: "Desligar", "Reiniciar", "Discos e partições…", "Instalar o FolioOS…", a espera do seletor
+key shift+tab
+key shift+tab
+key shift+tab
+key shift+tab
+key shift+tab
+wait 100
+key right
+wait 100
+key right
+wait 200
+shot seletor_ajuste.png
+key esc
+wait 300

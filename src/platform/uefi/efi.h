@@ -102,7 +102,9 @@ typedef struct {
     EFI_STATUS (EFIAPI *GetTime)(EFI_TIME *, void *);
     void *SetTime, *GetWakeupTime, *SetWakeupTime, *SetVirtualAddressMap, *ConvertPointer;
     EFI_STATUS (EFIAPI *GetVariable)(CHAR16 *, EFI_GUID *, UINT32 *, UINTN *, void *);
-    void *GetNextVariableName, *SetVariable, *GetNextHighMonotonicCount;
+    void *GetNextVariableName;
+    EFI_STATUS (EFIAPI *SetVariable)(CHAR16 *, EFI_GUID *, UINT32, UINTN, void *);
+    void *GetNextHighMonotonicCount;
     void (EFIAPI *ResetSystem)(EFI_RESET_TYPE, EFI_STATUS, UINTN, void *);
 } EFI_RUNTIME_SERVICES;
 
@@ -169,6 +171,30 @@ typedef struct {
     UINT32 LoadOptionsSize; void *LoadOptions; void *ImageBase; UINT64 ImageSize;
     EFI_MEMORY_TYPE ImageCodeType, ImageDataType; void *Unload;
 } EFI_LOADED_IMAGE_PROTOCOL;
+
+/* ---- discos: Block I/O, caminho de dispositivo, Disk Info ---- */
+typedef struct {
+    UINT32 MediaId;
+    BOOLEAN RemovableMedia, MediaPresent, LogicalPartition, ReadOnly, WriteCaching;
+    UINT32 BlockSize, IoAlign;
+    UINT64 LastBlock;
+} EFI_BLOCK_IO_MEDIA;
+typedef struct EFI_BLOCK_IO_PROTOCOL {
+    UINT64 Revision;
+    EFI_BLOCK_IO_MEDIA *Media;
+    EFI_STATUS (EFIAPI *Reset)(struct EFI_BLOCK_IO_PROTOCOL *, BOOLEAN);
+    EFI_STATUS (EFIAPI *ReadBlocks)(struct EFI_BLOCK_IO_PROTOCOL *, UINT32 MediaId, UINT64 Lba, UINTN Size, void *Buf);
+    EFI_STATUS (EFIAPI *WriteBlocks)(struct EFI_BLOCK_IO_PROTOCOL *, UINT32 MediaId, UINT64 Lba, UINTN Size, void *Buf);
+    EFI_STATUS (EFIAPI *FlushBlocks)(struct EFI_BLOCK_IO_PROTOCOL *);
+} EFI_BLOCK_IO_PROTOCOL;
+typedef struct { UINT8 Type, SubType, Length[2]; } EFI_DEVICE_PATH;   /* nó; o fim é Type 0x7F */
+#define DP_LEN(n) ((n)->Length[0] | (n)->Length[1] << 8)
+typedef struct EFI_DISK_INFO_PROTOCOL {
+    EFI_GUID Interface;
+    EFI_STATUS (EFIAPI *Inquiry)(struct EFI_DISK_INFO_PROTOCOL *, void *, UINT32 *);
+    EFI_STATUS (EFIAPI *Identify)(struct EFI_DISK_INFO_PROTOCOL *, void *, UINT32 *);
+    void *SenseData, *WhichIde;
+} EFI_DISK_INFO_PROTOCOL;
 
 typedef struct EFI_FILE_PROTOCOL {
     UINT64 Revision;

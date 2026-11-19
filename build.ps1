@@ -33,6 +33,8 @@ $link = @("-nostdlib", "-shared", "-Wl,--subsystem,10", "-Wl,--exclude-all-symbo
 
 Step 1 "UEFI x86_64  -> build\efi\BOOTX64.EFI"
 Run gcc ($free + @("-mno-red-zone") + $core + $uefi + $link + @("-Wl,-e,efi_main", "-o", "build\efi\BOOTX64.EFI", "-lgcc"))
+# the QEMU lab's stand-in for Windows (dual boot test): paints the screen blue, prints FAKE WINDOWS STARTED
+Run gcc ($free + @("-mno-red-zone", "tools\fakewin.c") + $link + @("-Wl,-e,efi_main", "-o", "build\fakewin.efi"))
 
 Step 2 "UEFI IA32    -> build\efi\BOOTIA32.EFI (tablets/netbooks with 32-bit firmware)"
 Run gcc ($free + @("-m32", "-march=i686", "-mno-sse", "-mfpmath=387") + $core + $uefi + $link + @("-Wl,-e,_efi_main", "-o", "build\efi\BOOTIA32.EFI"))
@@ -55,13 +57,23 @@ if ($clang -and $nasm) {
     New-Item -ItemType Directory -Force build\bios | Out-Null
     $b32 = @("--target=i686-unknown-none-elf", "-march=i686", "-O2", "-ffreestanding", "-fno-pic", "-fno-stack-protector", "-mno-sse", "-mno-mmx",
              "-malign-double", "-fshort-wchar", "-fno-strict-aliasing") + $warn
-    Run $clang ($b32 + @("-nostdlib", "-static", "-fuse-ld=lld", "-Wl,-T,src/platform/bios/bridge.ld", "-Wl,--oformat=binary",
-                         "-o", "build\bios\bridge.bin", "src\platform\bios\bridge.c", "src\platform\bios\fat32.c"))
+    # compile with clang, link with ld.lld itself: for a bare ELF target the clang driver may hand the link
+    # to gcc, which runs lld in its MinGW (PE) mode and rejects -T (that broke the CI build)
+    $lld = Join-Path (Split-Path ([string]$(if ($clang -is [string]) { $clang } else { $clang.Source }))) "ld.lld.exe"
+    if (-not (Test-Path $lld)) { $lld = (Get-Command ld.lld -ErrorAction Stop).Source }
+    Run $clang ($b32 + @("-c", "-o", "build\bios\bridge.o", "src\platform\bios\bridge.c"))
+    Run $clang ($b32 + @("-c", "-o", "build\bios\fat32.o", "src\core\fat32.c"))
+    Run $lld @("-T", "src/platform/bios/bridge.ld", "--oformat=binary", "-o", "build\bios\bridge.bin", "build\bios\bridge.o", "build\bios\fat32.o")
     Run $nasm @("-f", "bin", "-DMBR", "src\platform\bios\boot.asm", "-o", "build\bios\mbr.bin")
     Run $nasm @("-f", "bin", "-DVBR", "src\platform\bios\boot.asm", "-o", "build\bios\vbr.bin")
     Run $nasm @("-f", "bin", "-i", "build/bios/", "src\platform\bios\stub.asm", "-o", "build\bios\BIOS.SYS")
+    Run $nasm @("-f", "bin", "tools\fakeother.asm", "-o", "build\fakeother.bin")   # the "other system" MBR of the phase 3 tests
     Run gcc @("-O2", "-Wall", "-Wextra", "tools\biosboot.c", "-o", "build\biosboot.exe")
-    Run gcc @("-O2", "-Wall", "-Wextra", "tools\fat32_test.c", "src\platform\bios\fat32.c", "-o", "build\fat32_test.exe")
+    Run gcc @("-O2", "-Wall", "-Wextra", "tools\fat32_test.c", "src\core\fat32.c", "src\core\part.c", "-o", "build\fat32_test.exe")
+    Run gcc @("-O2", "-Wall", "-Wextra", "tools\part_test.c", "src\core\part.c", "src\core\fat32.c", "-o", "build\part_test.exe")
+    Run gcc @("-O2", "-Wall", "-Wextra", "tools\install_test.c", "src\core\install.c", "src\core\part.c", "src\core\fat32.c", "src\core\fscheck.c", "-o", "build\install_test.exe")
+    Run gcc @("-O2", "-Wall", "-Wextra", "tools\fscheck_test.c", "src\core\fscheck.c", "src\core\part.c", "src\core\fat32.c", "-o", "build\fscheck_test.exe")
+    Run gcc @("-O2", "-Wall", "tools\fatcat.c", "-o", "build\fatcat.exe")
 } else {
     Write-Host "      clang (LLVM) and nasm are needed: BIOS boot not built" -ForegroundColor Yellow
 }
@@ -261,12 +273,28 @@ if (-not $NoTests) {
         Fresh; Run .\build\efi_host.exe (@("build\efi\BOOTX64.EFI", "--root", $t, "--script", $vs, "--out", "build\shots") + $g) | Out-Null
         if (-not (Select-String -Quiet -Path "$t\FOLIO\DIAGNOSTICS.TXT" -Pattern "in use: ")) { throw "video $($g -join ' '): no output configured" }
     }
+    # keep proportions: a 4:3 mode on a 16:9 panel is drawn at 1024x576 and stretched to the mode
+    # (framebuffer, Blt only, rotated); "monitor" with an EDID that matches the mode changes nothing
+    foreach ($g in @(@(), @("--gop", "blt"), @("--gop", "mask16"))) {
+        foreach ($r in @("auto", "90")) {
+            Fresh; Set-Content -Encoding ascii "$t\FOLIO\CONFIG.INI" "keep_aspect=16:9`r`nrotation=$r`r`n"
+            Run .\build\efi_host.exe (@("build\efi\BOOTX64.EFI", "--root", $t, "--script", $vs, "--out", "build\shots", "--size", "1024x768") + $g) | Out-Null
+            if (-not (Select-String -Quiet -Path "$t\FOLIO\DIAGNOSTICS.TXT" -Pattern "keep proportions: drawn at 1024x576, stretched to 1024x768")) { throw "keep proportions $($g -join ' ') rotation $r`: not applied" }
+            $ls = if ($r -eq "90") { "screen 576x1024" } else { "screen 1024x576" }
+            if (-not (Select-String -Quiet -Path "$t\FOLIO\DIAGNOSTICS.TXT" -Pattern "logical $ls")) { throw "keep proportions $($g -join ' ') rotation $r`: logical screen is not $ls" }
+        }
+    }
+    Copy-Item build\shots\v.png build\shots\proporcao.png
+    Fresh; Set-Content -Encoding ascii "$t\FOLIO\CONFIG.INI" "keep_aspect=monitor`r`n"
+    Run .\build\efi_host.exe @("build\efi\BOOTX64.EFI", "--root", $t, "--script", $vs, "--out", "build\shots", "--size", "1024x768", "--edid") | Out-Null
+    if (Select-String -Quiet -Path "$t\FOLIO\DIAGNOSTICS.TXT" -Pattern "keep proportions") { throw "keep proportions: changed the picture although the mode matches the monitor" }
     Remove-Item $vs
-    Ok "video: RGB, 16-bit mask, Blt only, padded stride, UGA, rotated portrait - OK"
+    Ok "video: RGB, 16-bit mask, Blt only, padded stride, UGA, rotated portrait; keep proportions (4:3 mode on 16:9) - OK"
     # FAT32 driver of the BIOS bridge: random create/write/truncate/rename/delete vs. a model, then a full volume check
     if (Test-Path build\fat32_test.exe) {
         Run gcc @("-O2", "-Wall", "tools\mkimg.c", "-o", "build\mkimg.exe")
-        $ft = "build\fat32t"; if (Test-Path $ft) { Remove-Item -Recurse -Force $ft }
+        # disk images can take a few GB: FOLIO_WORK=<folder on another drive> keeps them off the system drive
+        $ft = if ($env:FOLIO_WORK) { "$env:FOLIO_WORK\fat32t" } else { "build\fat32t" }; if (Test-Path $ft) { Remove-Item -Recurse -Force $ft }
         New-Item -ItemType Directory -Force "$ft\seed\Docs" | Out-Null
         Set-Content -Encoding ascii "$ft\seed\seed.txt" "seed"; Set-Content -Encoding ascii "$ft\seed\Docs\old notes.md" "old"
         foreach ($cfg in @(@(64, 7), @(64, 21), @(1200, 99))) {
@@ -275,6 +303,280 @@ if (-not $NoTests) {
         }
         Remove-Item -Recurse -Force $ft
         Ok "FAT32 driver (BIOS bridge): 12000 random operations on 3 volumes, byte-exact, volume consistent - OK"
+        # partition tables (GPT/MBR) and FAT32 format, then the installer on empty GPT and MBR disks
+        New-Item -ItemType Directory -Force $ft | Out-Null
+        Run .\build\part_test.exe @($ft) | Out-Null
+        foreach ($i in "gpt", "mbr") { Run .\build\fat32_test.exe @("$ft\$i.img", "--fsck") | Out-Null }
+        Copy-Item -Recurse build\usb_files "$ft\src"
+        # a table FolioOS cannot read or would not rewrite exactly (unreadable GPT, MBR with an extended partition):
+        # the partition manager refuses before writing anything, and the disk stays byte for byte the same
+        foreach ($c in @(@("gpt256.img", "--op-create", "1", "20", "X"), @("mbrext.img", "--op-format", "1", "X"), @("mbrext.img", "--op-delete", "1"))) {
+            $h0 = (Get-FileHash "$ft\$($c[0])").Hash
+            $ErrorActionPreference = "Continue"; $null = & .\build\install_test.exe (@("$ft\src", "$ft\$($c[0])", "64") + $c[1..9]) 2>&1; $ec = $LASTEXITCODE; $ErrorActionPreference = "Stop"
+            if ($ec -ne 1) { throw "partition manager on $($c[0]) $($c[1]): expected a refusal, exit $ec" }
+            if ((Get-FileHash "$ft\$($c[0])").Hash -ne $h0) { throw "partition manager on $($c[0]) $($c[1]): the disk changed although the table is locked" }
+        }
+        foreach ($k in @(@("inst-uefi"), @("inst-bios", "--bios"))) {
+            Run .\build\install_test.exe (@("$ft\src", "$ft\$($k[0]).img", "600") + $k[1..9]) | Out-Null
+            Run .\build\fat32_test.exe @("$ft\$($k[0]).img", "--fsck") | Out-Null
+        }
+        if (@(Get-ChildItem "$ft\src\FOLIO\BACKUP\disk-*.bin").Count -ne 2) { throw "installer: safety copies missing from the USB drive" }
+        # phase 2: next to Windows (EFI, MSR, a hole in the table, C:, recovery at the end): only one new entry,
+        # every other entry and partition byte-for-byte the same, \EFI\FolioOS on the EFI partition, both volumes consistent
+        Run .\build\install_test.exe @("$ft\src", "$ft\win.img", "1400", "--windows") | Out-Null
+        Run .\build\install_test.exe @("$ft\src", "$ft\win.img", "1400", "--alongside") | Out-Null
+        Run .\build\fat32_test.exe @("$ft\win.img", "--fsck") | Out-Null
+        Remove-Item "$ft\win.img"
+        # partitions of other systems: the NTFS reader against volumes made by Windows itself (tools\ntfs-fixtures.ps1),
+        # with broken copies as negative controls, plus BitLocker/LUKS/LVM/Mac/ext4 verdicts on 512- and 4096-byte sectors
+        # ext4 volumes made by Linux itself (tools\ext-fixtures.ps1: Alpine in QEMU): clean, 1 KiB blocks, errors, journal pending
+        foreach ($n in "ntfs-clean", "ntfs-dirty", "ntfs-hiber", "ext-clean", "ext-small", "ext-errors", "ext-recover", "ext-linux") {
+            $gi = [IO.File]::OpenRead("tests\fixtures\$n.img.gz"); $gz = New-Object IO.Compression.GZipStream($gi, [IO.Compression.CompressionMode]::Decompress)
+            $go = [IO.File]::Create("$ft\$n.img"); $gz.CopyTo($go); $go.Dispose(); $gz.Dispose(); $gi.Dispose()
+        }
+        Run .\build\fscheck_test.exe @($ft, "tests\fixtures") | Out-Null
+        # a PC with Linux and no free space (EFI + ext4 made by Linux): FolioOS does not shrink ext4, so the screen
+        # offers the whole disk and explains how to make room from Linux; nothing is written
+        $before = (Get-FileHash "$ft\ext-linux.img").Hash
+        $ol = $env:FOLIO_PLATFORM_LANG; $env:FOLIO_PLATFORM_LANG = "pt-BR"; $env:FOLIO_DISKS = "$ft\ext-linux.img"
+        try { Fresh; Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\instalar_linux.txt", "--out", "build\shots") | Out-Null }
+        finally { $env:FOLIO_DISKS = $null; $env:FOLIO_PLATFORM_LANG = $ol }
+        if ((Get-FileHash "$ft\ext-linux.img").Hash -ne $before) { throw "installer: the Linux disk changed just by opening the installer" }
+        Remove-Item "$ft\ntfs-*.img", "$ft\ext-*.img"
+        Ok "other systems' partitions: NTFS read as Windows reports it, ext4 as Linux reports it; BitLocker/LUKS/LVM/Mac/FAT refusals - OK"
+        # the real BOOTX64.EFI lists the computer's disks (Block I/O) and reads their partition tables
+        $xf = [IO.File]::Create("$ft\empty.img"); $xf.SetLength(100MB); $xf.Close()
+        Fresh; Run .\build\efi_host.exe @("build\efi\BOOTX64.EFI", "--root", $t, "--script", "tests\efi_boot.txt", "--out", "build\shots",
+                                          "--disk", "$ft\inst-uefi.img", "--disk", "$ft\inst-bios.img", "--disk", "$ft\empty.img") | Out-Null
+        $dg = Get-Content -Raw -Encoding UTF8 "$t\FOLIO\DIAGNOSTICS.TXT"
+        foreach ($w in "== Disks \(3 found\)", "SATA . FolioOS test disk 1 . 629 MB", "partition table: GPT", "EFI system . FAT32 . 627 MB . `"FOLIO`"",
+                       "partition table: MBR", "FolioOS test disk 3 . 104 MB", "partition table: none \(empty disk\)") {
+            if ($dg -notmatch $w) { throw "disk list in DIAGNOSTICS.TXT: missing '$w'" }
+        }
+        if ($dg.Contains("started from here")) { throw "disk list: an image disk was taken for the boot disk" }
+        # update a whole-disk install (UEFI and BIOS) from the USB drive: the person's text and CONFIG.INI stay, the program
+        # becomes the USB drive's, every file swapped only after its new copy was checked
+        foreach ($k in "inst-uefi", "inst-bios") { Run .\build\install_test.exe @("$ft\src", "$ft\$k.img", "600", "--update") | Out-Null; Run .\build\fat32_test.exe @("$ft\$k.img", "--fsck") | Out-Null }
+        Ok "update an installation (UEFI and BIOS): program replaced and checked, the person's texts and settings untouched - OK"
+        # phase 3, a PC with BIOS only: next to "Windows" on an MBR disk (the old entries keep their positions and bytes, the
+        # original MBR code kept in FOLIO\OTHERMBR.BIN), update, uninstall: the table and the MBR back to the original
+        $wb = "$ft\winbios.img"; Remove-Item $wb -ErrorAction SilentlyContinue
+        Run .\build\install_test.exe @("$ft\src", $wb, "1400", "--windows-bios", "build\fakeother.bin") | Out-Null
+        Copy-Item $wb "$ft\winbios-orig.img"
+        Run .\build\install_test.exe @("$ft\src", $wb, "1400", "--alongside", "--bios") | Out-Null
+        Run .\build\fat32_test.exe @($wb, "--fsck") | Out-Null
+        Run .\build\install_test.exe @("$ft\src", $wb, "1400", "--update", "--bios") | Out-Null
+        Run .\build\install_test.exe @("$ft\src", $wb, "1400", "--remove") | Out-Null
+        Run .\build\install_test.exe @("$ft\src", $wb, "1400", "--same-table", "$ft\winbios-orig.img") | Out-Null
+        Remove-Item $wb, "$ft\winbios-orig.img"
+        # and with no free space: an MBR disk with one FAT32 filling it is shrunk, FolioOS goes after it, then uninstalled
+        Run .\build\install_test.exe @("$ft\src", $wb, "1400", "--mbr-fat32", "build\fakeother.bin") | Out-Null
+        Copy-Item $wb "$ft\winbios-orig.img"
+        Run .\build\install_test.exe @("$ft\src", $wb, "1400", "--shrink-ntfs", "--bios") | Out-Null
+        Run .\build\fat32_test.exe @($wb, "--fsck") | Out-Null
+        Run .\build\install_test.exe @("$ft\src", $wb, "1400", "--remove") | Out-Null
+        Run .\build\install_test.exe @("$ft\src", $wb, "1400", "--same-table", "$ft\winbios-orig.img") | Out-Null
+        Run .\build\fat32_test.exe @($wb, "--fsck") | Out-Null
+        Remove-Item $wb, "$ft\winbios-orig.img"
+        Get-ChildItem "$ft\src\DOCUMENTS" -Directory -Filter "computer-*" | Remove-Item -Recurse -Force
+        Ok "next to Windows on a PC with BIOS only: MBR entries untouched, original MBR kept, update, uninstall back to the original; also by shrinking - OK"
+        # where the texts live, chosen at install time: docs_place= in the installed CONFIG.INI (on the USB drive: no DOCUMENTS on the disk)
+        foreach ($m in "--docs-stick", "--docs-both") { Run .\build\install_test.exe @("$ft\src", "$ft\docs.img", "600", $m) | Out-Null; Remove-Item "$ft\docs.img" }
+        # uninstall a whole-disk install (UEFI and BIOS): texts to the USB drive, the disk left empty (no table)
+        Copy-Item -Recurse "$ft\src" "$ft\srcr"
+        foreach ($k in "inst-uefi", "inst-bios") { Run .\build\install_test.exe @("$ft\srcr", "$ft\$k.img", "600", "--remove") | Out-Null }
+        if (@(Get-ChildItem "$ft\srcr\DOCUMENTS" -Directory -Filter "computer-*").Count -ne 2) { throw "uninstall (whole disk): texts not copied to the USB drive (found: $((Get-ChildItem "$ft\srcr\DOCUMENTS" -Directory | ForEach-Object Name) -join ', '))" }
+        Remove-Item -Recurse -Force "$ft\srcr"
+        Ok "uninstall a whole-disk install (UEFI and BIOS): texts copied to the USB drive and checked, disk left empty - OK"
+        # the installer screen, keyboard only, in the simulator (pt-BR: the word is APAGAR): a disk too small
+        # (never written) and a 600 MB one. First run: wrong words only, nothing may be written. Second run:
+        # the right word in lowercase installs.
+        function Zero1MB($p) { $b = New-Object byte[] 1MB; $s = [IO.File]::OpenRead($p); [void]$s.Read($b, 0, $b.Length); $s.Close(); [Linq.Enumerable]::SequenceEqual($b, (New-Object byte[] 1MB)) }
+        foreach ($d in @(@("small", 100MB), @("target", 600MB))) { $xf = [IO.File]::Create("$ft\$($d[0]).img"); $xf.SetLength($d[1]); $xf.Close() }
+        $oldLang = $env:FOLIO_PLATFORM_LANG; $env:FOLIO_PLATFORM_LANG = "pt-BR"; $env:FOLIO_DISKS = "$ft\small.img;$ft\target.img"
+        try {
+            Fresh; Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\instalar_errado.txt", "--out", "build\shots") | Out-Null
+            if (-not (Zero1MB "$ft\target.img") -or (Test-Path "$t\FOLIO\BACKUP")) { throw "installer screen: a wrong confirmation word wrote to the disk" }
+            Fresh; Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\instalar.txt", "--out", "build\shots") | Out-Null
+        } finally { $env:FOLIO_DISKS = $null; $env:FOLIO_PLATFORM_LANG = $oldLang }
+        Run .\build\fat32_test.exe @("$ft\target.img", "--fsck") | Out-Null
+        & .\build\fatcat.exe "$ft\target.img" "EFI/BOOT/BOOTX64.EFI" "$ft\copied.efi" 2>$null
+        if (-not (Test-Path "$ft\copied.efi") -or (Get-FileHash "$ft\copied.efi").Hash -ne (Get-FileHash "$t\EFI\BOOT\BOOTX64.EFI").Hash) { throw "installer screen: EFI\BOOT\BOOTX64.EFI not copied to the disk" }
+        if (@(Get-ChildItem "$t\FOLIO\BACKUP\disk-*.bin" -ErrorAction SilentlyContinue).Count -ne 1) { throw "installer screen: no safety copy of the disk on the USB drive" }
+        if (-not (Zero1MB "$ft\small.img")) { throw "installer screen: the disk that is too small was written to" }
+        # updating it through the screen (from this USB drive): the version in FOLIO\INSTALLED.ID becomes this one
+        $env:FOLIO_PLATFORM_LANG = "pt-BR"; $env:FOLIO_DISKS = "$ft\target.img"
+        try { Fresh; Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\atualizar.txt", "--out", "build\shots") | Out-Null }
+        finally { $env:FOLIO_DISKS = $null; $env:FOLIO_PLATFORM_LANG = $oldLang }
+        $ver = [regex]::Match((Get-Content -Raw src\core\folio.h), '#define FOLIO_VERSION "([^"]+)"').Groups[1].Value
+        Remove-Item "$ft\INSTALLED.ID" -ErrorAction SilentlyContinue; & .\build\fatcat.exe "$ft\target.img" "FOLIO/INSTALLED.ID" "$ft\INSTALLED.ID" 2>$null
+        if (-not (Test-Path "$ft\INSTALLED.ID") -or -not (Select-String -Quiet -Path "$ft\INSTALLED.ID" -SimpleMatch "version=$ver")) { throw "update screen: FOLIO\INSTALLED.ID does not have version=$ver" }
+        Run .\build\fat32_test.exe @("$ft\target.img", "--fsck") | Out-Null
+        # where the texts live (docs_place=): an installation with the texts on the USB drive saves a new text there;
+        # "both" exchanges them with the USB drive (newest wins, the replaced version kept in FOLIO\VERSIONS)
+        $stick = "$ft\stick"
+        Fresh; if (Test-Path $stick) { Remove-Item -Recurse -Force $stick }; New-Item -ItemType Directory -Force "$stick\DOCUMENTS" | Out-Null
+        Set-Content -Encoding ascii "$t\FOLIO\INSTALLED.ID" "FolioOS installed on this disk`r`nkind=whole`r`nversion=$ver"
+        Set-Content -Encoding ascii "$t\FOLIO\CONFIG.INI" "docs_place=usb"
+        $env:FOLIO_PLATFORM_LANG = "pt-BR"
+        try { Run .\build\folio_sim.exe @("--root", $t, "--vol2", $stick, "--script", "tests\textos_pendrive.txt", "--out", "build\shots") | Out-Null }
+        finally { $env:FOLIO_PLATFORM_LANG = $oldLang }
+        if (-not (Select-String -Quiet -Path "$stick\DOCUMENTS\*.md" -SimpleMatch "texto que mora no pendrive")) { throw "docs_place=usb: the new text was not saved on the USB drive" }
+        Fresh; Remove-Item -Recurse -Force $stick; New-Item -ItemType Directory -Force "$stick\DOCUMENTS", "$t\DOCUMENTS" | Out-Null
+        Set-Content -Encoding ascii "$t\FOLIO\INSTALLED.ID" "FolioOS installed on this disk`r`nkind=whole`r`nversion=$ver"
+        Set-Content -Encoding ascii "$t\FOLIO\CONFIG.INI" "docs_place=both"
+        Set-Content -Encoding utf8 "$t\DOCUMENTS\a.md" "a do computador"; Set-Content -Encoding utf8 "$stick\DOCUMENTS\b.md" "b do pendrive"
+        Set-Content -Encoding utf8 "$t\DOCUMENTS\c.md" "c do computador"; Set-Content -Encoding utf8 "$stick\DOCUMENTS\c.md" "c do pendrive"
+        (Get-Item "$t\DOCUMENTS\c.md").LastWriteTime = [datetime]"2026-01-01 10:00"; (Get-Item "$stick\DOCUMENTS\c.md").LastWriteTime = [datetime]"2026-06-01 10:00"
+        $env:FOLIO_PLATFORM_LANG = "pt-BR"
+        try { Run .\build\folio_sim.exe @("--root", $t, "--vol2", $stick, "--script", "tests\trocar.txt", "--out", "build\shots") | Out-Null }
+        finally { $env:FOLIO_PLATFORM_LANG = $oldLang }
+        if (-not (Test-Path "$t\DOCUMENTS\b.md") -or -not (Test-Path "$stick\DOCUMENTS\a.md")) { throw "exchange: a text that was only on one side was not copied to the other" }
+        if ((Get-Content -Raw "$t\DOCUMENTS\c.md") -notmatch "c do pendrive" -or (Get-Content -Raw "$stick\DOCUMENTS\c.md") -notmatch "c do pendrive") { throw "exchange: the newest version of c.md did not win" }
+        if (-not (Select-String -Quiet -Path "$t\FOLIO\VERSIONS\*" -SimpleMatch "c do computador")) { throw "exchange: the replaced version was not kept in FOLIO\VERSIONS" }
+        Remove-Item -Recurse -Force $stick
+        Ok "where the texts live: on the USB drive (a new text is saved there), or on both (exchange: newest wins, old version kept) - OK"
+        # and removing it through the screen (the confirmation word is always asked: the disk is left empty)
+        $env:FOLIO_PLATFORM_LANG = "pt-BR"; $env:FOLIO_DISKS = "$ft\target.img"
+        try { Fresh; $out = & .\build\folio_sim.exe --root $t --script tests\remover_disco.txt --out build\shots 2>&1 | Out-String; $rc = $LASTEXITCODE }
+        finally { $env:FOLIO_DISKS = $null; $env:FOLIO_PLATFORM_LANG = $oldLang }
+        if ($rc -ne 0 -or $out -notmatch "boot entry removed" -or -not (Zero1MB "$ft\target.img")) { throw "uninstall screen (whole disk): the disk was not left empty: $out" }
+        # phase 2 on the screen: next to "Windows" (the option comes first, nothing to type), then nothing else changed
+        Run .\build\install_test.exe @("$ft\src", "$ft\winsim.img", "1400", "--windows") | Out-Null
+        Copy-Item "$ft\winsim.img" "$ft\winsim-before.img"
+        $env:FOLIO_PLATFORM_LANG = "pt-BR"; $env:FOLIO_DISKS = "$ft\winsim.img"
+        try { Fresh; Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\instalar_lado.txt", "--out", "build\shots") | Out-Null }
+        finally { $env:FOLIO_DISKS = $null; $env:FOLIO_PLATFORM_LANG = $oldLang }
+        Run .\build\install_test.exe @("$ft\src", "$ft\winsim.img", "1400", "--compare", "$ft\winsim-before.img") | Out-Null
+        Run .\build\fat32_test.exe @("$ft\winsim.img", "--fsck") | Out-Null
+        & .\build\fatcat.exe "$ft\winsim.img" "EFI/FolioOS/FOLIO.ID" "$ft\FOLIO.ID" 2>$null
+        if (-not (Test-Path "$ft\FOLIO.ID") -or -not (Select-String -Quiet -Path "$ft\FOLIO.ID" -Pattern "^data=[0-9A-F-]{36}")) { throw "installer next to Windows: EFI\FolioOS\FOLIO.ID missing" }
+        Remove-Item "$ft\winsim.img", "$ft\winsim-before.img"
+        # BitLocker on the other system: without "I have the recovery key" nothing is written; with it, installs
+        Run .\build\install_test.exe @("$ft\src", "$ft\winsim.img", "1400", "--windows", "--bitlocker") | Out-Null
+        Copy-Item "$ft\winsim.img" "$ft\winsim-before.img"
+        $env:FOLIO_PLATFORM_LANG = "pt-BR"; $env:FOLIO_DISKS = "$ft\winsim.img"
+        try {
+            Fresh; Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\instalar_bitlocker_nao.txt", "--out", "build\shots") | Out-Null
+            if ((Get-FileHash "$ft\winsim.img").Hash -ne (Get-FileHash "$ft\winsim-before.img").Hash) { throw "installer: wrote to a BitLocker disk without the recovery key confirmed" }
+            Fresh; Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\instalar_bitlocker.txt", "--out", "build\shots") | Out-Null
+        } finally { $env:FOLIO_DISKS = $null; $env:FOLIO_PLATFORM_LANG = $oldLang }
+        Run .\build\install_test.exe @("$ft\src", "$ft\winsim.img", "1400", "--compare", "$ft\winsim-before.img") | Out-Null
+        & .\build\fatcat.exe "$ft\winsim.img" "EFI/FolioOS/FOLIO.ID" "$ft\FOLIO.ID2" 2>$null
+        if (-not (Test-Path "$ft\FOLIO.ID2")) { throw "installer next to BitLocker: not installed after the recovery key was confirmed" }
+        Remove-Item "$ft\winsim.img", "$ft\winsim-before.img"
+        Ok "installer next to BitLocker: nothing written until the recovery key is confirmed - OK"
+        # no free space: a disk made by Windows (EFI + NTFS, tests\fixtures\ntfs-big) - the engine shrinks the NTFS without
+        # moving data and installs after it, then the same through the screen (preview, size with the arrow keys)
+        function Expand-Big { $gi = [IO.File]::OpenRead("tests\fixtures\ntfs-big.img.gz"); $gz = New-Object IO.Compression.GZipStream($gi, [IO.Compression.CompressionMode]::Decompress)
+                              $go = [IO.File]::Create("$ft\big.img"); $gz.CopyTo($go); $go.Dispose(); $gz.Dispose(); $gi.Dispose() }
+        Expand-Big
+        Run .\build\install_test.exe @("$ft\src", "$ft\big.img", "1100", "--shrink-ntfs") | Out-Null
+        Run .\build\fat32_test.exe @("$ft\big.img", "--fsck") | Out-Null
+        Expand-Big
+        $env:FOLIO_PLATFORM_LANG = "pt-BR"; $env:FOLIO_DISKS = "$ft\big.img"
+        try { Fresh; Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\instalar_encolher.txt", "--out", "build\shots") | Out-Null }
+        finally { $env:FOLIO_DISKS = $null; $env:FOLIO_PLATFORM_LANG = $oldLang }
+        Run .\build\fscheck_test.exe @("--shrunk", "$ft\big.img", "983") | Out-Null
+        Run .\build\fat32_test.exe @("$ft\big.img", "--fsck") | Out-Null
+        Ok "installer with no free space: NTFS made by Windows shrunk without moving data, FolioOS installed after it (engine and screen) - OK"
+        # FAT32 and exFAT made by Windows: shrink and grow without moving data (every file the same, the volume back byte
+        # for byte), then the whole installer on a PC disk (EFI + FAT32/exFAT, no free space): shrink, install, uninstall
+        foreach ($k in "fat32", "exfat") {
+            foreach ($n in "data", "pc") {
+                $gi = [IO.File]::OpenRead("tests\fixtures\$k-$n.img.gz"); $gz = New-Object IO.Compression.GZipStream($gi, [IO.Compression.CompressionMode]::Decompress)
+                $go = [IO.File]::Create("$ft\$k-$n.img"); $gz.CopyTo($go); $go.Dispose(); $gz.Dispose(); $gi.Dispose()
+            }
+            Run .\build\fscheck_test.exe @("--$k", "$ft\$k-data.img") | Out-Null
+            if ($k -eq "fat32") { Run .\build\fat32_test.exe @("$ft\$k-data.img", "--fsck") | Out-Null }
+            Copy-Item "$ft\$k-pc.img" "$ft\$k-pc-orig.img"
+            Run .\build\install_test.exe @("$ft\src", "$ft\$k-pc.img", "1100", "--shrink-ntfs") | Out-Null
+            Run .\build\fat32_test.exe @("$ft\$k-pc.img", "--fsck") | Out-Null
+            Run .\build\install_test.exe @("$ft\src", "$ft\$k-pc.img", "1100", "--remove") | Out-Null
+            Run .\build\install_test.exe @("$ft\src", "$ft\$k-pc.img", "1100", "--same-table", "$ft\$k-pc-orig.img") | Out-Null
+            Remove-Item "$ft\$k-data.img", "$ft\$k-pc.img", "$ft\$k-pc-orig.img"
+            Get-ChildItem "$ft\src\DOCUMENTS" -Directory -Filter "computer-*" | Remove-Item -Recurse -Force   # the copied texts (keeps the test USB drive the same)
+        }
+        Ok "FAT32 and exFAT made by Windows: shrink and grow without moving data; install next to them and uninstall - OK"
+        # partition manager, engine: create, grow, shrink, grow again, format, delete, grow into the freed space (FAT32 made
+        # here gets a FAT with room to grow), every step consistent
+        $pm = "$ft\pm.img"; Remove-Item $pm -ErrorAction SilentlyContinue
+        foreach ($a in @(@("--op-create", "1", "300", "DADOS"), @("--op-create", "400", "200", "OUTRO"), @("--op-resize", "1", "380"), @("--op-resize", "2", "150"),
+                         @("--op-resize", "2", "300"), @("--op-format", "2", "NOVO"), @("--op-delete", "1"), @("--op-resize", "1", "500"))) {
+            Run .\build\install_test.exe (@("$ft\src", $pm, "1000") + $a) | Out-Null
+            Run .\build\fat32_test.exe @($pm, "--fsck") | Out-Null
+        }
+        $l = (& .\build\install_test.exe "$ft\src" $pm 1000 --list) -join "`n"
+        if ($l -notmatch "^1 819200 1024000 FAT32 NOVO$") { throw "partition manager (engine): unexpected table: $l" }
+        # and the screen, keyboard only: create on an empty disk, shrink it with the slider, then delete it (word APAGAR)
+        Remove-Item $pm; $xf = [IO.File]::Create($pm); $xf.SetLength(1000MB); $xf.Close()
+        $ol = $env:FOLIO_PLATFORM_LANG; $env:FOLIO_PLATFORM_LANG = "pt-BR"; $env:FOLIO_DISKS = $pm
+        try {
+            Fresh; Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\particoes.txt", "--out", "build\shots") | Out-Null
+            $l = @(& .\build\install_test.exe "$ft\src" $pm 1000 --list)
+            if ($l.Count -ne 1 -or $l[0] -notmatch "^1 2048 (\d+) FAT32 DATA$" -or [int64]$Matches[1] -ge 2045952) { throw "partition manager (screen): expected one smaller FAT32 'DATA', got: $($l -join '; ')" }
+            Run .\build\fat32_test.exe @($pm, "--fsck") | Out-Null
+            Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\particoes_apagar.txt", "--out", "build\shots") | Out-Null
+            $l = @(& .\build\install_test.exe "$ft\src" $pm 1000 --list | Where-Object { $_ -match "FAT32" })
+            if ($l.Count) { throw "partition manager (screen): the partition was not deleted: $($l -join '; ')" }
+        } finally { $env:FOLIO_DISKS = $null; $env:FOLIO_PLATFORM_LANG = $ol }
+        Remove-Item $pm
+        Ok "partition manager: create, resize, format, delete (engine), and create, shrink, delete on the screen - OK"
+        # uninstall through the screen: texts to the USB drive, FolioOS's partition and \EFI\FolioOS gone, the NTFS back
+        # to the size Windows made; the table and the NTFS boot sector must be byte for byte the original ones
+        # (the disk installed by the engine from the full USB drive: it has texts in DOCUMENTS to copy back)
+        Remove-Item "$ft\big.img"; Expand-Big; Copy-Item "$ft\big.img" "$ft\big-orig.img"
+        Run .\build\install_test.exe @("$ft\src", "$ft\big.img", "1100", "--shrink-ntfs") | Out-Null
+        Run .\build\install_test.exe @("$ft\src", "$ft\big.img", "1100", "--update") | Out-Null      # update next to Windows (\EFI\FolioOS too)
+        $ol = $env:FOLIO_PLATFORM_LANG; $env:FOLIO_PLATFORM_LANG = "pt-BR"; $env:FOLIO_DISKS = "$ft\big.img"
+        try { Fresh; $out = & .\build\folio_sim.exe --root $t --script tests\remover.txt --out build\shots 2>&1 | Out-String; $rc = $LASTEXITCODE }
+        finally { $env:FOLIO_DISKS = $null; $env:FOLIO_PLATFORM_LANG = $ol }
+        if ($rc -ne 0 -or $out -notmatch "boot entry removed") { throw "uninstall screen failed: $out" }
+        Run .\build\install_test.exe @("$ft\src", "$ft\big.img", "1100", "--same-table", "$ft\big-orig.img") | Out-Null
+        Run .\build\fat32_test.exe @("$ft\big.img", "--fsck") | Out-Null
+        $copied = @(Get-ChildItem "$t\DOCUMENTS" -Directory -Filter "computer-*" -ErrorAction SilentlyContinue | Get-ChildItem -Recurse -File).Count
+        if ($copied -lt 1) { throw "uninstall: the computer's texts were not copied to the USB drive" }
+        # and the engine alone, on a fresh install (texts counted one by one, NTFS grown back, \EFI\FolioOS gone)
+        Copy-Item "$ft\big-orig.img" "$ft\big.img" -Force
+        Run .\build\install_test.exe @("$ft\src", "$ft\big.img", "1100", "--shrink-ntfs") | Out-Null
+        Run .\build\install_test.exe @("$ft\src", "$ft\big.img", "1100", "--remove") | Out-Null
+        Run .\build\install_test.exe @("$ft\src", "$ft\big.img", "1100", "--same-table", "$ft\big-orig.img") | Out-Null
+        Remove-Item "$ft\big.img", "$ft\big-orig.img"
+        Ok "uninstall: texts copied to the USB drive, NTFS back to the size Windows made, table byte for byte the original (engine and screen) - OK"
+        # boot chooser: started from the EFI partition (FOLIO.ID names this volume), another system in the boot order
+        $g = "3E540828-E7AD-48C4-B8AA-5F24B8C2B7E0"
+        foreach ($wait in 3, 0) {
+            Fresh; New-Item -ItemType Directory -Force "$t\EFI\FolioOS" | Out-Null
+            Set-Content -Encoding ascii "$t\EFI\FolioOS\FOLIO.ID" "FolioOS data partition`r`ndata=$g"
+            if ($wait -eq 0) { Set-Content -Encoding ascii "$t\FOLIO\CONFIG.INI" "boot_wait=0" }
+            $env:FOLIO_VOL_GUID = $g; $env:FOLIO_OTHER_OS = "Windows Boot Manager"
+            try { $out = & .\build\folio_sim.exe --root $t --script tests\seletor.txt --out build\shots 2>&1 | Out-String; $rc = $LASTEXITCODE }
+            finally { $env:FOLIO_VOL_GUID = $null; $env:FOLIO_OTHER_OS = $null }
+            $went = $out -match "boot other: Windows Boot Manager"
+            if ($rc -ne 0 -or ($wait -gt 0) -ne $went) { throw "boot chooser (boot_wait=$wait): expected $(if ($wait) { 'the other system' } else { 'FolioOS' }); output: $out" }
+            if ($wait -eq 0) {   # Settings → System: the chooser's wait, by keyboard, saved to CONFIG.INI
+                $env:FOLIO_VOL_GUID = $g; $env:FOLIO_OTHER_OS = "Windows Boot Manager"
+                try { Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\seletor_ajuste.txt", "--out", "build\shots") | Out-Null }
+                finally { $env:FOLIO_VOL_GUID = $null; $env:FOLIO_OTHER_OS = $null }
+                if (-not (Select-String -Quiet -Path "$t\FOLIO\CONFIG.INI" -Pattern "^boot_wait=[1-9]")) { throw "Settings: the boot chooser wait was not saved (CONFIG.INI: $((Select-String -Path "$t\FOLIO\CONFIG.INI" -Pattern 'boot_wait').Line))" }
+            }
+        }
+        # the same screen in the real BOOTX64.EFI: reads the USB drive through SimpleFS, writes through Block I/O
+        $xf = [IO.File]::Create("$ft\target2.img"); $xf.SetLength(600MB); $xf.Close()
+        $env:FOLIO_PLATFORM_LANG = "pt-BR"
+        try { Fresh; Run .\build\efi_host.exe @("build\efi\BOOTX64.EFI", "--root", $t, "--script", "tests\efi_instalar.txt", "--out", "build\shots", "--disk", "$ft\small.img", "--disk", "$ft\target2.img") | Out-Null }
+        finally { $env:FOLIO_PLATFORM_LANG = $oldLang }
+        Run .\build\fat32_test.exe @("$ft\target2.img", "--fsck") | Out-Null
+        Remove-Item "$ft\copied.efi"; & .\build\fatcat.exe "$ft\target2.img" "EFI/BOOT/BOOTX64.EFI" "$ft\copied.efi" 2>$null
+        if (-not (Test-Path "$ft\copied.efi") -or (Get-FileHash "$ft\copied.efi").Hash -ne (Get-FileHash "$t\EFI\BOOT\BOOTX64.EFI").Hash) { throw "installer in BOOTX64.EFI: EFI\BOOT\BOOTX64.EFI not copied to the disk" }
+        if (-not (Zero1MB "$ft\small.img")) { throw "installer in BOOTX64.EFI: the disk that is too small was written to" }
+        Remove-Item -Recurse -Force $ft
+        Ok "partition tables + installer: GPT (UEFI) and MBR (BIOS) disks installed, every file CRC-checked, volumes consistent - OK"
+        Ok "installer next to Windows: one new entry, other partitions and entry numbers untouched, \EFI\FolioOS added - OK"
+        Ok "real BOOTX64.EFI: 3 disks listed through Block I/O (bus, model, size), GPT/MBR/empty tables read - OK"
+        Ok "installer screen (keyboard only): small disk refused, wrong word refused, installed and verified - OK"
+        Ok "installer in the real BOOTX64.EFI: USB drive read through SimpleFS, disk written through Block I/O - OK"
+        Ok "next to Windows on the screen: nothing else changed; boot chooser: no key starts the other system, boot_wait=0 opens FolioOS - OK"
     }
     Remove-Item -Recurse -Force $t
 }

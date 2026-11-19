@@ -1,0 +1,23 @@
+# Instalador, só pelo teclado, em pt-BR (FOLIO_DISKS = disco pequeno demais; disco de 600 MB vazio)
+wait 300
+key esc
+wait 200
+key ctrl+k
+type Instalar o FolioOS neste
+key enter
+wait 300
+assert_keywin Install FolioOS on this computer
+shot inst1_discos
+# o disco pequeno não pode ser escolhido; o de 600 MB já vem marcado. Shift+Tab = último item (Next)
+key shift+tab
+key enter
+wait 200
+shot inst2_confirmar
+# a palavra em minúsculas também vale; Tab, Tab = "Apagar e instalar"
+type apagar
+key tab
+key tab
+key enter
+wait 3000
+shot inst3_pronto
+assert_keywin Install FolioOS on this computer

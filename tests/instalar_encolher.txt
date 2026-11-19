@@ -1,0 +1,30 @@
+# Instalador sem espaço livre, ao lado de um Windows de verdade (FOLIO_DISKS = tests\fixtures\ntfs-big: EFI + NTFS
+# feitos pelo Windows): a opção é encolher o NTFS; prévia antes → depois, tamanho por ←/→, só pelo teclado, em pt-BR
+wait 300
+key esc
+wait 200
+key ctrl+k
+type Instalar o FolioOS neste
+key enter
+wait 300
+assert_keywin Install FolioOS on this computer
+shot encolher1_opcoes.png
+# Shift+Tab = Next
+key shift+tab
+key enter
+wait 200
+shot encolher2_previa.png
+# Tab = o 1º item (o tamanho do FolioOS); ← diminui um pouco, → volta
+key tab
+key left
+key right
+wait 100
+shot encolher3_tamanho.png
+# Tab, Tab, Tab = "Seus textos", "Voltar", "Encolher e instalar"
+key tab
+key tab
+key tab
+key enter
+wait 4000
+shot encolher4_pronto.png
+assert_keywin Install FolioOS on this computer

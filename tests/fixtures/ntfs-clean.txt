@@ -1,0 +1,1 @@
+flags=0 cs=4096 nclus=12255 last=6463 mft=4085 bytes=50331648

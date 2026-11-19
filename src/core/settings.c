@@ -16,7 +16,7 @@ void prefs_defaults(void) {
     prefs.volume = 60; prefs.goal = 1000; prefs.sprint_min = 25; prefs.read_wpm = 200;
     prefs.autosave_s = 20; prefs.ui_scale = 0; prefs.pointer_speed = 1.0f; prefs.touch_mode = 0; prefs.audio_gpio = true; prefs.video_fast = true;
     prefs.shuffle = false; prefs.repeat = true;
-    prefs.tabs = false; prefs.splash = true; prefs.splash_secs = SPLASH_SECS_DEFAULT;
+    prefs.tabs = false; prefs.splash = true; prefs.splash_secs = SPLASH_SECS_DEFAULT; prefs.boot_wait = 3;
 }
 static char theme_name[48], font_name[64];
 bool prefs_had_file;          /* havia um CONFIG.INI (instalação já em uso) */
@@ -119,6 +119,7 @@ void prefs_load(void) {
         else if (str_eq(k, "fast_video")) prefs.video_fast = bv;
         else if (str_eq(k, "rotation")) prefs.rotation = str_ieq(v, "auto") ? 0 : iv == 0 && v[0] == '0' ? 1 : iv == 90 ? 2 : iv == 180 ? 3 : iv == 270 ? 4 : 0;
         else if (str_eq(k, "resolution")) str_copy(prefs.video_mode, str_ieq(v, "auto") ? "" : v, sizeof prefs.video_mode);
+        else if (str_eq(k, "keep_aspect")) prefs.aspect = str_ieq(v, "monitor") ? 1 : str_eq(v, "16:9") ? 2 : str_eq(v, "16:10") ? 3 : str_eq(v, "4:3") ? 4 : 0;
         else if (str_eq(k, "shuffle")) prefs.shuffle = bv;
         else if (str_eq(k, "repeat")) prefs.repeat = bv;
         else if (str_eq(k, "last_file")) str_copy(prefs.last_path, v, sizeof prefs.last_path);
@@ -131,6 +132,8 @@ void prefs_load(void) {
         else if (str_eq(k, "tabs")) prefs.tabs = bv;
         else if (str_eq(k, "splash")) prefs.splash = bv;
         else if (str_eq(k, "splash_seconds")) prefs.splash_secs = CLAMP(iv, 1, 60);
+        else if (str_eq(k, "boot_wait")) prefs.boot_wait = CLAMP(iv, 0, 60);
+        else if (str_eq(k, "docs_place")) prefs.docs_place = str_eq(v, "usb") ? DOCS_USB : str_eq(v, "both") ? DOCS_BOTH : DOCS_COMPUTER;
         else if (str_eq(k, "active_tab")) prefs.tab_active = MAX(0, iv - 1);
         else if (numbered(k, "recent", &r, 6)) str_copy(prefs.recent[r], v, sizeof prefs.recent[0]);
         else if (numbered(k, "position", &r, 6)) {
@@ -180,6 +183,8 @@ void prefs_save(void) {
     {
         static const char *rn[5] = { "auto", "0", "90", "180", "270" };
         buf_printf(&b, "rotation=%s\r\nresolution=%s\r\n", rn[CLAMP(prefs.rotation, 0, 4)], prefs.video_mode[0] ? prefs.video_mode : "auto");
+        static const char *an[5] = { "off", "monitor", "16:9", "16:10", "4:3" };
+        buf_printf(&b, "keep_aspect=%s\r\n", an[CLAMP(prefs.aspect, 0, 4)]);
     }
     if (app.has_path) {
         buf_printf(&b, "last_file=%s\r\nlast_volume=%d\r\nlast_paragraph=%d\r\nlast_column=%d\r\n", app.path, app.vol, preview_top_para(), preview_active() ? 0 : app.caret.o);
@@ -190,7 +195,9 @@ void prefs_save(void) {
         if (prefs.recent[i][0]) buf_printf(&b, "recent%d=%s\r\nposition%d=%d,%d\r\n", i + 1, prefs.recent[i], i + 1, prefs.recent_pos[i][0], prefs.recent_pos[i][1]);
     /* abas: com elas desligadas a lista anterior continua guardada, para voltar igual ao religar */
     if (prefs.tabs) app_tabs_to_prefs();
-    buf_printf(&b, "splash=%d\r\nsplash_seconds=%d\r\ntabs=%d\r\nactive_tab=%d\r\n", prefs.splash, prefs.splash_secs, prefs.tabs, prefs.tab_active + 1);
+    buf_printf(&b, "splash=%d\r\nsplash_seconds=%d\r\nboot_wait=%d\r\ntabs=%d\r\nactive_tab=%d\r\n", prefs.splash, prefs.splash_secs, prefs.boot_wait, prefs.tabs, prefs.tab_active + 1);
+    buf_printf(&b, "docs_place=%s\r\n", prefs.docs_place == DOCS_USB ? "usb" : prefs.docs_place == DOCS_BOTH ? "both" : "computer");
+    if (dbg_on) buf_puts(&b, "debug_serial=1\r\n");   /* ligado à mão para diagnóstico: continua ligado depois de gravar */
     for (int i = 0, n = 0; i < prefs.ntab_saved; i++)
         if (prefs.tab_list[i][0]) { n++; buf_printf(&b, "tab%d=%s\r\ntabpos%d=%d,%d\r\n", n, prefs.tab_list[i], n, prefs.tab_pos[i][0], prefs.tab_pos[i][1]); }
     paths_ensure(app_boot_vol(), DIR_FOLIO);

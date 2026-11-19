@@ -1,0 +1,23 @@
+# Atualizar o FolioOS instalado no disco (o de tests\instalar.txt) por este pendrive, só pelo teclado, em pt-BR:
+# a paleta "Atualizar o FolioOS" já marca a opção; nada para digitar (os textos e os ajustes ficam).
+# O build confere a versão nova em FOLIO\INSTALLED.ID.
+wait 300
+key esc
+wait 200
+key ctrl+k
+type Atualizar o FolioOS
+key enter
+wait 300
+assert_keywin Install FolioOS on this computer
+shot atualizar1_opcoes.png
+# Shift+Tab = Next
+key shift+tab
+key enter
+wait 200
+shot atualizar2_previa.png
+# Shift+Tab = "Atualizar"
+key shift+tab
+key enter
+wait 4000
+shot atualizar3_pronto.png
+assert_keywin Install FolioOS on this computer

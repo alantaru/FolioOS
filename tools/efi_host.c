@@ -144,6 +144,14 @@ static void script_step(void) {
         }
         if (!strcmp(line, "ctrl")) { pushkey(0, (CHAR16)(arg[0] - 'a' + 1), EFI_LEFT_CONTROL); script_due = now_ms() + 200; return; }
         if (!strcmp(line, "ctrlshift")) { pushkey(0, (CHAR16)(arg[0] - 'a' + 1), EFI_LEFT_CONTROL | EFI_LEFT_SHIFT); script_due = now_ms() + 200; return; }
+        if (!strcmp(line, "key")) {                    /* teclas de navegação: tab, shift+tab, enter, esc */
+            if (!strcmp(arg, "tab")) pushkey(0, 9, 0);
+            else if (!strcmp(arg, "shift+tab")) pushkey(0, 9, EFI_LEFT_SHIFT);
+            else if (!strcmp(arg, "enter")) pushkey(0, '\r', 0);
+            else if (!strcmp(arg, "esc")) pushkey(0x17, 0, 0);
+            else { fprintf(stderr, "tecla desconhecida: %s\n", arg); ExitProcess(2); }
+            script_due = now_ms() + 150; return;
+        }
         if (!strcmp(line, "scan")) { pushkey((UINT16)strtol(arg, 0, 0), 0, 0); script_due = now_ms() + 200; return; }
         if (!strcmp(line, "mouse")) { int x, y; sscanf(arg, "%d %d", &x, &y); mdx += x; mdy += y; mouse_dirty = 1; script_due = now_ms() + 150; return; }
         if (!strcmp(line, "click")) { mleft = 1; mouse_dirty = 1; script_due = now_ms() + 60; char *x = 0; (void)x; return; }
@@ -452,6 +460,54 @@ static EntryFn load_pe(const char *path) {
     return (EntryFn)(img + entry);
 }
 
+/* ------------------------------------------------------------ discos (--disk imagem): Block I/O sobre arquivos
+ * Cada imagem vira um disco SATA com Disk Info (IDENTIFY com o modelo "FolioOS test disk N"). O volume da
+ * pasta --root fica num caminho USB, então nenhum desses discos é o de boot. */
+static EFI_GUID G_BIO   = { 0x964e5b21, 0x6459, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b } };
+static EFI_GUID G_DPATH = { 0x09576e91, 0x6d3f, 0x11d2, { 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b } };
+static EFI_GUID G_DINFO = { 0xd432a67f, 0x14dc, 0x484b, { 0xb3, 0xbb, 0x3f, 0x02, 0x91, 0x84, 0x93, 0x27 } };
+typedef struct { EFI_BLOCK_IO_PROTOCOL bio; EFI_DISK_INFO_PROTOCOL di; EFI_BLOCK_IO_MEDIA media; FILE *f; UINT8 dp[14]; int handle; } HDisk;
+static HDisk hdisks[4]; static int nhdisks;
+static UINT8 fs_dp[] = { 3, 5, 6, 0, 1, 0,   4, 1, 42, 0, 1, 0, 0, 0,  0, 8, 0, 0, 0, 0, 0, 0,  0, 0, 1, 0, 0, 0, 0, 0,
+                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,   0x7F, 0xFF, 4, 0 };   /* USB / partição 1 / fim */
+static EFI_STATUS hd_rw(EFI_BLOCK_IO_PROTOCOL *b, UINT32 m, UINT64 lba, UINTN sz, void *buf, int w) {
+    HDisk *d = (HDisk *)b;
+    if (m != d->media.MediaId) return EFI_ERR(13);                       /* MEDIA_CHANGED */
+    if (sz % 512 || lba + sz / 512 > d->media.LastBlock + 1) return EFI_ERR(2);   /* INVALID_PARAMETER */
+    if (w && d->media.ReadOnly) return EFI_ERR(8);
+    if (_fseeki64(d->f, (long long)(lba * 512), SEEK_SET)) return EFI_ERR(7);
+    size_t got = w ? fwrite(buf, 1, sz, d->f) : fread(buf, 1, sz, d->f);
+    return got == sz ? 0 : EFI_ERR(7);                                   /* DEVICE_ERROR */
+}
+static EFI_STATUS EFIAPI hd_read(EFI_BLOCK_IO_PROTOCOL *b, UINT32 m, UINT64 lba, UINTN sz, void *buf) { return hd_rw(b, m, lba, sz, buf, 0); }
+static EFI_STATUS EFIAPI hd_write(EFI_BLOCK_IO_PROTOCOL *b, UINT32 m, UINT64 lba, UINTN sz, void *buf) { return hd_rw(b, m, lba, sz, buf, 1); }
+static EFI_STATUS EFIAPI hd_flush(EFI_BLOCK_IO_PROTOCOL *b) { fflush(((HDisk *)b)->f); return 0; }
+static EFI_STATUS EFIAPI hd_reset(EFI_BLOCK_IO_PROTOCOL *b, BOOLEAN x) { (void)b; (void)x; return 0; }
+static EFI_STATUS EFIAPI hd_identify(EFI_DISK_INFO_PROTOCOL *p, void *buf, UINT32 *sz) {
+    HDisk *d = (HDisk *)((char *)p - offsetof(HDisk, di));
+    if (*sz < 512) { *sz = 512; return EFI_BUFFER_TOO_SMALL; }
+    char m[48]; snprintf(m, sizeof m, "%-40s", "");
+    int n = snprintf(m, sizeof m, "FolioOS test disk %d", (int)(d - hdisks) + 1); m[n] = ' ';
+    memset(buf, 0, 512);
+    for (int i = 0; i < 40; i++) ((UINT8 *)buf)[54 + (i ^ 1)] = (UINT8)m[i];   /* palavras ATA: bytes trocados */
+    *sz = 512; return 0;
+}
+static EFI_STATUS EFIAPI hd_inquiry(EFI_DISK_INFO_PROTOCOL *p, void *buf, UINT32 *sz) { (void)p; (void)buf; (void)sz; return UNSUPPORTED; }
+static bool add_disk(const char *path) {
+    if (nhdisks >= 4) return false;
+    HDisk *d = &hdisks[nhdisks];
+    d->f = fopen(path, "r+b"); if (!d->f) { perror(path); return false; }
+    _fseeki64(d->f, 0, SEEK_END); UINT64 size = (UINT64)_ftelli64(d->f);
+    d->media.MediaId = 1; d->media.MediaPresent = 1; d->media.BlockSize = 512; d->media.LastBlock = size / 512 - 1;
+    d->bio.Revision = 0x10000; d->bio.Media = &d->media; d->bio.Reset = hd_reset; d->bio.ReadBlocks = hd_read; d->bio.WriteBlocks = hd_write; d->bio.FlushBlocks = hd_flush;
+    d->di.Identify = hd_identify; d->di.Inquiry = hd_inquiry;
+    UINT8 dp[14] = { 3, 0x12, 10, 0, (UINT8)nhdisks, 0, 0xFF, 0xFF, 0, 0, 0x7F, 0xFF, 4, 0 };   /* SATA porta N / fim */
+    memcpy(d->dp, dp, sizeof dp);
+    reg(&d->handle, &G_BIO, &d->bio); reg(&d->handle, &G_DPATH, d->dp); reg(&d->handle, &G_DINFO, &d->di);
+    nhdisks++;
+    return true;
+}
+
 int main(int argc, char **argv) {
     SetConsoleOutputCP(CP_UTF8);
     QueryPerformanceFrequency(&qpf);
@@ -462,6 +518,7 @@ int main(int argc, char **argv) {
         else if (!strcmp(argv[i], "--script") && i + 1 < argc) { script = fopen(argv[++i], "rb"); headless = 1; }
         else if (!strcmp(argv[i], "--gop") && i + 1 < argc) { const char *m = argv[++i]; gopmode = !strcmp(m, "rgb") ? 1 : !strcmp(m, "mask16") ? 2 : !strcmp(m, "blt") ? 3 : !strcmp(m, "pad") ? 4 : !strcmp(m, "uga") ? 5 : 0; }
         else if (!strcmp(argv[i], "--edid")) edid_on = 1;
+        else if (!strcmp(argv[i], "--disk") && i + 1 < argc) { if (!add_disk(argv[++i])) return 1; }
         else if (!strcmp(argv[i], "--out") && i + 1 < argc) snprintf(outdir, sizeof outdir, "%s", argv[++i]);
         else efi = argv[i];
     }
@@ -501,7 +558,7 @@ int main(int argc, char **argv) {
     st.ConIn = &ci; st.ConOut = &co; st.ConsoleInHandle = &h_con; st.RuntimeServices = &rt; st.BootServices = &bs;
     reg(&h_con, &G_TIEX, &cix); if (gopmode == 5) { static EFI_UGA_DRAW_PROTOCOL uga; uga.GetMode = uga_getmode; uga.SetMode = uga_setmode; uga.Blt = uga_blt; reg(&h_gop, &G_UGA, &uga); }
     else reg(&h_gop, &G_GOP, &gop);
-    if (edid_on) { make_edid(); reg(&h_gop, &G_EDIDA, &edid_p); } reg(&h_mouse, &G_SPTR, &ptr); reg(&h_fs, &G_SFS, &sfs); reg(&h_image, &G_LIMG, &li);
+    if (edid_on) { make_edid(); reg(&h_gop, &G_EDIDA, &edid_p); } reg(&h_mouse, &G_SPTR, &ptr); reg(&h_fs, &G_SFS, &sfs); reg(&h_fs, &G_DPATH, fs_dp); reg(&h_image, &G_LIMG, &li);
     printf("executando efi_main…\n"); fflush(stdout);
     EFI_STATUS s = entry(&h_image, &st);
     printf("efi_main retornou 0x%llx\n", (unsigned long long)s);

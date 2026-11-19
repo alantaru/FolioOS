@@ -83,6 +83,8 @@ void pal_video_fast(bool on) { (void)on; }
 void pal_set_rotation(int pref) { (void)pref; }
 int  pal_rotation(void) { return 0; }
 void pal_set_video_mode(const char *pref) { (void)pref; }
+void pal_set_aspect(int w, int h) { (void)w; (void)h; }
+void pal_video_apply(void) {}
 void pal_video_mode(int *w, int *h) { *w = screen.w; *h = screen.h; }
 int  pal_video_modes(int *ws, int *hs, int max) { if (max < 1) return 0; ws[0] = screen.w; hs[0] = screen.h; return 1; }
 /* the surface is in backing pixels: on Retina report the dpi that makes auto_scale() (110 dpi = 100%)
@@ -135,6 +137,19 @@ static bool to_p(int vol, const char *path, char *out, size_t cap) {
     while (n > 1 && out[n - 1] == '/') out[--n] = 0;
     return true;
 }
+/* discos: o simulador nunca toca nos discos do Mac */
+int pal_disk_count(void) { return 0; }
+bool pal_disk_info(int k, DiskInfo *o) { (void)k; (void)o; return false; }
+bool pal_disk_io(int k, u64 lba, u32 n, void *buf, bool w) { (void)k; (void)lba; (void)n; (void)buf; (void)w; return false; }
+bool pal_disk_flush(int k) { (void)k; return false; }
+bool pal_boot_entry_add(const char *desc, int part_num, u64 part_lba, u64 part_count, const u8 part_guid[16], const char *path) {
+    (void)desc; (void)part_num; (void)part_lba; (void)part_count; (void)part_guid; (void)path; return false;
+}
+bool pal_boot_entry_remove(void) { return false; }
+bool pal_chain_mbr(const u8 *code) { (void)code; return false; }
+bool pal_boot_other(char *name, int cap) { (void)name; (void)cap; return false; }
+void pal_boot_other_start(void) {}
+
 int pal_vol_count(void) { return nroots; }
 bool pal_vol_info(int v, VolInfo *o) {
     if (v < 0 || v >= nroots) return false;

@@ -41,6 +41,8 @@ void pal_video_fast(bool on) { (void)on; }
 void pal_set_rotation(int pref) { (void)pref; }
 int  pal_rotation(void) { return 0; }
 void pal_set_video_mode(const char *pref) { (void)pref; }
+void pal_set_aspect(int w, int h) { (void)w; (void)h; }
+void pal_video_apply(void) {}
 void pal_video_mode(int *w, int *h) { *w = screen.w; *h = screen.h; }
 int  pal_video_modes(int *ws, int *hs, int max) { if (max < 1) return 0; ws[0] = screen.w; hs[0] = screen.h; return 1; }
 float pal_display_dpi(void) { return 0; }
@@ -66,7 +68,7 @@ bool pal_poll(Event *e) {
     *e = q[qh]; qh = (qh + 1) % 2048;
     return true;
 }
-void pal_wait(int ms) { if (!headless) MsgWaitForMultipleObjects(0, 0, FALSE, (DWORD)ms, QS_ALLINPUT); }
+void pal_wait(int ms) { if (headless) fake_ms += (u64)MAX(ms, 1); else MsgWaitForMultipleObjects(0, 0, FALSE, (DWORD)ms, QS_ALLINPUT); }   /* roteiro: o tempo falso anda */
 
 /* ------------------------------------------------------------ PAL: arquivos */
 static void to_w(int vol, const char *path, wchar_t *out, int cap) {
@@ -77,12 +79,54 @@ static void to_w(int vol, const char *path, wchar_t *out, int cap) {
     while (n > 3 && full[n - 1] == '\\') full[--n] = 0;
     MultiByteToWideChar(CP_UTF8, 0, full, -1, out, cap);
 }
+/* discos: imagens de disco listadas em FOLIO_DISKS ("a.img;b.img"), para testar o instalador no simulador.
+ * Sem a variável, nenhum disco: o simulador nunca toca nos discos do Windows. */
+static FILE *dimg[8]; static u64 dsize[8]; static int ndimg = -1;
+static void disks_open(void) {
+    if (ndimg >= 0) return;
+    ndimg = 0;
+    const char *env = getenv("FOLIO_DISKS"); if (!env) return;
+    char list[2048]; snprintf(list, sizeof list, "%s", env);
+    for (char *p = strtok(list, ";"); p && ndimg < 8; p = strtok(0, ";")) {
+        FILE *f = fopen(p, "r+b"); if (!f) continue;
+        _fseeki64(f, 0, SEEK_END); dsize[ndimg] = (u64)_ftelli64(f) / 512; dimg[ndimg++] = f;
+    }
+}
+int pal_disk_count(void) { disks_open(); return ndimg; }
+bool pal_disk_info(int k, DiskInfo *o) {
+    disks_open(); if (k < 0 || k >= ndimg) return false;
+    memset(o, 0, sizeof *o);
+    snprintf(o->model, sizeof o->model, "Disk image %d", k + 1);
+    o->nsec = dsize[k]; o->bs = 512; o->kind = DISK_VIRTUAL;
+    return true;
+}
+bool pal_disk_io(int k, u64 lba, u32 n, void *buf, bool w) {
+    disks_open(); if (k < 0 || k >= ndimg || lba + n > dsize[k]) return false;
+    if (_fseeki64(dimg[k], (long long)(lba * 512), SEEK_SET)) return false;
+    bool ok = w ? fwrite(buf, 512, n, dimg[k]) == n : fread(buf, 512, n, dimg[k]) == n;
+    return ok;
+}
+bool pal_disk_flush(int k) { disks_open(); return k >= 0 && k < ndimg && fflush(dimg[k]) == 0; }
+/* entradas de boot: o simulador não tem firmware. FOLIO_OTHER_OS="Windows Boot Manager" finge um outro sistema
+ * (para testar o seletor de boot); iniciá-lo encerra o simulador com a linha "boot other: <nome>" */
+bool pal_boot_entry_add(const char *desc, int part_num, u64 part_lba, u64 part_count, const u8 part_guid[16], const char *path) {
+    (void)desc; (void)part_num; (void)part_lba; (void)part_count; (void)part_guid; (void)path; return false;
+}
+bool pal_boot_entry_remove(void) { printf("boot entry removed\n"); fflush(stdout); return true; }
+bool pal_chain_mbr(const u8 *code) { printf("chain other mbr: %02x %02x\n", code[0], code[1]); fflush(stdout); ExitProcess(0); }
+bool pal_boot_other(char *name, int cap) { const char *e = getenv("FOLIO_OTHER_OS"); if (!e || !*e) return false; snprintf(name, cap, "%s", e); return true; }
+void pal_boot_other_start(void) { printf("boot other: %s\n", getenv("FOLIO_OTHER_OS")); fflush(stdout); ExitProcess(0); }
+
 int pal_vol_count(void) { return nroots; }
 bool pal_vol_info(int v, VolInfo *o) {
     if (v < 0 || v >= nroots) return false;
     memset(o, 0, sizeof *o);
     o->boot = v == 0;
     snprintf(o->label, sizeof o->label, v == 0 ? "FOLIO" : "BACKUP");
+    /* FOLIO_VOL_GUID: o volume finge ser a partição GPT com esse GUID (para testar \EFI\FolioOS\FOLIO.ID) */
+    extern bool part_guid_parse(const char *s, u8 g[16]);
+    const char *g = getenv("FOLIO_VOL_GUID");
+    if (v == 0 && g && part_guid_parse(g, o->part_guid)) o->has_guid = true;
     return true;
 }
 static void ft_to_dt(FILETIME ft, DateTime *d) {

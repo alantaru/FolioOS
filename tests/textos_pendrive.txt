@@ -1,0 +1,12 @@
+# Textos "no pendrive" (docs_place=usb) numa instalação: um texto novo, salvo pelo teclado, vai para a pasta
+# DOCUMENTS do pendrive (--vol2), não para o computador. O build confere.
+wait 300
+key esc
+wait 200
+key ctrl+end
+type  texto que mora no pendrive
+key ctrl+s
+wait 400
+shot pendrive1_salvar.png
+key enter
+wait 600

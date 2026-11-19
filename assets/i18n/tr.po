@@ -13,1577 +13,1681 @@ msgstr ""
 "X-Date-Format: {d} {month} {yyyy}\n"
 "X-Decimal: ,\n"
 
-#: src/core/app.c:31 src/core/app.c:53 src/core/app.c:273 src/core/filedlg.c:139 src/core/md.c:239
+#: src/core/app.c:34 src/core/app.c:56 src/core/app.c:276 src/core/filedlg.c:139 src/core/md.c:239
 msgid "Untitled"
 msgstr "Adsız"
 
-#: src/core/app.c:161
+#: src/core/app.c:164
 msgid "Could not open the file"
 msgstr "Dosya açılamadı"
 
-#: src/core/app.c:285 src/core/app.c:456
+#: src/core/app.c:288 src/core/app.c:558
 msgid "Limit of 16 tabs — close one (Ctrl+W)"
 msgstr "En fazla 16 sekme — birini kapatın (Ctrl+W)"
 
-#: src/core/app.c:420
+#: src/core/app.c:423
 msgid "Picking up where you left off"
 msgstr "Kaldığınız yerden devam ediliyor"
 
-#: src/core/app.c:438
+#: src/core/app.c:441
 msgid "Close tab without saving?"
 msgstr "Sekme kaydedilmeden kapatılsın mı?"
 
-#: src/core/app.c:438
+#: src/core/app.c:441
 msgid "Save changes?"
 msgstr "Değişiklikler kaydedilsin mi?"
 
-#: src/core/app.c:439
+#: src/core/app.c:442
 msgid "The current document has changes that have not been saved yet."
 msgstr "Geçerli belgede henüz kaydedilmemiş değişiklikler var."
 
-#: src/core/app.c:439 src/core/app.c:766 src/core/app.c:897 src/core/filedlg.c:409
+#: src/core/app.c:442 src/core/app.c:868 src/core/app.c:1004 src/core/filedlg.c:410
 msgid "Save"
 msgstr "Kaydet"
 
-#: src/core/app.c:439
+#: src/core/app.c:442
 msgid "Don't save"
 msgstr "Kaydetme"
 
-#: src/core/app.c:446
+#: src/core/app.c:534
+msgid "Connect the USB drive with your texts (a DOCUMENTS folder) first."
+msgstr "Önce metinlerinizin olduğu USB belleği takın (DOCUMENTS klasörü)."
+
+#: src/core/app.c:539
+msgid "The texts on this computer and on the USB drive are already the same."
+msgstr "Bu bilgisayardaki ve USB bellekteki metinler zaten aynı."
+
+#: src/core/app.c:540
+#, c-format
+msgid "Texts exchanged: %d to the USB drive, %d to this computer."
+msgstr "Metinler değiştirildi: %d USB belleğe, %d bu bilgisayara."
+
+#: src/core/app.c:541
+#, c-format
+msgid " %d left as it is (open in another tab, or changed on both sides at the same minute)."
+msgid_plural " %d left as they are (open in another tab, or changed on both sides at the same minute)."
+msgstr[0] " %d metin olduğu gibi bırakıldı (başka bir sekmede açık ya da iki tarafta aynı dakikada değişmiş)."
+msgstr[1] " %d metin olduğu gibi bırakıldı (başka bir sekmede açık ya da iki tarafta aynı dakikada değişmiş)."
+
+#: src/core/app.c:548
 msgid "This format is export-only. Open the matching .md file."
 msgstr "Bu biçim yalnızca dışa aktarma içindir. İlgili .md dosyasını açın."
 
-#: src/core/app.c:467
+#: src/core/app.c:569
 msgid "Failed to create the file"
 msgstr "Dosya oluşturulamadı"
 
-#: src/core/app.c:478
+#: src/core/app.c:580
 msgid "Write error — is the USB drive write-protected or full?"
 msgstr "Yazma hatası — USB bellek korumalı mı ya da dolu mu?"
 
-#: src/core/app.c:491 src/core/app.c:507
+#: src/core/app.c:593 src/core/app.c:609
 #, c-format
 msgid "Saved · %s"
 msgstr "Kaydedildi · %s"
 
-#: src/core/app.c:496 src/core/filedlg.c:197
+#: src/core/app.c:598 src/core/filedlg.c:197
 msgid "Export is not available for LaTeX files"
 msgstr "Dışa aktarma LaTeX dosyaları için kullanılamaz"
 
-#: src/core/app.c:509
+#: src/core/app.c:611
 #, c-format
 msgid "Exported · %s"
 msgstr "Dışa aktarıldı · %s"
 
-#: src/core/app.c:557
+#: src/core/app.c:659
 msgid "Narrow"
 msgstr "Dar"
 
-#: src/core/app.c:557
+#: src/core/app.c:659
 msgid "Medium"
 msgstr "Orta"
 
-#: src/core/app.c:557
+#: src/core/app.c:659
 msgid "Wide"
 msgstr "Geniş"
 
-#: src/core/app.c:557
+#: src/core/app.c:659
 msgid "Extra"
 msgstr "Çok geniş"
 
-#: src/core/app.c:561
+#: src/core/app.c:663
 msgid "Full screen: the text uses the full width"
 msgstr "Tam ekran: metin tüm genişliği kullanır"
 
-#: src/core/app.c:561
+#: src/core/app.c:663
 msgid "Page: text in a column, like on a sheet of paper"
 msgstr "Sayfa: metin, kâğıttaki gibi bir sütunda"
 
-#: src/core/app.c:603
+#: src/core/app.c:705
 msgid "Settings"
 msgstr "Ayarlar"
 
-#: src/core/app.c:604 src/core/app.c:780 src/core/app.c:908 src/core/app.c:1606
+#: src/core/app.c:706 src/core/app.c:882 src/core/app.c:1015 src/core/app.c:1757
 msgid "Find and replace"
 msgstr "Bul ve değiştir"
 
-#: src/core/app.c:605 src/core/app.c:908 src/core/app.c:1618
+#: src/core/app.c:707 src/core/app.c:1015 src/core/app.c:1769
 msgid "Outline"
 msgstr "Ana hat"
 
-#: src/core/app.c:606 src/core/app.c:797 src/core/app.c:1619
+#: src/core/app.c:708 src/core/app.c:899 src/core/app.c:1770
 msgid "Session and goals"
 msgstr "Oturum ve hedefler"
 
-#: src/core/app.c:607 src/core/app.c:801 src/core/app.c:912
+#: src/core/app.c:709 src/core/app.c:903 src/core/app.c:1019
 msgid "Keyboard shortcuts"
 msgstr "Klavye kısayolları"
 
-#: src/core/app.c:608
+#: src/core/app.c:710
 msgid "Commands"
 msgstr "Komutlar"
 
-#: src/core/app.c:609 src/core/app.c:1738
+#: src/core/app.c:711 src/core/app.c:1889
 msgid "Menu"
 msgstr "Menü"
 
-#: src/core/app.c:611
+#: src/core/app.c:713
 msgid "Theme editor"
 msgstr "Tema düzenleyici"
 
-#: src/core/app.c:630
+#: src/core/app.c:732
 #, c-format
 msgid "Tabs on · %d documents open (Ctrl+N new, Ctrl+W close)"
 msgstr "Sekmeler açık · %d belge açık (Ctrl+N yeni, Ctrl+W kapat)"
 
-#: src/core/app.c:630
+#: src/core/app.c:732
 msgid "Tabs on (Ctrl+N new tab, Ctrl+W close)"
 msgstr "Sekmeler açık (Ctrl+N yeni sekme, Ctrl+W kapat)"
 
-#: src/core/app.c:631
+#: src/core/app.c:733
 msgid "Tabs off — your tabs are kept for when you turn them back on"
 msgstr "Sekmeler kapalı — sekmeleriniz yeniden açtığınızda geri gelir"
 
-#: src/core/app.c:634
+#: src/core/app.c:736
 msgid "Turn tabs on to use Ctrl+W (Ctrl+K → Tabs, or the button at the top)"
 msgstr "Ctrl+W için sekmeleri açın (Ctrl+K → Sekmeler veya üstteki düğme)"
 
-#: src/core/app.c:646
+#: src/core/app.c:748
 msgid "Focus off"
 msgstr "Odak kapalı"
 
-#: src/core/app.c:646
+#: src/core/app.c:748
 msgid "Focus on sentence"
 msgstr "Odak cümlede"
 
-#: src/core/app.c:646
+#: src/core/app.c:748
 msgid "Focus on paragraph"
 msgstr "Odak paragrafta"
 
-#: src/core/app.c:646
+#: src/core/app.c:748
 msgid "Focus on line"
 msgstr "Odak satırda"
 
-#: src/core/app.c:649
+#: src/core/app.c:751
 msgid "Typewriter: current line always centered"
 msgstr "Daktilo: geçerli satır her zaman ortada"
 
-#: src/core/app.c:649
+#: src/core/app.c:751
 msgid "Typewriter off"
 msgstr "Daktilo kapalı"
 
-#: src/core/app.c:650
+#: src/core/app.c:752
 msgid "Zen mode — Esc or move the mouse to the top to leave"
 msgstr "Zen modu — çıkmak için Esc ya da fareyi en üste götürün"
 
-#: src/core/app.c:650
+#: src/core/app.c:752
 msgid "Zen mode off"
 msgstr "Zen modu kapalı"
 
-#: src/core/app.c:671
+#: src/core/app.c:773
 #, c-format
 msgid "Theme: %s"
 msgstr "Tema: %s"
 
-#: src/core/app.c:672
+#: src/core/app.c:774
 #, c-format
 msgid "Font: %s"
 msgstr "Yazı tipi: %s"
 
-#: src/core/app.c:685
+#: src/core/app.c:787
 msgid "Sprint stopped"
 msgstr "Sprint durduruldu"
 
-#: src/core/app.c:688
+#: src/core/app.c:790
 #, c-format
 msgid "%d-minute sprint started. Happy writing!"
 msgstr "%d dakikalık sprint başladı. İyi yazmalar!"
 
-#: src/core/app.c:691
+#: src/core/app.c:793
 msgid "Hemingway mode: deleting is disabled"
 msgstr "Hemingway modu: silme devre dışı"
 
-#: src/core/app.c:691
+#: src/core/app.c:793
 msgid "Hemingway mode off"
 msgstr "Hemingway modu kapalı"
 
-#: src/core/app.c:692
+#: src/core/app.c:794
 msgid "Markup hidden outside the current paragraph"
 msgstr "İşaretler geçerli paragrafın dışında gizli"
 
-#: src/core/app.c:692
+#: src/core/app.c:794
 msgid "Markup always visible"
 msgstr "İşaretler her zaman görünür"
 
-#: src/core/app.c:693
+#: src/core/app.c:795
 msgid "Smart typography on (— “ ” …)"
 msgstr "Akıllı tipografi açık (— “ ” …)"
 
-#: src/core/app.c:693
+#: src/core/app.c:795
 msgid "Smart typography off"
 msgstr "Akıllı tipografi kapalı"
 
-#: src/core/app.c:705
+#: src/core/app.c:807
 #, c-format
 msgid "Page %s"
 msgstr "Sayfa %s"
 
-#: src/core/app.c:713 src/core/editor.c:757 src/core/preview.c:252
+#: src/core/app.c:815 src/core/editor.c:757 src/core/preview.c:252
 msgid "This is the last chapter"
 msgstr "Bu son bölüm"
 
-#: src/core/app.c:730
+#: src/core/app.c:832
 msgid "Mouse and touchpad off: keyboard only (Ctrl+K → Mouse turns them back on)"
 msgstr "Fare ve dokunmatik yüzey kapalı: yalnızca klavye (Ctrl+K → Fare yeniden açar)"
 
-#: src/core/app.c:730
+#: src/core/app.c:832
 msgid "Mouse and touchpad on"
 msgstr "Fare ve dokunmatik yüzey açık"
 
-#: src/core/app.c:741
+#: src/core/app.c:843
 msgid "Could not read the language file"
 msgstr "Dil dosyası okunamadı"
 
-#: src/core/app.c:745
+#: src/core/app.c:847
 #, c-format
 msgid "This language needs fonts (%s) that are missing from %s. Copy FolioOS.zip to the USB drive again."
 msgstr "Bu dil, %2$s içinde eksik olan yazı tiplerine (%1$s) ihtiyaç duyuyor. FolioOS.zip dosyasını USB belleğe yeniden kopyalayın."
 
-#: src/core/app.c:758
+#: src/core/app.c:860
 msgid "New document"
 msgstr "Yeni belge"
 
-#: src/core/app.c:758 src/core/app.c:896
+#: src/core/app.c:860 src/core/app.c:1003
 msgid "Ctrl+N"
 msgstr "Ctrl+N"
 
-#: src/core/app.c:759
+#: src/core/app.c:861
 msgid "Tabs: several documents (on/off)"
 msgstr "Sekmeler: birden çok belge (aç/kapat)"
 
-#: src/core/app.c:760
+#: src/core/app.c:862
 msgid "Close tab"
 msgstr "Sekmeyi kapat"
 
-#: src/core/app.c:760
+#: src/core/app.c:862
 msgid "Ctrl+W"
 msgstr "Ctrl+W"
 
-#: src/core/app.c:761
+#: src/core/app.c:863
 msgid "Next tab"
 msgstr "Sonraki sekme"
 
-#: src/core/app.c:761
+#: src/core/app.c:863
 msgid "Ctrl+Tab"
 msgstr "Ctrl+Tab"
 
-#: src/core/app.c:762
+#: src/core/app.c:864
 msgid "Previous tab"
 msgstr "Önceki sekme"
 
-#: src/core/app.c:762
+#: src/core/app.c:864
 msgid "Ctrl+Shift+Tab"
 msgstr "Ctrl+Shift+Tab"
 
-#: src/core/app.c:763
+#: src/core/app.c:865
 msgid "Create a custom theme (colors and fonts)"
 msgstr "Özel tema oluştur (renkler ve yazı tipleri)"
 
-#: src/core/app.c:764
+#: src/core/app.c:866
 msgid "Edit the current theme"
 msgstr "Geçerli temayı düzenle"
 
-#: src/core/app.c:765 src/core/app.c:896
+#: src/core/app.c:867 src/core/app.c:1003
 msgid "Open…"
 msgstr "Aç…"
 
-#: src/core/app.c:765 src/core/app.c:896
+#: src/core/app.c:867 src/core/app.c:1003
 msgid "Ctrl+O"
 msgstr "Ctrl+O"
 
-#: src/core/app.c:766 src/core/app.c:897
+#: src/core/app.c:868 src/core/app.c:1004
 msgid "Ctrl+S"
 msgstr "Ctrl+S"
 
-#: src/core/app.c:767 src/core/app.c:897
+#: src/core/app.c:869 src/core/app.c:1004
 msgid "Save as / Export…"
 msgstr "Farklı kaydet / Dışa aktar…"
 
-#: src/core/app.c:767 src/core/app.c:897 src/core/app.c:1603
+#: src/core/app.c:869 src/core/app.c:1004 src/core/app.c:1754
 msgid "Ctrl+Shift+S"
 msgstr "Ctrl+Shift+S"
 
-#: src/core/app.c:768
+#: src/core/app.c:870
 msgid "Reading mode (formatted Markdown)"
 msgstr "Okuma modu (biçimlendirilmiş Markdown)"
 
-#: src/core/app.c:768 src/core/app.c:1605
+#: src/core/app.c:870 src/core/app.c:1756
 msgid "Ctrl+P"
 msgstr "Ctrl+P"
 
-#: src/core/app.c:769
+#: src/core/app.c:871
 msgid "Reading auto-scroll (on/off)"
 msgstr "Okumada otomatik kaydırma (aç/kapat)"
 
-#: src/core/app.c:769 src/core/app.c:1612
+#: src/core/app.c:871 src/core/app.c:1763
 msgid "Enter (reading)"
 msgstr "Enter (okuma)"
 
-#: src/core/app.c:770
+#: src/core/app.c:872
 msgid "Next chapter"
 msgstr "Sonraki bölüm"
 
-#: src/core/app.c:770
+#: src/core/app.c:872
 msgid "Ctrl+PgDn"
 msgstr "Ctrl+PgDn"
 
-#: src/core/app.c:771
+#: src/core/app.c:873
 msgid "Previous chapter"
 msgstr "Önceki bölüm"
 
-#: src/core/app.c:771
+#: src/core/app.c:873
 msgid "Ctrl+PgUp"
 msgstr "Ctrl+PgUp"
 
-#: src/core/app.c:772
+#: src/core/app.c:874
 msgid "Go to the last edit"
 msgstr "Son değişikliğe git"
 
-#: src/core/app.c:772 src/core/app.c:1610
+#: src/core/app.c:874 src/core/app.c:1761
 msgid "Ctrl+J"
 msgstr "Ctrl+J"
 
-#: src/core/app.c:773 src/core/app.c:1609
+#: src/core/app.c:875 src/core/app.c:1760
 msgid "Duplicate paragraph"
 msgstr "Paragrafı çoğalt"
 
-#: src/core/app.c:773 src/core/app.c:1609
+#: src/core/app.c:875 src/core/app.c:1760
 msgid "Ctrl+D"
 msgstr "Ctrl+D"
 
-#: src/core/app.c:774 src/core/app.c:1609
+#: src/core/app.c:876 src/core/app.c:1760
 msgid "Delete paragraph"
 msgstr "Paragrafı sil"
 
-#: src/core/app.c:774 src/core/app.c:1609
+#: src/core/app.c:876 src/core/app.c:1760
 msgid "Ctrl+Shift+K"
 msgstr "Ctrl+Shift+K"
 
-#: src/core/app.c:775
+#: src/core/app.c:877
 msgid "Change case"
 msgstr "Büyük / küçük harf"
 
-#: src/core/app.c:775 src/core/app.c:1611
+#: src/core/app.c:877 src/core/app.c:1762
 msgid "Shift+F3"
 msgstr "Shift+F3"
 
-#: src/core/app.c:776
+#: src/core/app.c:878
 msgid "Insert today's date"
 msgstr "Bugünün tarihini ekle"
 
-#: src/core/app.c:777
+#: src/core/app.c:879
 msgid "Focus mode (sentence / paragraph / line)"
 msgstr "Odak modu (cümle / paragraf / satır)"
 
-#: src/core/app.c:778
+#: src/core/app.c:880
 msgid "Typewriter (centered line)"
 msgstr "Daktilo (ortalanmış satır)"
 
-#: src/core/app.c:779
+#: src/core/app.c:881
 msgid "Zen mode (no bars)"
 msgstr "Zen modu (çubuksuz)"
 
-#: src/core/app.c:780 src/core/app.c:908 src/core/app.c:1606
+#: src/core/app.c:882 src/core/app.c:1015 src/core/app.c:1757
 msgid "Ctrl+F"
 msgstr "Ctrl+F"
 
-#: src/core/app.c:781
+#: src/core/app.c:883
 msgid "Document outline"
 msgstr "Belgenin ana hattı"
 
-#: src/core/app.c:782
+#: src/core/app.c:884
 msgid "Appearance: themes and typography"
 msgstr "Görünüm: temalar ve tipografi"
 
-#: src/core/app.c:783 src/core/app.c:1615
+#: src/core/app.c:885 src/core/app.c:1766
 msgid "Next theme"
 msgstr "Sonraki tema"
 
-#: src/core/app.c:783 src/core/app.c:1615
+#: src/core/app.c:885 src/core/app.c:1766
 msgid "Ctrl+T"
 msgstr "Ctrl+T"
 
-#: src/core/app.c:784
+#: src/core/app.c:886
 msgid "Next font"
 msgstr "Sonraki yazı tipi"
 
-#: src/core/app.c:784
+#: src/core/app.c:886
 msgid "Ctrl+Shift+T"
 msgstr "Ctrl+Shift+T"
 
-#: src/core/app.c:785
+#: src/core/app.c:887
 msgid "Larger text"
 msgstr "Daha büyük metin"
 
-#: src/core/app.c:785
+#: src/core/app.c:887
 msgid "Ctrl+="
 msgstr "Ctrl+="
 
-#: src/core/app.c:786
+#: src/core/app.c:888
 msgid "Smaller text"
 msgstr "Daha küçük metin"
 
-#: src/core/app.c:786
+#: src/core/app.c:888
 msgid "Ctrl+-"
 msgstr "Ctrl+-"
 
-#: src/core/app.c:787
+#: src/core/app.c:889
 msgid "Page or full screen (text width)"
 msgstr "Sayfa veya tam ekran (metin genişliği)"
 
-#: src/core/app.c:788
+#: src/core/app.c:890
 msgid "Page size: narrow · medium · wide · extra"
 msgstr "Sayfa boyutu: dar · orta · geniş · çok geniş"
 
-#: src/core/app.c:789
+#: src/core/app.c:891
 msgid "Paper sheet (show/hide)"
 msgstr "Kâğıt sayfa (göster/gizle)"
 
-#: src/core/app.c:790 src/core/app.c:911
+#: src/core/app.c:892 src/core/app.c:1018
 msgid "Writing settings"
 msgstr "Yazma ayarları"
 
-#: src/core/app.c:791
+#: src/core/app.c:893
 msgid "Music: play / pause"
 msgstr "Müzik: çal / duraklat"
 
-#: src/core/app.c:792
+#: src/core/app.c:894
 msgid "Music: next track"
 msgstr "Müzik: sonraki parça"
 
-#: src/core/app.c:793
+#: src/core/app.c:895
 msgid "Music: previous track"
 msgstr "Müzik: önceki parça"
 
-#: src/core/app.c:794 src/core/app.c:1618
+#: src/core/app.c:896 src/core/app.c:1769
 msgid "Music player"
 msgstr "Müzik çalar"
 
-#: src/core/app.c:795
+#: src/core/app.c:897
 msgid "Sound test (chime)"
 msgstr "Ses testi (zil)"
 
-#: src/core/app.c:796
+#: src/core/app.c:898
 msgid "Start / stop writing sprint"
 msgstr "Yazma sprintini başlat / durdur"
 
-#: src/core/app.c:798
+#: src/core/app.c:900
 msgid "Hemingway mode (no deleting)"
 msgstr "Hemingway modu (silmeden)"
 
-#: src/core/app.c:799
+#: src/core/app.c:901
 msgid "Hide markup outside the paragraph"
 msgstr "Paragraf dışındaki işaretleri gizle"
 
-#: src/core/app.c:800
+#: src/core/app.c:902
 msgid "Smart typography (— “ ” …)"
 msgstr "Akıllı tipografi (— “ ” …)"
 
-#: src/core/app.c:802 src/core/app.c:1613
+#: src/core/app.c:904 src/core/app.c:1764
 msgid "Menu and recent documents"
 msgstr "Menü ve son belgeler"
 
-#: src/core/app.c:802 src/core/app.c:1613
+#: src/core/app.c:904 src/core/app.c:1764
 msgid "Alt+M"
 msgstr "Alt+M"
 
-#: src/core/app.c:803
+#: src/core/app.c:905
 msgid "Keyboard focus: text or the next window"
 msgstr "Klavye odağı: metin veya sonraki pencere"
 
-#: src/core/app.c:803 src/core/app.c:1623
+#: src/core/app.c:905 src/core/app.c:1774
 msgid "Ctrl+F6"
 msgstr "Ctrl+F6"
 
-#: src/core/app.c:804
+#: src/core/app.c:906
 msgid "Mouse and touchpad (on/off)"
 msgstr "Fare ve dokunmatik yüzey (aç/kapat)"
 
-#: src/core/app.c:805 src/core/app.c:1625
+#: src/core/app.c:907 src/core/app.c:1776
 msgid "Input method on/off (Korean, Japanese)"
 msgstr "Giriş yöntemi aç/kapat (Korece, Japonca)"
 
-#: src/core/app.c:805 src/core/app.c:1625
+#: src/core/app.c:907 src/core/app.c:1776
 msgid "Ctrl+Space"
 msgstr "Ctrl+Boşluk"
 
-#: src/core/app.c:806
+#: src/core/app.c:908
 msgid "Language and keyboard"
 msgstr "Dil ve klavye"
 
-#: src/core/app.c:807
+#: src/core/app.c:909 src/core/installer.c:38
+msgid "Install FolioOS on this computer"
+msgstr "FolioOS’u bu bilgisayara kur"
+
+#: src/core/app.c:910
+msgid "Update FolioOS on this computer"
+msgstr "Bu bilgisayardaki FolioOS’u güncelle"
+
+#: src/core/app.c:911 src/core/app.c:1315
+msgid "Exchange texts with the USB drive"
+msgstr "Metinleri USB bellekle değiştir"
+
+#: src/core/app.c:912
+msgid "Remove FolioOS from this computer"
+msgstr "FolioOS’u bu bilgisayardan kaldır"
+
+#: src/core/app.c:913 src/core/partitions.c:27
+msgid "Disks and partitions"
+msgstr "Diskler ve bölümler"
+
+#: src/core/app.c:914
 msgid "Restart the computer"
 msgstr "Bilgisayarı yeniden başlat"
 
-#: src/core/app.c:808
+#: src/core/app.c:915
 msgid "Shut down the computer"
 msgstr "Bilgisayarı kapat"
 
-#: src/core/app.c:808 src/core/app.c:914 src/core/app.c:1621
+#: src/core/app.c:915 src/core/app.c:1021 src/core/app.c:1772
 msgid "Ctrl+Q"
 msgstr "Ctrl+Q"
 
-#: src/core/app.c:830
+#: src/core/app.c:937
 msgid "Type a command…"
 msgstr "Bir komut yazın…"
 
-#: src/core/app.c:861
+#: src/core/app.c:968
 msgid "No command found"
 msgstr "Komut bulunamadı"
 
-#: src/core/app.c:887
+#: src/core/app.c:994
 msgid "File not found (a different USB drive?)"
 msgstr "Dosya bulunamadı (başka bir USB bellek mi?)"
 
-#: src/core/app.c:895
+#: src/core/app.c:1002
 msgid "DOCUMENT"
 msgstr "BELGE"
 
-#: src/core/app.c:896
+#: src/core/app.c:1003
 msgid "New"
 msgstr "Yeni"
 
-#: src/core/app.c:903
+#: src/core/app.c:1010
 msgid "RECENT"
 msgstr "SON KULLANILANLAR"
 
-#: src/core/app.c:907
+#: src/core/app.c:1014
 msgid "WRITING"
 msgstr "YAZMA"
 
-#: src/core/app.c:909
+#: src/core/app.c:1016
 msgid "Session, goals and sprint"
 msgstr "Oturum, hedefler ve sprint"
 
-#: src/core/app.c:910
+#: src/core/app.c:1017
 msgid "PREFERENCES"
 msgstr "TERCİHLER"
 
-#: src/core/app.c:911 src/core/app.c:994 src/core/app.c:1620
+#: src/core/app.c:1018 src/core/app.c:1109 src/core/app.c:1771
 msgid "Appearance"
 msgstr "Görünüm"
 
-#: src/core/app.c:914 src/core/app.c:1194 src/core/app.c:1621
+#: src/core/app.c:1021 src/core/app.c:1345 src/core/app.c:1772
 msgid "Shut down"
 msgstr "Kapat"
 
-#: src/core/app.c:978
+#: src/core/app.c:1086
 #, c-format
 msgid "Diagnostics saved to %s"
 msgstr "Tanılama %s konumuna kaydedildi"
 
-#: src/core/app.c:978
+#: src/core/app.c:1086
 msgid "Could not save the diagnostics"
 msgstr "Tanılama kaydedilemedi"
 
-#: src/core/app.c:988
+#: src/core/app.c:1103
 msgid "Display restored: automatic resolution and rotation"
 msgstr "Ekran geri yüklendi: otomatik çözünürlük ve döndürme"
 
-#: src/core/app.c:994
+#: src/core/app.c:1109
 msgid "Writing"
 msgstr "Yazma"
 
-#: src/core/app.c:994
+#: src/core/app.c:1109
 msgid "System"
 msgstr "Sistem"
 
-#: src/core/app.c:1004
+#: src/core/app.c:1119
 msgid "THEMES"
 msgstr "TEMALAR"
 
-#: src/core/app.c:1011
+#: src/core/app.c:1126
 msgid "+  Create my theme"
 msgstr "+  Kendi temamı oluştur"
 
-#: src/core/app.c:1012
+#: src/core/app.c:1127
 msgid "Edit this theme"
 msgstr "Bu temayı düzenle"
 
-#: src/core/app.c:1014
+#: src/core/app.c:1129
 #, c-format
 msgid "Mix colors and fonts; themes are saved in %s (editable .INI files)."
 msgstr "Renkleri ve yazı tiplerini karıştırın; temalar %s klasörüne kaydedilir (düzenlenebilir .INI dosyaları)."
 
-#: src/core/app.c:1016
+#: src/core/app.c:1131
 msgid "TEXT FONT"
 msgstr "METİN YAZI TİPİ"
 
-#: src/core/app.c:1025
+#: src/core/app.c:1140
 msgid "The quick brown fox jumps — “Hello!”"
 msgstr "Pijamalı hasta yağız şoföre çabucak güvendi — “Merhaba!”"
 
-#: src/core/app.c:1031
+#: src/core/app.c:1146
 #, c-format
 msgid "Add .ttf fonts to %s (subfolders work too) and restart."
 msgstr ".ttf yazı tiplerini %s klasörüne ekleyin (alt klasörler de olur) ve yeniden başlatın."
 
-#: src/core/app.c:1032
+#: src/core/app.c:1147
 msgid "Included writing fonts: Literata, Lora, EB Garamond, iA Writer, Special Elite and more."
 msgstr "Dahil yazı tipleri: Literata, Lora, EB Garamond, iA Writer, Special Elite ve daha fazlası."
 
-#: src/core/app.c:1034
+#: src/core/app.c:1149
 msgid "TYPOGRAPHY"
 msgstr "TİPOGRAFİ"
 
-#: src/core/app.c:1035
+#: src/core/app.c:1150
 #, c-format
 msgid "%d px"
 msgstr "%d px"
 
-#: src/core/app.c:1036
+#: src/core/app.c:1151
 msgid "Text size"
 msgstr "Metin boyutu"
 
-#: src/core/app.c:1039
+#: src/core/app.c:1154
 msgid "Line spacing"
 msgstr "Satır aralığı"
 
-#: src/core/app.c:1041
+#: src/core/app.c:1156
 #, c-format
 msgid "%.2f lines"
 msgstr "%.2f satır"
 
-#: src/core/app.c:1042
+#: src/core/app.c:1157
 msgid "Space between paragraphs"
 msgstr "Paragraflar arası boşluk"
 
-#: src/core/app.c:1044
+#: src/core/app.c:1159
 msgid "First-line indent for paragraphs (book style)"
 msgstr "Paragrafların ilk satırında girinti (kitap stili)"
 
-#: src/core/app.c:1046
+#: src/core/app.c:1161
 msgid "PAGE"
 msgstr "SAYFA"
 
-#: src/core/app.c:1048
+#: src/core/app.c:1163
 msgid "Page"
 msgstr "Sayfa"
 
-#: src/core/app.c:1048
+#: src/core/app.c:1163
 msgid "Full screen"
 msgstr "Tam ekran"
 
-#: src/core/app.c:1057
+#: src/core/app.c:1172
 #, c-format
 msgid "%d px (~%d characters per line)"
 msgstr "%d px (satır başına ~%d karakter)"
 
-#: src/core/app.c:1058
+#: src/core/app.c:1173
 msgid "Page width"
 msgstr "Sayfa genişliği"
 
-#: src/core/app.c:1060
+#: src/core/app.c:1175
 msgid "Paper sheet on the desk (light themes)"
 msgstr "Masada kâğıt sayfa (açık temalar)"
 
-#: src/core/app.c:1063
+#: src/core/app.c:1178
 msgid "The text fills the whole screen width, with no sheet."
 msgstr "Metin, sayfa olmadan ekranın tüm genişliğini kaplar."
 
-#: src/core/app.c:1067
+#: src/core/app.c:1182
 msgid "FOCUS MODE"
 msgstr "ODAK MODU"
 
-#: src/core/app.c:1068
+#: src/core/app.c:1183
 msgid "Off"
 msgstr "Kapalı"
 
-#: src/core/app.c:1068
+#: src/core/app.c:1183
 msgid "Sentence"
 msgstr "Cümle"
 
-#: src/core/app.c:1068
+#: src/core/app.c:1183
 msgid "Paragraph"
 msgstr "Paragraf"
 
-#: src/core/app.c:1068
+#: src/core/app.c:1183
 msgid "Line"
 msgstr "Satır"
 
-#: src/core/app.c:1071
+#: src/core/app.c:1186
 msgid "EDITOR"
 msgstr "DÜZENLEYİCİ"
 
-#: src/core/app.c:1073
+#: src/core/app.c:1188
 msgid "Typewriter — current line in the center"
 msgstr "Daktilo — geçerli satır ortada"
 
-#: src/core/app.c:1074
+#: src/core/app.c:1189
 msgid "Live Markdown (headings, bold, lists)"
 msgstr "Canlı Markdown (başlıklar, kalın, listeler)"
 
-#: src/core/app.c:1075
+#: src/core/app.c:1190
 msgid "Hide markup outside the current paragraph"
 msgstr "Geçerli paragrafın dışındaki işaretleri gizle"
 
-#: src/core/app.c:1076
+#: src/core/app.c:1191
 msgid "Smart typography:  --  →  —   \"\"  →  “”   ...  →  …"
 msgstr "Akıllı tipografi:  --  →  —   \"\"  →  “”   ...  →  …"
 
-#: src/core/app.c:1077
+#: src/core/app.c:1192
 msgid "Hemingway mode — deleting is not allowed"
 msgstr "Hemingway modu — silmeye izin verilmez"
 
-#: src/core/app.c:1078
+#: src/core/app.c:1193
 msgid "Hide the bars while writing"
 msgstr "Yazarken çubukları gizle"
 
-#: src/core/app.c:1079
+#: src/core/app.c:1194
 msgid "Blinking cursor"
 msgstr "Yanıp sönen imleç"
 
-#: src/core/app.c:1080
+#: src/core/app.c:1195
 msgid "Smooth cursor movement"
 msgstr "Yumuşak imleç hareketi"
 
-#: src/core/app.c:1087
+#: src/core/app.c:1202
 msgid "Tabs — several open documents, remembered after a restart"
 msgstr "Sekmeler — birden çok açık belge, yeniden başlatınca hatırlanır"
 
-#: src/core/app.c:1090
+#: src/core/app.c:1205
 msgid "GOALS AND SAVING"
 msgstr "HEDEFLER VE KAYDETME"
 
-#: src/core/app.c:1091 src/core/app.c:1563 src/core/app.c:1815
+#: src/core/app.c:1206 src/core/app.c:1714 src/core/app.c:1966
 #, c-format
 msgid "%d word"
 msgid_plural "%d words"
 msgstr[0] "%d kelime"
 msgstr[1] "%d kelime"
 
-#: src/core/app.c:1092
+#: src/core/app.c:1207
 msgid "Session goal"
 msgstr "Oturum hedefi"
 
-#: src/core/app.c:1094 src/core/app.c:1565 src/core/app.c:1780
+#: src/core/app.c:1209 src/core/app.c:1716 src/core/app.c:1931
 #, c-format
 msgid "%d min"
 msgstr "%d dk"
 
-#: src/core/app.c:1095
+#: src/core/app.c:1210
 msgid "Sprint length"
 msgstr "Sprint süresi"
 
-#: src/core/app.c:1097
+#: src/core/app.c:1212
 #, c-format
 msgid "every %d s"
 msgstr "her %d sn"
 
-#: src/core/app.c:1098
+#: src/core/app.c:1213
 msgid "Autosave"
 msgstr "Otomatik kaydetme"
 
-#: src/core/app.c:1101
+#: src/core/app.c:1216
 msgid "LANGUAGE AND KEYBOARD"
 msgstr "DİL VE KLAVYE"
 
-#: src/core/app.c:1104
+#: src/core/app.c:1219
 msgid "Language"
 msgstr "Dil"
 
-#: src/core/app.c:1109
+#: src/core/app.c:1224
 msgid "Keyboard"
 msgstr "Klavye"
 
-#: src/core/app.c:1118
+#: src/core/app.c:1233
 #, c-format
 msgid "Languages: %s · keyboards: %s (text files anyone can add)"
 msgstr "Diller: %s · klavyeler: %s (herkesin ekleyebileceği metin dosyaları)"
 
-#: src/core/app.c:1122
+#: src/core/app.c:1237
 msgid "DISPLAY AND POINTER"
 msgstr "EKRAN VE İŞARETÇİ"
 
-#: src/core/app.c:1123
+#: src/core/app.c:1238
 msgid "Auto"
 msgstr "Otomatik"
 
-#: src/core/app.c:1128
+#: src/core/app.c:1243
 msgid "Rotate: auto"
 msgstr "Döndür: otomatik"
 
-#: src/core/app.c:1136
+#: src/core/app.c:1251
 #, c-format
 msgid "Resolution: %dx%d"
 msgstr "Çözünürlük: %dx%d"
 
-#: src/core/app.c:1137
+#: src/core/app.c:1252
 #, c-format
 msgid "Resolution: automatic (%dx%d)"
 msgstr "Çözünürlük: otomatik (%dx%d)"
 
-#: src/core/app.c:1147
+#: src/core/app.c:1262
 msgid "Restore display"
 msgstr "Ekranı geri yükle"
 
-#: src/core/app.c:1149
+#: src/core/app.c:1265
+msgid "Proportions: off"
+msgstr "Oran: kapalı"
+
+#: src/core/app.c:1265
+msgid "Monitor"
+msgstr "Monitör"
+
+#: src/core/app.c:1268
+msgid "If circles look like ovals, choose the shape of your screen."
+msgstr "Daireler oval görünüyorsa ekranınızın biçimini seçin."
+
+#: src/core/app.c:1270
 msgid "If the picture looks wrong or goes black: Ctrl+Alt+Home restores it; Ctrl+Alt+arrows rotate the screen."
 msgstr "Görüntü bozuk veya siyahsa: Ctrl+Alt+Home geri yükler; Ctrl+Alt+ok tuşları ekranı döndürür."
 
-#: src/core/app.c:1153
+#: src/core/app.c:1274
 msgid "Mouse / touchpad speed"
 msgstr "Fare / dokunmatik yüzey hızı"
 
-#: src/core/app.c:1155
+#: src/core/app.c:1276
 msgid "Automatic"
 msgstr "Otomatik"
 
-#: src/core/app.c:1155
+#: src/core/app.c:1276
 msgid "Touchpad"
 msgstr "Dokunmatik yüzey"
 
-#: src/core/app.c:1155
+#: src/core/app.c:1276
 msgid "Touch screen"
 msgstr "Dokunmatik ekran"
 
-#: src/core/app.c:1158
+#: src/core/app.c:1279
 msgid "If the pointer jumps to the corners when you use the touchpad, choose Touchpad."
 msgstr "Dokunmatik yüzeyde işaretçi köşelere atlıyorsa Dokunmatik yüzey seçeneğini seçin."
 
-#: src/core/app.c:1161
+#: src/core/app.c:1282
 msgid "Use the mouse and touchpad (off = keyboard only)"
 msgstr "Fare ve dokunmatik yüzeyi kullan (kapalı = yalnızca klavye)"
 
-#: src/core/app.c:1163
+#: src/core/app.c:1284
 msgid "SOUND"
 msgstr "SES"
 
-#: src/core/app.c:1164
+#: src/core/app.c:1285
 msgid "Turn on the amplifier through GPIO (some laptops; applies after a restart)"
 msgstr "Amplifikatörü GPIO ile aç (bazı dizüstüler; yeniden başlatınca geçerli)"
 
-#: src/core/app.c:1166
+#: src/core/app.c:1287
 msgid "Test sound"
 msgstr "Sesi test et"
 
-#: src/core/app.c:1167
+#: src/core/app.c:1288
 msgid "Save diagnostics"
 msgstr "Tanılamayı kaydet"
 
-#: src/core/app.c:1169
+#: src/core/app.c:1290
 #, c-format
 msgid "The diagnostics go to %s on the USB drive (it opens on any computer)."
 msgstr "Tanılama, USB bellekte %s konumuna kaydedilir (her bilgisayarda açılır)."
 
-#: src/core/app.c:1171
+#: src/core/app.c:1292
 msgid "STARTUP"
 msgstr "BAŞLANGIÇ"
 
-#: src/core/app.c:1172
+#: src/core/app.c:1293
 msgid "FolioOS splash screen"
 msgstr "FolioOS açılış ekranı"
 
-#: src/core/app.c:1177
+#: src/core/app.c:1298
 msgid "Splash duration (any key skips it)"
 msgstr "Açılış ekranı süresi (herhangi bir tuş geçer)"
 
-#: src/core/app.c:1183
+#: src/core/app.c:1305
+msgid "TEXTS"
+msgstr "METİNLER"
+
+#: src/core/app.c:1306
+msgid "This computer"
+msgstr "Bu bilgisayar"
+
+#: src/core/app.c:1306
+msgid "USB drive"
+msgstr "USB bellek"
+
+#: src/core/app.c:1306
+msgid "Both"
+msgstr "İkisi de"
+
+#: src/core/app.c:1309
+msgid "Your texts stay on the USB drive and go with you; without it, new texts are saved on this computer."
+msgstr "Metinleriniz USB bellekte kalır ve sizinle gelir; o olmadan yeni metinler bu bilgisayara kaydedilir."
+
+#: src/core/app.c:1310
+msgid "Your texts are on this computer; the button copies the newest version of each text in both directions. Nothing is deleted."
+msgstr "Metinleriniz bu bilgisayarda; düğme her metnin en yeni sürümünü iki yöne de kopyalar. Hiçbir şey silinmez."
+
+#: src/core/app.c:1311
+msgid "Your texts are on this computer."
+msgstr "Metinleriniz bu bilgisayarda."
+
+#: src/core/app.c:1322
+msgid "Wait for a key before starting the other system"
+msgstr "Diğer sistemi başlatmadan önce bir tuş bekle"
+
+#: src/core/app.c:1327
+msgid "Without a key, the other system starts as usual."
+msgstr "Tuşa basılmazsa diğer sistem her zamanki gibi açılır."
+
+#: src/core/app.c:1327
+msgid "0 s: the computer always starts FolioOS."
+msgstr "0 sn: bilgisayar her zaman FolioOS’u başlatır."
+
+#: src/core/app.c:1330
 msgid "ABOUT"
 msgstr "HAKKINDA"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1333
 #, c-format
 msgid "FolioOS %s · %s · %dx%d"
 msgstr "FolioOS %s · %s · %dx%d"
 
-#: src/core/app.c:1187
+#: src/core/app.c:1334
 #, c-format
 msgid "Memory: %d MB used of %d MB · %d fonts · %d themes"
 msgstr "Bellek: %d MB / %d MB kullanımda · %d yazı tipi · %d tema"
 
-#: src/core/app.c:1188
+#: src/core/app.c:1335
 #, c-format
 msgid "Audio: %s"
 msgstr "Ses: %s"
 
-#: src/core/app.c:1193
+#: src/core/app.c:1340
+msgid "Install FolioOS on this computer…"
+msgstr "FolioOS’u bu bilgisayara kur…"
+
+#: src/core/app.c:1342
+msgid "Disks and partitions…"
+msgstr "Diskler ve bölümler…"
+
+#: src/core/app.c:1344 src/core/installer.c:496
 msgid "Restart"
 msgstr "Yeniden başlat"
 
-#: src/core/app.c:1213
+#: src/core/app.c:1364
 msgid "Desk (background)"
 msgstr "Masa (arka plan)"
 
-#: src/core/app.c:1213
+#: src/core/app.c:1364
 msgid "Paper"
 msgstr "Kâğıt"
 
-#: src/core/app.c:1213 src/core/app.c:1414
+#: src/core/app.c:1364 src/core/app.c:1565
 msgid "Text"
 msgstr "Metin"
 
-#: src/core/app.c:1213
+#: src/core/app.c:1364
 msgid "Faded text"
 msgstr "Soluk metin"
 
-#: src/core/app.c:1213
+#: src/core/app.c:1364
 msgid "Subtle lines"
 msgstr "İnce çizgiler"
 
-#: src/core/app.c:1213
+#: src/core/app.c:1364
 msgid "Accent"
 msgstr "Vurgu"
 
-#: src/core/app.c:1213
+#: src/core/app.c:1364
 msgid "Selection"
 msgstr "Seçim"
 
-#: src/core/app.c:1213
+#: src/core/app.c:1364
 msgid "Cursor"
 msgstr "İmleç"
 
-#: src/core/app.c:1214
+#: src/core/app.c:1365
 msgid "Bars"
 msgstr "Çubuklar"
 
-#: src/core/app.c:1214
+#: src/core/app.c:1365
 msgid "Bar text"
 msgstr "Çubuk metni"
 
-#: src/core/app.c:1214
+#: src/core/app.c:1365
 msgid "Borders"
 msgstr "Kenarlıklar"
 
-#: src/core/app.c:1214
+#: src/core/app.c:1365
 msgid "Panels"
 msgstr "Paneller"
 
-#: src/core/app.c:1214
+#: src/core/app.c:1365
 msgid "Panel text"
 msgstr "Panel metni"
 
-#: src/core/app.c:1214
+#: src/core/app.c:1365
 msgid "Headings"
 msgstr "Başlıklar"
 
-#: src/core/app.c:1214
+#: src/core/app.c:1365
 msgid "Code background"
 msgstr "Kod arka planı"
 
-#: src/core/app.c:1214
+#: src/core/app.c:1365
 msgid "Highlighter"
 msgstr "Fosforlu kalem"
 
-#: src/core/app.c:1248
+#: src/core/app.c:1399
 msgid "My theme"
 msgstr "Temam"
 
-#: src/core/app.c:1249
+#: src/core/app.c:1400
 #, c-format
 msgid "My theme %d"
 msgstr "Temam %d"
 
-#: src/core/app.c:1272
+#: src/core/app.c:1423
 msgid "Give the theme a name"
 msgstr "Temaya bir ad verin"
 
-#: src/core/app.c:1274
+#: src/core/app.c:1425
 msgid "That name belongs to a built-in theme — choose another"
 msgstr "Bu ad hazır bir temaya ait — başka bir ad seçin"
 
-#: src/core/app.c:1275
+#: src/core/app.c:1426
 msgid "You already have a theme with that name"
 msgstr "Bu ada sahip bir temanız zaten var"
 
-#: src/core/app.c:1278
+#: src/core/app.c:1429
 #, c-format
 msgid "Could not write to %s (is the USB drive write-protected or full?)"
 msgstr "%s konumuna yazılamadı (USB bellek korumalı mı ya da dolu mu?)"
 
-#: src/core/app.c:1283
+#: src/core/app.c:1434
 #, c-format
 msgid "Theme “%s” saved to %s"
 msgstr "“%s” teması %s konumuna kaydedildi"
 
-#: src/core/app.c:1295
+#: src/core/app.c:1446
 msgid "Theme deleted"
 msgstr "Tema silindi"
 
-#: src/core/app.c:1326
+#: src/core/app.c:1477
 msgid "THEME NAME"
 msgstr "TEMA ADI"
 
-#: src/core/app.c:1327
+#: src/core/app.c:1478
 msgid "Theme name"
 msgstr "Tema adı"
 
-#: src/core/app.c:1330
+#: src/core/app.c:1481
 msgid "STARTING POINT"
 msgstr "BAŞLANGIÇ NOKTASI"
 
-#: src/core/app.c:1333
+#: src/core/app.c:1484
 msgid "Colors from"
 msgstr "Renklerin kaynağı"
 
-#: src/core/app.c:1335
+#: src/core/app.c:1486
 msgid "Use all"
 msgstr "Tümünü kullan"
 
-#: src/core/app.c:1342
+#: src/core/app.c:1493
 msgid "Or mix: pick a color below and take it from any built-in theme."
 msgstr "Ya da karıştırın: aşağıdan bir renk seçin ve hazır temalardan birinden alın."
 
-#: src/core/app.c:1346
+#: src/core/app.c:1497
 msgid "COLORS"
 msgstr "RENKLER"
 
-#: src/core/app.c:1375
+#: src/core/app.c:1526
 msgid "hex code"
 msgstr "onaltılık kod"
 
-#: src/core/app.c:1379
+#: src/core/app.c:1530
 msgid "Hue"
 msgstr "Ton"
 
-#: src/core/app.c:1382
+#: src/core/app.c:1533
 msgid "Saturation"
 msgstr "Doygunluk"
 
-#: src/core/app.c:1385
+#: src/core/app.c:1536
 msgid "Lightness"
 msgstr "Açıklık"
 
-#: src/core/app.c:1389
+#: src/core/app.c:1540
 msgid "Take from a built-in theme:"
 msgstr "Hazır bir temadan al:"
 
-#: src/core/app.c:1412
+#: src/core/app.c:1563
 msgid "THEME FONTS"
 msgstr "TEMA YAZI TİPLERİ"
 
-#: src/core/app.c:1419
+#: src/core/app.c:1570
 #, c-format
 msgid "Default (%s)"
 msgstr "Varsayılan (%s)"
 
-#: src/core/app.c:1420
+#: src/core/app.c:1571
 msgid "Interface"
 msgstr "Arayüz"
 
-#: src/core/app.c:1428
+#: src/core/app.c:1579
 msgid "Interface = bars, menus and windows."
 msgstr "Arayüz = çubuklar, menüler ve pencereler."
 
-#: src/core/app.c:1432
+#: src/core/app.c:1583
 msgid "DESK AND PAPER"
 msgstr "MASA VE KÂĞIT"
 
-#: src/core/app.c:1433
+#: src/core/app.c:1584
 msgid "Paper sheet on the desk"
 msgstr "Masada kâğıt sayfa"
 
-#: src/core/app.c:1437
+#: src/core/app.c:1588
 msgid "Vignette at the desk edges"
 msgstr "Masa kenarlarında vinyet"
 
-#: src/core/app.c:1448
+#: src/core/app.c:1599
 msgid "Save theme"
 msgstr "Temayı kaydet"
 
-#: src/core/app.c:1449 src/core/filedlg.c:60 src/core/filedlg.c:73 src/core/filedlg.c:410 src/core/filedlg.c:441
+#: src/core/app.c:1600 src/core/filedlg.c:60 src/core/filedlg.c:73 src/core/filedlg.c:411 src/core/filedlg.c:442 src/core/installer.c:319
 msgid "Cancel"
 msgstr "İptal"
 
-#: src/core/app.c:1450 src/core/app.c:1451 src/core/filedlg.c:57 src/core/filedlg.c:314 src/core/filedlg.c:317 src/core/filedlg.c:317
+#: src/core/app.c:1601 src/core/app.c:1602 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:208 src/core/partitions.c:247
 msgid "Delete"
 msgstr "Sil"
 
-#: src/core/app.c:1451
+#: src/core/app.c:1602
 msgid "Delete theme?"
 msgstr "Tema silinsin mi?"
 
-#: src/core/app.c:1451
+#: src/core/app.c:1602
 #, c-format
 msgid "The theme file in %s will be deleted."
 msgstr "%s içindeki tema dosyası silinecek."
 
-#: src/core/app.c:1458
+#: src/core/app.c:1609
 msgid "Find"
 msgstr "Bul"
 
-#: src/core/app.c:1459
+#: src/core/app.c:1610
 msgid "Previous (Shift+Enter)"
 msgstr "Önceki (Shift+Enter)"
 
-#: src/core/app.c:1460
+#: src/core/app.c:1611
 msgid "Next (Enter)"
 msgstr "Sonraki (Enter)"
 
-#: src/core/app.c:1461
+#: src/core/app.c:1612
 msgid "Replace with"
 msgstr "Şununla değiştir"
 
-#: src/core/app.c:1463 src/core/filedlg.c:204
+#: src/core/app.c:1614 src/core/filedlg.c:204
 msgid "Replace"
 msgstr "Değiştir"
 
-#: src/core/app.c:1464
+#: src/core/app.c:1615
 msgid "Replace all"
 msgstr "Tümünü değiştir"
 
-#: src/core/app.c:1466
+#: src/core/app.c:1617
 #, c-format
 msgid "%d replacement"
 msgid_plural "%d replacements"
 msgstr[0] "%d değiştirme"
 msgstr[1] "%d değiştirme"
 
-#: src/core/app.c:1473
+#: src/core/app.c:1624
 msgid "Nothing found"
 msgstr "Hiçbir şey bulunamadı"
 
-#: src/core/app.c:1480
+#: src/core/app.c:1631
 #, c-format
 msgid "%d match"
 msgid_plural "%d matches"
 msgstr[0] "%d eşleşme"
 msgstr[1] "%d eşleşme"
 
-#: src/core/app.c:1518
+#: src/core/app.c:1669
 msgid "(untitled)"
 msgstr "(adsız)"
 
-#: src/core/app.c:1527
+#: src/core/app.c:1678
 msgid "No headings yet."
 msgstr "Henüz başlık yok."
 
-#: src/core/app.c:1528
+#: src/core/app.c:1679
 msgid "Start a line with # to create chapters."
 msgstr "Bölüm oluşturmak için satıra # ile başlayın."
 
-#: src/core/app.c:1557
+#: src/core/app.c:1708
 #, c-format
 msgid "goal of %d reached"
 msgstr "%d hedefine ulaşıldı"
 
-#: src/core/app.c:1557
+#: src/core/app.c:1708
 #, c-format
 msgid "of %d words today"
 msgstr "bugün %d kelimeden"
 
-#: src/core/app.c:1558
+#: src/core/app.c:1709
 msgid "words today"
 msgstr "bugünkü kelimeler"
 
-#: src/core/app.c:1563
+#: src/core/app.c:1714
 msgid "This document"
 msgstr "Bu belge"
 
-#: src/core/app.c:1564
+#: src/core/app.c:1715
 msgid "This session"
 msgstr "Bu oturum"
 
-#: src/core/app.c:1564
+#: src/core/app.c:1715
 #, c-format
 msgid "+%d in %dh%02d"
 msgstr "%2$dsa%3$02d içinde +%1$d"
 
-#: src/core/app.c:1565
+#: src/core/app.c:1716
 msgid "Estimated reading"
 msgstr "Tahmini okuma"
 
-#: src/core/app.c:1566
+#: src/core/app.c:1717
 msgid "Pace"
 msgstr "Hız"
 
-#: src/core/app.c:1566
+#: src/core/app.c:1717
 #, c-format
 msgid "%d words/h"
 msgstr "%d kelime/sa"
 
-#: src/core/app.c:1577
+#: src/core/app.c:1728
 msgid "15 min"
 msgstr "15 dk"
 
-#: src/core/app.c:1577
+#: src/core/app.c:1728
 msgid "25 min"
 msgstr "25 dk"
 
-#: src/core/app.c:1577
+#: src/core/app.c:1728
 msgid "45 min"
 msgstr "45 dk"
 
-#: src/core/app.c:1577
+#: src/core/app.c:1728
 msgid "60 min"
 msgstr "60 dk"
 
-#: src/core/app.c:1582
+#: src/core/app.c:1733
 msgid "Start sprint"
 msgstr "Sprinti başlat"
 
-#: src/core/app.c:1588
+#: src/core/app.c:1739
 #, c-format
 msgid "+%d word in this sprint"
 msgid_plural "+%d words in this sprint"
 msgstr[0] "Bu sprintte +%d kelime"
 msgstr[1] "Bu sprintte +%d kelime"
 
-#: src/core/app.c:1591
+#: src/core/app.c:1742
 msgid "Stop sprint"
 msgstr "Sprinti durdur"
 
-#: src/core/app.c:1603
+#: src/core/app.c:1754
 msgid "Ctrl+N / O / S"
 msgstr "Ctrl+N / O / S"
 
-#: src/core/app.c:1603
+#: src/core/app.c:1754
 msgid "New · Open · Save"
 msgstr "Yeni · Aç · Kaydet"
 
-#: src/core/app.c:1603 src/core/filedlg.c:122
+#: src/core/app.c:1754 src/core/filedlg.c:122
 msgid "Save as / Export"
 msgstr "Farklı kaydet / Dışa aktar"
 
-#: src/core/app.c:1604
+#: src/core/app.c:1755
 msgid "Ctrl+W · Ctrl+Tab"
 msgstr "Ctrl+W · Ctrl+Tab"
 
-#: src/core/app.c:1604
+#: src/core/app.c:1755
 msgid "Tabs: close · next"
 msgstr "Sekmeler: kapat · sonraki"
 
-#: src/core/app.c:1604
+#: src/core/app.c:1755
 msgid "Alt+1…9"
 msgstr "Alt+1…9"
 
-#: src/core/app.c:1604
+#: src/core/app.c:1755
 msgid "Go to tab 1…9"
 msgstr "1…9 numaralı sekmeye git"
 
-#: src/core/app.c:1605
+#: src/core/app.c:1756
 msgid "Ctrl+K"
 msgstr "Ctrl+K"
 
-#: src/core/app.c:1605
+#: src/core/app.c:1756
 msgid "Command palette"
 msgstr "Komut paleti"
 
-#: src/core/app.c:1605
+#: src/core/app.c:1756
 msgid "Reading (formatted Markdown)"
 msgstr "Okuma (biçimlendirilmiş Markdown)"
 
-#: src/core/app.c:1606
+#: src/core/app.c:1757
 msgid "Ctrl+Z / Y"
 msgstr "Ctrl+Z / Y"
 
-#: src/core/app.c:1606
+#: src/core/app.c:1757
 msgid "Undo · Redo"
 msgstr "Geri al · Yinele"
 
-#: src/core/app.c:1607
+#: src/core/app.c:1758
 msgid "Ctrl+B / I"
 msgstr "Ctrl+B / I"
 
-#: src/core/app.c:1607
+#: src/core/app.c:1758
 msgid "Bold · Italic"
 msgstr "Kalın · İtalik"
 
-#: src/core/app.c:1607
+#: src/core/app.c:1758
 msgid "Ctrl+1…6 / 0"
 msgstr "Ctrl+1…6 / 0"
 
-#: src/core/app.c:1607
+#: src/core/app.c:1758
 msgid "Heading level 1–6 · Text"
 msgstr "Başlık düzeyi 1–6 · Metin"
 
-#: src/core/app.c:1608
+#: src/core/app.c:1759
 msgid "Alt+↑ / ↓"
 msgstr "Alt+↑ / ↓"
 
-#: src/core/app.c:1608
+#: src/core/app.c:1759
 msgid "Move paragraph"
 msgstr "Paragrafı taşı"
 
-#: src/core/app.c:1608
+#: src/core/app.c:1759
 msgid "Tab / Shift+Tab"
 msgstr "Tab / Shift+Tab"
 
-#: src/core/app.c:1608
+#: src/core/app.c:1759
 msgid "Indent list item"
 msgstr "Liste öğesini girintile"
 
-#: src/core/app.c:1610
+#: src/core/app.c:1761
 msgid "Ctrl+PgUp / PgDn"
 msgstr "Ctrl+PgUp / PgDn"
 
-#: src/core/app.c:1610
+#: src/core/app.c:1761
 msgid "Previous · next chapter"
 msgstr "Önceki · sonraki bölüm"
 
-#: src/core/app.c:1610
+#: src/core/app.c:1761
 msgid "Jump to and back from the last edit"
 msgstr "Son değişikliğe gidip geri dön"
 
-#: src/core/app.c:1611
+#: src/core/app.c:1762
 msgid "lowercase → Title Case → UPPERCASE"
 msgstr "küçük harf → Baş Harfler → BÜYÜK HARF"
 
-#: src/core/app.c:1611
+#: src/core/app.c:1762
 msgid "Select and type ( \" *"
 msgstr "Seçip ( \" * yazın"
 
-#: src/core/app.c:1611
+#: src/core/app.c:1762
 msgid "Wraps the selection"
 msgstr "Seçimi sarar"
 
-#: src/core/app.c:1612
+#: src/core/app.c:1763
 msgid "← / → · Space (reading)"
 msgstr "← / → · Boşluk (okuma)"
 
-#: src/core/app.c:1612
+#: src/core/app.c:1763
 msgid "Previous · next page"
 msgstr "Önceki · sonraki sayfa"
 
-#: src/core/app.c:1612
+#: src/core/app.c:1763
 msgid "Auto-scroll on/off"
 msgstr "Otomatik kaydırma aç/kapat"
 
-#: src/core/app.c:1613
+#: src/core/app.c:1764
 msgid "+ / − (reading)"
 msgstr "+ / − (okuma)"
 
-#: src/core/app.c:1613
+#: src/core/app.c:1764
 msgid "Auto-scroll speed"
 msgstr "Otomatik kaydırma hızı"
 
-#: src/core/app.c:1614
+#: src/core/app.c:1765
 msgid "Ctrl+← / →"
 msgstr "Ctrl+← / →"
 
-#: src/core/app.c:1614
+#: src/core/app.c:1765
 msgid "Previous / next word"
 msgstr "Önceki / sonraki kelime"
 
-#: src/core/app.c:1614
+#: src/core/app.c:1765
 msgid "Ctrl+Home / End"
 msgstr "Ctrl+Home / End"
 
-#: src/core/app.c:1614
+#: src/core/app.c:1765
 msgid "Start · end of the text"
 msgstr "Metnin başı · sonu"
 
-#: src/core/app.c:1615
+#: src/core/app.c:1766
 msgid "Ctrl+= / -"
 msgstr "Ctrl+= / -"
 
-#: src/core/app.c:1615
+#: src/core/app.c:1766
 msgid "Larger · smaller text"
 msgstr "Daha büyük · daha küçük metin"
 
-#: src/core/app.c:1616
+#: src/core/app.c:1767
 msgid "This help"
 msgstr "Bu yardım"
 
-#: src/core/app.c:1616
+#: src/core/app.c:1767
 msgid "Focus mode (sentence/paragraph/line)"
 msgstr "Odak modu (cümle/paragraf/satır)"
 
-#: src/core/app.c:1617
+#: src/core/app.c:1768
 msgid "Typewriter"
 msgstr "Daktilo"
 
-#: src/core/app.c:1617
+#: src/core/app.c:1768
 msgid "Writing sprint"
 msgstr "Yazma sprinti"
 
-#: src/core/app.c:1619
+#: src/core/app.c:1770
 msgid "F7 / F8 / F9"
 msgstr "F7 / F8 / F9"
 
-#: src/core/app.c:1619
+#: src/core/app.c:1770
 msgid "Previous track · Play/pause · Next"
 msgstr "Önceki parça · Çal/duraklat · Sonraki"
 
-#: src/core/app.c:1620
+#: src/core/app.c:1771
 msgid "Zen mode"
 msgstr "Zen modu"
 
-#: src/core/app.c:1621
+#: src/core/app.c:1772
 msgid "Esc"
 msgstr "Esc"
 
-#: src/core/app.c:1621
+#: src/core/app.c:1772
 msgid "Close window · leave zen/reading"
 msgstr "Pencereyi kapat · zen/okumadan çık"
 
-#: src/core/app.c:1622
+#: src/core/app.c:1773
 msgid "Tab · ↑ ↓ (windows)"
 msgstr "Tab · ↑ ↓ (pencereler)"
 
-#: src/core/app.c:1622
+#: src/core/app.c:1773
 msgid "Move between buttons and options"
 msgstr "Düğmeler ve seçenekler arasında gezinir"
 
-#: src/core/app.c:1622
+#: src/core/app.c:1773
 msgid "Enter · Space · ← →"
 msgstr "Enter · Boşluk · ← →"
 
-#: src/core/app.c:1622
+#: src/core/app.c:1773
 msgid "Press · adjust the focused option"
 msgstr "Seçili öğeyi çalıştırır · ayarlar"
 
-#: src/core/app.c:1623
+#: src/core/app.c:1774
 msgid "Keyboard between the text and the windows"
 msgstr "Klavye metin ile pencereler arasında"
 
-#: src/core/app.c:1623
+#: src/core/app.c:1774
 msgid "Ctrl+Shift+← / →"
 msgstr "Ctrl+Shift+← / →"
 
-#: src/core/app.c:1623
+#: src/core/app.c:1774
 msgid "Select word by word"
 msgstr "Kelime kelime seçer"
 
-#: src/core/app.c:1624
+#: src/core/app.c:1775
 msgid "Become — and … (smart typography)"
 msgstr "— ve … olur (akıllı tipografi)"
 
-#: src/core/app.c:1624
+#: src/core/app.c:1775
 msgid "Alt+F7 / Alt+F8"
 msgstr "Alt+F7 / Alt+F8"
 
-#: src/core/app.c:1624
+#: src/core/app.c:1775
 msgid "Move · resize the window (arrows, Enter)"
 msgstr "Pencereyi taşı · boyutlandır (oklar, Enter)"
 
-#: src/core/app.c:1701
+#: src/core/app.c:1852
 #, c-format
 msgid "Untitled — kept in %s until you save it"
 msgstr "Adsız — kaydedene kadar %s içinde tutulur"
 
-#: src/core/app.c:1708
+#: src/core/app.c:1859
 msgid "New tab (Ctrl+N)"
 msgstr "Yeni sekme (Ctrl+N)"
 
-#: src/core/app.c:1727
+#: src/core/app.c:1878
 msgid "Not saved yet (Ctrl+S)"
 msgstr "Henüz kaydedilmedi (Ctrl+S)"
 
-#: src/core/app.c:1742
+#: src/core/app.c:1893
 #, c-format
 msgid "Playing: %s (F6)"
 msgstr "Çalıyor: %s (F6)"
 
-#: src/core/app.c:1743
+#: src/core/app.c:1894
 msgid "Music (F6)"
 msgstr "Müzik (F6)"
 
-#: src/core/app.c:1743
+#: src/core/app.c:1894
 #, c-format
 msgid "Music (F6) — put MP3 files in the %s folder"
 msgstr "Müzik (F6) — MP3 dosyalarını %s klasörüne koyun"
 
-#: src/core/app.c:1745
+#: src/core/app.c:1896
 msgid "Tabs on — click to turn off"
 msgstr "Sekmeler açık — kapatmak için tıklayın"
 
-#: src/core/app.c:1745
+#: src/core/app.c:1896
 msgid "Tabs: open several documents (like in Sublime Text)"
 msgstr "Sekmeler: birden çok belge açın (Sublime Text'teki gibi)"
 
-#: src/core/app.c:1746
+#: src/core/app.c:1897
 msgid "Zen mode (F11)"
 msgstr "Zen modu (F11)"
 
-#: src/core/app.c:1747
+#: src/core/app.c:1898
 msgid "Typewriter (F3)"
 msgstr "Daktilo (F3)"
 
-#: src/core/app.c:1748
+#: src/core/app.c:1899
 msgid "Reading (Ctrl+P)"
 msgstr "Okuma (Ctrl+P)"
 
-#: src/core/app.c:1750
+#: src/core/app.c:1901
 msgid "Appearance (F12)"
 msgstr "Görünüm (F12)"
 
-#: src/core/app.c:1751
+#: src/core/app.c:1902
 msgid "Commands (Ctrl+K)"
 msgstr "Komutlar (Ctrl+K)"
 
-#: src/core/app.c:1763
+#: src/core/app.c:1914
 msgid "Next track (F9)"
 msgstr "Sonraki parça (F9)"
 
-#: src/core/app.c:1765
+#: src/core/app.c:1916
 msgid "Pause (F8)"
 msgstr "Duraklat (F8)"
 
-#: src/core/app.c:1765
+#: src/core/app.c:1916
 msgid "Play (F8)"
 msgstr "Çal (F8)"
 
-#: src/core/app.c:1767
+#: src/core/app.c:1918
 msgid "Previous track (F7)"
 msgstr "Önceki parça (F7)"
 
-#: src/core/app.c:1780
+#: src/core/app.c:1931
 #, c-format
 msgid "%d h %02d min"
 msgstr "%d sa %02d dk"
 
-#: src/core/app.c:1808
+#: src/core/app.c:1959
 msgid " · end of the text"
 msgstr " · metnin sonu"
 
-#: src/core/app.c:1809
+#: src/core/app.c:1960
 #, c-format
 msgid " · %s · %s to the end of the chapter · %s in total"
 msgstr " · %s · bölüm sonuna %s · toplam %s"
 
-#: src/core/app.c:1810
+#: src/core/app.c:1961
 #, c-format
 msgid " · %s · %s of reading left"
 msgstr " · %s · %s okuma kaldı"
 
-#: src/core/app.c:1811
+#: src/core/app.c:1962
 #, c-format
 msgid " · %s of reading left"
 msgstr " · %s okuma kaldı"
 
-#: src/core/app.c:1814
+#: src/core/app.c:1965
 #, c-format
 msgid "%d of %d word"
 msgid_plural "%d of %d words"
 msgstr[0] "%d / %d kelime"
 msgstr[1] "%d / %d kelime"
 
-#: src/core/app.c:1820
+#: src/core/app.c:1971
 #, c-format
 msgid "Today: %d words · %d min reading"
 msgstr "Bugün: %d kelime · %d dk okuma"
 
-#: src/core/app.c:2038 src/core/app.c:2043
+#: src/core/app.c:2181
+msgid "The USB drive with your texts is not connected: new texts are saved on this computer for now."
+msgstr "Metinlerinizin olduğu USB bellek takılı değil: şimdilik yeni metinler bu bilgisayara kaydediliyor."
+
+#: src/core/app.c:2212 src/core/app.c:2217
 msgid "Welcome back. Picking up where you left off."
 msgstr "Tekrar hoş geldiniz. Kaldığınız yerden devam ediliyor."
 
-#: src/core/app.c:2038
+#: src/core/app.c:2212
 #, c-format
 msgid "Welcome back: %d tab reopened."
 msgid_plural "Welcome back: %d tabs reopened."
 msgstr[0] "Tekrar hoş geldiniz: %d sekme yeniden açıldı."
 msgstr[1] "Tekrar hoş geldiniz: %d sekme yeniden açıldı."
 
-#: src/core/app.c:2042
+#: src/core/app.c:2216
 msgid "Welcome back. Reading continues where you left off."
 msgstr "Tekrar hoş geldiniz. Okuma kaldığınız yerden sürüyor."
 
-#: src/core/app.c:2047
+#: src/core/app.c:2221
 msgid "Unsaved draft recovered"
 msgstr "Kaydedilmemiş taslak kurtarıldı"
 
-#: src/core/app.c:2052
+#: src/core/app.c:2226
 msgid ""
 "# Welcome to FolioOS\n"
 "\n"
@@ -1617,12 +1721,32 @@ msgstr ""
 "\n"
 "Bu metni silin (Ctrl+A) ve hikâyenize başlayın.\n"
 
-#: src/core/app.c:2179
+#: src/core/app.c:2355
 #, c-format
 msgid "Sprint finished: %d word. Breathe and stretch."
 msgid_plural "Sprint finished: %d words. Breathe and stretch."
 msgstr[0] "Sprint bitti: %d kelime. Nefes alın ve esneyin."
 msgstr[1] "Sprint bitti: %d kelime. Nefes alın ve esneyin."
+
+#: src/core/chooser.c:17
+msgid "the other system"
+msgstr "diğer sistem"
+
+#: src/core/chooser.c:34
+msgid "Press any key to write"
+msgstr "Yazmak için herhangi bir tuşa basın"
+
+#: src/core/chooser.c:36
+#, c-format
+msgid "Starting %2$s in %1$d second…"
+msgid_plural "Starting %2$s in %1$d seconds…"
+msgstr[0] "%2$s %1$d saniye içinde başlıyor…"
+msgstr[1] "%2$s %1$d saniye içinde başlıyor…"
+
+#: src/core/chooser.c:38
+#, c-format
+msgid "Esc: start %s now"
+msgstr "Esc: %s şimdi başlat"
 
 #: src/core/editor.c:330
 msgid "Cut"
@@ -1712,7 +1836,7 @@ msgstr "Dosyalar"
 msgid "OK"
 msgstr "Tamam"
 
-#: src/core/filedlg.c:67 src/core/filedlg.c:326
+#: src/core/filedlg.c:67 src/core/filedlg.c:327
 msgid "Name"
 msgstr "Ad"
 
@@ -1788,7 +1912,7 @@ msgstr "SÜRÜCÜLER"
 msgid "FolioOS USB drive"
 msgstr "FolioOS USB belleği"
 
-#: src/core/filedlg.c:234 src/core/filedlg.c:288
+#: src/core/filedlg.c:234 src/core/filedlg.c:289
 msgid "Drive"
 msgstr "Sürücü"
 
@@ -1808,78 +1932,154 @@ msgstr "Müzik"
 msgid "Root"
 msgstr "Kök dizin"
 
-#: src/core/filedlg.c:263
+#: src/core/filedlg.c:264
 msgid "All files"
 msgstr "Tüm dosyalar"
 
-#: src/core/filedlg.c:274
+#: src/core/filedlg.c:275
 msgid "Parent folder (Alt+↑)"
 msgstr "Üst klasör (Alt+↑)"
 
-#: src/core/filedlg.c:309 src/core/filedlg.c:309 src/core/filedlg.c:309
+#: src/core/filedlg.c:310 src/core/filedlg.c:310 src/core/filedlg.c:310
 msgid "New folder"
 msgstr "Yeni klasör"
 
-#: src/core/filedlg.c:311
+#: src/core/filedlg.c:312
 msgid "Rename (F2)"
 msgstr "Yeniden adlandır (F2)"
 
-#: src/core/filedlg.c:312
+#: src/core/filedlg.c:313
 msgid "Rename"
 msgstr "Yeniden adlandır"
 
-#: src/core/filedlg.c:312 src/core/filedlg.c:318
+#: src/core/filedlg.c:313 src/core/filedlg.c:319
 msgid "Select an item"
 msgstr "Bir öğe seçin"
 
-#: src/core/filedlg.c:316
+#: src/core/filedlg.c:317
 #, c-format
 msgid "Delete the folder \"%s\" and everything in it? This cannot be undone."
 msgstr "“%s” klasörü ve tüm içeriği silinsin mi? Bu işlem geri alınamaz."
 
-#: src/core/filedlg.c:316
+#: src/core/filedlg.c:317
 #, c-format
 msgid "Delete \"%s\"? This cannot be undone."
 msgstr "“%s” silinsin mi? Bu işlem geri alınamaz."
 
-#: src/core/filedlg.c:326
+#: src/core/filedlg.c:327 src/core/partitions.c:228
 msgid "Size"
 msgstr "Boyut"
 
-#: src/core/filedlg.c:326
+#: src/core/filedlg.c:327
 msgid "Modified"
 msgstr "Değiştirilme"
 
-#: src/core/filedlg.c:367
+#: src/core/filedlg.c:368
 msgid "No .md or .txt documents here"
 msgstr "Burada .md veya .txt belgesi yok"
 
-#: src/core/filedlg.c:367
+#: src/core/filedlg.c:368
 msgid "Empty folder"
 msgstr "Boş klasör"
 
-#: src/core/filedlg.c:407
+#: src/core/filedlg.c:408
 msgid "File name"
 msgstr "Dosya adı"
 
-#: src/core/filedlg.c:409
+#: src/core/filedlg.c:410
 msgid "Export"
 msgstr "Dışa aktar"
 
-#: src/core/filedlg.c:434
+#: src/core/filedlg.c:435
 msgid ". The document stays open as .md."
 msgstr ". Belge .md olarak açık kalır."
 
-#: src/core/filedlg.c:438
+#: src/core/filedlg.c:439
 #, c-format
 msgid "%d item"
 msgid_plural "%d items"
 msgstr[0] "%d öğe"
 msgstr[1] "%d öğe"
 
-#: src/core/filedlg.c:440
+#: src/core/filedlg.c:441
 msgid "Open"
 msgstr "Aç"
+
+#: src/core/fscheck.c:815
+msgid "This partition is encrypted with BitLocker. To make room, shrink it in Windows (Disk Management, Shrink Volume) or turn BitLocker off first."
+msgstr "Bu bölüm BitLocker ile şifrelenmiş. Yer açmak için Windows’ta küçültün (Disk Yönetimi, Birimi Küçült) veya önce BitLocker’ı kapatın."
+
+#: src/core/fscheck.c:816
+msgid "This partition is encrypted (LUKS). To make room, shrink it from Linux with the encryption tools."
+msgstr "Bu bölüm şifrelenmiş (LUKS). Yer açmak için Linux’tan şifreleme araçlarıyla küçültün."
+
+#: src/core/fscheck.c:817
+msgid "This partition holds LVM volumes. To make room, shrink them from Linux (lvreduce, then pvresize)."
+msgstr "Bu bölüm LVM birimleri içeriyor. Yer açmak için bunları Linux’tan küçültün (önce lvreduce, sonra pvresize)."
+
+#: src/core/fscheck.c:818
+msgid "This is a Mac partition (APFS or HFS+). To make room, use Disk Utility on the Mac."
+msgstr "Bu bir Mac bölümü (APFS veya HFS+). Yer açmak için Mac’te Disk İzlencesi’ni kullanın."
+
+#: src/core/fscheck.c:819
+msgid "Windows is hibernated or uses Fast Startup. Start Windows, then shut it down while holding Shift (or turn Fast Startup off in Power Options), and try again."
+msgstr "Windows hazırda bekletmede veya Hızlı başlatma kullanıyor. Windows’u başlatın, Shift tuşunu basılı tutarak kapatın (veya Güç Seçenekleri’nde Hızlı başlatmayı kapatın) ve yeniden deneyin."
+
+#: src/core/fscheck.c:820
+msgid "Windows marked this partition as needing a check. Start Windows, run chkdsk /f on it, and try again."
+msgstr "Windows bu bölümü denetlenmesi gereken olarak işaretledi. Windows’u başlatın, bu bölümde chkdsk /f çalıştırın ve yeniden deneyin."
+
+#: src/core/fscheck.c:821
+msgid "This Linux partition was not unmounted cleanly. Start Linux and shut it down normally, then try again."
+msgstr "Bu Linux bölümü düzgün ayrılmamış. Linux’u başlatıp normal şekilde kapatın, sonra yeniden deneyin."
+
+#: src/core/fscheck.c:822
+msgid "Linux found errors on this partition. Check it with fsck from Linux, then try again."
+msgstr "Linux bu bölümde hatalar buldu. Linux’tan fsck ile denetleyin, sonra yeniden deneyin."
+
+#: src/core/fscheck.c:823
+msgid "This partition could not be read safely, so FolioOS will not change it."
+msgstr "Bu bölüm güvenle okunamadı; bu yüzden FolioOS onu değiştirmeyecek."
+
+#: src/core/fscheck.c:824
+msgid "FolioOS cannot resize this file system yet."
+msgstr "FolioOS bu dosya sistemini henüz yeniden boyutlandıramıyor."
+
+#: src/core/fscheck.c:830
+msgid "encrypted (BitLocker)"
+msgstr "şifreli (BitLocker)"
+
+#: src/core/fscheck.c:831
+msgid "encrypted (LUKS)"
+msgstr "şifreli (LUKS)"
+
+#: src/core/fscheck.c:833
+msgid "Mac (APFS/HFS+)"
+msgstr "Mac (APFS/HFS+)"
+
+#: src/core/fscheck.c:834
+msgid "Windows hibernated or Fast Startup"
+msgstr "Windows hazırda bekletmede veya Hızlı başlatma"
+
+#: src/core/fscheck.c:835
+msgid "needs a check (chkdsk)"
+msgstr "denetlenmeli (chkdsk)"
+
+#: src/core/fscheck.c:836
+msgid "not unmounted cleanly"
+msgstr "düzgün ayrılmamış"
+
+#: src/core/fscheck.c:837
+msgid "has errors (fsck)"
+msgstr "hatalı (fsck)"
+
+#: src/core/fscheck.c:838
+msgid "unreadable"
+msgstr "okunamıyor"
+
+#: src/core/fscheck.c:839
+msgid "cannot be resized yet"
+msgstr "henüz yeniden boyutlandırılamaz"
 
 #: src/core/i18n.c:435
 msgid "January"
@@ -1949,6 +2149,452 @@ msgstr "Giriş: hiragana"
 msgid "Input: Katakana"
 msgstr "Giriş: katakana"
 
+#: src/core/install.c:889
+msgid "Done"
+msgstr "Tamamlandı"
+
+#: src/core/install.c:890
+msgid "Could not read"
+msgstr "Okunamadı"
+
+#: src/core/install.c:891
+msgid "Could not write to the disk"
+msgstr "Diske yazılamadı"
+
+#: src/core/install.c:892
+msgid "The disk is too small (at least 512 MB)"
+msgstr "Disk çok küçük (en az 512 MB)"
+
+#: src/core/install.c:893
+msgid "Could not save the safety copy to the USB drive"
+msgstr "Güvenlik kopyası USB belleğe kaydedilemedi"
+
+#: src/core/install.c:894
+msgid "Could not format the new partition"
+msgstr "Yeni bölüm biçimlendirilemedi"
+
+#: src/core/install.c:895
+msgid "Could not copy"
+msgstr "Kopyalanamadı"
+
+#: src/core/install.c:896
+msgid "A copied file did not match the original"
+msgstr "Kopyalanan bir dosya asılıyla eşleşmiyor"
+
+#: src/core/install.c:897
+msgid "The BIOS boot code is missing from the USB drive"
+msgstr "USB bellekte BIOS önyükleme kodu eksik"
+
+#: src/core/install.c:898
+msgid "The USB drive does not have a complete FolioOS"
+msgstr "USB bellekte eksiksiz bir FolioOS yok"
+
+#: src/core/install.c:899
+msgid "This disk does not use a GPT partition table"
+msgstr "Bu disk GPT bölüm tablosu kullanmıyor"
+
+#: src/core/install.c:900
+msgid "No FAT32 EFI system partition was found on this disk"
+msgstr "Bu diskte FAT32 EFI sistem bölümü bulunamadı"
+
+#: src/core/install.c:901
+msgid "The EFI system partition is full"
+msgstr "EFI sistem bölümü dolu"
+
+#: src/core/install.c:902
+msgid "The chosen space is not free"
+msgstr "Seçilen alan boş değil"
+
+#: src/core/install.c:903
+msgid "Could not shrink the other system's partition"
+msgstr "Diğer sistemin bölümü küçültülemedi"
+
+#: src/core/install.c:904
+msgid "Could not give the space back to the other system's partition"
+msgstr "Alan diğer sistemin bölümüne geri verilemedi"
+
+#: src/core/install.c:905
+msgid "This partition cannot change to that size without moving data"
+msgstr "Bu bölüm veri taşımadan o boyuta getirilemez"
+
+#: src/core/install.c:906 src/core/partitions.c:46
+msgid "FolioOS cannot change this disk's partition table safely: it is left as it is"
+msgstr "FolioOS bu diskin bölüm tablosunu güvenle değiştiremez: olduğu gibi bırakılır"
+
+#: src/core/install.c:907
+msgid "Error"
+msgstr "Hata"
+
+#: src/core/installer.c:53 src/core/partitions.c:39
+msgid "This disk is read-only."
+msgstr "Bu disk salt okunur."
+
+#: src/core/installer.c:54 src/core/partitions.c:40
+msgid "Disks with 4096-byte sectors are not supported yet."
+msgstr "4096 baytlık sektörlü diskler henüz desteklenmiyor."
+
+#: src/core/installer.c:55
+msgid "This disk is too small (at least 512 MB)."
+msgstr "Bu disk çok küçük (en az 512 MB)."
+
+#: src/core/installer.c:99
+msgid "To keep Linux, shrink its partition from Linux (with GParted, for example) and run the installer again: FolioOS will use the free space."
+msgstr "Linux’u korumak için bölümünü Linux’tan küçültün (örneğin GParted ile) ve yükleyiciyi yeniden açın: FolioOS boş alanı kullanır."
+
+#: src/core/installer.c:100
+msgid "To keep Windows, shrink drive C: in Windows (Disk Management, Shrink Volume) and run the installer again: FolioOS will use the free space."
+msgstr "Windows’u korumak için C: sürücüsünü Windows’ta küçültün (Disk Yönetimi, Birimi Küçült) ve yükleyiciyi yeniden açın: FolioOS boş alanı kullanır."
+
+#: src/core/installer.c:106 src/core/partitions.c:44
+msgid "Partition table unreadable"
+msgstr "Bölüm tablosu okunamıyor"
+
+#: src/core/installer.c:107 src/core/partitions.c:138
+msgid "Empty: no partitions"
+msgstr "Boş: bölüm yok"
+
+#: src/core/installer.c:113
+#, c-format
+msgid "…and %d more partition"
+msgid_plural "…and %d more partitions"
+msgstr[0] "…ve %d bölüm daha"
+msgstr[1] "…ve %d bölüm daha"
+
+#: src/core/installer.c:124 src/core/partitions.c:134
+msgid "disk"
+msgstr "disk"
+
+#: src/core/installer.c:268
+msgid "Your texts:"
+msgstr "Metinleriniz:"
+
+#: src/core/installer.c:270
+msgid "They stay on this USB drive and go with you; FolioOS on the computer uses them when the drive is connected."
+msgstr "Bu USB bellekte kalır ve sizinle gelir; bilgisayardaki FolioOS bellek takılıyken onları kullanır."
+
+#: src/core/installer.c:271
+msgid "They are copied to the computer; a button in Settings exchanges them with this USB drive."
+msgstr "Bilgisayara kopyalanır; Ayarlar’daki bir düğme onları bu USB bellekle değiştirir."
+
+#: src/core/installer.c:272
+msgid "They are copied to the computer."
+msgstr "Bilgisayara kopyalanır."
+
+#: src/core/installer.c:288
+msgid "Install FolioOS next to the system you already have, in the free space, or as the only system on a disk."
+msgstr "FolioOS’u mevcut sisteminizin yanına, boş alana ya da bir diskteki tek sistem olarak kurun."
+
+#: src/core/installer.c:289
+msgid "Choose where:"
+msgstr "Nereye kurulacağını seçin:"
+
+#: src/core/installer.c:290 src/core/partitions.c:173
+msgid "No disk was found besides the USB drive FolioOS started from."
+msgstr "FolioOS’un başlatıldığı USB bellek dışında disk bulunamadı."
+
+#: src/core/installer.c:302
+msgid "Reinstall the FolioOS program on this disk (your texts and settings stay)"
+msgstr "Bu diskteki FolioOS programını yeniden yükle (metinleriniz ve ayarlarınız kalır)"
+
+#: src/core/installer.c:303
+#, c-format
+msgid "Update FolioOS on this disk (%s → %s)"
+msgstr "Bu diskteki FolioOS’u güncelle (%s → %s)"
+
+#: src/core/installer.c:305
+msgid "Remove FolioOS from this disk (the disk is left empty)"
+msgstr "FolioOS’u bu diskten kaldır (disk boş kalır)"
+
+#: src/core/installer.c:305
+msgid "Remove FolioOS from this disk (Windows gets the space back)"
+msgstr "FolioOS’u bu diskten kaldır (Windows alanı geri alır)"
+
+#: src/core/installer.c:305
+msgid "Remove FolioOS from this disk (the partition before it gets the space back)"
+msgstr "FolioOS’u bu diskten kaldır (önceki bölüm alanı geri alır)"
+
+#: src/core/installer.c:305
+msgid "Remove FolioOS from this disk (its space becomes free)"
+msgstr "FolioOS’u bu diskten kaldır (alanı boş kalır)"
+
+#: src/core/installer.c:306
+#, c-format
+msgid "Next to the other system, making room in its %s partition (up to %s)"
+msgstr "Diğer sistemin yanına, %s bölümünde yer açarak (en fazla %s)"
+
+#: src/core/installer.c:307
+#, c-format
+msgid "Next to the other system, in %s of free space"
+msgstr "Diğer sistemin yanına, %s boş alana"
+
+#: src/core/installer.c:308
+msgid "The whole disk (everything on it is erased)"
+msgstr "Diskin tamamı (içindeki her şey silinir)"
+
+#: src/core/installer.c:320
+msgid "Next"
+msgstr "İleri"
+
+#: src/core/installer.c:332
+msgid "FolioOS on this disk will be updated:"
+msgstr "Bu diskteki FolioOS güncellenecek:"
+
+#: src/core/installer.c:335
+#, c-format
+msgid "Version %s → %s"
+msgstr "Sürüm %s → %s"
+
+#: src/core/installer.c:337
+msgid "Only the program, fonts, languages, themes and keyboards are replaced. Your texts, music and settings stay as they are, and fonts or themes you added are kept."
+msgstr "Yalnızca program, yazı tipleri, diller, temalar ve klavyeler değiştirilir. Metinleriniz, müzikleriniz ve ayarlarınız olduğu gibi kalır; eklediğiniz yazı tipleri veya temalar korunur."
+
+#: src/core/installer.c:338
+msgid "Each file is replaced only after the new copy has been checked, so a power cut never leaves FolioOS half updated."
+msgstr "Her dosya ancak yeni kopya denetlendikten sonra değiştirilir; bu yüzden bir elektrik kesintisi FolioOS’u asla yarı güncellenmiş bırakmaz."
+
+#: src/core/installer.c:339 src/core/installer.c:371 src/core/installer.c:423 src/core/installer.c:451
+#, c-format
+msgid "Before anything is written, the start of the disk (partition table and boot sectors) is saved to %s on this USB drive."
+msgstr "Herhangi bir şey yazılmadan önce diskin başı (bölüm tablosu ve önyükleme sektörleri) bu USB bellekte %s konumuna kaydedilir."
+
+#: src/core/installer.c:341 src/core/installer.c:382 src/core/installer.c:435 src/core/installer.c:458 src/core/partitions.c:246
+msgid "Back"
+msgstr "Geri"
+
+#: src/core/installer.c:342
+msgid "Update"
+msgstr "Güncelle"
+
+#: src/core/installer.c:348
+msgid "FolioOS will be removed from this disk:"
+msgstr "FolioOS bu diskten kaldırılacak:"
+
+#: src/core/installer.c:352
+#, c-format
+msgid "− FolioOS · FAT32 · %s"
+msgstr "− FolioOS · FAT32 · %s"
+
+#: src/core/installer.c:357 src/core/installer.c:405 src/core/partitions.c:226
+#, c-format
+msgid "%s%s: %s → %s"
+msgstr "%s%s: %s → %s"
+
+#: src/core/installer.c:363
+#, c-format
+msgid "Copy the %d text from this computer to the USB drive first (%s)"
+msgid_plural "Copy the %d texts from this computer to the USB drive first (%s)"
+msgstr[0] "Önce bu bilgisayardaki %d metni USB belleğe kopyala (%s)"
+msgstr[1] "Önce bu bilgisayardaki %d metni USB belleğe kopyala (%s)"
+
+#: src/core/installer.c:366
+msgid "There are no texts on FolioOS's partition."
+msgstr "FolioOS bölümünde metin yok."
+
+#: src/core/installer.c:367
+msgid "The disk will be left empty, with no partitions, ready for another system."
+msgstr "Disk boş kalacak; bölümsüz ve başka bir sisteme hazır olacak."
+
+#: src/core/installer.c:368
+msgid "The start of the disk gets the other system's original boot code back, and the computer starts it directly again."
+msgstr "Diskin başlangıcı diğer sistemin özgün önyükleme kodunu geri alır ve bilgisayar onu yeniden doğrudan başlatır."
+
+#: src/core/installer.c:369
+msgid "The EFI system partition loses only the folder EFI/FolioOS, and the computer starts the other system directly again."
+msgstr "EFI sistem bölümü yalnızca EFI/FolioOS klasörünü kaybeder ve bilgisayar diğer sistemi yeniden doğrudan başlatır."
+
+#: src/core/installer.c:370
+msgid "The next time Windows starts, it checks its partition (chkdsk) once; this is expected."
+msgstr "Windows bir sonraki açılışta bölümünü bir kez denetler (chkdsk); bu beklenen bir durumdur."
+
+#: src/core/installer.c:373 src/core/installer.c:443 src/core/partitions.c:220
+msgid "ERASE"
+msgstr "SİL"
+
+#: src/core/installer.c:377
+#, c-format
+msgid "Your texts on this computer will be lost. To confirm, type %s:"
+msgstr "Bu bilgisayardaki metinleriniz kaybolacak. Onaylamak için %s yazın:"
+
+#: src/core/installer.c:377 src/core/installer.c:385 src/core/installer.c:453 src/core/installer.c:461 src/core/partitions.c:241 src/core/partitions.c:250
+#, c-format
+msgid "To confirm, type %s:"
+msgstr "Onaylamak için %s yazın:"
+
+#: src/core/installer.c:383
+msgid "Remove FolioOS"
+msgstr "FolioOS’u kaldır"
+
+#: src/core/installer.c:392
+msgid "Nothing on this disk will be erased."
+msgstr "Bu diskteki hiçbir şey silinmeyecek."
+
+#: src/core/installer.c:408
+#, c-format
+msgid "+ FolioOS · FAT32 · %s, in the space this frees"
+msgstr "+ FolioOS · FAT32 · %s, açılan alanda"
+
+#: src/core/installer.c:410
+msgid "Size for FolioOS"
+msgstr "FolioOS için boyut"
+
+#: src/core/installer.c:412 src/core/partitions.c:230
+msgid "No file is moved: FolioOS only takes free space from the end of that partition. The next time Windows starts, it checks the partition (chkdsk) once; this is expected."
+msgstr "Hiçbir dosya taşınmaz: FolioOS yalnızca o bölümün sonundaki boş alanı alır. Windows bir sonraki açılışta bölümü bir kez denetler (chkdsk); bu beklenen bir durumdur."
+
+#: src/core/installer.c:412 src/core/partitions.c:230
+msgid "No file is moved: FolioOS only takes free space from the end of that partition."
+msgstr "Hiçbir dosya taşınmaz: FolioOS yalnızca o bölümün sonundaki boş alanı alır."
+
+#: src/core/installer.c:415
+#, c-format
+msgid "+ FolioOS · FAT32 · %s, in the free space"
+msgstr "+ FolioOS · FAT32 · %s, boş alanda"
+
+#: src/core/installer.c:417
+msgid "The start of the disk gets FolioOS's boot code; the other system's original code is kept, and FolioOS starts it. Your texts, fonts and settings are copied from this USB drive to the new partition."
+msgstr "Diskin başlangıcı FolioOS’un önyükleme kodunu alır; diğer sistemin özgün kodu saklanır ve FolioOS onu başlatır. Metinleriniz, yazı tipleriniz ve ayarlarınız bu USB bellekten yeni bölüme kopyalanır."
+
+#: src/core/installer.c:418
+msgid "The EFI system partition only receives the folder EFI/FolioOS. Your texts, fonts and settings are copied from this USB drive to the new partition."
+msgstr "EFI sistem bölümüne yalnızca EFI/FolioOS klasörü eklenir. Metinleriniz, yazı tipleriniz ve ayarlarınız bu USB bellekten yeni bölüme kopyalanır."
+
+#: src/core/installer.c:420
+#, c-format
+msgid "When the computer starts, FolioOS waits %d second for a key; without one, the other system starts as usual."
+msgid_plural "When the computer starts, FolioOS waits %d seconds for a key; without one, the other system starts as usual."
+msgstr[0] "Bilgisayar açılırken FolioOS %d saniye bir tuş bekler; basılmazsa diğer sistem her zamanki gibi açılır."
+msgstr[1] "Bilgisayar açılırken FolioOS %d saniye bir tuş bekler; basılmazsa diğer sistem her zamanki gibi açılır."
+
+#: src/core/installer.c:429
+msgid "This disk has a partition encrypted with BitLocker. FolioOS does not touch it, but after the startup settings change, Windows may ask once for the BitLocker recovery key. Make sure you have it (it is in your Microsoft account at aka.ms/myrecoverykey, or where you saved or printed it) before you continue."
+msgstr "Bu diskte BitLocker ile şifrelenmiş bir bölüm var. FolioOS ona dokunmaz, ancak başlangıç ayarları değiştikten sonra Windows bir kez BitLocker kurtarma anahtarını isteyebilir. Devam etmeden önce anahtarın sizde olduğundan emin olun (Microsoft hesabınızda aka.ms/myrecoverykey adresindedir veya kaydettiğiniz ya da yazdırdığınız yerdedir)."
+
+#: src/core/installer.c:430 src/core/installer.c:438
+msgid "I have the BitLocker recovery key"
+msgstr "BitLocker kurtarma anahtarı bende"
+
+#: src/core/installer.c:433 src/core/installer.c:463
+msgid "On this computer"
+msgstr "Bu bilgisayarda"
+
+#: src/core/installer.c:433 src/core/installer.c:463
+msgid "On the USB drive"
+msgstr "USB bellekte"
+
+#: src/core/installer.c:433 src/core/installer.c:463
+msgid "On both"
+msgstr "İkisinde de"
+
+#: src/core/installer.c:436
+msgid "Shrink and install"
+msgstr "Küçült ve yükle"
+
+#: src/core/installer.c:436
+msgid "Install next to it"
+msgstr "Yanına kur"
+
+#: src/core/installer.c:445
+msgid "Everything on this disk will be erased:"
+msgstr "Bu diskteki her şey silinecek:"
+
+#: src/core/installer.c:450
+msgid "FolioOS gets one partition that fills the disk, with your texts, fonts and settings copied from this USB drive."
+msgstr "FolioOS diskin tamamını kaplayan tek bir bölüm alır; metinleriniz, yazı tipleriniz ve ayarlarınız bu USB bellekten kopyalanır."
+
+#: src/core/installer.c:459
+msgid "Erase and install"
+msgstr "Sil ve kur"
+
+#: src/core/installer.c:467
+msgid "Removing FolioOS… Do not turn off the computer or remove the USB drive."
+msgstr "FolioOS kaldırılıyor… Bilgisayarı kapatmayın ve USB belleği çıkarmayın."
+
+#: src/core/installer.c:467
+msgid "Updating FolioOS… Do not turn off the computer or remove the USB drive."
+msgstr "FolioOS güncelleniyor… Bilgisayarı kapatmayın ve USB belleği çıkarmayın."
+
+#: src/core/installer.c:467
+msgid "Installing FolioOS… Do not turn off the computer or remove the USB drive."
+msgstr "FolioOS kuruluyor… Bilgisayarı kapatmayın ve USB belleği çıkarmayın."
+
+#: src/core/installer.c:479
+msgid "FolioOS on this disk is up to date."
+msgstr "Bu diskteki FolioOS güncel."
+
+#: src/core/installer.c:480
+msgid "Remove the USB drive and restart. Your texts and settings are where they were."
+msgstr "USB belleği çıkarın ve yeniden başlatın. Metinleriniz ve ayarlarınız oldukları yerde."
+
+#: src/core/installer.c:482
+msgid "FolioOS was removed from this computer."
+msgstr "FolioOS bu bilgisayardan kaldırıldı."
+
+#: src/core/installer.c:483
+#, c-format
+msgid "The texts from the computer are on this USB drive, in %s."
+msgstr "Bilgisayardaki metinler bu USB bellekte, %s içinde."
+
+#: src/core/installer.c:484
+msgid "The disk is empty now: install another system on it, or FolioOS again from this USB drive."
+msgstr "Disk artık boş: üzerine başka bir sistem yükleyin ya da bu USB bellekten FolioOS’u yeniden yükleyin."
+
+#: src/core/installer.c:484
+msgid "Remove the USB drive and restart: the computer starts the other system as before."
+msgstr "USB belleği çıkarın ve yeniden başlatın: bilgisayar diğer sistemi eskisi gibi başlatır."
+
+#: src/core/installer.c:485
+msgid "The firmware did not let FolioOS remove its boot entry; if the computer still lists FolioOS at startup, remove it in the firmware settings."
+msgstr "Ürün yazılımı FolioOS’un açılış girdisini kaldırmasına izin vermedi; bilgisayar açılışta hâlâ FolioOS gösteriyorsa, girdiyi ürün yazılımı ayarlarından kaldırın."
+
+#: src/core/installer.c:487
+msgid "FolioOS is installed next to the other system."
+msgstr "FolioOS diğer sistemin yanına kuruldu."
+
+#: src/core/installer.c:488
+msgid "Remove the USB drive and restart. FolioOS starts first and waits a few seconds for a key; without one, the other system starts as usual."
+msgstr "USB belleği çıkarın ve yeniden başlatın. Önce FolioOS açılır ve birkaç saniye bir tuş bekler; basılmazsa diğer sistem her zamanki gibi açılır."
+
+#: src/core/installer.c:490
+msgid "FolioOS is installed on this computer."
+msgstr "FolioOS bu bilgisayara kuruldu."
+
+#: src/core/installer.c:491
+msgid "Remove the USB drive and restart. From now on the computer starts straight into FolioOS; your texts are in DOCUMENTS on the disk."
+msgstr "USB belleği çıkarın ve yeniden başlatın. Artık bilgisayar doğrudan FolioOS ile açılır; metinleriniz diskte DOCUMENTS klasöründe."
+
+#: src/core/installer.c:493
+msgid "The firmware did not accept a new boot entry: choose FolioOS in the computer's boot menu (often F12, F8 or Esc right after power-on)."
+msgstr "Ürün yazılımı yeni bir önyükleme girdisini kabul etmedi: bilgisayarın önyükleme menüsünden FolioOS’u seçin (genellikle açılışta F12, F8 ya da Esc)."
+
+#: src/core/installer.c:494 src/core/installer.c:503
+#, c-format
+msgid "The previous start of the disk is saved in %s."
+msgstr "Diskin önceki başı %s konumuna kaydedildi."
+
+#: src/core/installer.c:495 src/core/installer.c:505
+msgid "Close"
+msgstr "Kapat"
+
+#: src/core/installer.c:500
+msgid "The removal did not finish."
+msgstr "Kaldırma tamamlanmadı."
+
+#: src/core/installer.c:500
+msgid "The update did not finish. FolioOS on the disk still works: every file is either the old or the new one."
+msgstr "Güncelleme tamamlanmadı. Diskteki FolioOS çalışmaya devam ediyor: her dosya ya eski ya da yeni sürüm."
+
+#: src/core/installer.c:500
+msgid "The installation did not finish."
+msgstr "Kurulum tamamlanmadı."
+
+#: src/core/installer.c:504
+msgid "Your texts on this USB drive were not touched. You can try again, or keep using FolioOS from the USB drive."
+msgstr "Bu USB bellekteki metinlerinize dokunulmadı. Yeniden deneyebilir ya da FolioOS’u USB bellekten kullanmaya devam edebilirsiniz."
+
+#: src/core/installer.c:506
+msgid "Try again"
+msgstr "Yeniden dene"
+
 #: src/core/music.c:131
 #, c-format
 msgid "No sound: %s. Details in %s"
@@ -2015,6 +2661,64 @@ msgid "%d track · %s"
 msgid_plural "%d tracks · %s"
 msgstr[0] "%d parça · %s"
 msgstr[1] "%d parça · %s"
+
+#: src/core/partitions.c:110
+msgid "Done. The previous start of the disk is saved on this USB drive."
+msgstr "Tamam. Diskin önceki başlangıcı bu USB belleğe kaydedildi."
+
+#: src/core/partitions.c:139
+#, c-format
+msgid "Free space · %s"
+msgstr "Boş alan · %s"
+
+#: src/core/partitions.c:169
+msgid "Working… Do not turn off the computer or remove the USB drive."
+msgstr "Çalışıyor… Bilgisayarı kapatmayın ve USB belleği çıkarmayın."
+
+#: src/core/partitions.c:172
+msgid "Choose a partition or a free space, then an action. Before anything is written, the start of the disk is saved to FOLIO/BACKUP on this USB drive."
+msgstr "Bir bölüm ya da boş alan, sonra bir işlem seçin. Herhangi bir şey yazılmadan önce diskin başlangıcı bu USB bellekte FOLIO/BACKUP içine kaydedilir."
+
+#: src/core/partitions.c:194
+msgid "Create a FAT32 partition"
+msgstr "FAT32 bölümü oluştur"
+
+#: src/core/partitions.c:200
+msgid "Resize"
+msgstr "Yeniden boyutlandır"
+
+#: src/core/partitions.c:206
+msgid "Format as FAT32"
+msgstr "FAT32 olarak biçimlendir"
+
+#: src/core/partitions.c:225
+#, c-format
+msgid "+ FAT32 · %s, in this free space"
+msgstr "+ FAT32 · %s, bu boş alanda"
+
+#: src/core/partitions.c:234
+msgid "Name of the new volume:"
+msgstr "Yeni birimin adı:"
+
+#: src/core/partitions.c:238
+msgid "Everything on this partition will be erased; it becomes an empty FAT32 volume."
+msgstr "Bu bölümdeki her şey silinecek; boş bir FAT32 birimi olacak."
+
+#: src/core/partitions.c:239
+msgid "This partition and everything on it will be erased; its space becomes free."
+msgstr "Bu bölüm ve içindeki her şey silinecek; alanı boş kalacak."
+
+#: src/core/partitions.c:247
+msgid "Create"
+msgstr "Oluştur"
+
+#: src/core/partitions.c:247
+msgid "Apply"
+msgstr "Uygula"
+
+#: src/core/partitions.c:247
+msgid "Format"
+msgstr "Biçimlendir"
 
 #: src/core/preview.c:46 src/core/preview.c:472
 msgid "The whole text already fits on the screen"

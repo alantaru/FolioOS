@@ -1,0 +1,27 @@
+# Remover o FolioOS instalado como único sistema (o disco de tests\instalar.txt), só pelo teclado, em pt-BR: o disco
+# fica vazio, então a palavra de confirmação é sempre pedida (APAGAR). O build confere que o disco ficou vazio.
+wait 300
+key esc
+wait 200
+key ctrl+k
+type Remover o FolioOS
+key enter
+wait 300
+assert_keywin Install FolioOS on this computer
+shot remover_disco1_opcoes.png
+# Shift+Tab = Next ("remover" já vem marcado: é a 1ª opção do disco)
+key shift+tab
+key enter
+wait 200
+# este disco não tem textos (instalado de um pendrive de teste vazio): Tab = o campo da palavra
+key tab
+type APAGAR
+wait 100
+shot remover_disco2_palavra.png
+# Tab, Tab = "Voltar", "Remover o FolioOS"
+key tab
+key tab
+key enter
+wait 3000
+shot remover_disco3_pronto.png
+assert_keywin Install FolioOS on this computer

@@ -1,0 +1,4 @@
+# Seletor de boot (ao lado de outro sistema). Com boot_wait=0 ele não aparece e o FolioOS abre direto;
+# com a espera normal e sem tecla, o simulador encerra com "boot other: ..." antes de chegar aqui.
+wait 500
+assert_keywin text

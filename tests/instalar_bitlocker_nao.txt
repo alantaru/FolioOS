@@ -1,0 +1,21 @@
+# Ao lado de um "Windows" com BitLocker: sem confirmar que tem a chave de recuperação, o botão não instala
+# (o build confere que o disco ficou byte a byte igual)
+wait 300
+key esc
+wait 200
+key ctrl+k
+type Instalar o FolioOS neste
+key enter
+wait 300
+assert_keywin Install FolioOS on this computer
+# Shift+Tab = Next
+key shift+tab
+key enter
+wait 200
+shot bitlocker1_aviso.png
+# Shift+Tab = "Instalar ao lado", ainda sem a chave: recusado
+key shift+tab
+key enter
+wait 1500
+shot bitlocker2_recusado.png
+assert_keywin Install FolioOS on this computer

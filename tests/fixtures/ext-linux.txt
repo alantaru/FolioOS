@@ -1,0 +1,1 @@
+name=linux bs=4096 blocks=127488 last=98367 features=has_journal,ext_attr,resize_inode,dir_index,orphan_file,filetype,extent,64bit,flex_bg,metadata_csum_seed,sparse_super,large_file,huge_file,dir_nlink,extra_isize,metadata_csum bytes=629145600

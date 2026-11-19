@@ -1,5 +1,7 @@
 /* FOLIO v4 — aplicação: laço principal, barras, janelas, comandos e atalhos */
 #include "folio.h"
+#include "disks.h"
+#include "install.h"
 
 AppDoc app;
 static bool  quit_flag;
@@ -7,6 +9,7 @@ static u64   last_frame_ms, last_mouse_ms, sprint_end, sprint_start_words;
 static float chrome_a = 1;
 static bool  zen;
 static int   boot_vol;
+static bool  alongside;                    /* instalado ao lado de outro sistema (iniciado por \EFI\FolioOS + FOLIO.ID) */
 static int   last_W, last_H, last_theme = -1;
 static Surface desk;
 static int   cur_mods;
@@ -441,6 +444,105 @@ static void guard_then(int action) {
     }
     run_pending();
 }
+/* ------------------------------------------------------------ onde ficam os textos (docs_place=) */
+bool app_installed(void) { bool d; return pal_exists(boot_vol, "/FOLIO/INSTALLED.ID", &d) && !d; }
+int app_texts_stick(void) {
+    /* um outro volume, gravável, com a pasta de textos: o pendrive (o primeiro achado) */
+    for (int v = 0; v < pal_vol_count(); v++) {
+        VolInfo vi; bool d;
+        if (v == boot_vol || !pal_vol_info(v, &vi) || vi.readonly) continue;
+        if ((pal_exists(v, "/DOCUMENTS", &d) && d) || (pal_exists(v, "/TEXTOS", &d) && d)) return v;
+    }
+    return -1;
+}
+int app_docs_vol(void) {
+    if (prefs.docs_place == DOCS_USB) { int s = app_texts_stick(); if (s >= 0) return s; }
+    return boot_vol;
+}
+static const char *docs_dir_on(int vol) {
+    bool d;
+    if (vol == boot_vol) return paths_dir(DIR_DOCS);
+    return pal_exists(vol, "/TEXTOS", &d) && d && !(pal_exists(vol, "/DOCUMENTS", &d) && d) ? "/TEXTOS" : "/DOCUMENTS";
+}
+const char *app_docs_dir(void) { return docs_dir_on(app_docs_vol()); }
+
+/* troca dos textos com o pendrive (docs_place=both): o que só existe de um lado vai para o outro; o que existe nos
+ * dois e é diferente fica com a versão mais nova (a mais velha vai antes para FOLIO/VERSIONS). Nada é apagado.
+ * Um texto aberto em outra aba e diferente fica de fora (não pode haver duas versões dele na memória). */
+typedef struct { int a, b, to_b, to_a, skipped; } Xch;
+static i64 dt_key(DateTime t) { return ((((i64)t.year * 12 + t.month) * 31 + t.day) * 24 + t.hour) * 3600 + (i64)t.min * 60 + t.sec; }
+static bool open_elsewhere(int vol, const char *path) {
+    for (int i = 0; prefs.tabs && i < ntabs; i++) {
+        if (i == cur_tab) continue;
+        AppDoc *d = tab_at(i);
+        if (d->has_path && d->vol == vol && str_eq(d->path, path)) return true;
+    }
+    return false;
+}
+static bool xch_copy(int sv, const char *sp, int dv, const char *dp) {
+    u8 *data; usize len; bool d;
+    if (!pal_read(sv, sp, &data, &len)) return false;
+    if (pal_exists(dv, dp, &d) && !d) snapshot(dv, dp, true);   /* a versão que vai ser substituída fica guardada */
+    bool ok = pal_write(dv, dp, data, len);
+    mem_free(data);
+    if (ok && app.has_path && app.vol == dv && str_eq(app.path, dp)) load_into(dv, dp, app.caret);   /* o texto aberto */
+    return ok;
+}
+static void xch_dir(Xch *x, const char *pa, const char *pb, int depth) {
+    if (depth > 12) return;
+    FileEntry *la = 0, *lb = 0;
+    int na = pal_list(x->a, pa, &la), nb = pal_list(x->b, pb, &lb);
+    if (na < 0) na = 0;
+    if (nb < 0) nb = 0;
+    for (int pass = 0; pass < 2; pass++) {               /* 0: o que está em A (e talvez em B); 1: o que só está em B */
+        FileEntry *l = pass ? lb : la; int n = pass ? nb : na;
+        for (int i = 0; i < n; i++) {
+            FileEntry *e = &l[i], *o = 0;
+            if (e->name[0] == '.') continue;
+            FileEntry *other = pass ? la : lb; int no = pass ? na : nb;
+            for (int k = 0; k < no; k++) if (str_ieq(other[k].name, e->name)) o = &other[k];
+            if (pass && o) continue;                       /* já tratado na passada 0 */
+            char a[512], b[512];
+            path_join(a, sizeof a, pa, e->name); path_join(b, sizeof b, pb, o ? o->name : e->name);
+            if (e->dir) {
+                if (pass) pal_mkdir(x->a, a); else if (!o) pal_mkdir(x->b, b);
+                xch_dir(x, a, b, depth + 1);
+                continue;
+            }
+            if (!o) {                                      /* só de um lado: copia */
+                if (open_elsewhere(pass ? x->b : x->a, pass ? b : a)) { x->skipped++; continue; }
+                if (pass ? xch_copy(x->b, b, x->a, a) : xch_copy(x->a, a, x->b, b)) { if (pass) x->to_a++; else x->to_b++; }
+                continue;
+            }
+            u8 *da, *db; usize ln_a, ln_b;
+            if (!pal_read(x->a, a, &da, &ln_a)) continue;
+            if (!pal_read(x->b, b, &db, &ln_b)) { mem_free(da); continue; }
+            bool same = ln_a == ln_b && !memcmp(da, db, ln_a);
+            mem_free(da); mem_free(db);
+            if (same) continue;
+            bool a_newer = dt_key(e->mtime) > dt_key(o->mtime);
+            if (dt_key(e->mtime) == dt_key(o->mtime)) { x->skipped++; continue; }   /* mesma hora, conteúdo diferente: não adivinha */
+            if (open_elsewhere(x->a, a) || open_elsewhere(x->b, b)) { x->skipped++; continue; }
+            if (a_newer ? xch_copy(x->a, a, x->b, b) : xch_copy(x->b, b, x->a, a)) { if (a_newer) x->to_b++; else x->to_a++; }
+        }
+    }
+    if (la) mem_free(la);
+    if (lb) mem_free(lb);
+}
+void app_exchange_texts(void) {
+    int s = app_texts_stick();
+    if (s < 0) { ui_toast(L("Connect the USB drive with your texts (a DOCUMENTS folder) first.")); return; }
+    app_flush_all();                                       /* os textos abertos vão para o disco antes de comparar */
+    Xch x = { boot_vol, s, 0, 0, 0 };
+    xch_dir(&x, docs_dir_on(boot_vol), docs_dir_on(s), 0);
+    char m[200];
+    if (!x.to_a && !x.to_b && !x.skipped) str_copy(m, L("The texts on this computer and on the USB drive are already the same."), sizeof m);
+    else fmt(m, sizeof m, L("Texts exchanged: %d to the USB drive, %d to this computer."), x.to_b, x.to_a);
+    if (x.skipped) { char k[120]; fmt(k, sizeof k, LN(" %d left as it is (open in another tab, or changed on both sides at the same minute).", " %d left as they are (open in another tab, or changed on both sides at the same minute).", x.skipped), x.skipped); str_cat(m, k, sizeof m); }
+    ui_toast(m);
+    dbg("texts exchanged: to stick %d, to computer %d, skipped %d", x.to_b, x.to_a, x.skipped);
+}
+
 void app_open_path(int vol, const char *path) {
     int f = format_from_path(path);
     if (f >= 0 && !path_editable(path)) { ui_toast(L("This format is export-only. Open the matching .md file.")); return; }
@@ -804,6 +906,11 @@ static const Cmd cmds[] = {
     { N_("Mouse and touchpad (on/off)"), "", c_mouse, IC_SETTINGS },
     { N_("Input method on/off (Korean, Japanese)"), N_("Ctrl+Space"), ime_toggle, IC_EDIT },
     { N_("Language and keyboard"), "", c_language, IC_SETTINGS },
+    { N_("Install FolioOS on this computer"), "", installer_open, IC_DRIVE },
+    { N_("Update FolioOS on this computer"), "", installer_open_update, IC_DRIVE },
+    { N_("Exchange texts with the USB drive"), "", app_exchange_texts, IC_DOC },
+    { N_("Remove FolioOS from this computer"), "", installer_open_remove, IC_DRIVE },
+    { N_("Disks and partitions"), "", partitions_open, IC_DRIVE },
     { N_("Restart the computer"), "", c_reboot, IC_POWER },
     { N_("Shut down the computer"), N_("Ctrl+Q"), c_shutdown, IC_POWER },
 };
@@ -971,6 +1078,7 @@ static void app_write_diag(bool notify) {
     buf_printf(&b, "FolioOS — hardware diagnostics · %04d-%02d-%02d %02d:%02d\r\n", t.year, t.month, t.day, t.hour, t.min);
     buf_puts(&b, "Send this file to the FolioOS maintainers if the mouse, touchpad or sound does not work.\r\n\r\n");
     pal_diag(&b);
+    buf_puts(&b, "\r\n"); disks_diag(&b);
     bool d;
     (void)d; paths_ensure(boot_vol, DIR_FOLIO);
     bool ok = pal_write(boot_vol, paths_dir(FILE_DIAG), b.s, b.len);
@@ -980,10 +1088,17 @@ static void app_write_diag(bool notify) {
 
 void app_save_diag(void) { app_write_diag(false); }
 
+/* manter proporção: o que o ajuste pede à PAL */
+static void app_apply_aspect(void) {
+    static const int aw[5] = { 0, -1, 16, 16, 4 }, ah[5] = { 0, -1, 9, 10, 3 };
+    int a = CLAMP(prefs.aspect, 0, 4);
+    pal_set_aspect(aw[a], ah[a]);
+}
+
 /* volta à resolução e rotação automáticas (atalho Ctrl+Alt+Home, útil se a imagem sumir) */
 static void app_video_reset(void) {
-    prefs.rotation = 0; prefs.video_mode[0] = 0;
-    pal_set_rotation(0); pal_set_video_mode("");
+    prefs.rotation = 0; prefs.video_mode[0] = 0; prefs.aspect = 0;
+    pal_set_rotation(0); pal_set_video_mode(""); pal_set_aspect(0, 0);
     prefs_save();
     ui_toast(L("Display restored: automatic resolution and rotation"));
 }
@@ -1146,6 +1261,12 @@ static void settings_body(Window *w, Rect r) {
             }
             if (ui_button(rect(cur.x + wd - SI(150), cur.y, SI(150), SI(38)), L("Restore display"), BTN_GHOST)) app_video_reset();
             cur.y += SI(46);
+            /* manter proporção: quando o modo de vídeo tem outra proporção que o painel e o monitor estica a imagem */
+            const char *as[] = { L("Proportions: off"), L("Monitor"), "16:9", "16:10", "4:3" };
+            if (ui_segmented(rect(cur.x, cur.y, wd, SI(38)), as, 5, &prefs.aspect)) { app_apply_aspect(); prefs_save(); }
+            cur.y += SI(46);
+            draw_text(f, S(12.5f), cur.x, cur.y + S(12), L("If circles look like ovals, choose the shape of your screen."), -1, col_alpha(T->panel_text, 0.5f));
+            cur.y += SI(30);
             draw_text(f, S(12.5f), cur.x, cur.y + S(12), L("If the picture looks wrong or goes black: Ctrl+Alt+Home restores it; Ctrl+Alt+arrows rotate the screen."), -1, col_alpha(T->panel_text, 0.5f));
             cur.y += SI(34);
         }
@@ -1180,6 +1301,32 @@ static void settings_body(Window *w, Rect r) {
             }
             cur.y += SI(62);
         }
+        if (app_installed()) {   /* instalado: onde ficam os textos (no computador, no pendrive, ou nos dois com a troca) */
+            ui_section(&cur, L("TEXTS"));
+            const char *dp[] = { L("This computer"), L("USB drive"), L("Both") };
+            if (ui_segmented(rect(cur.x, cur.y, wd, SI(38)), dp, 3, &prefs.docs_place)) prefs_save();
+            cur.y += SI(46);
+            const char *hint = prefs.docs_place == DOCS_USB ? L("Your texts stay on the USB drive and go with you; without it, new texts are saved on this computer.")
+                             : prefs.docs_place == DOCS_BOTH ? L("Your texts are on this computer; the button copies the newest version of each text in both directions. Nothing is deleted.")
+                             : L("Your texts are on this computer.");
+            draw_text_ellipsis(f, S(12.5f), cur.x, cur.y + S(12), wd, hint, col_alpha(T->panel_text, 0.5f));
+            cur.y += SI(34);
+            if (prefs.docs_place == DOCS_BOTH) {
+                if (ui_button(rect(cur.x, cur.y, wd, SI(38)), L("Exchange texts with the USB drive"), BTN_GHOST)) app_exchange_texts();
+                cur.y += SI(48);
+            }
+        }
+        if (alongside) {   /* seletor de boot: quanto tempo o FolioOS espera uma tecla antes de iniciar o outro sistema */
+            char vt[24]; fmt(vt, sizeof vt, "%d s", prefs.boot_wait);
+            float bv = (float)prefs.boot_wait;
+            if (ui_slider(rect(cur.x, cur.y, wd, SI(52)), &bv, 0, 30, L("Wait for a key before starting the other system"), vt)) {
+                int nb = CLAMP((int)f_round(bv), 0, 30);
+                if (nb != prefs.boot_wait) { prefs.boot_wait = nb; prefs_save(); }
+            }
+            cur.y += SI(56);
+            draw_text(f, S(12.5f), cur.x, cur.y + S(12), prefs.boot_wait ? L("Without a key, the other system starts as usual.") : L("0 s: the computer always starts FolioOS."), -1, col_alpha(T->panel_text, 0.5f));
+            cur.y += SI(34);
+        }
         ui_section(&cur, L("ABOUT"));
         Surface *s = pal_screen();
         char l1[160], l2[160], l3[200];
@@ -1190,6 +1337,10 @@ static void settings_body(Window *w, Rect r) {
         draw_text(f, S(13.5f), cur.x, cur.y + S(36), l2, -1, col_alpha(T->panel_text, 0.7f));
         draw_text_ellipsis(f, S(13.5f), cur.x, cur.y + S(58), wd, l3, col_alpha(T->panel_text, 0.7f));
         cur.y += SI(80);
+        if (ui_button(rect(cur.x, cur.y, wd, SI(38)), L("Install FolioOS on this computer…"), BTN_GHOST)) installer_open();
+        cur.y += SI(48);
+        if (ui_button(rect(cur.x, cur.y, wd, SI(38)), L("Disks and partitions…"), BTN_GHOST)) partitions_open();
+        cur.y += SI(48);
         if (ui_button(rect(cur.x, cur.y, SI(150), SI(38)), L("Restart"), BTN_GHOST)) c_reboot();
         if (ui_button(rect(cur.x + SI(160), cur.y, SI(150), SI(38)), L("Shut down"), BTN_DANGER)) c_shutdown();
         cur.y += SI(56);
@@ -1995,6 +2146,22 @@ void app_init(void) {
     ntabs = 0; cur_tab = 0; cur_draft = 0; cur_dver = 0xFFFFFFFFu;
     boot_vol = 0;
     for (int v = 0; v < pal_vol_count(); v++) { VolInfo vi; if (pal_vol_info(v, &vi) && vi.boot) { boot_vol = v; break; } }
+    alongside = false;
+    {   /* ao lado de outro sistema: o firmware iniciou o FolioOS pela partição EFI, que só tem \EFI\FolioOS;
+         * FOLIO.ID diz qual partição tem as fontes, os ajustes e os textos */
+        u8 *id; usize n; u8 g[16];
+        if (pal_read(boot_vol, "/EFI/FolioOS/FOLIO.ID", &id, &n)) {
+            if (install_parse_id((const char *)id, (int)n, g))
+                for (int v = 0; v < pal_vol_count(); v++) {
+                    VolInfo vi;
+                    if (pal_vol_info(v, &vi) && vi.has_guid && !memcmp(vi.part_guid, g, 16)) { boot_vol = v; alongside = true; break; }
+                }
+            mem_free(id);
+        }
+    }
+    if (!alongside) {   /* PC só BIOS (fase 3): instalado ao lado, o MBR original do outro sistema está guardado aqui */
+        bool d; if (pal_exists(boot_vol, "/FOLIO/OTHERMBR.BIN", &d) && !d) alongside = true;
+    }
     paths_init(boot_vol);
     fonts_init();
     splash_start();                         /* FolioOS: aparece já, enquanto as fontes carregam */
@@ -2009,11 +2176,16 @@ void app_init(void) {
     }
     T = theme_get(prefs.theme);
     apply_theme_fonts(false);
+    if (alongside) { boot_chooser(); splash_skip(); }   /* "aperte uma tecla para escrever"; sem tecla, o outro sistema inicia */
+    if (prefs.docs_place == DOCS_USB && app_installed() && app_texts_stick() < 0)   /* os textos estão no pendrive, que não veio */
+        ui_toast(L("The USB drive with your texts is not connected: new texts are saved on this computer for now."));
     pal_set_pointer_speed(prefs.pointer_speed);
     pal_set_touch_mode(prefs.touch_mode);
     pal_audio_set_gpio(prefs.audio_gpio);
     if (prefs.rotation) pal_set_rotation(prefs.rotation);
     if (prefs.video_mode[0]) pal_set_video_mode(prefs.video_mode);
+    if (prefs.aspect) app_apply_aspect();
+    pal_video_apply();                   /* antes do DIAGNOSTICS.TXT, que mostra a tela em uso */
     pal_video_fast(prefs.video_fast);
     pal_audio_probe();
     doc_init(&app.doc);
@@ -2024,6 +2196,8 @@ void app_init(void) {
     app_write_diag(false);
     wm_add(&win_settings); wm_add(&win_find); wm_add(&win_outline); wm_add(&win_stats);
     wm_add(&win_help); wm_add(&win_palette); wm_add(&win_menu); wm_add(&win_music); wm_add(&win_files); wm_add(&win_theme_ed);
+    wm_add(installer_window());
+    wm_add(partitions_window());
     ui.in.now = pal_ms();
     app.session_start_ms = ui.in.now;
     last_frame_ms = ui.in.now; last_mouse_ms = ui.in.now;
@@ -2078,6 +2252,8 @@ static float auto_scale(int W, int H) {
 }
 
 bool app_frame(void) {
+    installer_poll();                    /* instalação pedida no quadro anterior (desenha o progresso por conta própria) */
+    partitions_poll();
     Surface *s = pal_screen();
     Input *in = &ui.in;
     u64 now = pal_ms();

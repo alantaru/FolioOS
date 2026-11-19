@@ -2,6 +2,7 @@
  *   fatcat <imagem> <caminho>            imprime o arquivo (ex.: FOLIO/DIAGNOSTICS.TXT)
  *   fatcat <imagem> <caminho> <saida>    grava num arquivo
  *   fatcat <imagem> --ls <pasta>         lista uma pasta
+ *   FATCAT_VOL=N: lê o N-ésimo volume FAT do disco (0 = o primeiro; ex.: a partição do FolioOS ao lado da EFI)
  * Usado pelo laboratório QEMU (tools/qemu-lab.ps1) para conferir o que o FolioOS gravou no disco
  * durante o boot emulado. Nomes longos (LFN) e 8.3; comparação sem diferenciar maiúsculas. */
 #include <stdio.h>
@@ -25,10 +26,24 @@ static u32 le32(const u8 *p) { return (u32)p[0] | (u32)p[1] << 8 | (u32)p[2] << 
 static void mount(void) {
     u8 s[512]; rd(0, s, 512);
     part = 0;
+    int want = getenv("FATCAT_VOL") ? atoi(getenv("FATCAT_VOL")) : 0, seen = 0;   /* FATCAT_VOL=N: o N-ésimo volume FAT (0 = o primeiro) */
     if (s[510] == 0x55 && s[511] == 0xAA && !(s[0] == 0xEB || s[0] == 0xE9)) {   /* MBR: primeira partição FAT */
         for (int i = 0; i < 4; i++) {
             const u8 *e = s + 446 + 16 * i;
-            if (e[4] == 0x0B || e[4] == 0x0C || e[4] == 0x0E || e[4] == 0x06 || e[4] == 0xEF) { part = (u64)le32(e + 8) * 512; break; }
+            if ((e[4] == 0x0B || e[4] == 0x0C || e[4] == 0x0E || e[4] == 0x06 || e[4] == 0xEF) && seen++ == want) { part = (u64)le32(e + 8) * 512; break; }
+            if (e[4] == 0xEE) {                       /* GPT: primeira entrada com sistema FAT */
+                u8 h[512]; rd(512, h, 512);
+                if (memcmp(h, "EFI PART", 8)) die("GPT sem cabeçalho");
+                u64 elba = le32(h + 72) | (u64)le32(h + 76) << 32; u32 num = le32(h + 80), esz = le32(h + 84);
+                for (u32 k = 0; k < num && k < 128 && !part; k++) {
+                    u8 en[128], b[512]; rd(elba * 512 + (u64)k * esz, en, 128);
+                    u64 st = le32(en + 32) | (u64)le32(en + 36) << 32;
+                    if (!st) continue;
+                    rd(st * 512, b, 512);
+                    if ((!memcmp(b + 82, "FAT32   ", 8) || !memcmp(b + 54, "FAT16   ", 8)) && seen++ == want) part = st * 512;
+                }
+                break;
+            }
         }
         if (!part) die("nenhuma partição FAT no MBR");
         rd(part, s, 512);

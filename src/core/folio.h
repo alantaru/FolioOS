@@ -18,7 +18,7 @@ typedef uint32_t u32; typedef int32_t i32;
 typedef uint64_t u64; typedef int64_t i64;
 typedef size_t usize;
 
-#define FOLIO_VERSION "4.3"
+#define FOLIO_VERSION "4.4 beta"
 #define MIN(a,b) ((a)<(b)?(a):(b))
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define CLAMP(v,lo,hi) ((v)<(lo)?(lo):((v)>(hi)?(hi):(v)))
@@ -125,7 +125,7 @@ typedef struct {
 } Event;
 
 typedef struct { int year, month, day, hour, min, sec; } DateTime;
-typedef struct { char label[64]; bool boot; bool readonly; u64 size, free; } VolInfo;
+typedef struct { char label[64]; bool boot; bool readonly; u64 size, free; bool has_guid; u8 part_guid[16]; } VolInfo;   /* part_guid: partição GPT do volume */
 typedef struct { char name[256]; bool dir; u64 size; DateTime mtime; } FileEntry;
 typedef struct PalFile PalFile;
 
@@ -148,6 +148,27 @@ bool  pal_mkdir(int vol, const char *path);
 bool  pal_remove(int vol, const char *path);
 bool  pal_rename(int vol, const char *path, const char *new_name);
 bool  pal_exists(int vol, const char *path, bool *is_dir);
+/* discos inteiros (não partições), para o instalador e o gerenciador de partições */
+enum { DISK_OTHER, DISK_SATA, DISK_NVME, DISK_USB, DISK_IDE, DISK_SD, DISK_MMC, DISK_SCSI, DISK_VIRTUAL };
+typedef struct {
+    char model[48];          /* do próprio disco, se ele informar ("" se não) */
+    u64  nsec; u32 bs;       /* setores e bytes por setor */
+    int  kind;               /* DISK_* (a interface traduz) */
+    bool removable, readonly;
+    bool boot;               /* é o disco de onde o FolioOS foi iniciado */
+} DiskInfo;
+int   pal_disk_count(void);
+bool  pal_disk_info(int disk, DiskInfo *out);
+bool  pal_disk_io(int disk, u64 lba, u32 count, void *buf, bool write);
+bool  pal_disk_flush(int disk);          /* esvazia o cache de escrita (chamado em pontos seguros, não a cada gravação) */
+/* entrada de boot do firmware UEFI: `desc` iniciando `path` ("\EFI\FolioOS\BOOTX64.EFI") da partição GPT dada,
+ * no começo da ordem de boot. Reaproveita uma entrada igual que já exista. false = o firmware não deixou (ou não é UEFI) */
+bool  pal_boot_entry_add(const char *desc, int part_num, u64 part_lba, u64 part_count, const u8 part_guid[16], const char *path);
+/* outro sistema para o seletor de boot: a 1ª entrada ativa da ordem de boot que não é o FolioOS */
+bool  pal_boot_entry_remove(void);         /* desinstalar: tira as entradas de boot do FolioOS da UEFI */
+bool  pal_chain_mbr(const u8 *code440);   /* PC só BIOS: inicia o MBR original do outro sistema (não volta; false = não deu) */
+bool  pal_boot_other(char *name, int cap);
+void  pal_boot_other_start(void);          /* inicia o outro sistema (só volta se não conseguir) */
 PalFile *pal_fopen(int vol, const char *path, u64 *size);
 int   pal_fread(PalFile *f, void *buf, int n);
 bool  pal_fseek(PalFile *f, u64 pos);
@@ -402,6 +423,8 @@ int  pal_rotation(void);                 /* rotação em uso, 0..3 */
 void pal_set_video_mode(const char *pref);   /* "" automática, "max" ou "LxA" */
 void pal_video_mode(int *w, int *h);     /* modo físico em uso */
 int  pal_video_modes(int *ws, int *hs, int max);
+void pal_set_aspect(int w, int h);       /* proporção do painel quando o monitor estica a imagem: 0 desligado, -1 a do monitor (EDID), senão w:h */
+void pal_video_apply(void);              /* aplica já as mudanças de vídeo pendentes (só fora de um quadro) */
 float pal_display_dpi(void);             /* 0 se o monitor não informar o tamanho */            /* framebuffer em write-combining (MTRR) */
 
 /* ======================================================================
@@ -601,6 +624,7 @@ typedef struct {
     bool  video_fast;        /* vídeo em write-combining */
     int   rotation;          /* 0 automática, 1..4 = 0°, 90°, 180°, 270° */
     char  video_mode[16];    /* "" automática (nativa), "max" ou "LxA" */
+    int   aspect;            /* manter proporção: 0 desligado, 1 a do monitor, 2 16:9, 3 16:10, 4 4:3 */
     bool  shuffle, repeat;
     char  last_path[512]; int last_vol; int last_p, last_o;
     int   today_date, today_words;  /* palavras escritas hoje (antes da sessão atual) */
@@ -614,6 +638,8 @@ typedef struct {
     int   tab_pos[MAX_TABS][2];
     bool  splash;                   /* tela de abertura FolioOS */
     int   splash_secs;              /* duração da abertura, em segundos (abertura_segundos=) */
+    int   boot_wait;                /* boot_wait=: segundos do seletor de boot ao lado de outro sistema (0 = sempre o FolioOS) */
+    int   docs_place;               /* docs_place=: onde ficam os textos de uma instalação (DOCS_*) */
     char  lang[16];                 /* idioma=: código (pt-BR, en, es…) ou "auto" */
     bool  no_mouse;                 /* mouse=0: mouse e touchpad desligados, só teclado */
 } Prefs;
@@ -658,6 +684,22 @@ void app_tab_switch(int i);
 void app_tab_new(void);
 void app_tab_close(int i);
 void app_flush_all(void);               /* grava abas modificadas (arquivo ou rascunho da aba) */
+/* installer.c — instalar o FolioOS no disco do computador */
+enum { DOCS_COMPUTER, DOCS_USB, DOCS_BOTH };   /* textos no computador, no pendrive, ou nos dois (trocados por um botão) */
+int  app_docs_vol(void);                  /* o volume da pasta de textos (o pendrive, com docs_place=usb e ele ligado) */
+const char *app_docs_dir(void);           /* a pasta de textos nesse volume ("/DOCUMENTS", ou o nome antigo) */
+int  app_texts_stick(void);               /* um pendrive com pasta DOCUMENTS ligado (-1 = nenhum) */
+void app_exchange_texts(void);            /* docs_place=both: troca os textos com o pendrive (o mais novo vale) */
+bool app_installed(void);                 /* rodando de uma instalação (FOLIO/INSTALLED.ID no volume de início) */
+void installer_open(void);
+void installer_open_remove(void);         /* a mesma tela, com "remover" já marcado */
+void installer_open_update(void);         /* a mesma tela, com "atualizar" já marcado */
+void installer_poll(void);               /* no começo de cada quadro: roda a instalação pedida */
+Window *installer_window(void);
+void partitions_open(void);               /* o gerenciador de partições (criar, redimensionar, formatar, apagar) */
+void partitions_poll(void);               /* no começo de cada quadro: roda a operação pedida */
+Window *partitions_window(void);
+void boot_chooser(void);                 /* chooser.c: ao lado de outro sistema, "aperte uma tecla para escrever" */
 /* splash */
 #define SPLASH_SECS_DEFAULT 10
 bool splash_active(void);

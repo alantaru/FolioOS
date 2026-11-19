@@ -1,0 +1,26 @@
+# Gerenciador de partições: apaga a partição criada por tests\particoes.txt (pede a palavra APAGAR), só pelo teclado.
+# O build confere que o disco ficou sem partições.
+wait 300
+key esc
+wait 200
+key ctrl+k
+type Discos e parti
+key enter
+wait 400
+assert_keywin Disks and partitions
+# a partição vem marcada; Shift+Tab = "Apagar" (o último botão)
+key shift+tab
+key enter
+wait 200
+# Tab = o campo da palavra
+key tab
+type APAGAR
+wait 100
+shot particoes6_apagar.png
+# Tab, Tab = "Voltar", "Apagar"
+key tab
+key tab
+key enter
+wait 1500
+shot particoes7_apagada.png
+assert_keywin Disks and partitions

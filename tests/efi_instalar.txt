@@ -1,0 +1,18 @@
+wait 1500
+key esc
+wait 300
+ctrl k
+wait 300
+type Instalar o FolioOS neste¶
+wait 600
+shot ei1_discos.png
+key shift+tab
+key enter
+wait 400
+type apagar
+key tab
+key tab
+key enter
+wait 15000
+shot ei2_pronto.png
+quit

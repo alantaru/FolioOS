@@ -28,6 +28,8 @@ typedef struct {
     uint32_t fsinfo;         /* setor do FSInfo (relativo à partição), 0 = nenhum */
     bool mirror, dirty_info, ok;
     uint32_t hint;           /* próximo cluster livre provável */
+    uint32_t free_count;     /* livres (0xFFFFFFFF = desconhecido) */
+    uint32_t memo_d, memo_i, memo_c;   /* última posição achada numa pasta */
     struct { uint64_t lba; uint32_t age; bool used; uint8_t d[512]; } c[FAT_CACHE];
     uint32_t tick;
     void (*now)(uint16_t *date, uint16_t *time);
@@ -48,4 +50,6 @@ int  fat_delete(Fat *f, FatNode *n);
 int  fat_rename(Fat *f, FatNode *n, const uint16_t *newname);
 int  fat_flush(Fat *f);
 uint32_t fat_free_clusters(Fat *f);
+bool fat32_format(FatIo io, void *ctx, uint64_t part_lba, uint64_t nsec, const char *label, uint32_t serial);
+bool fat32_format2(FatIo io, void *ctx, uint64_t part_lba, uint64_t nsec, uint64_t plan, const char *label, uint32_t serial);   /* FAT com folga para crescer até plan */
 #endif
