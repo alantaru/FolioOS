@@ -4,6 +4,55 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [4.4.0-beta] — 2026-11-18
+
+**Beta.** The installer writes to the computer's own disk. It passes every test on emulated
+machines (QEMU with OVMF and SeaBIOS, disks made by Windows and Linux, checked by Windows `chkdsk`
+and Linux `fsck`), but it has not run on real hardware yet. Back up your disk before using it.
+
+### Added
+- **Install FolioOS on the computer** (command palette → *Install FolioOS on this computer*, or
+  Settings → System). Keyboard-only screen, translated into every language:
+  - **as the only system** on an empty or erased disk (GPT with UEFI, MBR with BIOS); the
+    confirmation word is translated (*ERASE* in English);
+  - **next to Windows or Linux** in free space, without touching the other partitions: a FAT32
+    partition plus `\EFI\FolioOS` on the existing EFI partition and a firmware boot entry (UEFI),
+    or the original MBR code kept in `FOLIO\OTHERMBR.BIN` (BIOS only);
+  - **making room**: NTFS, FAT32 and exFAT are shrunk without moving data (only free space at the
+    end is taken). The volume must be clean: Windows hibernated or with Fast Startup, a volume
+    that needs `chkdsk`, or a dirty EFI partition is refused with an explanation. BitLocker disks
+    ask you to confirm you have the recovery key. ext4 is never resized: the screen explains how to
+    make room from Linux (GParted).
+  - Every file is checked by CRC after copying; the partition table and boot sectors are backed up
+    to the USB drive first (`FOLIO\BACKUP`).
+- **Boot chooser** next to another system: FolioOS starts first and, without a key, hands over to
+  the other system after `boot_wait` seconds (Settings → System; 0 = straight to FolioOS). With
+  UEFI it uses `BootNext` and a restart, so BitLocker/TPM measurements stay as Windows expects.
+- **Update** an installation from a newer USB drive: program, fonts, languages, themes and
+  keyboards are replaced and checked; texts, music and settings stay.
+- **Uninstall**: texts are copied to the USB drive and checked, then the neighbouring partition
+  grows back to the size it had (the partition table ends up as before), the boot entry is
+  removed and, with BIOS, the original MBR code is restored. A whole-disk install leaves an empty
+  disk.
+- **Where your texts live** on an installed FolioOS: on the computer, on the USB drive, or both
+  (the newest copy wins; the replaced one is kept in `FOLIO\VERSIONS`). `docs_place=` in
+  `CONFIG.INI`.
+- **Disks and partitions** window (Settings → System, or the palette): create a FAT32 partition in
+  free space, format, shrink/grow NTFS, FAT32 and exFAT, delete (with the confirmation word).
+- **Keep proportions** (Settings → System → Display, `keep_aspect=` in `CONFIG.INI`): when the
+  only video mode available has another shape than the screen (e.g. 1024×768 on a widescreen) and
+  the screen stretches it, FolioOS draws at the screen's shape and the stretch evens out. Choose
+  *Monitor* (the shape the monitor reports, 16:9 if it reports none), 16:9, 16:10 or 4:3.
+  Ctrl+Alt+Home turns it off. Works with UEFI and BIOS, also on rotated screens.
+- `DIAGNOSTICS.TXT` lists the computer's disks (bus, model, size, partitions and their state).
+- Hardware lab: 20 QEMU machines, including installed disks, dual boot next to a fake Windows
+  (UEFI) and a fake other system (BIOS), shrinking an NTFS made by Windows, and keep proportions.
+
+### Fixed
+- `CONFIG.INI` lost `debug_serial` when the settings were saved.
+- Video settings from `CONFIG.INI` (rotation, resolution) are applied before the boot diagnostics
+  are written, so `DIAGNOSTICS.TXT` shows the screen actually in use.
+
 ## [4.3.0] — 2026-11-17
 
 ### Added
