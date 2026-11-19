@@ -385,7 +385,7 @@ if (-not $NoTests) {
         # uninstall a whole-disk install (UEFI and BIOS): texts to the USB drive, the disk left empty (no table)
         Copy-Item -Recurse "$ft\src" "$ft\srcr"
         foreach ($k in "inst-uefi", "inst-bios") { Run .\build\install_test.exe @("$ft\srcr", "$ft\$k.img", "600", "--remove") | Out-Null }
-        if (@(Get-ChildItem "$ft\srcr\DOCUMENTS" -Directory -Filter "computer-*").Count -ne 2) { throw "uninstall (whole disk): texts not copied to the USB drive" }
+        if (@(Get-ChildItem "$ft\srcr\DOCUMENTS" -Directory -Filter "computer-*").Count -ne 2) { throw "uninstall (whole disk): texts not copied to the USB drive (found: $((Get-ChildItem "$ft\srcr\DOCUMENTS" -Directory | ForEach-Object Name) -join ', '))" }
         Remove-Item -Recurse -Force "$ft\srcr"
         Ok "uninstall a whole-disk install (UEFI and BIOS): texts copied to the USB drive and checked, disk left empty - OK"
         # the installer screen, keyboard only, in the simulator (pt-BR: the word is APAGAR): a disk too small

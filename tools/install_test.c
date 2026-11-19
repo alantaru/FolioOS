@@ -318,7 +318,7 @@ int main(int argc, char **argv) {
     InstallSrc s = { 0 };
     s.list = s_list; s.read = s_read; s.backup = s_backup; s.progress = s_progress;
     s.seed = GetTickCount64() * 2654435761ull; s.buf = buf; s.bufsize = sizeof buf;
-    snprintf(s.date, sizeof s.date, "test-%llu", (unsigned long long)GetTickCount64());
+    snprintf(s.date, sizeof s.date, "t%llx-%lx", (unsigned long long)GetTickCount64(), (unsigned long)GetCurrentProcessId());   /* único mesmo com duas execuções no mesmo tique */
     InstallResult r;
     s.save = s_save;
     /* gerenciador de partições: --list (a tabela), --op-create <início MiB> <MiB> <rótulo>, --op-delete <n>,
