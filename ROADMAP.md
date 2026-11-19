@@ -137,7 +137,8 @@ a beta (back up first, or use a spare disk).
    instructions instead of a risk. A partition table FolioOS cannot read is never taken for an empty
    disk, and one it could not write back exactly (a GPT with a non-standard number or size of entries,
    an MBR with an extended partition) is shown but never changed. FAT32 without mirrored FATs and exFAT
-   with a scattered allocation bitmap are neither resized nor written to.
+   with a scattered allocation bitmap are never resized (formatting or deleting such a partition, after
+   a typed confirmation, still works).
 4. **The same FolioOS.** Fully usable from the keyboard, translated into every language, and with
    the same calm interface.
 5. **Tested on every build.** In the QEMU lab, virtual disks with Windows-like (NTFS), Linux

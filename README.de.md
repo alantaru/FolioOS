@@ -354,11 +354,17 @@ in dein Schreiben startet. Öffne **Strg+K › FolioOS auf diesem Computer insta
   was stattdessen zu tun ist. ext4 wird nie in der Größe geändert: Schaffe unter Linux Platz (GParted) und
   starte den Installer erneut.
 - Bevor irgendetwas geschrieben wird, wird die Partitionstabelle (die ersten und letzten Sektoren des
-  Datenträgers) in `FOLIO/BACKUP` auf dem USB-Stick gesichert. Deine Texte können auf dem Computer, auf dem USB-Stick oder auf beiden liegen.
-- **Aktualisieren** von einem neueren USB-Stick oder **deinstallieren**: Deine Texte werden zuerst auf den
-  USB-Stick kopiert, und die andere Partition wächst wieder auf ihre frühere Größe.
+  Datenträgers) in `FOLIO/BACKUP` auf dem Laufwerk gesichert, von dem FolioOS gestartet wurde – normalerweise
+  dem USB-Stick. Deine Texte können auf dem Computer, auf dem USB-Stick oder auf beiden liegen.
+- **Aktualisieren** von einem neueren USB-Stick: Nur die Dateien von FolioOS selbst werden ersetzt; deine
+  Texte und die Partitionen bleiben, wie sie sind.
+- **Deinstallieren**: Deine Texte können vorher auf das Laufwerk kopiert werden, von dem FolioOS gestartet
+  wurde. Hat der Installer eine Partition verkleinert, um Platz zu schaffen, wächst sie wieder auf ihre frühere
+  Größe; sonst wird der Platz frei.
 - *Einstellungen › System › Datenträger und Partitionen* ist eine kleine Partitionsverwaltung: FAT32-Partition
   anlegen, formatieren, NTFS/FAT32/exFAT verkleinern oder vergrößern, löschen.
+- Die 4.4 Beta ist eine Vorabversion: Lade sie von
+  [ihrer Release-Seite](https://github.com/alantaru/FolioOS/releases/tag/v4.4.1-beta) herunter, nicht über „latest“.
 
 Funktioniert auf UEFI-PCs und auf PCs mit reinem BIOS. **Das ist eine Beta:** Sie besteht alle Tests auf
 emulierten Maschinen, mit Datenträgern von Windows und von Linux, lief aber noch nicht auf echter Hardware –
@@ -407,8 +413,9 @@ anderen Schreibenden bei der Wahl eines Laptops.
 
 Nein. Vom USB-Stick aus schreibt FolioOS nie auf die interne Festplatte, und die Installation auf dem Stick
 fügt nur Dateien hinzu – was schon darauf ist, bleibt. Zieh den Stick ab, und der PC startet wieder sein
-gewohntes System. Die Festplatte wird nur angefasst, wenn du selbst den Installer öffnest, und selbst dann
-wird nichts geschrieben, bevor du bestätigst und die Partitionstabelle auf dem USB-Stick gesichert ist.
+gewohntes System. Die Festplatte wird nur angefasst, wenn du selbst den Installer oder *Datenträger und
+Partitionen* öffnest, und selbst dann wird nichts geschrieben, bevor du bestätigst und die Partitionstabelle
+auf dem Laufwerk gesichert ist, von dem FolioOS gestartet wurde.
 </details>
 
 <details>
@@ -416,7 +423,7 @@ wird nichts geschrieben, bevor du bestätigst und die Partitionstabelle auf dem 
 
 Ja, seit 4.4 (Beta): **Strg+K › FolioOS auf diesem Computer installieren**. Es nutzt freien Speicher oder
 verkleinert eine NTFS-, FAT32- oder exFAT-Partition, ohne Daten zu verschieben, und bei jedem Start wählst du
-FolioOS oder das andere System. Beim Deinstallieren wird der Platz zurückgegeben. Siehe [Auf dem Computer installieren](#15-install-it-on-the-computer-beta).
+FolioOS oder das andere System. Beim Deinstallieren wächst die Partition, die der Installer verkleinert hat, wieder (sonst wird der Platz frei). Siehe [Auf dem Computer installieren](#15-install-it-on-the-computer-beta).
 </details>
 
 <details>

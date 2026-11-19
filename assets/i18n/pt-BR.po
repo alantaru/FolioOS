@@ -13,1688 +13,1688 @@ msgstr ""
 "X-Date-Format: {d} de {month} de {yyyy}\n"
 "X-Decimal: ,\n"
 
-#: src/core/app.c:34 src/core/app.c:56 src/core/app.c:338 src/core/filedlg.c:139 src/core/md.c:239
+#: src/core/app.c:34 src/core/app.c:56 src/core/app.c:347 src/core/filedlg.c:139 src/core/md.c:239
 msgid "Untitled"
 msgstr "Sem título"
 
-#: src/core/app.c:226
+#: src/core/app.c:235
 msgid "Could not open the file"
 msgstr "Não foi possível abrir o arquivo"
 
-#: src/core/app.c:350 src/core/app.c:630
+#: src/core/app.c:359 src/core/app.c:651
 msgid "Limit of 16 tabs — close one (Ctrl+W)"
 msgstr "Limite de 16 abas — feche uma (Ctrl+W)"
 
-#: src/core/app.c:484
+#: src/core/app.c:493
 msgid "Picking up where you left off"
 msgstr "Continuando de onde parou"
 
-#: src/core/app.c:502
+#: src/core/app.c:511
 msgid "Close tab without saving?"
 msgstr "Fechar aba sem salvar?"
 
-#: src/core/app.c:502
+#: src/core/app.c:511
 msgid "Save changes?"
 msgstr "Salvar alterações?"
 
-#: src/core/app.c:503
+#: src/core/app.c:512
 msgid "The current document has changes that have not been saved yet."
 msgstr "O documento atual tem alterações que ainda não foram salvas."
 
-#: src/core/app.c:503 src/core/app.c:940 src/core/app.c:1074 src/core/filedlg.c:410
+#: src/core/app.c:512 src/core/app.c:961 src/core/app.c:1095 src/core/filedlg.c:410
 msgid "Save"
 msgstr "Salvar"
 
-#: src/core/app.c:503
+#: src/core/app.c:512
 msgid "Don't save"
 msgstr "Não salvar"
 
-#: src/core/app.c:605
+#: src/core/app.c:626
 msgid "Connect the USB drive with your texts (a DOCUMENTS folder) first."
 msgstr "Conecte antes o pen-drive com os seus textos (uma pasta DOCUMENTS)."
 
-#: src/core/app.c:610
+#: src/core/app.c:631
 msgid "The texts on this computer and on the USB drive are already the same."
 msgstr "Os textos deste computador e do pen-drive já são iguais."
 
-#: src/core/app.c:611
+#: src/core/app.c:632
 #, c-format
 msgid "Texts exchanged: %d to the USB drive, %d to this computer."
 msgstr "Textos trocados: %d para o pen-drive, %d para este computador."
 
-#: src/core/app.c:612
-#, c-format
-msgid " %d left as it is (open in another tab or with unsaved changes, or changed on both sides at the same minute)."
-msgid_plural " %d left as they are (open in another tab or with unsaved changes, or changed on both sides at the same minute)."
-msgstr[0] " %d ficou como estava (aberto em outra aba ou com alterações não salvas, ou mudou dos dois lados no mesmo minuto)."
-msgstr[1] " %d ficaram como estavam (abertos em outra aba ou com alterações não salvas, ou mudaram dos dois lados no mesmo minuto)."
-
-#: src/core/app.c:613
+#: src/core/app.c:633
 #, c-format
 msgid " %d could not be copied (nothing was replaced without its previous version saved)."
 msgid_plural " %d could not be copied (nothing was replaced without its previous version saved)."
 msgstr[0] " %d não pôde ser copiado (nada foi substituído sem guardar antes a versão anterior)."
 msgstr[1] " %d não puderam ser copiados (nada foi substituído sem guardar antes a versão anterior)."
 
-#: src/core/app.c:620
+#: src/core/app.c:634
+#, c-format
+msgid " %d left as it is (open in another tab or with unsaved changes, or changed on both sides at the same minute)."
+msgid_plural " %d left as they are (open in another tab or with unsaved changes, or changed on both sides at the same minute)."
+msgstr[0] " %d ficou como estava (aberto em outra aba ou com alterações não salvas, ou mudou dos dois lados no mesmo minuto)."
+msgstr[1] " %d ficaram como estavam (abertos em outra aba ou com alterações não salvas, ou mudaram dos dois lados no mesmo minuto)."
+
+#: src/core/app.c:641
 msgid "This format is export-only. Open the matching .md file."
 msgstr "Este formato é só de exportação. Abra o .md correspondente."
 
-#: src/core/app.c:641
+#: src/core/app.c:662
 msgid "Failed to create the file"
 msgstr "Falha ao gerar o arquivo"
 
-#: src/core/app.c:652
+#: src/core/app.c:673
 msgid "Write error — is the USB drive write-protected or full?"
 msgstr "Erro ao gravar — o pen-drive está protegido ou cheio?"
 
-#: src/core/app.c:665 src/core/app.c:681
+#: src/core/app.c:686 src/core/app.c:702
 #, c-format
 msgid "Saved · %s"
 msgstr "Salvo · %s"
 
-#: src/core/app.c:670 src/core/filedlg.c:197
+#: src/core/app.c:691 src/core/filedlg.c:197
 msgid "Export is not available for LaTeX files"
 msgstr "A exportação não está disponível para arquivos LaTeX"
 
-#: src/core/app.c:683
+#: src/core/app.c:704
 #, c-format
 msgid "Exported · %s"
 msgstr "Exportado · %s"
 
-#: src/core/app.c:731
+#: src/core/app.c:752
 msgid "Narrow"
 msgstr "Estreita"
 
-#: src/core/app.c:731
+#: src/core/app.c:752
 msgid "Medium"
 msgstr "Média"
 
-#: src/core/app.c:731
+#: src/core/app.c:752
 msgid "Wide"
 msgstr "Larga"
 
-#: src/core/app.c:731
+#: src/core/app.c:752
 msgid "Extra"
 msgstr "Extra"
 
-#: src/core/app.c:735
+#: src/core/app.c:756
 msgid "Full screen: the text uses the full width"
 msgstr "Tela cheia: o texto usa toda a largura"
 
-#: src/core/app.c:735
+#: src/core/app.c:756
 msgid "Page: text in a column, like on a sheet of paper"
 msgstr "Página: texto em coluna, como numa folha"
 
-#: src/core/app.c:777
+#: src/core/app.c:798
 msgid "Settings"
 msgstr "Ajustes"
 
-#: src/core/app.c:778 src/core/app.c:954 src/core/app.c:1085 src/core/app.c:1827
+#: src/core/app.c:799 src/core/app.c:975 src/core/app.c:1106 src/core/app.c:1848
 msgid "Find and replace"
 msgstr "Localizar e substituir"
 
-#: src/core/app.c:779 src/core/app.c:1085 src/core/app.c:1839
+#: src/core/app.c:800 src/core/app.c:1106 src/core/app.c:1860
 msgid "Outline"
 msgstr "Sumário"
 
-#: src/core/app.c:780 src/core/app.c:971 src/core/app.c:1840
+#: src/core/app.c:801 src/core/app.c:992 src/core/app.c:1861
 msgid "Session and goals"
 msgstr "Sessão e metas"
 
-#: src/core/app.c:781 src/core/app.c:975 src/core/app.c:1089
+#: src/core/app.c:802 src/core/app.c:996 src/core/app.c:1110
 msgid "Keyboard shortcuts"
 msgstr "Atalhos de teclado"
 
-#: src/core/app.c:782
+#: src/core/app.c:803
 msgid "Commands"
 msgstr "Comandos"
 
-#: src/core/app.c:783 src/core/app.c:1959
+#: src/core/app.c:804 src/core/app.c:1980
 msgid "Menu"
 msgstr "Menu"
 
-#: src/core/app.c:785
+#: src/core/app.c:806
 msgid "Theme editor"
 msgstr "Editor de temas"
 
-#: src/core/app.c:804
+#: src/core/app.c:825
 #, c-format
 msgid "Tabs on · %d documents open (Ctrl+N new, Ctrl+W close)"
 msgstr "Abas ligadas · %d documentos abertos (Ctrl+N nova, Ctrl+W fecha)"
 
-#: src/core/app.c:804
+#: src/core/app.c:825
 msgid "Tabs on (Ctrl+N new tab, Ctrl+W close)"
 msgstr "Abas ligadas (Ctrl+N nova aba, Ctrl+W fecha)"
 
-#: src/core/app.c:805
+#: src/core/app.c:826
 msgid "Tabs off — your tabs are kept for when you turn them back on"
 msgstr "Abas desligadas — as abas ficam guardadas para quando religar"
 
-#: src/core/app.c:808
+#: src/core/app.c:829
 msgid "Turn tabs on to use Ctrl+W (Ctrl+K → Tabs, or the button at the top)"
 msgstr "Ligue as abas para usar Ctrl+W (Ctrl+K → Abas, ou o botão do topo)"
 
-#: src/core/app.c:820
+#: src/core/app.c:841
 msgid "Focus off"
 msgstr "Foco desligado"
 
-#: src/core/app.c:820
+#: src/core/app.c:841
 msgid "Focus on sentence"
 msgstr "Foco na frase"
 
-#: src/core/app.c:820
+#: src/core/app.c:841
 msgid "Focus on paragraph"
 msgstr "Foco no parágrafo"
 
-#: src/core/app.c:820
+#: src/core/app.c:841
 msgid "Focus on line"
 msgstr "Foco na linha"
 
-#: src/core/app.c:823
+#: src/core/app.c:844
 msgid "Typewriter: current line always centered"
 msgstr "Máquina de escrever: linha sempre no centro"
 
-#: src/core/app.c:823
+#: src/core/app.c:844
 msgid "Typewriter off"
 msgstr "Máquina de escrever desligada"
 
-#: src/core/app.c:824
+#: src/core/app.c:845
 msgid "Zen mode — Esc or move the mouse to the top to leave"
 msgstr "Modo zen — Esc ou mouse no topo para sair"
 
-#: src/core/app.c:824
+#: src/core/app.c:845
 msgid "Zen mode off"
 msgstr "Modo zen desligado"
 
-#: src/core/app.c:845
+#: src/core/app.c:866
 #, c-format
 msgid "Theme: %s"
 msgstr "Tema: %s"
 
-#: src/core/app.c:846
+#: src/core/app.c:867
 #, c-format
 msgid "Font: %s"
 msgstr "Fonte: %s"
 
-#: src/core/app.c:859
+#: src/core/app.c:880
 msgid "Sprint stopped"
 msgstr "Sprint interrompido"
 
-#: src/core/app.c:862
+#: src/core/app.c:883
 #, c-format
 msgid "%d-minute sprint started. Happy writing!"
 msgstr "Sprint de %d minutos iniciado. Boa escrita!"
 
-#: src/core/app.c:865
+#: src/core/app.c:886
 msgid "Hemingway mode: deleting is disabled"
 msgstr "Modo Hemingway: apagar está desativado"
 
-#: src/core/app.c:865
+#: src/core/app.c:886
 msgid "Hemingway mode off"
 msgstr "Modo Hemingway desligado"
 
-#: src/core/app.c:866
+#: src/core/app.c:887
 msgid "Markup hidden outside the current paragraph"
 msgstr "Marcação oculta fora do parágrafo atual"
 
-#: src/core/app.c:866
+#: src/core/app.c:887
 msgid "Markup always visible"
 msgstr "Marcação sempre visível"
 
-#: src/core/app.c:867
+#: src/core/app.c:888
 msgid "Smart typography on (— “ ” …)"
 msgstr "Tipografia inteligente ligada (— “ ” …)"
 
-#: src/core/app.c:867
+#: src/core/app.c:888
 msgid "Smart typography off"
 msgstr "Tipografia inteligente desligada"
 
-#: src/core/app.c:879
+#: src/core/app.c:900
 #, c-format
 msgid "Page %s"
 msgstr "Página %s"
 
-#: src/core/app.c:887 src/core/editor.c:757 src/core/preview.c:252
+#: src/core/app.c:908 src/core/editor.c:757 src/core/preview.c:252
 msgid "This is the last chapter"
 msgstr "Este é o último capítulo"
 
-#: src/core/app.c:904
+#: src/core/app.c:925
 msgid "Mouse and touchpad off: keyboard only (Ctrl+K → Mouse turns them back on)"
 msgstr "Mouse e touchpad desligados: só teclado (Ctrl+K → Mouse liga de novo)"
 
-#: src/core/app.c:904
+#: src/core/app.c:925
 msgid "Mouse and touchpad on"
 msgstr "Mouse e touchpad ligados"
 
-#: src/core/app.c:915
+#: src/core/app.c:936
 msgid "Could not read the language file"
 msgstr "Não foi possível ler o arquivo do idioma"
 
-#: src/core/app.c:919
+#: src/core/app.c:940
 #, c-format
 msgid "This language needs fonts (%s) that are missing from %s. Copy FolioOS.zip to the USB drive again."
 msgstr "Este idioma precisa de fontes (%s) que faltam em %s. Copie o FolioOS.zip para o pen-drive de novo."
 
-#: src/core/app.c:932
+#: src/core/app.c:953
 msgid "New document"
 msgstr "Novo documento"
 
-#: src/core/app.c:932 src/core/app.c:1073
+#: src/core/app.c:953 src/core/app.c:1094
 msgid "Ctrl+N"
 msgstr "Ctrl+N"
 
-#: src/core/app.c:933
+#: src/core/app.c:954
 msgid "Tabs: several documents (on/off)"
 msgstr "Abas: vários documentos (ligar/desligar)"
 
-#: src/core/app.c:934
+#: src/core/app.c:955
 msgid "Close tab"
 msgstr "Fechar aba"
 
-#: src/core/app.c:934
+#: src/core/app.c:955
 msgid "Ctrl+W"
 msgstr "Ctrl+W"
 
-#: src/core/app.c:935
+#: src/core/app.c:956
 msgid "Next tab"
 msgstr "Próxima aba"
 
-#: src/core/app.c:935
+#: src/core/app.c:956
 msgid "Ctrl+Tab"
 msgstr "Ctrl+Tab"
 
-#: src/core/app.c:936
+#: src/core/app.c:957
 msgid "Previous tab"
 msgstr "Aba anterior"
 
-#: src/core/app.c:936
+#: src/core/app.c:957
 msgid "Ctrl+Shift+Tab"
 msgstr "Ctrl+Shift+Tab"
 
-#: src/core/app.c:937
+#: src/core/app.c:958
 msgid "Create a custom theme (colors and fonts)"
 msgstr "Criar tema personalizado (cores e fontes)"
 
-#: src/core/app.c:938
+#: src/core/app.c:959
 msgid "Edit the current theme"
 msgstr "Editar o tema atual"
 
-#: src/core/app.c:939 src/core/app.c:1073
+#: src/core/app.c:960 src/core/app.c:1094
 msgid "Open…"
 msgstr "Abrir…"
 
-#: src/core/app.c:939 src/core/app.c:1073
+#: src/core/app.c:960 src/core/app.c:1094
 msgid "Ctrl+O"
 msgstr "Ctrl+O"
 
-#: src/core/app.c:940 src/core/app.c:1074
+#: src/core/app.c:961 src/core/app.c:1095
 msgid "Ctrl+S"
 msgstr "Ctrl+S"
 
-#: src/core/app.c:941 src/core/app.c:1074
+#: src/core/app.c:962 src/core/app.c:1095
 msgid "Save as / Export…"
 msgstr "Salvar como / Exportar…"
 
-#: src/core/app.c:941 src/core/app.c:1074 src/core/app.c:1824
+#: src/core/app.c:962 src/core/app.c:1095 src/core/app.c:1845
 msgid "Ctrl+Shift+S"
 msgstr "Ctrl+Shift+S"
 
-#: src/core/app.c:942
+#: src/core/app.c:963
 msgid "Reading mode (formatted Markdown)"
 msgstr "Modo leitura (Markdown formatado)"
 
-#: src/core/app.c:942 src/core/app.c:1826
+#: src/core/app.c:963 src/core/app.c:1847
 msgid "Ctrl+P"
 msgstr "Ctrl+P"
 
-#: src/core/app.c:943
+#: src/core/app.c:964
 msgid "Reading auto-scroll (on/off)"
 msgstr "Rolagem automática da leitura (ligar/desligar)"
 
-#: src/core/app.c:943 src/core/app.c:1833
+#: src/core/app.c:964 src/core/app.c:1854
 msgid "Enter (reading)"
 msgstr "Enter (leitura)"
 
-#: src/core/app.c:944
+#: src/core/app.c:965
 msgid "Next chapter"
 msgstr "Próximo capítulo"
 
-#: src/core/app.c:944
+#: src/core/app.c:965
 msgid "Ctrl+PgDn"
 msgstr "Ctrl+PgDn"
 
-#: src/core/app.c:945
+#: src/core/app.c:966
 msgid "Previous chapter"
 msgstr "Capítulo anterior"
 
-#: src/core/app.c:945
+#: src/core/app.c:966
 msgid "Ctrl+PgUp"
 msgstr "Ctrl+PgUp"
 
-#: src/core/app.c:946
+#: src/core/app.c:967
 msgid "Go to the last edit"
 msgstr "Voltar à última alteração"
 
-#: src/core/app.c:946 src/core/app.c:1831
+#: src/core/app.c:967 src/core/app.c:1852
 msgid "Ctrl+J"
 msgstr "Ctrl+J"
 
-#: src/core/app.c:947 src/core/app.c:1830
+#: src/core/app.c:968 src/core/app.c:1851
 msgid "Duplicate paragraph"
 msgstr "Duplicar parágrafo"
 
-#: src/core/app.c:947 src/core/app.c:1830
+#: src/core/app.c:968 src/core/app.c:1851
 msgid "Ctrl+D"
 msgstr "Ctrl+D"
 
-#: src/core/app.c:948 src/core/app.c:1830
+#: src/core/app.c:969 src/core/app.c:1851
 msgid "Delete paragraph"
 msgstr "Apagar parágrafo"
 
-#: src/core/app.c:948 src/core/app.c:1830
+#: src/core/app.c:969 src/core/app.c:1851
 msgid "Ctrl+Shift+K"
 msgstr "Ctrl+Shift+K"
 
-#: src/core/app.c:949
+#: src/core/app.c:970
 msgid "Change case"
 msgstr "Maiúsculas / minúsculas"
 
-#: src/core/app.c:949 src/core/app.c:1832
+#: src/core/app.c:970 src/core/app.c:1853
 msgid "Shift+F3"
 msgstr "Shift+F3"
 
-#: src/core/app.c:950
+#: src/core/app.c:971
 msgid "Insert today's date"
 msgstr "Inserir a data de hoje"
 
-#: src/core/app.c:951
+#: src/core/app.c:972
 msgid "Focus mode (sentence / paragraph / line)"
 msgstr "Modo foco (frase / parágrafo / linha)"
 
-#: src/core/app.c:952
+#: src/core/app.c:973
 msgid "Typewriter (centered line)"
 msgstr "Máquina de escrever (linha centralizada)"
 
-#: src/core/app.c:953
+#: src/core/app.c:974
 msgid "Zen mode (no bars)"
 msgstr "Modo zen (sem barras)"
 
-#: src/core/app.c:954 src/core/app.c:1085 src/core/app.c:1827
+#: src/core/app.c:975 src/core/app.c:1106 src/core/app.c:1848
 msgid "Ctrl+F"
 msgstr "Ctrl+F"
 
-#: src/core/app.c:955
+#: src/core/app.c:976
 msgid "Document outline"
 msgstr "Sumário do documento"
 
-#: src/core/app.c:956
+#: src/core/app.c:977
 msgid "Appearance: themes and typography"
 msgstr "Aparência: temas e tipografia"
 
-#: src/core/app.c:957 src/core/app.c:1836
+#: src/core/app.c:978 src/core/app.c:1857
 msgid "Next theme"
 msgstr "Próximo tema"
 
-#: src/core/app.c:957 src/core/app.c:1836
+#: src/core/app.c:978 src/core/app.c:1857
 msgid "Ctrl+T"
 msgstr "Ctrl+T"
 
-#: src/core/app.c:958
+#: src/core/app.c:979
 msgid "Next font"
 msgstr "Próxima fonte"
 
-#: src/core/app.c:958
+#: src/core/app.c:979
 msgid "Ctrl+Shift+T"
 msgstr "Ctrl+Shift+T"
 
-#: src/core/app.c:959
+#: src/core/app.c:980
 msgid "Larger text"
 msgstr "Aumentar texto"
 
-#: src/core/app.c:959
+#: src/core/app.c:980
 msgid "Ctrl+="
 msgstr "Ctrl+="
 
-#: src/core/app.c:960
+#: src/core/app.c:981
 msgid "Smaller text"
 msgstr "Diminuir texto"
 
-#: src/core/app.c:960
+#: src/core/app.c:981
 msgid "Ctrl+-"
 msgstr "Ctrl+-"
 
-#: src/core/app.c:961
+#: src/core/app.c:982
 msgid "Page or full screen (text width)"
 msgstr "Página ou tela cheia (largura do texto)"
 
-#: src/core/app.c:962
+#: src/core/app.c:983
 msgid "Page size: narrow · medium · wide · extra"
 msgstr "Tamanho da página: estreita · média · larga · extra"
 
-#: src/core/app.c:963
+#: src/core/app.c:984
 msgid "Paper sheet (show/hide)"
 msgstr "Folha de papel (mostrar/ocultar)"
 
-#: src/core/app.c:964 src/core/app.c:1088
+#: src/core/app.c:985 src/core/app.c:1109
 msgid "Writing settings"
 msgstr "Ajustes de escrita"
 
-#: src/core/app.c:965
+#: src/core/app.c:986
 msgid "Music: play / pause"
 msgstr "Música: tocar / pausar"
 
-#: src/core/app.c:966
+#: src/core/app.c:987
 msgid "Music: next track"
 msgstr "Música: próxima faixa"
 
-#: src/core/app.c:967
+#: src/core/app.c:988
 msgid "Music: previous track"
 msgstr "Música: faixa anterior"
 
-#: src/core/app.c:968 src/core/app.c:1839
+#: src/core/app.c:989 src/core/app.c:1860
 msgid "Music player"
 msgstr "Player de música"
 
-#: src/core/app.c:969
+#: src/core/app.c:990
 msgid "Sound test (chime)"
 msgstr "Teste de som (sininho)"
 
-#: src/core/app.c:970
+#: src/core/app.c:991
 msgid "Start / stop writing sprint"
 msgstr "Iniciar / parar sprint de escrita"
 
-#: src/core/app.c:972
+#: src/core/app.c:993
 msgid "Hemingway mode (no deleting)"
 msgstr "Modo Hemingway (sem apagar)"
 
-#: src/core/app.c:973
+#: src/core/app.c:994
 msgid "Hide markup outside the paragraph"
 msgstr "Ocultar marcação fora do parágrafo"
 
-#: src/core/app.c:974
+#: src/core/app.c:995
 msgid "Smart typography (— “ ” …)"
 msgstr "Tipografia inteligente (— “ ” …)"
 
-#: src/core/app.c:976 src/core/app.c:1834
+#: src/core/app.c:997 src/core/app.c:1855
 msgid "Menu and recent documents"
 msgstr "Menu e documentos recentes"
 
-#: src/core/app.c:976 src/core/app.c:1834
+#: src/core/app.c:997 src/core/app.c:1855
 msgid "Alt+M"
 msgstr "Alt+M"
 
-#: src/core/app.c:977
+#: src/core/app.c:998
 msgid "Keyboard focus: text or the next window"
 msgstr "Foco do teclado: texto ou a próxima janela"
 
-#: src/core/app.c:977 src/core/app.c:1844
+#: src/core/app.c:998 src/core/app.c:1865
 msgid "Ctrl+F6"
 msgstr "Ctrl+F6"
 
-#: src/core/app.c:978
+#: src/core/app.c:999
 msgid "Mouse and touchpad (on/off)"
 msgstr "Mouse e touchpad (ligar/desligar)"
 
-#: src/core/app.c:979 src/core/app.c:1846
+#: src/core/app.c:1000 src/core/app.c:1867
 msgid "Input method on/off (Korean, Japanese)"
 msgstr "Método de entrada liga/desliga (coreano, japonês)"
 
-#: src/core/app.c:979 src/core/app.c:1846
+#: src/core/app.c:1000 src/core/app.c:1867
 msgid "Ctrl+Space"
 msgstr "Ctrl+Espaço"
 
-#: src/core/app.c:980
+#: src/core/app.c:1001
 msgid "Language and keyboard"
 msgstr "Idioma e teclado"
 
-#: src/core/app.c:981 src/core/installer.c:38
+#: src/core/app.c:1002 src/core/installer.c:38
 msgid "Install FolioOS on this computer"
 msgstr "Instalar o FolioOS neste computador"
 
-#: src/core/app.c:982
+#: src/core/app.c:1003
 msgid "Update FolioOS on this computer"
 msgstr "Atualizar o FolioOS neste computador"
 
-#: src/core/app.c:983 src/core/app.c:1385
+#: src/core/app.c:1004 src/core/app.c:1406
 msgid "Exchange texts with the USB drive"
 msgstr "Trocar os textos com o pen-drive"
 
-#: src/core/app.c:984
+#: src/core/app.c:1005
 msgid "Remove FolioOS from this computer"
 msgstr "Remover o FolioOS deste computador"
 
-#: src/core/app.c:985 src/core/partitions.c:27
+#: src/core/app.c:1006 src/core/partitions.c:29
 msgid "Disks and partitions"
 msgstr "Discos e partições"
 
-#: src/core/app.c:986
+#: src/core/app.c:1007
 msgid "Restart the computer"
 msgstr "Reiniciar o computador"
 
-#: src/core/app.c:987
+#: src/core/app.c:1008
 msgid "Shut down the computer"
 msgstr "Desligar o computador"
 
-#: src/core/app.c:987 src/core/app.c:1091 src/core/app.c:1842
+#: src/core/app.c:1008 src/core/app.c:1112 src/core/app.c:1863
 msgid "Ctrl+Q"
 msgstr "Ctrl+Q"
 
-#: src/core/app.c:1009
+#: src/core/app.c:1030
 msgid "Type a command…"
 msgstr "Digite um comando…"
 
-#: src/core/app.c:1040
+#: src/core/app.c:1061
 msgid "No command found"
 msgstr "Nenhum comando encontrado"
 
-#: src/core/app.c:1064
+#: src/core/app.c:1085
 msgid "File not found (a different USB drive?)"
 msgstr "Arquivo não encontrado (pen-drive diferente?)"
 
-#: src/core/app.c:1072
+#: src/core/app.c:1093
 msgid "DOCUMENT"
 msgstr "DOCUMENTO"
 
-#: src/core/app.c:1073
+#: src/core/app.c:1094
 msgid "New"
 msgstr "Novo"
 
-#: src/core/app.c:1080
+#: src/core/app.c:1101
 msgid "RECENT"
 msgstr "RECENTES"
 
-#: src/core/app.c:1084
+#: src/core/app.c:1105
 msgid "WRITING"
 msgstr "ESCRITA"
 
-#: src/core/app.c:1086
+#: src/core/app.c:1107
 msgid "Session, goals and sprint"
 msgstr "Sessão, metas e sprint"
 
-#: src/core/app.c:1087
+#: src/core/app.c:1108
 msgid "PREFERENCES"
 msgstr "PREFERÊNCIAS"
 
-#: src/core/app.c:1088 src/core/app.c:1179 src/core/app.c:1841
+#: src/core/app.c:1109 src/core/app.c:1200 src/core/app.c:1862
 msgid "Appearance"
 msgstr "Aparência"
 
-#: src/core/app.c:1091 src/core/app.c:1415 src/core/app.c:1842
+#: src/core/app.c:1112 src/core/app.c:1436 src/core/app.c:1863
 msgid "Shut down"
 msgstr "Desligar"
 
-#: src/core/app.c:1156
+#: src/core/app.c:1177
 #, c-format
 msgid "Diagnostics saved to %s"
 msgstr "Diagnóstico salvo em %s"
 
-#: src/core/app.c:1156
+#: src/core/app.c:1177
 msgid "Could not save the diagnostics"
 msgstr "Não foi possível gravar o diagnóstico"
 
-#: src/core/app.c:1173
+#: src/core/app.c:1194
 msgid "Display restored: automatic resolution and rotation"
 msgstr "Tela restaurada: resolução e rotação automáticas"
 
-#: src/core/app.c:1179
+#: src/core/app.c:1200
 msgid "Writing"
 msgstr "Escrita"
 
-#: src/core/app.c:1179
+#: src/core/app.c:1200
 msgid "System"
 msgstr "Sistema"
 
-#: src/core/app.c:1189
+#: src/core/app.c:1210
 msgid "THEMES"
 msgstr "TEMAS"
 
-#: src/core/app.c:1196
+#: src/core/app.c:1217
 msgid "+  Create my theme"
 msgstr "+  Criar meu tema"
 
-#: src/core/app.c:1197
+#: src/core/app.c:1218
 msgid "Edit this theme"
 msgstr "Editar este tema"
 
-#: src/core/app.c:1199
+#: src/core/app.c:1220
 #, c-format
 msgid "Mix colors and fonts; themes are saved in %s (editable .INI files)."
 msgstr "Misture cores e fontes; os temas ficam em %s (arquivos .INI editáveis)."
 
-#: src/core/app.c:1201
+#: src/core/app.c:1222
 msgid "TEXT FONT"
 msgstr "FONTE DO TEXTO"
 
-#: src/core/app.c:1210
+#: src/core/app.c:1231
 msgid "The quick brown fox jumps — “Hello!”"
 msgstr "Ágil, a raposa saltou — “Olá!”"
 
-#: src/core/app.c:1216
+#: src/core/app.c:1237
 #, c-format
 msgid "Add .ttf fonts to %s (subfolders work too) and restart."
 msgstr "Adicione fontes .ttf em %s (subpastas valem) e reinicie."
 
-#: src/core/app.c:1217
+#: src/core/app.c:1238
 msgid "Included writing fonts: Literata, Lora, EB Garamond, iA Writer, Special Elite and more."
 msgstr "Fontes de escrita incluídas: Literata, Lora, EB Garamond, iA Writer, Special Elite e outras."
 
-#: src/core/app.c:1219
+#: src/core/app.c:1240
 msgid "TYPOGRAPHY"
 msgstr "TIPOGRAFIA"
 
-#: src/core/app.c:1220
+#: src/core/app.c:1241
 #, c-format
 msgid "%d px"
 msgstr "%d px"
 
-#: src/core/app.c:1221
+#: src/core/app.c:1242
 msgid "Text size"
 msgstr "Tamanho do texto"
 
-#: src/core/app.c:1224
+#: src/core/app.c:1245
 msgid "Line spacing"
 msgstr "Entrelinha"
 
-#: src/core/app.c:1226
+#: src/core/app.c:1247
 #, c-format
 msgid "%.2f lines"
 msgstr "%.2f linha"
 
-#: src/core/app.c:1227
+#: src/core/app.c:1248
 msgid "Space between paragraphs"
 msgstr "Espaço entre parágrafos"
 
-#: src/core/app.c:1229
+#: src/core/app.c:1250
 msgid "First-line indent for paragraphs (book style)"
 msgstr "Recuo na primeira linha dos parágrafos (estilo livro)"
 
-#: src/core/app.c:1231
+#: src/core/app.c:1252
 msgid "PAGE"
 msgstr "PÁGINA"
 
-#: src/core/app.c:1233
+#: src/core/app.c:1254
 msgid "Page"
 msgstr "Página"
 
-#: src/core/app.c:1233
+#: src/core/app.c:1254
 msgid "Full screen"
 msgstr "Tela cheia"
 
-#: src/core/app.c:1242
+#: src/core/app.c:1263
 #, c-format
 msgid "%d px (~%d characters per line)"
 msgstr "%d px (~%d caracteres por linha)"
 
-#: src/core/app.c:1243
+#: src/core/app.c:1264
 msgid "Page width"
 msgstr "Largura da página"
 
-#: src/core/app.c:1245
+#: src/core/app.c:1266
 msgid "Paper sheet on the desk (light themes)"
 msgstr "Folha de papel sobre a mesa (temas claros)"
 
-#: src/core/app.c:1248
+#: src/core/app.c:1269
 msgid "The text fills the whole screen width, with no sheet."
 msgstr "O texto ocupa toda a largura da tela, sem folha."
 
-#: src/core/app.c:1252
+#: src/core/app.c:1273
 msgid "FOCUS MODE"
 msgstr "MODO FOCO"
 
-#: src/core/app.c:1253
+#: src/core/app.c:1274
 msgid "Off"
 msgstr "Desligado"
 
-#: src/core/app.c:1253
+#: src/core/app.c:1274
 msgid "Sentence"
 msgstr "Frase"
 
-#: src/core/app.c:1253
+#: src/core/app.c:1274
 msgid "Paragraph"
 msgstr "Parágrafo"
 
-#: src/core/app.c:1253
+#: src/core/app.c:1274
 msgid "Line"
 msgstr "Linha"
 
-#: src/core/app.c:1256
+#: src/core/app.c:1277
 msgid "EDITOR"
 msgstr "EDITOR"
 
-#: src/core/app.c:1258
+#: src/core/app.c:1279
 msgid "Typewriter — current line in the center"
 msgstr "Máquina de escrever — linha atual no centro"
 
-#: src/core/app.c:1259
+#: src/core/app.c:1280
 msgid "Live Markdown (headings, bold, lists)"
 msgstr "Markdown ao vivo (títulos, negrito, listas)"
 
-#: src/core/app.c:1260
+#: src/core/app.c:1281
 msgid "Hide markup outside the current paragraph"
 msgstr "Ocultar marcação fora do parágrafo atual"
 
-#: src/core/app.c:1261
+#: src/core/app.c:1282
 msgid "Smart typography:  --  →  —   \"\"  →  “”   ...  →  …"
 msgstr "Tipografia inteligente:  --  →  —   \"\"  →  “”   ...  →  …"
 
-#: src/core/app.c:1262
+#: src/core/app.c:1283
 msgid "Hemingway mode — deleting is not allowed"
 msgstr "Modo Hemingway — não permite apagar"
 
-#: src/core/app.c:1263
+#: src/core/app.c:1284
 msgid "Hide the bars while writing"
 msgstr "Ocultar barras enquanto escreve"
 
-#: src/core/app.c:1264
+#: src/core/app.c:1285
 msgid "Blinking cursor"
 msgstr "Cursor piscando"
 
-#: src/core/app.c:1265
+#: src/core/app.c:1286
 msgid "Smooth cursor movement"
 msgstr "Cursor com movimento suave"
 
-#: src/core/app.c:1272
+#: src/core/app.c:1293
 msgid "Tabs — several open documents, remembered after a restart"
 msgstr "Abas — vários documentos abertos, lembrados ao reiniciar"
 
-#: src/core/app.c:1275
+#: src/core/app.c:1296
 msgid "GOALS AND SAVING"
 msgstr "METAS E SALVAMENTO"
 
-#: src/core/app.c:1276 src/core/app.c:1784 src/core/app.c:2036
+#: src/core/app.c:1297 src/core/app.c:1805 src/core/app.c:2057
 #, c-format
 msgid "%d word"
 msgid_plural "%d words"
 msgstr[0] "%d palavra"
 msgstr[1] "%d palavras"
 
-#: src/core/app.c:1277
+#: src/core/app.c:1298
 msgid "Session goal"
 msgstr "Meta da sessão"
 
-#: src/core/app.c:1279 src/core/app.c:1786 src/core/app.c:2001
+#: src/core/app.c:1300 src/core/app.c:1807 src/core/app.c:2022
 #, c-format
 msgid "%d min"
 msgstr "%d min"
 
-#: src/core/app.c:1280
+#: src/core/app.c:1301
 msgid "Sprint length"
 msgstr "Duração do sprint"
 
-#: src/core/app.c:1282
+#: src/core/app.c:1303
 #, c-format
 msgid "every %d s"
 msgstr "a cada %d s"
 
-#: src/core/app.c:1283
+#: src/core/app.c:1304
 msgid "Autosave"
 msgstr "Salvamento automático"
 
-#: src/core/app.c:1286
+#: src/core/app.c:1307
 msgid "LANGUAGE AND KEYBOARD"
 msgstr "IDIOMA E TECLADO"
 
-#: src/core/app.c:1289
+#: src/core/app.c:1310
 msgid "Language"
 msgstr "Idioma"
 
-#: src/core/app.c:1294
+#: src/core/app.c:1315
 msgid "Keyboard"
 msgstr "Teclado"
 
-#: src/core/app.c:1303
+#: src/core/app.c:1324
 #, c-format
 msgid "Languages: %s · keyboards: %s (text files anyone can add)"
 msgstr "Idiomas: %s · teclados: %s (arquivos de texto que qualquer pessoa pode acrescentar)"
 
-#: src/core/app.c:1307
+#: src/core/app.c:1328
 msgid "DISPLAY AND POINTER"
 msgstr "TELA E PONTEIRO"
 
-#: src/core/app.c:1308
+#: src/core/app.c:1329
 msgid "Auto"
 msgstr "Auto"
 
-#: src/core/app.c:1313
+#: src/core/app.c:1334
 msgid "Rotate: auto"
 msgstr "Girar: auto"
 
-#: src/core/app.c:1321
+#: src/core/app.c:1342
 #, c-format
 msgid "Resolution: %dx%d"
 msgstr "Resolução: %dx%d"
 
-#: src/core/app.c:1322
+#: src/core/app.c:1343
 #, c-format
 msgid "Resolution: automatic (%dx%d)"
 msgstr "Resolução: automática (%dx%d)"
 
-#: src/core/app.c:1332
+#: src/core/app.c:1353
 msgid "Restore display"
 msgstr "Restaurar tela"
 
-#: src/core/app.c:1335
+#: src/core/app.c:1356
 msgid "Proportions: off"
 msgstr "Proporção: desligada"
 
-#: src/core/app.c:1335
+#: src/core/app.c:1356
 msgid "Monitor"
 msgstr "Monitor"
 
-#: src/core/app.c:1338
+#: src/core/app.c:1359
 msgid "If circles look like ovals, choose the shape of your screen."
 msgstr "Se os círculos parecem ovais, escolha o formato da sua tela."
 
-#: src/core/app.c:1340
+#: src/core/app.c:1361
 msgid "If the picture looks wrong or goes black: Ctrl+Alt+Home restores it; Ctrl+Alt+arrows rotate the screen."
 msgstr "Se a imagem ficar errada ou preta: Ctrl+Alt+Home restaura; Ctrl+Alt+setas giram a tela."
 
-#: src/core/app.c:1344
+#: src/core/app.c:1365
 msgid "Mouse / touchpad speed"
 msgstr "Velocidade do mouse / touchpad"
 
-#: src/core/app.c:1346
+#: src/core/app.c:1367
 msgid "Automatic"
 msgstr "Automático"
 
-#: src/core/app.c:1346
+#: src/core/app.c:1367
 msgid "Touchpad"
 msgstr "Touchpad"
 
-#: src/core/app.c:1346
+#: src/core/app.c:1367
 msgid "Touch screen"
 msgstr "Tela de toque"
 
-#: src/core/app.c:1349
+#: src/core/app.c:1370
 msgid "If the pointer jumps to the corners when you use the touchpad, choose Touchpad."
 msgstr "Se o cursor pular para os cantos ao usar o touchpad, escolha Touchpad."
 
-#: src/core/app.c:1352
+#: src/core/app.c:1373
 msgid "Use the mouse and touchpad (off = keyboard only)"
 msgstr "Usar o mouse e o touchpad (desligado = só teclado)"
 
-#: src/core/app.c:1354
+#: src/core/app.c:1375
 msgid "SOUND"
 msgstr "SOM"
 
-#: src/core/app.c:1355
+#: src/core/app.c:1376
 msgid "Turn on the amplifier through GPIO (some laptops; applies after a restart)"
 msgstr "Ligar amplificador pelos GPIO (alguns notebooks; vale após reiniciar)"
 
-#: src/core/app.c:1357
+#: src/core/app.c:1378
 msgid "Test sound"
 msgstr "Testar som"
 
-#: src/core/app.c:1358
+#: src/core/app.c:1379
 msgid "Save diagnostics"
 msgstr "Salvar diagnóstico"
 
-#: src/core/app.c:1360
+#: src/core/app.c:1381
 #, c-format
 msgid "The diagnostics go to %s on the USB drive (it opens on any computer)."
 msgstr "O diagnóstico vai para %s no pen-drive (abre em qualquer computador)."
 
-#: src/core/app.c:1362
+#: src/core/app.c:1383
 msgid "STARTUP"
 msgstr "INICIALIZAÇÃO"
 
-#: src/core/app.c:1363
+#: src/core/app.c:1384
 msgid "FolioOS splash screen"
 msgstr "Tela de abertura FolioOS"
 
-#: src/core/app.c:1368
+#: src/core/app.c:1389
 msgid "Splash duration (any key skips it)"
 msgstr "Duração da abertura (qualquer tecla pula)"
 
-#: src/core/app.c:1375
+#: src/core/app.c:1396
 msgid "TEXTS"
 msgstr "TEXTOS"
 
-#: src/core/app.c:1376
+#: src/core/app.c:1397
 msgid "This computer"
 msgstr "Este computador"
 
-#: src/core/app.c:1376
+#: src/core/app.c:1397
 msgid "USB drive"
 msgstr "Pen-drive"
 
-#: src/core/app.c:1376
+#: src/core/app.c:1397
 msgid "Both"
 msgstr "Os dois"
 
-#: src/core/app.c:1379
+#: src/core/app.c:1400
 msgid "Your texts stay on the USB drive and go with you; without it, new texts are saved on this computer."
 msgstr "Seus textos ficam no pen-drive e vão com você; sem ele, os textos novos são salvos neste computador."
 
-#: src/core/app.c:1380
+#: src/core/app.c:1401
 msgid "Your texts are on this computer; the button copies the newest version of each text in both directions. Nothing is deleted."
 msgstr "Seus textos ficam neste computador; o botão copia a versão mais nova de cada texto nos dois sentidos. Nada é apagado."
 
-#: src/core/app.c:1381
+#: src/core/app.c:1402
 msgid "Your texts are on this computer."
 msgstr "Seus textos ficam neste computador."
 
-#: src/core/app.c:1392
+#: src/core/app.c:1413
 msgid "Wait for a key before starting the other system"
 msgstr "Esperar uma tecla antes de iniciar o outro sistema"
 
-#: src/core/app.c:1397
+#: src/core/app.c:1418
 msgid "Without a key, the other system starts as usual."
 msgstr "Sem tecla, o outro sistema inicia como sempre."
 
-#: src/core/app.c:1397
+#: src/core/app.c:1418
 msgid "0 s: the computer always starts FolioOS."
 msgstr "0 s: o computador sempre inicia o FolioOS."
 
-#: src/core/app.c:1400
+#: src/core/app.c:1421
 msgid "ABOUT"
 msgstr "SOBRE"
 
-#: src/core/app.c:1403
+#: src/core/app.c:1424
 #, c-format
 msgid "FolioOS %s · %s · %dx%d"
 msgstr "FolioOS %s · %s · %dx%d"
 
-#: src/core/app.c:1404
+#: src/core/app.c:1425
 #, c-format
 msgid "Memory: %d MB used of %d MB · %d fonts · %d themes"
 msgstr "Memória: %d MB em uso de %d MB · %d fontes · %d temas"
 
-#: src/core/app.c:1405
+#: src/core/app.c:1426
 #, c-format
 msgid "Audio: %s"
 msgstr "Áudio: %s"
 
-#: src/core/app.c:1410
+#: src/core/app.c:1431
 msgid "Install FolioOS on this computer…"
 msgstr "Instalar o FolioOS neste computador…"
 
-#: src/core/app.c:1412
+#: src/core/app.c:1433
 msgid "Disks and partitions…"
 msgstr "Discos e partições…"
 
-#: src/core/app.c:1414 src/core/installer.c:519
+#: src/core/app.c:1435 src/core/installer.c:522
 msgid "Restart"
 msgstr "Reiniciar"
 
-#: src/core/app.c:1434
+#: src/core/app.c:1455
 msgid "Desk (background)"
 msgstr "Mesa (fundo)"
 
-#: src/core/app.c:1434
+#: src/core/app.c:1455
 msgid "Paper"
 msgstr "Papel"
 
-#: src/core/app.c:1434 src/core/app.c:1635
+#: src/core/app.c:1455 src/core/app.c:1656
 msgid "Text"
 msgstr "Texto"
 
-#: src/core/app.c:1434
+#: src/core/app.c:1455
 msgid "Faded text"
 msgstr "Texto apagado"
 
-#: src/core/app.c:1434
+#: src/core/app.c:1455
 msgid "Subtle lines"
 msgstr "Linhas sutis"
 
-#: src/core/app.c:1434
+#: src/core/app.c:1455
 msgid "Accent"
 msgstr "Destaque"
 
-#: src/core/app.c:1434
+#: src/core/app.c:1455
 msgid "Selection"
 msgstr "Seleção"
 
-#: src/core/app.c:1434
+#: src/core/app.c:1455
 msgid "Cursor"
 msgstr "Cursor"
 
-#: src/core/app.c:1435
+#: src/core/app.c:1456
 msgid "Bars"
 msgstr "Barras"
 
-#: src/core/app.c:1435
+#: src/core/app.c:1456
 msgid "Bar text"
 msgstr "Texto das barras"
 
-#: src/core/app.c:1435
+#: src/core/app.c:1456
 msgid "Borders"
 msgstr "Bordas"
 
-#: src/core/app.c:1435
+#: src/core/app.c:1456
 msgid "Panels"
 msgstr "Painéis"
 
-#: src/core/app.c:1435
+#: src/core/app.c:1456
 msgid "Panel text"
 msgstr "Texto dos painéis"
 
-#: src/core/app.c:1435
+#: src/core/app.c:1456
 msgid "Headings"
 msgstr "Títulos"
 
-#: src/core/app.c:1435
+#: src/core/app.c:1456
 msgid "Code background"
 msgstr "Fundo de código"
 
-#: src/core/app.c:1435
+#: src/core/app.c:1456
 msgid "Highlighter"
 msgstr "Marca-texto"
 
-#: src/core/app.c:1469
+#: src/core/app.c:1490
 msgid "My theme"
 msgstr "Meu tema"
 
-#: src/core/app.c:1470
+#: src/core/app.c:1491
 #, c-format
 msgid "My theme %d"
 msgstr "Meu tema %d"
 
-#: src/core/app.c:1493
+#: src/core/app.c:1514
 msgid "Give the theme a name"
 msgstr "Dê um nome ao tema"
 
-#: src/core/app.c:1495
+#: src/core/app.c:1516
 msgid "That name belongs to a built-in theme — choose another"
 msgstr "Esse nome já é de um tema pronto — escolha outro"
 
-#: src/core/app.c:1496
+#: src/core/app.c:1517
 msgid "You already have a theme with that name"
 msgstr "Já existe um tema seu com esse nome"
 
-#: src/core/app.c:1499
+#: src/core/app.c:1520
 #, c-format
 msgid "Could not write to %s (is the USB drive write-protected or full?)"
 msgstr "Não foi possível gravar em %s (pen-drive protegido ou cheio?)"
 
-#: src/core/app.c:1504
+#: src/core/app.c:1525
 #, c-format
 msgid "Theme “%s” saved to %s"
 msgstr "Tema “%s” salvo em %s"
 
-#: src/core/app.c:1516
+#: src/core/app.c:1537
 msgid "Theme deleted"
 msgstr "Tema excluído"
 
-#: src/core/app.c:1547
+#: src/core/app.c:1568
 msgid "THEME NAME"
 msgstr "NOME DO TEMA"
 
-#: src/core/app.c:1548
+#: src/core/app.c:1569
 msgid "Theme name"
 msgstr "Nome do tema"
 
-#: src/core/app.c:1551
+#: src/core/app.c:1572
 msgid "STARTING POINT"
 msgstr "PONTO DE PARTIDA"
 
-#: src/core/app.c:1554
+#: src/core/app.c:1575
 msgid "Colors from"
 msgstr "Cores de"
 
-#: src/core/app.c:1556
+#: src/core/app.c:1577
 msgid "Use all"
 msgstr "Usar todas"
 
-#: src/core/app.c:1563
+#: src/core/app.c:1584
 msgid "Or mix: pick a color below and take it from any built-in theme."
 msgstr "Ou misture: escolha uma cor abaixo e pegue-a de qualquer tema pronto."
 
-#: src/core/app.c:1567
+#: src/core/app.c:1588
 msgid "COLORS"
 msgstr "CORES"
 
-#: src/core/app.c:1596
+#: src/core/app.c:1617
 msgid "hex code"
 msgstr "código hexadecimal"
 
-#: src/core/app.c:1600
+#: src/core/app.c:1621
 msgid "Hue"
 msgstr "Matiz"
 
-#: src/core/app.c:1603
+#: src/core/app.c:1624
 msgid "Saturation"
 msgstr "Saturação"
 
-#: src/core/app.c:1606
+#: src/core/app.c:1627
 msgid "Lightness"
 msgstr "Luminosidade"
 
-#: src/core/app.c:1610
+#: src/core/app.c:1631
 msgid "Take from a built-in theme:"
 msgstr "Pegar de um tema pronto:"
 
-#: src/core/app.c:1633
+#: src/core/app.c:1654
 msgid "THEME FONTS"
 msgstr "FONTES DO TEMA"
 
-#: src/core/app.c:1640
+#: src/core/app.c:1661
 #, c-format
 msgid "Default (%s)"
 msgstr "Padrão (%s)"
 
-#: src/core/app.c:1641
+#: src/core/app.c:1662
 msgid "Interface"
 msgstr "Interface"
 
-#: src/core/app.c:1649
+#: src/core/app.c:1670
 msgid "Interface = bars, menus and windows."
 msgstr "Interface = barras, menus e janelas."
 
-#: src/core/app.c:1653
+#: src/core/app.c:1674
 msgid "DESK AND PAPER"
 msgstr "MESA E PAPEL"
 
-#: src/core/app.c:1654
+#: src/core/app.c:1675
 msgid "Paper sheet on the desk"
 msgstr "Folha de papel sobre a mesa"
 
-#: src/core/app.c:1658
+#: src/core/app.c:1679
 msgid "Vignette at the desk edges"
 msgstr "Vinheta nas bordas da mesa"
 
-#: src/core/app.c:1669
+#: src/core/app.c:1690
 msgid "Save theme"
 msgstr "Salvar tema"
 
-#: src/core/app.c:1670 src/core/filedlg.c:60 src/core/filedlg.c:73 src/core/filedlg.c:411 src/core/filedlg.c:442 src/core/installer.c:339
+#: src/core/app.c:1691 src/core/filedlg.c:60 src/core/filedlg.c:73 src/core/filedlg.c:411 src/core/filedlg.c:442 src/core/installer.c:340
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/core/app.c:1671 src/core/app.c:1672 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:232 src/core/partitions.c:274
+#: src/core/app.c:1692 src/core/app.c:1693 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:243 src/core/partitions.c:285
 msgid "Delete"
 msgstr "Excluir"
 
-#: src/core/app.c:1672
+#: src/core/app.c:1693
 msgid "Delete theme?"
 msgstr "Excluir tema?"
 
-#: src/core/app.c:1672
+#: src/core/app.c:1693
 #, c-format
 msgid "The theme file in %s will be deleted."
 msgstr "O arquivo do tema em %s será apagado."
 
-#: src/core/app.c:1679
+#: src/core/app.c:1700
 msgid "Find"
 msgstr "Localizar"
 
-#: src/core/app.c:1680
+#: src/core/app.c:1701
 msgid "Previous (Shift+Enter)"
 msgstr "Anterior (Shift+Enter)"
 
-#: src/core/app.c:1681
+#: src/core/app.c:1702
 msgid "Next (Enter)"
 msgstr "Próximo (Enter)"
 
-#: src/core/app.c:1682
+#: src/core/app.c:1703
 msgid "Replace with"
 msgstr "Substituir por"
 
-#: src/core/app.c:1684 src/core/filedlg.c:204
+#: src/core/app.c:1705 src/core/filedlg.c:204
 msgid "Replace"
 msgstr "Substituir"
 
-#: src/core/app.c:1685
+#: src/core/app.c:1706
 msgid "Replace all"
 msgstr "Substituir todos"
 
-#: src/core/app.c:1687
+#: src/core/app.c:1708
 #, c-format
 msgid "%d replacement"
 msgid_plural "%d replacements"
 msgstr[0] "%d substituição"
 msgstr[1] "%d substituições"
 
-#: src/core/app.c:1694
+#: src/core/app.c:1715
 msgid "Nothing found"
 msgstr "Nada encontrado"
 
-#: src/core/app.c:1701
+#: src/core/app.c:1722
 #, c-format
 msgid "%d match"
 msgid_plural "%d matches"
 msgstr[0] "%d ocorrência"
 msgstr[1] "%d ocorrências"
 
-#: src/core/app.c:1739
+#: src/core/app.c:1760
 msgid "(untitled)"
 msgstr "(sem título)"
 
-#: src/core/app.c:1748
+#: src/core/app.c:1769
 msgid "No headings yet."
 msgstr "Sem títulos ainda."
 
-#: src/core/app.c:1749
+#: src/core/app.c:1770
 msgid "Start a line with # to create chapters."
 msgstr "Comece uma linha com # para criar capítulos."
 
-#: src/core/app.c:1778
+#: src/core/app.c:1799
 #, c-format
 msgid "goal of %d reached"
 msgstr "meta de %d cumprida"
 
-#: src/core/app.c:1778
+#: src/core/app.c:1799
 #, c-format
 msgid "of %d words today"
 msgstr "de %d palavras hoje"
 
-#: src/core/app.c:1779
+#: src/core/app.c:1800
 msgid "words today"
 msgstr "palavras hoje"
 
-#: src/core/app.c:1784
+#: src/core/app.c:1805
 msgid "This document"
 msgstr "Este documento"
 
-#: src/core/app.c:1785
+#: src/core/app.c:1806
 msgid "This session"
 msgstr "Nesta sessão"
 
-#: src/core/app.c:1785
+#: src/core/app.c:1806
 #, c-format
 msgid "+%d in %dh%02d"
 msgstr "+%d em %dh%02d"
 
-#: src/core/app.c:1786
+#: src/core/app.c:1807
 msgid "Estimated reading"
 msgstr "Leitura estimada"
 
-#: src/core/app.c:1787
+#: src/core/app.c:1808
 msgid "Pace"
 msgstr "Ritmo"
 
-#: src/core/app.c:1787
+#: src/core/app.c:1808
 #, c-format
 msgid "%d words/h"
 msgstr "%d palavras/h"
 
-#: src/core/app.c:1798
+#: src/core/app.c:1819
 msgid "15 min"
 msgstr "15 min"
 
-#: src/core/app.c:1798
+#: src/core/app.c:1819
 msgid "25 min"
 msgstr "25 min"
 
-#: src/core/app.c:1798
+#: src/core/app.c:1819
 msgid "45 min"
 msgstr "45 min"
 
-#: src/core/app.c:1798
+#: src/core/app.c:1819
 msgid "60 min"
 msgstr "60 min"
 
-#: src/core/app.c:1803
+#: src/core/app.c:1824
 msgid "Start sprint"
 msgstr "Iniciar sprint"
 
-#: src/core/app.c:1809
+#: src/core/app.c:1830
 #, c-format
 msgid "+%d word in this sprint"
 msgid_plural "+%d words in this sprint"
 msgstr[0] "+%d palavra neste sprint"
 msgstr[1] "+%d palavras neste sprint"
 
-#: src/core/app.c:1812
+#: src/core/app.c:1833
 msgid "Stop sprint"
 msgstr "Parar sprint"
 
-#: src/core/app.c:1824
+#: src/core/app.c:1845
 msgid "Ctrl+N / O / S"
 msgstr "Ctrl+N / O / S"
 
-#: src/core/app.c:1824
+#: src/core/app.c:1845
 msgid "New · Open · Save"
 msgstr "Novo · Abrir · Salvar"
 
-#: src/core/app.c:1824 src/core/filedlg.c:122
+#: src/core/app.c:1845 src/core/filedlg.c:122
 msgid "Save as / Export"
 msgstr "Salvar como / Exportar"
 
-#: src/core/app.c:1825
+#: src/core/app.c:1846
 msgid "Ctrl+W · Ctrl+Tab"
 msgstr "Ctrl+W · Ctrl+Tab"
 
-#: src/core/app.c:1825
+#: src/core/app.c:1846
 msgid "Tabs: close · next"
 msgstr "Abas: fechar · próxima"
 
-#: src/core/app.c:1825
+#: src/core/app.c:1846
 msgid "Alt+1…9"
 msgstr "Alt+1…9"
 
-#: src/core/app.c:1825
+#: src/core/app.c:1846
 msgid "Go to tab 1…9"
 msgstr "Ir para a aba 1…9"
 
-#: src/core/app.c:1826
+#: src/core/app.c:1847
 msgid "Ctrl+K"
 msgstr "Ctrl+K"
 
-#: src/core/app.c:1826
+#: src/core/app.c:1847
 msgid "Command palette"
 msgstr "Paleta de comandos"
 
-#: src/core/app.c:1826
+#: src/core/app.c:1847
 msgid "Reading (formatted Markdown)"
 msgstr "Leitura (Markdown formatado)"
 
-#: src/core/app.c:1827
+#: src/core/app.c:1848
 msgid "Ctrl+Z / Y"
 msgstr "Ctrl+Z / Y"
 
-#: src/core/app.c:1827
+#: src/core/app.c:1848
 msgid "Undo · Redo"
 msgstr "Desfazer · Refazer"
 
-#: src/core/app.c:1828
+#: src/core/app.c:1849
 msgid "Ctrl+B / I"
 msgstr "Ctrl+B / I"
 
-#: src/core/app.c:1828
+#: src/core/app.c:1849
 msgid "Bold · Italic"
 msgstr "Negrito · Itálico"
 
-#: src/core/app.c:1828
+#: src/core/app.c:1849
 msgid "Ctrl+1…6 / 0"
 msgstr "Ctrl+1…6 / 0"
 
-#: src/core/app.c:1828
+#: src/core/app.c:1849
 msgid "Heading level 1–6 · Text"
 msgstr "Título nível 1–6 · Texto"
 
-#: src/core/app.c:1829
+#: src/core/app.c:1850
 msgid "Alt+↑ / ↓"
 msgstr "Alt+↑ / ↓"
 
-#: src/core/app.c:1829
+#: src/core/app.c:1850
 msgid "Move paragraph"
 msgstr "Mover parágrafo"
 
-#: src/core/app.c:1829
+#: src/core/app.c:1850
 msgid "Tab / Shift+Tab"
 msgstr "Tab / Shift+Tab"
 
-#: src/core/app.c:1829
+#: src/core/app.c:1850
 msgid "Indent list item"
 msgstr "Recuar item de lista"
 
-#: src/core/app.c:1831
+#: src/core/app.c:1852
 msgid "Ctrl+PgUp / PgDn"
 msgstr "Ctrl+PgUp / PgDn"
 
-#: src/core/app.c:1831
+#: src/core/app.c:1852
 msgid "Previous · next chapter"
 msgstr "Capítulo anterior · seguinte"
 
-#: src/core/app.c:1831
+#: src/core/app.c:1852
 msgid "Jump to and back from the last edit"
 msgstr "Ir e voltar da última alteração"
 
-#: src/core/app.c:1832
+#: src/core/app.c:1853
 msgid "lowercase → Title Case → UPPERCASE"
 msgstr "minúsculas → Iniciais → MAIÚSCULAS"
 
-#: src/core/app.c:1832
+#: src/core/app.c:1853
 msgid "Select and type ( \" *"
 msgstr "Selecionar e digitar ( \" *"
 
-#: src/core/app.c:1832
+#: src/core/app.c:1853
 msgid "Wraps the selection"
 msgstr "Envolve a seleção"
 
-#: src/core/app.c:1833
+#: src/core/app.c:1854
 msgid "← / → · Space (reading)"
 msgstr "← / → · Espaço (leitura)"
 
-#: src/core/app.c:1833
+#: src/core/app.c:1854
 msgid "Previous · next page"
 msgstr "Página anterior · seguinte"
 
-#: src/core/app.c:1833
+#: src/core/app.c:1854
 msgid "Auto-scroll on/off"
 msgstr "Rolagem automática liga/desliga"
 
-#: src/core/app.c:1834
+#: src/core/app.c:1855
 msgid "+ / − (reading)"
 msgstr "+ / − (leitura)"
 
-#: src/core/app.c:1834
+#: src/core/app.c:1855
 msgid "Auto-scroll speed"
 msgstr "Velocidade da rolagem automática"
 
-#: src/core/app.c:1835
+#: src/core/app.c:1856
 msgid "Ctrl+← / →"
 msgstr "Ctrl+← / →"
 
-#: src/core/app.c:1835
+#: src/core/app.c:1856
 msgid "Previous / next word"
 msgstr "Palavra anterior / seguinte"
 
-#: src/core/app.c:1835
+#: src/core/app.c:1856
 msgid "Ctrl+Home / End"
 msgstr "Ctrl+Home / End"
 
-#: src/core/app.c:1835
+#: src/core/app.c:1856
 msgid "Start · end of the text"
 msgstr "Início · Fim do texto"
 
-#: src/core/app.c:1836
+#: src/core/app.c:1857
 msgid "Ctrl+= / -"
 msgstr "Ctrl+= / -"
 
-#: src/core/app.c:1836
+#: src/core/app.c:1857
 msgid "Larger · smaller text"
 msgstr "Aumentar · Diminuir texto"
 
-#: src/core/app.c:1837
+#: src/core/app.c:1858
 msgid "This help"
 msgstr "Esta ajuda"
 
-#: src/core/app.c:1837
+#: src/core/app.c:1858
 msgid "Focus mode (sentence/paragraph/line)"
 msgstr "Modo foco (frase/parágrafo/linha)"
 
-#: src/core/app.c:1838
+#: src/core/app.c:1859
 msgid "Typewriter"
 msgstr "Máquina de escrever"
 
-#: src/core/app.c:1838
+#: src/core/app.c:1859
 msgid "Writing sprint"
 msgstr "Sprint de escrita"
 
-#: src/core/app.c:1840
+#: src/core/app.c:1861
 msgid "F7 / F8 / F9"
 msgstr "F7 / F8 / F9"
 
-#: src/core/app.c:1840
+#: src/core/app.c:1861
 msgid "Previous track · Play/pause · Next"
 msgstr "Faixa anterior · Tocar/pausar · Próxima"
 
-#: src/core/app.c:1841
+#: src/core/app.c:1862
 msgid "Zen mode"
 msgstr "Modo zen"
 
-#: src/core/app.c:1842
+#: src/core/app.c:1863
 msgid "Esc"
 msgstr "Esc"
 
-#: src/core/app.c:1842
+#: src/core/app.c:1863
 msgid "Close window · leave zen/reading"
 msgstr "Fechar janela · sair do zen/leitura"
 
-#: src/core/app.c:1843
+#: src/core/app.c:1864
 msgid "Tab · ↑ ↓ (windows)"
 msgstr "Tab · ↑ ↓ (janelas)"
 
-#: src/core/app.c:1843
+#: src/core/app.c:1864
 msgid "Move between buttons and options"
 msgstr "Anda entre botões e opções"
 
-#: src/core/app.c:1843
+#: src/core/app.c:1864
 msgid "Enter · Space · ← →"
 msgstr "Enter · Espaço · ← →"
 
-#: src/core/app.c:1843
+#: src/core/app.c:1864
 msgid "Press · adjust the focused option"
 msgstr "Aciona · ajusta a opção em foco"
 
-#: src/core/app.c:1844
+#: src/core/app.c:1865
 msgid "Keyboard between the text and the windows"
 msgstr "Teclado entre o texto e as janelas"
 
-#: src/core/app.c:1844
+#: src/core/app.c:1865
 msgid "Ctrl+Shift+← / →"
 msgstr "Ctrl+Shift+← / →"
 
-#: src/core/app.c:1844
+#: src/core/app.c:1865
 msgid "Select word by word"
 msgstr "Seleciona palavra por palavra"
 
-#: src/core/app.c:1845
+#: src/core/app.c:1866
 msgid "Become — and … (smart typography)"
 msgstr "Viram — e … (tipografia inteligente)"
 
-#: src/core/app.c:1845
+#: src/core/app.c:1866
 msgid "Alt+F7 / Alt+F8"
 msgstr "Alt+F7 / Alt+F8"
 
-#: src/core/app.c:1845
+#: src/core/app.c:1866
 msgid "Move · resize the window (arrows, Enter)"
 msgstr "Mover · redimensionar a janela (setas, Enter)"
 
-#: src/core/app.c:1922
+#: src/core/app.c:1943
 #, c-format
 msgid "Untitled — kept in %s until you save it"
 msgstr "Sem título — guardado em %s até ser salvo"
 
-#: src/core/app.c:1929
+#: src/core/app.c:1950
 msgid "New tab (Ctrl+N)"
 msgstr "Nova aba (Ctrl+N)"
 
-#: src/core/app.c:1948
+#: src/core/app.c:1969
 msgid "Not saved yet (Ctrl+S)"
 msgstr "Ainda não salvo (Ctrl+S)"
 
-#: src/core/app.c:1963
+#: src/core/app.c:1984
 #, c-format
 msgid "Playing: %s (F6)"
 msgstr "Tocando: %s (F6)"
 
-#: src/core/app.c:1964
+#: src/core/app.c:1985
 msgid "Music (F6)"
 msgstr "Música (F6)"
 
-#: src/core/app.c:1964
+#: src/core/app.c:1985
 #, c-format
 msgid "Music (F6) — put MP3 files in the %s folder"
 msgstr "Música (F6) — coloque MP3 na pasta %s"
 
-#: src/core/app.c:1966
+#: src/core/app.c:1987
 msgid "Tabs on — click to turn off"
 msgstr "Abas ligadas — clique para desligar"
 
-#: src/core/app.c:1966
+#: src/core/app.c:1987
 msgid "Tabs: open several documents (like in Sublime Text)"
 msgstr "Abas: abrir vários documentos (como no Sublime Text)"
 
-#: src/core/app.c:1967
+#: src/core/app.c:1988
 msgid "Zen mode (F11)"
 msgstr "Modo zen (F11)"
 
-#: src/core/app.c:1968
+#: src/core/app.c:1989
 msgid "Typewriter (F3)"
 msgstr "Máquina de escrever (F3)"
 
-#: src/core/app.c:1969
+#: src/core/app.c:1990
 msgid "Reading (Ctrl+P)"
 msgstr "Leitura (Ctrl+P)"
 
-#: src/core/app.c:1971
+#: src/core/app.c:1992
 msgid "Appearance (F12)"
 msgstr "Aparência (F12)"
 
-#: src/core/app.c:1972
+#: src/core/app.c:1993
 msgid "Commands (Ctrl+K)"
 msgstr "Comandos (Ctrl+K)"
 
-#: src/core/app.c:1984
+#: src/core/app.c:2005
 msgid "Next track (F9)"
 msgstr "Próxima faixa (F9)"
 
-#: src/core/app.c:1986
+#: src/core/app.c:2007
 msgid "Pause (F8)"
 msgstr "Pausar (F8)"
 
-#: src/core/app.c:1986
+#: src/core/app.c:2007
 msgid "Play (F8)"
 msgstr "Tocar (F8)"
 
-#: src/core/app.c:1988
+#: src/core/app.c:2009
 msgid "Previous track (F7)"
 msgstr "Faixa anterior (F7)"
 
-#: src/core/app.c:2001
+#: src/core/app.c:2022
 #, c-format
 msgid "%d h %02d min"
 msgstr "%d h %02d min"
 
-#: src/core/app.c:2029
+#: src/core/app.c:2050
 msgid " · end of the text"
 msgstr " · fim do texto"
 
-#: src/core/app.c:2030
+#: src/core/app.c:2051
 #, c-format
 msgid " · %s · %s to the end of the chapter · %s in total"
 msgstr " · %s · %s até o fim do capítulo · %s no total"
 
-#: src/core/app.c:2031
+#: src/core/app.c:2052
 #, c-format
 msgid " · %s · %s of reading left"
 msgstr " · %s · faltam %s de leitura"
 
-#: src/core/app.c:2032
+#: src/core/app.c:2053
 #, c-format
 msgid " · %s of reading left"
 msgstr " · faltam %s de leitura"
 
-#: src/core/app.c:2035
+#: src/core/app.c:2056
 #, c-format
 msgid "%d of %d word"
 msgid_plural "%d of %d words"
 msgstr[0] "%d de %d palavra"
 msgstr[1] "%d de %d palavras"
 
-#: src/core/app.c:2041
+#: src/core/app.c:2062
 #, c-format
 msgid "Today: %d words · %d min reading"
 msgstr "Hoje: %d palavras · leitura %d min"
 
-#: src/core/app.c:2251
+#: src/core/app.c:2272
 msgid "The USB drive with your texts is not connected: new texts are saved on this computer for now."
 msgstr "O pen-drive com os seus textos não está conectado: por enquanto, os textos novos são salvos neste computador."
 
-#: src/core/app.c:2282 src/core/app.c:2287
+#: src/core/app.c:2303 src/core/app.c:2308
 msgid "Welcome back. Picking up where you left off."
 msgstr "Bem-vindo de volta. Continuando de onde parou."
 
-#: src/core/app.c:2282
+#: src/core/app.c:2303
 #, c-format
 msgid "Welcome back: %d tab reopened."
 msgid_plural "Welcome back: %d tabs reopened."
 msgstr[0] "Bem-vindo de volta: %d aba reaberta."
 msgstr[1] "Bem-vindo de volta: %d abas reabertas."
 
-#: src/core/app.c:2286
+#: src/core/app.c:2307
 msgid "Welcome back. Reading continues where you left off."
 msgstr "Bem-vindo de volta. A leitura continua de onde parou."
 
-#: src/core/app.c:2291
+#: src/core/app.c:2312
 msgid "Unsaved draft recovered"
 msgstr "Rascunho não salvo recuperado"
 
-#: src/core/app.c:2296
+#: src/core/app.c:2317
 msgid ""
 "# Welcome to FolioOS\n"
 "\n"
@@ -1728,7 +1728,7 @@ msgstr ""
 "\n"
 "Apague este texto (Ctrl+A) e comece a sua história.\n"
 
-#: src/core/app.c:2425
+#: src/core/app.c:2446
 #, c-format
 msgid "Sprint finished: %d word. Breathe and stretch."
 msgid_plural "Sprint finished: %d words. Breathe and stretch."
@@ -1973,7 +1973,7 @@ msgstr "Excluir a pasta \"%s\" e todo o seu conteúdo? Esta ação não pode ser
 msgid "Delete \"%s\"? This cannot be undone."
 msgstr "Excluir \"%s\"? Esta ação não pode ser desfeita."
 
-#: src/core/filedlg.c:327 src/core/partitions.c:252
+#: src/core/filedlg.c:327 src/core/partitions.c:263
 msgid "Size"
 msgstr "Tamanho"
 
@@ -2012,79 +2012,79 @@ msgstr[1] "%d itens"
 msgid "Open"
 msgstr "Abrir"
 
-#: src/core/fscheck.c:882
+#: src/core/fscheck.c:894
 msgid "This partition is encrypted with BitLocker. To make room, shrink it in Windows (Disk Management, Shrink Volume) or turn BitLocker off first."
 msgstr "Esta partição está cifrada com BitLocker. Para abrir espaço, diminua-a no Windows (Gerenciamento de Disco, Diminuir Volume) ou desative o BitLocker antes."
 
-#: src/core/fscheck.c:883
+#: src/core/fscheck.c:895
 msgid "This partition is encrypted (LUKS). To make room, shrink it from Linux with the encryption tools."
 msgstr "Esta partição está cifrada (LUKS). Para abrir espaço, diminua-a pelo Linux com as ferramentas de criptografia."
 
-#: src/core/fscheck.c:884
-msgid "This partition holds LVM volumes. To make room, free space from Linux: shrink the file system first, then its logical volume (lvreduce --resizefs), then the physical volume (pvresize)."
-msgstr "Esta partição guarda volumes LVM. Para abrir espaço, use o Linux: encolha primeiro o sistema de arquivos, depois o volume lógico (lvreduce --resizefs) e então o volume físico (pvresize)."
+#: src/core/fscheck.c:896
+msgid "This partition holds LVM volumes. To make room, shrink it from Linux, in this order: the file system and its logical volume (lvreduce --resizefs), the physical volume (pvresize), then the partition itself (parted or GParted). Then open the installer again."
+msgstr "Esta partição contém volumes LVM. Para abrir espaço, encolha-a pelo Linux, nesta ordem: o sistema de arquivos e seu volume lógico (lvreduce --resizefs), o volume físico (pvresize) e depois a própria partição (parted ou GParted). Depois, abra o instalador de novo."
 
-#: src/core/fscheck.c:885
+#: src/core/fscheck.c:897
 msgid "This is a Mac partition (APFS or HFS+). To make room, use Disk Utility on the Mac."
 msgstr "Esta é uma partição de Mac (APFS ou HFS+). Para abrir espaço, use o Utilitário de Disco no Mac."
 
-#: src/core/fscheck.c:886
+#: src/core/fscheck.c:898
 msgid "Windows is hibernated or uses Fast Startup. Start Windows, then shut it down while holding Shift (or turn Fast Startup off in Power Options), and try again."
 msgstr "O Windows está hibernado ou usa a Inicialização Rápida. Inicie o Windows, desligue-o segurando Shift (ou desative a Inicialização Rápida nas Opções de Energia) e tente de novo."
 
-#: src/core/fscheck.c:887
+#: src/core/fscheck.c:899
 msgid "Windows marked this partition as needing a check. Start Windows, run chkdsk /f on it, and try again."
 msgstr "O Windows marcou esta partição como precisando de verificação. Inicie o Windows, rode chkdsk /f nela e tente de novo."
 
-#: src/core/fscheck.c:888
+#: src/core/fscheck.c:900
 msgid "This Linux partition was not unmounted cleanly. Start Linux and shut it down normally, then try again."
 msgstr "Esta partição Linux não foi desmontada corretamente. Inicie o Linux e desligue-o normalmente; depois tente de novo."
 
-#: src/core/fscheck.c:889
+#: src/core/fscheck.c:901
 msgid "Linux found errors on this partition. Check it with fsck from Linux, then try again."
 msgstr "O Linux encontrou erros nesta partição. Verifique-a com fsck pelo Linux e tente de novo."
 
-#: src/core/fscheck.c:890
+#: src/core/fscheck.c:902
 msgid "This partition could not be read safely, so FolioOS will not change it."
 msgstr "Não foi possível ler esta partição com segurança, então o FolioOS não vai alterá-la."
 
-#: src/core/fscheck.c:891
+#: src/core/fscheck.c:903
 msgid "FolioOS cannot resize this file system yet."
 msgstr "O FolioOS ainda não consegue redimensionar este sistema de arquivos."
 
-#: src/core/fscheck.c:897
+#: src/core/fscheck.c:909
 msgid "encrypted (BitLocker)"
 msgstr "cifrada (BitLocker)"
 
-#: src/core/fscheck.c:898
+#: src/core/fscheck.c:910
 msgid "encrypted (LUKS)"
 msgstr "cifrada (LUKS)"
 
-#: src/core/fscheck.c:900
+#: src/core/fscheck.c:912
 msgid "Mac (APFS/HFS+)"
 msgstr "Mac (APFS/HFS+)"
 
-#: src/core/fscheck.c:901
+#: src/core/fscheck.c:913
 msgid "Windows hibernated or Fast Startup"
 msgstr "Windows hibernado ou Inicialização Rápida"
 
-#: src/core/fscheck.c:902
+#: src/core/fscheck.c:914
 msgid "needs a check (chkdsk)"
 msgstr "precisa de verificação (chkdsk)"
 
-#: src/core/fscheck.c:903
+#: src/core/fscheck.c:915
 msgid "not unmounted cleanly"
 msgstr "não desmontada corretamente"
 
-#: src/core/fscheck.c:904
+#: src/core/fscheck.c:916
 msgid "has errors (fsck)"
 msgstr "com erros (fsck)"
 
-#: src/core/fscheck.c:905
+#: src/core/fscheck.c:917
 msgid "unreadable"
 msgstr "ilegível"
 
-#: src/core/fscheck.c:906
+#: src/core/fscheck.c:918
 msgid "cannot be resized yet"
 msgstr "ainda não redimensionável"
 
@@ -2156,87 +2156,87 @@ msgstr "Entrada: hiragana"
 msgid "Input: Katakana"
 msgstr "Entrada: katakana"
 
-#: src/core/install.c:984
+#: src/core/install.c:1002
 msgid "Done"
 msgstr "Concluído"
 
-#: src/core/install.c:985
+#: src/core/install.c:1003
 msgid "Could not read"
 msgstr "Não foi possível ler"
 
-#: src/core/install.c:986
+#: src/core/install.c:1004
 msgid "Could not write to the disk"
 msgstr "Não foi possível gravar no disco"
 
-#: src/core/install.c:987
+#: src/core/install.c:1005
 msgid "The disk is too small (at least 512 MB)"
 msgstr "O disco é pequeno demais (no mínimo 512 MB)"
 
-#: src/core/install.c:988
+#: src/core/install.c:1006
 msgid "Could not save the safety copy to the USB drive"
 msgstr "Não foi possível salvar a cópia de segurança no pen-drive"
 
-#: src/core/install.c:989
+#: src/core/install.c:1007
 msgid "Could not format the new partition"
 msgstr "Não foi possível formatar a nova partição"
 
-#: src/core/install.c:990
+#: src/core/install.c:1008
 msgid "Could not copy"
 msgstr "Não foi possível copiar"
 
-#: src/core/install.c:991
+#: src/core/install.c:1009
 msgid "A copied file did not match the original"
 msgstr "Um arquivo copiado não confere com o original"
 
-#: src/core/install.c:992
+#: src/core/install.c:1010
 msgid "The BIOS boot code is missing from the USB drive"
 msgstr "Falta o código de boot BIOS no pen-drive"
 
-#: src/core/install.c:993
+#: src/core/install.c:1011
 msgid "The USB drive does not have a complete FolioOS"
 msgstr "O pen-drive não tem um FolioOS completo"
 
-#: src/core/install.c:994
+#: src/core/install.c:1012
 msgid "This disk does not use a GPT partition table"
 msgstr "Este disco não usa tabela de partições GPT"
 
-#: src/core/install.c:995
+#: src/core/install.c:1013
 msgid "No FAT32 EFI system partition was found on this disk"
 msgstr "Nenhuma partição de sistema EFI em FAT32 foi encontrada neste disco"
 
-#: src/core/install.c:996
+#: src/core/install.c:1014
 msgid "The EFI system partition is full"
 msgstr "A partição de sistema EFI está cheia"
 
-#: src/core/install.c:997
+#: src/core/install.c:1015
 msgid "The chosen space is not free"
 msgstr "O espaço escolhido não está livre"
 
-#: src/core/install.c:998
+#: src/core/install.c:1016
 msgid "Could not shrink the other system's partition"
 msgstr "Não foi possível diminuir a partição do outro sistema"
 
-#: src/core/install.c:999
+#: src/core/install.c:1017
 msgid "Could not give the space back to the other system's partition"
 msgstr "Não foi possível devolver o espaço à partição do outro sistema"
 
-#: src/core/install.c:1000
+#: src/core/install.c:1018
 msgid "This partition cannot change to that size without moving data"
 msgstr "Esta partição não pode mudar para esse tamanho sem mover dados"
 
-#: src/core/install.c:1001 src/core/partitions.c:46
+#: src/core/install.c:1019 src/core/partitions.c:48
 msgid "FolioOS cannot change this disk's partition table safely: it is left as it is"
 msgstr "O FolioOS não consegue alterar a tabela de partições deste disco com segurança: ela fica como está"
 
-#: src/core/install.c:1002
+#: src/core/install.c:1020
 msgid "Error"
 msgstr "Erro"
 
-#: src/core/installer.c:53 src/core/partitions.c:39
+#: src/core/installer.c:53 src/core/partitions.c:41
 msgid "This disk is read-only."
 msgstr "Este disco é somente leitura."
 
-#: src/core/installer.c:54 src/core/partitions.c:40
+#: src/core/installer.c:54 src/core/partitions.c:42
 msgid "Disks with 4096-byte sectors are not supported yet."
 msgstr "Discos com setores de 4096 bytes ainda não são suportados."
 
@@ -2252,11 +2252,11 @@ msgstr "Para manter o Linux, diminua a partição dele pelo próprio Linux (com 
 msgid "To keep Windows, shrink drive C: in Windows (Disk Management, Shrink Volume) and run the installer again: FolioOS will use the free space."
 msgstr "Para manter o Windows, diminua a unidade C: no Windows (Gerenciamento de Disco, Diminuir Volume) e abra o instalador de novo: o FolioOS usará o espaço livre."
 
-#: src/core/installer.c:108 src/core/partitions.c:44
+#: src/core/installer.c:108 src/core/partitions.c:46
 msgid "Partition table unreadable"
 msgstr "Tabela de partições ilegível"
 
-#: src/core/installer.c:109 src/core/partitions.c:149
+#: src/core/installer.c:109 src/core/partitions.c:152
 msgid "Empty: no partitions"
 msgstr "Vazio: nenhuma partição"
 
@@ -2267,346 +2267,355 @@ msgid_plural "…and %d more partitions"
 msgstr[0] "…e mais %d partição"
 msgstr[1] "…e mais %d partições"
 
-#: src/core/installer.c:126 src/core/partitions.c:145
+#: src/core/installer.c:126 src/core/partitions.c:148
 msgid "disk"
 msgstr "disco"
 
-#: src/core/installer.c:273
+#: src/core/installer.c:274
 msgid "Your texts:"
 msgstr "Seus textos:"
 
-#: src/core/installer.c:275
+#: src/core/installer.c:276
 msgid "They stay on this USB drive and go with you; FolioOS on the computer uses them when the drive is connected."
 msgstr "Ficam neste pen-drive e vão com você; o FolioOS do computador os usa quando o pen-drive estiver conectado."
 
-#: src/core/installer.c:276
+#: src/core/installer.c:277
 msgid "They are copied to the computer; a button in Settings exchanges them with this USB drive."
 msgstr "São copiados para o computador; um botão nos Ajustes os troca com este pen-drive."
 
-#: src/core/installer.c:277
+#: src/core/installer.c:278
 msgid "They are copied to the computer."
 msgstr "São copiados para o computador."
 
-#: src/core/installer.c:293
+#: src/core/installer.c:294
 msgid "Install FolioOS next to the system you already have, in the free space, or as the only system on a disk."
 msgstr "Instale o FolioOS ao lado do sistema que você já tem, no espaço livre, ou como único sistema de um disco."
 
-#: src/core/installer.c:294
+#: src/core/installer.c:295
 msgid "Choose where:"
 msgstr "Escolha onde:"
 
-#: src/core/installer.c:295 src/core/partitions.c:184
+#: src/core/installer.c:296 src/core/partitions.c:187
 msgid "No disk was found besides the USB drive FolioOS started from."
 msgstr "Nenhum disco foi encontrado além do pen-drive de onde o FolioOS iniciou."
 
-#: src/core/installer.c:315
+#: src/core/installer.c:316
 msgid "Reinstall the FolioOS program on this disk (your texts and settings stay)"
 msgstr "Reinstalar o programa do FolioOS neste disco (seus textos e ajustes ficam)"
 
-#: src/core/installer.c:316
+#: src/core/installer.c:317
 #, c-format
 msgid "Update FolioOS on this disk (%s → %s)"
 msgstr "Atualizar o FolioOS neste disco (%s → %s)"
 
-#: src/core/installer.c:318
+#: src/core/installer.c:319
 msgid "Remove FolioOS from this disk (the disk is left empty)"
 msgstr "Remover o FolioOS deste disco (o disco fica vazio)"
 
-#: src/core/installer.c:318
+#: src/core/installer.c:319
 msgid "Remove FolioOS from this disk (Windows gets the space back)"
 msgstr "Remover o FolioOS deste disco (o Windows recebe o espaço de volta)"
 
-#: src/core/installer.c:318
+#: src/core/installer.c:319
 msgid "Remove FolioOS from this disk (the partition before it gets the space back)"
 msgstr "Remover o FolioOS deste disco (a partição de antes recebe o espaço de volta)"
 
-#: src/core/installer.c:318
+#: src/core/installer.c:319
 msgid "Remove FolioOS from this disk (its space becomes free)"
 msgstr "Remover o FolioOS deste disco (o espaço dele fica livre)"
 
-#: src/core/installer.c:319
+#: src/core/installer.c:320
 #, c-format
 msgid "Next to the other system, making room in its %s partition (up to %s)"
 msgstr "Ao lado do outro sistema, abrindo espaço na partição %s dele (até %s)"
 
-#: src/core/installer.c:320
+#: src/core/installer.c:321
 #, c-format
 msgid "Next to the other system, in %s of free space"
 msgstr "Ao lado do outro sistema, em %s de espaço livre"
 
-#: src/core/installer.c:321
+#: src/core/installer.c:322
 msgid "The whole disk (everything on it is erased)"
 msgstr "O disco inteiro (tudo nele é apagado)"
 
-#: src/core/installer.c:340
+#: src/core/installer.c:341
 msgid "Next"
 msgstr "Avançar"
 
-#: src/core/installer.c:352
+#: src/core/installer.c:353
 msgid "FolioOS on this disk will be updated:"
 msgstr "O FolioOS deste disco será atualizado:"
 
-#: src/core/installer.c:355
+#: src/core/installer.c:356
 #, c-format
 msgid "Version %s → %s"
 msgstr "Versão %s → %s"
 
-#: src/core/installer.c:357
+#: src/core/installer.c:358
 msgid "Only the program, fonts, languages, themes and keyboards are replaced. Your texts, music and settings stay as they are, and fonts or themes you added are kept."
 msgstr "Só o programa, as fontes, os idiomas, os temas e os teclados são trocados. Seus textos, músicas e ajustes ficam como estão, e as fontes ou temas que você acrescentou continuam."
 
-#: src/core/installer.c:358
+#: src/core/installer.c:359
 msgid "Each file is replaced only after its new copy has been checked, and the old copy is kept until the new one is in place. If the update stops in the middle, some files may already be new: start the update again from this USB drive to finish it."
 msgstr "Cada arquivo só é substituído depois que a cópia nova é conferida, e a cópia antiga fica até a nova estar no lugar. Se a atualização parar no meio, alguns arquivos podem já estar novos: comece a atualização de novo por este pen-drive para terminá-la."
 
-#: src/core/installer.c:359 src/core/installer.c:391 src/core/installer.c:445 src/core/installer.c:473
+#: src/core/installer.c:360 src/core/installer.c:392 src/core/installer.c:446 src/core/installer.c:474
 #, c-format
 msgid "Before anything is written, the partition table (the first and last sectors of the disk) is saved to %s on this USB drive."
 msgstr "Antes de gravar qualquer coisa, a tabela de partições (os primeiros e os últimos setores do disco) é salva em %s neste pen-drive."
 
-#: src/core/installer.c:361 src/core/installer.c:402 src/core/installer.c:457 src/core/installer.c:480 src/core/partitions.c:273
+#: src/core/installer.c:362 src/core/installer.c:403 src/core/installer.c:458 src/core/installer.c:481 src/core/partitions.c:284
 msgid "Back"
 msgstr "Voltar"
 
-#: src/core/installer.c:362
+#: src/core/installer.c:363
 msgid "Update"
 msgstr "Atualizar"
 
-#: src/core/installer.c:368
+#: src/core/installer.c:369
 msgid "FolioOS will be removed from this disk:"
 msgstr "O FolioOS será removido deste disco:"
 
-#: src/core/installer.c:372
+#: src/core/installer.c:373
 #, c-format
 msgid "− FolioOS · FAT32 · %s"
 msgstr "− FolioOS · FAT32 · %s"
 
-#: src/core/installer.c:377 src/core/installer.c:425 src/core/partitions.c:250
+#: src/core/installer.c:378 src/core/installer.c:426 src/core/partitions.c:261
 #, c-format
 msgid "%s%s: %s → %s"
 msgstr "%s%s: %s → %s"
 
-#: src/core/installer.c:383
+#: src/core/installer.c:384
 #, c-format
 msgid "Copy the %d text from this computer to the USB drive first (%s)"
 msgid_plural "Copy the %d texts from this computer to the USB drive first (%s)"
 msgstr[0] "Copiar antes o %d texto deste computador para o pen-drive (%s)"
 msgstr[1] "Copiar antes os %d textos deste computador para o pen-drive (%s)"
 
-#: src/core/installer.c:386
+#: src/core/installer.c:387
 msgid "There are no texts on FolioOS's partition."
 msgstr "Não há textos na partição do FolioOS."
 
-#: src/core/installer.c:387
+#: src/core/installer.c:388
 msgid "The disk will be left empty, with no partitions, ready for another system."
 msgstr "O disco ficará vazio, sem partições, pronto para outro sistema."
 
-#: src/core/installer.c:388
+#: src/core/installer.c:389
 msgid "The start of the disk gets the other system's original boot code back, and the computer starts it directly again."
 msgstr "O início do disco recebe de volta o código de boot original do outro sistema, e o computador volta a iniciá-lo direto."
 
-#: src/core/installer.c:389
+#: src/core/installer.c:390
 msgid "The EFI system partition loses only the folder EFI/FolioOS, and the computer starts the other system directly again."
 msgstr "A partição de sistema EFI perde só a pasta EFI/FolioOS, e o computador volta a iniciar o outro sistema direto."
 
-#: src/core/installer.c:390
+#: src/core/installer.c:391
 msgid "The next time Windows starts, it checks its partition (chkdsk) once; this is expected."
 msgstr "Na próxima vez que o Windows iniciar, ele verifica a partição (chkdsk) uma vez; isso é esperado."
 
-#: src/core/installer.c:393 src/core/installer.c:465 src/core/partitions.c:244
+#: src/core/installer.c:394 src/core/installer.c:466 src/core/partitions.c:255
 msgid "ERASE"
 msgstr "APAGAR"
 
-#: src/core/installer.c:397
+#: src/core/installer.c:398
 #, c-format
 msgid "Your texts on this computer will be lost. To confirm, type %s:"
 msgstr "Seus textos neste computador serão perdidos. Para confirmar, digite %s:"
 
-#: src/core/installer.c:397 src/core/installer.c:405 src/core/installer.c:475 src/core/installer.c:483 src/core/partitions.c:268 src/core/partitions.c:277
+#: src/core/installer.c:398 src/core/installer.c:406 src/core/installer.c:476 src/core/installer.c:484 src/core/partitions.c:279 src/core/partitions.c:288
 #, c-format
 msgid "To confirm, type %s:"
 msgstr "Para confirmar, digite %s:"
 
-#: src/core/installer.c:403
+#: src/core/installer.c:404
 msgid "Remove FolioOS"
 msgstr "Remover o FolioOS"
 
-#: src/core/installer.c:412
+#: src/core/installer.c:413
 msgid "Nothing on this disk will be erased."
 msgstr "Nada neste disco será apagado."
 
-#: src/core/installer.c:428
+#: src/core/installer.c:429
 #, c-format
 msgid "+ FolioOS · FAT32 · %s, in the space this frees"
 msgstr "+ FolioOS · FAT32 · %s, no espaço liberado"
 
-#: src/core/installer.c:430
+#: src/core/installer.c:431
 msgid "Size for FolioOS"
 msgstr "Tamanho para o FolioOS"
 
-#: src/core/installer.c:432 src/core/partitions.c:254
+#: src/core/installer.c:433 src/core/partitions.c:265
 msgid "No file is moved: FolioOS only takes free space from the end of that partition. The next time Windows starts, it checks the partition (chkdsk) once; this is expected."
 msgstr "Nenhum arquivo é movido: o FolioOS só usa espaço livre do fim daquela partição. Na próxima vez que o Windows iniciar, ele verifica a partição (chkdsk) uma vez; isso é esperado."
 
-#: src/core/installer.c:432 src/core/partitions.c:254
+#: src/core/installer.c:433 src/core/partitions.c:265
 msgid "No file is moved: FolioOS only takes free space from the end of that partition."
 msgstr "Nenhum arquivo é movido: o FolioOS só usa espaço livre do fim daquela partição."
 
-#: src/core/installer.c:435
+#: src/core/installer.c:436
 #, c-format
 msgid "+ FolioOS · FAT32 · %s, in the free space"
 msgstr "+ FolioOS · FAT32 · %s, no espaço livre"
 
-#: src/core/installer.c:437
+#: src/core/installer.c:438
 msgid "The start of the disk gets FolioOS's boot code; the other system's original code is kept, and FolioOS starts it. Your texts, fonts and settings are copied from this USB drive to the new partition."
 msgstr "O início do disco recebe o código de boot do FolioOS; o código original do outro sistema fica guardado, e o FolioOS o inicia. Seus textos, fontes e ajustes são copiados deste pen-drive para a nova partição."
 
-#: src/core/installer.c:438
+#: src/core/installer.c:439
 msgid "The EFI system partition only receives the folder EFI/FolioOS. Your texts, fonts and settings are copied from this USB drive to the new partition."
 msgstr "A partição de sistema EFI recebe só a pasta EFI/FolioOS. Seus textos, fontes e ajustes são copiados deste pen-drive para a nova partição."
 
-#: src/core/installer.c:441
+#: src/core/installer.c:442
 #, c-format
 msgid "When the computer starts, FolioOS waits %d second for a key; without one, the other system starts as usual."
 msgid_plural "When the computer starts, FolioOS waits %d seconds for a key; without one, the other system starts as usual."
 msgstr[0] "Ao ligar o computador, o FolioOS espera %d segundo por uma tecla; sem ela, o outro sistema inicia como sempre."
 msgstr[1] "Ao ligar o computador, o FolioOS espera %d segundos por uma tecla; sem ela, o outro sistema inicia como sempre."
 
-#: src/core/installer.c:443
+#: src/core/installer.c:444
 msgid "The wait for a key is set to 0 seconds: the computer starts straight into FolioOS. To start the other system, use the computer's boot menu (or set a wait in Settings › System › Startup)."
 msgstr "A espera por uma tecla está em 0 segundos: o computador inicia direto no FolioOS. Para iniciar o outro sistema, use o menu de boot do computador (ou defina uma espera em Ajustes › Sistema › Inicialização)."
 
-#: src/core/installer.c:451
+#: src/core/installer.c:452
 msgid "This disk has a partition encrypted with BitLocker. FolioOS does not touch it, but after the startup settings change, Windows may ask once for the BitLocker recovery key. Make sure you have it (it is in your Microsoft account at aka.ms/myrecoverykey, or where you saved or printed it) before you continue."
 msgstr "Este disco tem uma partição cifrada com BitLocker. O FolioOS não mexe nela, mas, depois da mudança nas configurações de inicialização, o Windows pode pedir uma vez a chave de recuperação do BitLocker. Confira se você a tem (ela está na sua conta Microsoft em aka.ms/myrecoverykey, ou onde você a salvou ou imprimiu) antes de continuar."
 
-#: src/core/installer.c:452 src/core/installer.c:460
+#: src/core/installer.c:453 src/core/installer.c:461
 msgid "I have the BitLocker recovery key"
 msgstr "Tenho a chave de recuperação do BitLocker"
 
-#: src/core/installer.c:455 src/core/installer.c:485
+#: src/core/installer.c:456 src/core/installer.c:486
 msgid "On this computer"
 msgstr "Neste computador"
 
-#: src/core/installer.c:455 src/core/installer.c:485
+#: src/core/installer.c:456 src/core/installer.c:486
 msgid "On the USB drive"
 msgstr "No pen-drive"
 
-#: src/core/installer.c:455 src/core/installer.c:485
+#: src/core/installer.c:456 src/core/installer.c:486
 msgid "On both"
 msgstr "Nos dois"
 
-#: src/core/installer.c:458
+#: src/core/installer.c:459
 msgid "Shrink and install"
 msgstr "Diminuir e instalar"
 
-#: src/core/installer.c:458
+#: src/core/installer.c:459
 msgid "Install next to it"
 msgstr "Instalar ao lado"
 
-#: src/core/installer.c:467
+#: src/core/installer.c:468
 msgid "Everything on this disk will be erased:"
 msgstr "Tudo o que há neste disco será apagado:"
 
-#: src/core/installer.c:472
+#: src/core/installer.c:473
 msgid "FolioOS gets one partition that fills the disk, with your texts, fonts and settings copied from this USB drive."
 msgstr "O FolioOS recebe uma partição que ocupa o disco inteiro, com seus textos, fontes e ajustes copiados deste pen-drive."
 
-#: src/core/installer.c:481
+#: src/core/installer.c:482
 msgid "Erase and install"
 msgstr "Apagar e instalar"
 
-#: src/core/installer.c:489
+#: src/core/installer.c:490
 msgid "Removing FolioOS… Do not turn off the computer or remove the USB drive."
 msgstr "Removendo o FolioOS… Não desligue o computador nem tire o pen-drive."
 
-#: src/core/installer.c:489
+#: src/core/installer.c:490
 msgid "Updating FolioOS… Do not turn off the computer or remove the USB drive."
 msgstr "Atualizando o FolioOS… Não desligue o computador nem tire o pen-drive."
 
-#: src/core/installer.c:489
+#: src/core/installer.c:490
 msgid "Installing FolioOS… Do not turn off the computer or remove the USB drive."
 msgstr "Instalando o FolioOS… Não desligue o computador nem tire o pen-drive."
 
-#: src/core/installer.c:501
+#: src/core/installer.c:502
 msgid "FolioOS on this disk is up to date."
 msgstr "O FolioOS deste disco está atualizado."
 
-#: src/core/installer.c:502
+#: src/core/installer.c:503
 msgid "Remove the USB drive and restart. Your texts and settings are where they were."
 msgstr "Tire o pen-drive e reinicie. Seus textos e ajustes estão onde estavam."
 
-#: src/core/installer.c:504
+#: src/core/installer.c:505
 msgid "FolioOS was removed from this computer."
 msgstr "O FolioOS foi removido deste computador."
 
-#: src/core/installer.c:505
+#: src/core/installer.c:507
 #, c-format
 msgid "The texts from the computer are on this USB drive, in %s."
 msgstr "Os textos do computador estão neste pen-drive, em %s."
 
-#: src/core/installer.c:506
+#: src/core/installer.c:507
+#, c-format
+msgid "The texts from the computer are on the drive FolioOS started from, in %s."
+msgstr "Os textos do computador estão na unidade de onde o FolioOS iniciou, em %s."
+
+#: src/core/installer.c:508
 msgid "The disk is empty now: install another system on it, or FolioOS again from this USB drive."
 msgstr "O disco agora está vazio: instale outro sistema nele, ou o FolioOS de novo por este pen-drive."
 
-#: src/core/installer.c:506
+#: src/core/installer.c:508
 msgid "Remove the USB drive and restart: the computer starts the other system as before."
 msgstr "Tire o pen-drive e reinicie: o computador inicia o outro sistema como antes."
 
-#: src/core/installer.c:507
+#: src/core/installer.c:509
 msgid "The firmware did not let FolioOS remove its boot entry; if the computer still lists FolioOS at startup, remove it in the firmware settings."
 msgstr "O firmware não deixou o FolioOS remover a entrada de boot dele; se o computador ainda mostrar o FolioOS ao ligar, remova-a nos ajustes do firmware."
 
-#: src/core/installer.c:509
+#: src/core/installer.c:511
 msgid "FolioOS is installed next to the other system."
 msgstr "O FolioOS está instalado ao lado do outro sistema."
 
-#: src/core/installer.c:510
+#: src/core/installer.c:512
 msgid "Remove the USB drive and restart. FolioOS starts first and waits a few seconds for a key; without one, the other system starts as usual."
 msgstr "Tire o pen-drive e reinicie. O FolioOS inicia primeiro e espera alguns segundos por uma tecla; sem ela, o outro sistema inicia como sempre."
 
-#: src/core/installer.c:511
+#: src/core/installer.c:513
+msgid "Remove the USB drive and restart. FolioOS starts directly (the wait for a key is 0 seconds); to be able to start the other system, set a wait of a few seconds in Settings → System."
+msgstr "Tire o pen-drive e reinicie. O FolioOS inicia direto (a espera por uma tecla é de 0 segundos); para poder iniciar o outro sistema, defina uma espera de alguns segundos em Ajustes → Sistema."
+
+#: src/core/installer.c:514
 msgid "Remove the USB drive and restart. FolioOS starts directly (the wait for a key is 0 seconds); to start the other system, use the computer's boot menu."
 msgstr "Tire o pen-drive e reinicie. O FolioOS inicia direto (a espera por uma tecla está em 0 segundos); para iniciar o outro sistema, use o menu de boot do computador."
 
-#: src/core/installer.c:513
+#: src/core/installer.c:516
 msgid "FolioOS is installed on this computer."
 msgstr "O FolioOS está instalado neste computador."
 
-#: src/core/installer.c:514
+#: src/core/installer.c:517
 msgid "Remove the USB drive and restart. From now on the computer starts straight into FolioOS; your texts are in DOCUMENTS on the disk."
 msgstr "Tire o pen-drive e reinicie. De agora em diante o computador inicia direto no FolioOS; seus textos ficam em DOCUMENTS no disco."
 
-#: src/core/installer.c:516
+#: src/core/installer.c:519
 msgid "The firmware did not accept a new boot entry: choose FolioOS in the computer's boot menu (often F12, F8 or Esc right after power-on)."
 msgstr "O firmware não aceitou uma nova entrada de boot: escolha o FolioOS no menu de boot do computador (geralmente F12, F8 ou Esc logo ao ligar)."
 
-#: src/core/installer.c:517 src/core/installer.c:526
+#: src/core/installer.c:520 src/core/installer.c:529
 #, c-format
 msgid "The previous start of the disk is saved in %s."
 msgstr "O início anterior do disco está salvo em %s."
 
-#: src/core/installer.c:518 src/core/installer.c:528
+#: src/core/installer.c:521 src/core/installer.c:531
 msgid "Close"
 msgstr "Fechar"
 
-#: src/core/installer.c:523
+#: src/core/installer.c:526
 msgid "The removal did not finish."
 msgstr "A remoção não terminou."
 
-#: src/core/installer.c:523
+#: src/core/installer.c:526
 msgid "The update did not finish. Some files on the disk may already be the new ones: start the update again from this USB drive to finish it."
 msgstr "A atualização não terminou. Alguns arquivos no disco podem já ser os novos: comece a atualização de novo por este pen-drive para terminá-la."
 
-#: src/core/installer.c:523
+#: src/core/installer.c:526
 msgid "The installation did not finish."
 msgstr "A instalação não terminou."
 
-#: src/core/installer.c:527
+#: src/core/installer.c:530
 msgid "Your texts on this USB drive were not touched. You can try again, or keep using FolioOS from the USB drive."
 msgstr "Seus textos neste pen-drive não foram tocados. Você pode tentar de novo ou continuar usando o FolioOS pelo pen-drive."
 
-#: src/core/installer.c:529
+#: src/core/installer.c:532
 msgid "Try again"
 msgstr "Tentar de novo"
 
@@ -2677,61 +2686,65 @@ msgid_plural "%d tracks · %s"
 msgstr[0] "%d faixa · %s"
 msgstr[1] "%d faixas · %s"
 
-#: src/core/partitions.c:121
+#: src/core/partitions.c:124
 msgid "Done. The previous start of the disk is saved on this USB drive."
 msgstr "Pronto. O início anterior do disco está salvo neste pen-drive."
 
-#: src/core/partitions.c:150
+#: src/core/partitions.c:153
 #, c-format
 msgid "Free space · %s"
 msgstr "Espaço livre · %s"
 
-#: src/core/partitions.c:180
+#: src/core/partitions.c:183
 msgid "Working… Do not turn off the computer or remove the USB drive."
 msgstr "Trabalhando… Não desligue o computador nem tire o pen-drive."
 
-#: src/core/partitions.c:183
+#: src/core/partitions.c:186
 msgid "Choose a partition or a free space, then an action. Before anything is written, the start of the disk is saved to FOLIO/BACKUP on this USB drive."
 msgstr "Escolha uma partição ou um espaço livre e depois uma ação. Antes de qualquer gravação, o início do disco é salvo em FOLIO/BACKUP neste pen-drive."
 
-#: src/core/partitions.c:218
+#: src/core/partitions.c:221
 msgid "Create a FAT32 partition"
 msgstr "Criar uma partição FAT32"
 
-#: src/core/partitions.c:224
+#: src/core/partitions.c:230
+msgid "Finish resizing"
+msgstr "Terminar de redimensionar"
+
+#: src/core/partitions.c:235
 msgid "Resize"
 msgstr "Redimensionar"
 
-#: src/core/partitions.c:230
+#: src/core/partitions.c:241
 msgid "Format as FAT32"
 msgstr "Formatar como FAT32"
 
-#: src/core/partitions.c:249
+#: src/core/partitions.c:260
 #, c-format
 msgid "+ FAT32 · %s, in this free space"
 msgstr "+ FAT32 · %s, neste espaço livre"
 
-#: src/core/partitions.c:261
+#: src/core/partitions.c:272
 msgid "Name of the new volume:"
 msgstr "Nome do volume novo:"
 
-#: src/core/partitions.c:265
+#: src/core/partitions.c:276
 msgid "Everything on this partition will be erased; it becomes an empty FAT32 volume."
 msgstr "Tudo nesta partição será apagado; ela vira um volume FAT32 vazio."
 
-#: src/core/partitions.c:266
+#: src/core/partitions.c:277
 msgid "This partition and everything on it will be erased; its space becomes free."
 msgstr "Esta partição e tudo nela serão apagados; o espaço dela fica livre."
 
-#: src/core/partitions.c:274
+#: src/core/partitions.c:285
 msgid "Create"
 msgstr "Criar"
 
-#: src/core/partitions.c:274
+#: src/core/partitions.c:285
 msgid "Apply"
 msgstr "Aplicar"
 
-#: src/core/partitions.c:274
+#: src/core/partitions.c:285
 msgid "Format"
 msgstr "Formatar"
 
@@ -2887,42 +2900,23 @@ msgstr "Teclado: %s (Tab anda, Esc fecha)"
 msgid "Keyboard: text"
 msgstr "Teclado: texto"
 
-#: src/core/ui.c:229
+#: src/core/ui.c:235
 msgid "No window open"
 msgstr "Nenhuma janela aberta"
 
-#: src/core/ui.c:230
+#: src/core/ui.c:236
 msgid "This window cannot be resized"
 msgstr "Esta janela não pode ser redimensionada"
 
-#: src/core/ui.c:233
+#: src/core/ui.c:239
 msgid "Move the window with the arrows · Enter confirms · Esc cancels"
 msgstr "Mova a janela com as setas · Enter confirma · Esc cancela"
 
-#: src/core/ui.c:234
+#: src/core/ui.c:240
 msgid "Resize the window with the arrows · Enter confirms · Esc cancels"
 msgstr "Redimensione a janela com as setas · Enter confirma · Esc cancela"
 
-#: src/core/ui.c:283
+#: src/core/ui.c:289
 msgid "Close (Esc)"
 msgstr "Fechar (Esc)"
-
-#, c-format
-#~ msgid " %d left as it is (open in another tab, or changed on both sides at the same minute)."
-#~ msgid_plural " %d left as they are (open in another tab, or changed on both sides at the same minute)."
-#~ msgstr[0] " %d ficou como estava (aberto em outra aba, ou mudado dos dois lados no mesmo minuto)."
-#~ msgstr[1] " %d ficaram como estavam (abertos em outra aba, ou mudados dos dois lados no mesmo minuto)."
-
-#~ msgid "This partition holds LVM volumes. To make room, shrink them from Linux (lvreduce, then pvresize)."
-#~ msgstr "Esta partição contém volumes LVM. Para abrir espaço, diminua-os pelo Linux (lvreduce, depois pvresize)."
-
-#~ msgid "Each file is replaced only after the new copy has been checked, so a power cut never leaves FolioOS half updated."
-#~ msgstr "Cada arquivo só é trocado depois que a cópia nova foi conferida, então uma queda de energia nunca deixa o FolioOS atualizado pela metade."
-
-#, c-format
-#~ msgid "Before anything is written, the start of the disk (partition table and boot sectors) is saved to %s on this USB drive."
-#~ msgstr "Antes de qualquer gravação, o início do disco (tabela de partições e setores de boot) é salvo em %s neste pen-drive."
-
-#~ msgid "The update did not finish. FolioOS on the disk still works: every file is either the old or the new one."
-#~ msgstr "A atualização não terminou. O FolioOS do disco continua funcionando: cada arquivo é o antigo ou o novo."
 

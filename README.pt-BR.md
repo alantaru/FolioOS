@@ -347,11 +347,17 @@ iniciar direto na sua escrita. Abra **Ctrl+K › Instalar o FolioOS neste comput
   `chkdsk`, BitLocker sem a chave de recuperação, LUKS, LVM, volumes da Apple) e explica o que fazer.
   ext4 nunca é redimensionado: abra espaço pelo próprio Linux (GParted) e abra o instalador de novo.
 - Antes de gravar qualquer coisa, a tabela de partições (os primeiros e os últimos setores do disco)
-  é salva em `FOLIO/BACKUP` no pen-drive. Seus textos podem ficar no computador, no pen-drive ou nos dois.
-- **Atualize** por um pen-drive mais novo, ou **desinstale**: seus textos são copiados antes para o
-  pen-drive, e a outra partição cresce de volta ao tamanho que tinha.
+  é salva em `FOLIO/BACKUP` na unidade de onde o FolioOS iniciou, normalmente o pen-drive. Seus textos podem
+  ficar no computador, no pen-drive ou nos dois.
+- **Atualize** por um pen-drive mais novo: só os arquivos do próprio FolioOS são trocados; seus textos e as
+  partições ficam como estão.
+- **Desinstale**: antes, você pode ter seus textos copiados para a unidade de onde o FolioOS iniciou. Se o
+  instalador encolheu uma partição para abrir espaço, ela cresce de volta ao tamanho que tinha; senão, o
+  espaço fica livre.
 - *Ajustes › Sistema › Discos e partições* é um pequeno gerenciador de partições: criar uma partição FAT32,
   formatar, encolher ou aumentar NTFS/FAT32/exFAT, apagar.
+- A 4.4 beta é uma pré-versão: baixe-a pela
+  [página da versão](https://github.com/alantaru/FolioOS/releases/tag/v4.4.1-beta), não pela "latest".
 
 Funciona em PCs com UEFI e em PCs só com BIOS. **É uma beta:** passa em todos os testes em máquinas
 emuladas, com discos feitos pelo Windows e pelo Linux, mas ainda não rodou em hardware real: faça um
@@ -400,8 +406,8 @@ ajuda outros escritores a escolher um notebook.
 
 Não. Rodando do pen-drive, o FolioOS nunca grava no disco interno, e instalá-lo no pen-drive só acrescenta
 arquivos: o que já estava lá continua. Tire o pen-drive e o PC volta a iniciar o sistema de sempre.
-O disco só é tocado se você mesmo abrir o instalador, e mesmo assim nada é gravado antes de você
-confirmar e de a tabela de partições ser salva no pen-drive.
+O disco só é tocado se você mesmo abrir o instalador ou *Discos e partições*, e mesmo assim nada é gravado
+antes de você confirmar e de a tabela de partições ser salva na unidade de onde o FolioOS iniciou.
 </details>
 
 <details>
@@ -409,7 +415,7 @@ confirmar e de a tabela de partições ser salva no pen-drive.
 
 Sim, desde a 4.4 (beta): **Ctrl+K › Instalar o FolioOS neste computador**. Ele usa o espaço livre ou
 encolhe uma partição NTFS, FAT32 ou exFAT sem mover dados, e a cada início você escolhe o FolioOS ou o
-outro sistema. Desinstalar devolve o espaço. Veja [Instale no computador](#15-install-it-on-the-computer-beta).
+outro sistema. Desinstalar faz crescer de volta a partição que o instalador encolheu (senão, o espaço fica livre). Veja [Instale no computador](#15-install-it-on-the-computer-beta).
 </details>
 
 <details>

@@ -210,6 +210,7 @@ void installer_poll(void) {
     BlkDev b; InstallSrc s; InstallOpts o;
     memset(&s, 0, sizeof s); memset(&o, 0, sizeof o);
     backup_name[0] = 0; entry_ok = false;            /* antes de qualquer saída: nada velho na tela de erro */
+    { paths_ensure(app_boot_vol(), DIR_FOLIO); char bd[200]; fmt(bd, sizeof bd, "%s/BACKUP", paths_dir(DIR_FOLIO)); pal_mkdir(app_boot_vol(), bd); }   /* o motor lista essa pasta antes da cópia de segurança */
     int d = opt[sel].d;
     if (!disk_dev(dk[d], &b)) { res.code = INST_ERR_WRITE; str_copy(res.path, "", sizeof res.path); st = ST_FAIL; running = false; return; }
     DateTime t; pal_now(&t);
@@ -305,7 +306,7 @@ static void installer_body(Window *w, Rect r) {
             int d = opt[i].d; bool al = opt[i].mode != MODE_WHOLE;
             float hgt = S(64) + S(19) * (float)n_on[d] + (why[d][0] ? S(20) : 0);
             Rect it = rect(x, (int)y, wd, (int)hgt);
-            bool fire = ui_item(it), on = i == sel;
+            bool fire = ui_item_in(it, area), on = i == sel;   /* clique só na parte visível do cartão */
             if (on) gfx_rrect(it, S(10), col_alpha(T->accent, 0.14f));
             else if (ui_hover(it)) gfx_rrect(it, S(10), col_alpha(T->text, 0.06f));
             gfx_rrect_line(it, S(10), on ? S(2) : S(1), on ? T->accent : col_alpha(T->border, 0.9f));
@@ -502,12 +503,14 @@ static void installer_body(Window *w, Rect r) {
             y = wrap(f, S(14), x, y, wd, L("Remove the USB drive and restart. Your texts and settings are where they were."), T->panel_text);
         } else         if (removing) {
             y = wrap(fb, S(16), x + S(44), y + S(18), wd - S(44), L("FolioOS was removed from this computer."), T->panel_text) + S(10);
-            if (copy_texts && found[opt[sel].d].docs_files) { fmt(line, sizeof line, L("The texts from the computer are on this USB drive, in %s."), res.path); y = wrap(f, S(14), x, y, wd, line, T->panel_text) + S(4); }
+            if (copy_texts && found[opt[sel].d].docs_files) { VolInfo bv; bool usb = pal_vol_info(app_boot_vol(), &bv) && bv.removable;
+                fmt(line, sizeof line, usb ? L("The texts from the computer are on this USB drive, in %s.") : L("The texts from the computer are on the drive FolioOS started from, in %s."), res.path); y = wrap(f, S(14), x, y, wd, line, T->panel_text) + S(4); }
             y = wrap(f, S(14), x, y, wd, found[opt[sel].d].kind == FOUND_WHOLE ? L("The disk is empty now: install another system on it, or FolioOS again from this USB drive.") : L("Remove the USB drive and restart: the computer starts the other system as before."), T->panel_text);
             if (!entry_ok) y = wrap(fb, S(13.5f), x, y + S(8), wd, L("The firmware did not let FolioOS remove its boot entry; if the computer still lists FolioOS at startup, remove it in the firmware settings."), 0xFFC0392B);
         } else if (along) {
             y = wrap(fb, S(16), x + S(44), y + S(18), wd - S(44), L("FolioOS is installed next to the other system."), T->panel_text) + S(10);
             y = wrap(f, S(14), x, y, wd, prefs.boot_wait > 0 ? L("Remove the USB drive and restart. FolioOS starts first and waits a few seconds for a key; without one, the other system starts as usual.")
+                                                         : is_bios() ? L("Remove the USB drive and restart. FolioOS starts directly (the wait for a key is 0 seconds); to be able to start the other system, set a wait of a few seconds in Settings → System.")
                                                          : L("Remove the USB drive and restart. FolioOS starts directly (the wait for a key is 0 seconds); to start the other system, use the computer's boot menu."), T->panel_text);
         } else {
             y = wrap(fb, S(16), x + S(44), y + S(18), wd - S(44), L("FolioOS is installed on this computer."), T->panel_text) + S(10);

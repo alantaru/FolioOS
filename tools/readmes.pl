@@ -108,7 +108,7 @@ sub write_po {
     for my $id (sort keys %$tr) {       # blocos que mudaram no inglês: ficam como referência
         next if $seen{$id} || $tr->{$id} eq '';
         my $e = po_str('msgid', $id) . po_str('msgstr', $tr->{$id});
-        $e =~ s/^/#~ /mg; $o .= "$e\n";
+        $e =~ s/^/#~ /mg; $o .= ($fz->{$id} ? "#, fuzzy\n" : "") . "$e\n";   # a marca "fuzzy" vai junto: se o bloco voltar, volta como não revisado
     }
     spit($f, $o);
 }

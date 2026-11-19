@@ -295,6 +295,7 @@ int main(int argc, char **argv) {
     SetConsoleOutputCP(CP_UTF8);
     if (argc < 4) { fprintf(stderr, "uso: install_test <origem> <imagem> <MB> [--bios] [--docs-stick] [--windows] [--alongside]\n"); return 2; }
     GetFullPathNameA(argv[1], MAX_PATH, root, 0);
+    { char bk[MAX_PATH + 32]; snprintf(bk, sizeof bk, "%s\\FOLIO", root); CreateDirectoryA(bk, 0); strcat(bk, "\\BACKUP"); CreateDirectoryA(bk, 0); }   /* o motor lista FOLIO/BACKUP antes da cópia de segurança */
     char *mend; u64 mb = strtoull(argv[3], &mend, 10);
     if (!argv[3][0] || *mend || !mb || mb > (16ull << 20)) { fprintf(stderr, "tamanho inválido: \"%s\" (MB)\n", argv[3]); return 2; }
     InstallOpts o = { 0 }; o.label = "FOLIO"; o.efi_name = "BOOTX64.EFI"; o.version = "test";
@@ -339,8 +340,11 @@ int main(int argc, char **argv) {
             id[n] = 0; int o = 0;
             for (char *line = id; *line; ) {               /* troca só a linha version= */
                 char *e = line; while (*e && *e != '\n') e++;
-                if (!strncmp(line, "version=", 8)) o += snprintf(out + o, sizeof out - o, "version=%s\r\n", argv[i + 1]);
-                else { memcpy(out + o, line, (size_t)(e - line) + (*e ? 1 : 0)); o += (int)(e - line) + (*e ? 1 : 0); }
+                int add = !strncmp(line, "version=", 8) ? snprintf(0, 0, "version=%s\r\n", argv[i + 1]) : (int)(e - line) + (*e ? 1 : 0);
+                if (add < 0 || (size_t)o + (size_t)add >= sizeof out) { fprintf(stderr, "FALHA: INSTALLED.ID novo grande demais\n"); return 1; }
+                if (!strncmp(line, "version=", 8)) snprintf(out + o, sizeof out - o, "version=%s\r\n", argv[i + 1]);
+                else memcpy(out + o, line, (size_t)add);
+                o += add;
                 line = *e ? e + 1 : e;
             }
             if (fat_truncate(&sv, &idn, 0) != FAT_OK || fat_write(&sv, &idn, 0, out, (u32)o) != o || fat_flush(&sv) != FAT_OK) { fprintf(stderr, "FALHA: gravar INSTALLED.ID\n"); return 1; }

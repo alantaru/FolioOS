@@ -20,6 +20,7 @@ static u64 data_off, root_off;
 
 static void die(const char *m) { fprintf(stderr, "fatcat: %s\n", m); exit(2); }
 static void rd(u64 off, void *b, size_t n) { if (_fseeki64(img, (long long)off, SEEK_SET) || fread(b, 1, n, img) != n) die("falha de leitura"); }
+static int rd_try(u64 off, void *b, size_t n) { return !_fseeki64(img, (long long)off, SEEK_SET) && fread(b, 1, n, img) == n; }   /* sem morrer: a outra cópia ainda pode servir */
 static u16 le16(const u8 *p) { return (u16)(p[0] | p[1] << 8); }
 static u32 le32(const u8 *p) { return (u32)p[0] | (u32)p[1] << 8 | (u32)p[2] << 16 | (u32)p[3] << 24; }
 
@@ -30,7 +31,7 @@ static u32 crc32(const u8 *p, size_t n) {
 }
 /* um cabeçalho GPT válido em hdr_lba (com os dois CRCs certos): *elba, *num, *esz; senão false */
 static int gpt_at(u64 hdr_lba, u64 *elba, u32 *num, u32 *esz) {
-    u8 h[512]; rd(hdr_lba * 512, h, 512);
+    u8 h[512]; if (!rd_try(hdr_lba * 512, h, 512)) return 0;
     if (memcmp(h, "EFI PART", 8)) return 0;
     u32 hs = le32(h + 12); if (hs < 92 || hs > 512) return 0;
     u32 hc = le32(h + 16); h[16] = h[17] = h[18] = h[19] = 0;
@@ -38,7 +39,7 @@ static int gpt_at(u64 hdr_lba, u64 *elba, u32 *num, u32 *esz) {
     *elba = le32(h + 72) | (u64)le32(h + 76) << 32; *num = le32(h + 80); *esz = le32(h + 84);
     if (*esz < 128 || *esz > 4096 || !*num || (u64)*num * *esz > (4u << 20)) return 0;
     u8 *ents = malloc((size_t)*num * *esz); if (!ents) die("sem memória");
-    rd(*elba * 512, ents, (size_t)*num * *esz);
+    if (!rd_try(*elba * 512, ents, (size_t)*num * *esz)) { free(ents); return 0; }
     int ok = crc32(ents, (size_t)*num * *esz) == le32(h + 88);
     free(ents);
     return ok;

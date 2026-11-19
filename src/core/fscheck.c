@@ -219,7 +219,7 @@ static u8 *vol_flags(u8 *rec, u32 rlen) {
     u8 *vi = (u8 *)attr_find(rec, rlen, 0x70, true);
     if (!vi || vi[8]) return 0;
     u32 al = rd32(vi + 4), vl = rd32(vi + 0x10), vo = rd16(vi + 0x14);
-    if (al < 0x18 || vl < 12 || vo < 0x18 || vo + vl > al) return 0;
+    if (al < 0x18 || vl < 12 || vo < 0x18 || vo > al || vl > al - vo) return 0;   /* sem somar: nada de estouro de u32 */
     return vi + vo + 0x0A;
 }
 
@@ -287,7 +287,10 @@ bool ntfs_last_used(Ntfs *n, u64 *lcn) {
 static int log_page(Ntfs *n, const u8 *a, u64 off, u8 *pg, u32 cap, u64 *lsn, bool *clean) {
     /* 1 = página válida (lsn, clean), 0 = não há página aqui (outra assinatura), -1 = ilegível/estragada */
     if (!nonres_read(n, a, off, pg, 4096)) return -1;
-    if (memcmp(pg, "RSTR", 4)) return memcmp(pg, "RCRD", 4) && memcmp(pg, "CHKD", 4) ? 0 : -1;
+    if (memcmp(pg, "RSTR", 4)) {                                 /* sem "RSTR": só uma página nunca usada (toda zero) é "não há" */
+        for (u32 i = 0; i < 4096; i++) if (pg[i]) return -1;       /* qualquer outra coisa (estragada, RCRD, CHKD…): na dúvida, não */
+        return 0;
+    }
     u32 ps = rd32(pg + 0x10);                                    /* tamanho da página do sistema */
     if (ps < 512 || ps > cap || ps % n->bps || (ps & (ps - 1))) return -1;
     if (ps > 4096 && !nonres_read(n, a, off, pg, ps)) return -1;
@@ -738,7 +741,16 @@ int exfat_resize(const BlkDev *d, u64 lba, u64 part_sectors, u64 new_sectors) {
     u64 nc64 = (new_sectors - g.heap) / g.spc;
     if (nc64 < 1 || nc64 > ex_cap(&g) || nc64 > 0xFFFFFFF5ull) return NTFS_SHRINK_TOO_SMALL;
     u32 nc = (u32)nc64;
-    if (nc == g.nclus) return NTFS_SHRINK_BAD_SIZE;
+    if (nc == g.nclus) {
+        /* o volume já tem esse tamanho; um encolhimento interrompido pode ter deixado só o tamanho do bitmap para trás:
+         * termina esse passo (e só esse); sem nada a fazer, continua sendo "mesmo tamanho" */
+        if (g.bm_len != (nc + 7) / 8) {
+            int rc = ex_set_bm_len(d, &g, nc, s); if (rc) return rc;
+            if (d->flush && !d->flush(d->ctx)) return NTFS_SHRINK_WRITE;
+            return NTFS_SHRINK_OK;
+        }
+        return NTFS_SHRINK_BAD_SIZE;
+    }
     u64 bm_at = lba + g.heap + (u64)(g.bm_clus - 2) * g.spc;
     if (nc < g.nclus) {
         u32 last; if (!ex_last_used(d, lba, &g, &last)) return NTFS_SHRINK_UNREADABLE;
@@ -881,7 +893,7 @@ const char *fs_safety_text(int v) {
     case SAFE_OK: return "";
     case SAFE_BITLOCKER: return N_("This partition is encrypted with BitLocker. To make room, shrink it in Windows (Disk Management, Shrink Volume) or turn BitLocker off first.");
     case SAFE_LUKS: return N_("This partition is encrypted (LUKS). To make room, shrink it from Linux with the encryption tools.");
-    case SAFE_LVM: return N_("This partition holds LVM volumes. To make room, free space from Linux: shrink the file system first, then its logical volume (lvreduce --resizefs), then the physical volume (pvresize).");
+    case SAFE_LVM: return N_("This partition holds LVM volumes. To make room, shrink it from Linux, in this order: the file system and its logical volume (lvreduce --resizefs), the physical volume (pvresize), then the partition itself (parted or GParted). Then open the installer again.");
     case SAFE_APPLE: return N_("This is a Mac partition (APFS or HFS+). To make room, use Disk Utility on the Mac.");
     case SAFE_HIBERNATED: return N_("Windows is hibernated or uses Fast Startup. Start Windows, then shut it down while holding Shift (or turn Fast Startup off in Power Options), and try again.");
     case SAFE_DIRTY: return N_("Windows marked this partition as needing a check. Start Windows, run chkdsk /f on it, and try again.");

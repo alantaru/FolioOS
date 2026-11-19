@@ -28,5 +28,6 @@ in the release notes unless you prefer to stay anonymous.
   (`..` and absolute paths are rejected).
 - Disks are only written after the user confirms in the installer or the partition manager, and
   only after the first sectors are backed up to the USB drive. Partition tables that cannot be read
-  or written back exactly, and volumes that cannot be fully verified (encrypted, hibernated, dirty,
-  non-mirrored FAT32, scattered exFAT bitmap), are left untouched.
+  or written back exactly are never changed, and volumes that cannot be fully verified (encrypted,
+  hibernated, dirty, non-mirrored FAT32, scattered exFAT bitmap) are never resized. Formatting or
+  deleting a partition in the partition manager erases it whatever its state, after a typed confirmation.

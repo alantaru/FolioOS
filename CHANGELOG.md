@@ -18,6 +18,8 @@ All notable changes to this project are documented here. The format follows
 - If the other system's boot entry failed to load, every unattended start tried it again. A failed
   attempt (FolioOS back in the very boot the entry was tried, by the firmware's boot counter) is no longer repeated automatically.
 - Retrying a boot-entry registration no longer creates a duplicate entry.
+- If the attempt record cannot be saved, FolioOS does not ask the firmware to start the other system
+  automatically (it stays in FolioOS) instead of risking a loop.
 - Disk writes are tied to the medium that was listed: if it changes (another stick in the same slot),
   nothing is read or written until the disks are scanned again. Buffers respect the firmware's I/O
   alignment. BIOS disks with sectors other than 512 bytes are no longer offered.
@@ -25,21 +27,24 @@ All notable changes to this project are documented here. The format follows
 
 ### Fixed — disks and file systems
 - NTFS: both `$LogFile` restart pages are read and the newest one decides; version 2.0 pages (Windows
-  8+ with a pending journal) are refused. A damaged `$Volume` attribute can no longer make FolioOS
+  8+ with a pending journal) are refused. A restart page that is neither valid nor blank counts as
+  "not clean". A damaged `$Volume` attribute (also one whose size would wrap around) can no longer make FolioOS
   read or write outside its record. The resize direction comes from the volume's own size.
 - A failed flush is now an error in every resize, install, update, uninstall and partition-manager path
   (it used to report success).
 - GPT: entries can no longer overlap the GPT itself; when only the backup GPT was valid, the primary
   is rewritten first; the backup reaches the disk before the primary is touched.
 - exFAT: a shrink never frees the bitmap's own clusters (so the volume can always grow back), and the
-  order of the writes keeps the bitmap at least as large as the volume after an interruption.
+  order of the writes keeps the bitmap at least as large as the volume after an interruption. A retry
+  finishes a shrink interrupted before the bitmap's size was updated.
 - FAT32: the free-cluster count is marked "unknown" instead of being adjusted, so a retried resize
   cannot apply the change twice.
 - Deleting a partition shorter than 32 sectors no longer zeroes the start of the next one.
 - Installing next to another system checks that the new partition fits in the table (MBR with four
   primaries) before shrinking anything.
 - Uninstalling only grows back a partition the installer itself shrank (recorded at install time); a
-  free-space install leaves the neighbour exactly as it was. `\EFI\FolioOS\FOLIO.ID` is removed only
+  free-space install leaves the neighbour exactly as it was. Updating keeps that record, so an
+  updated installation still gives the space back. `\EFI\FolioOS\FOLIO.ID` is removed only
   after the table changed, so an interrupted uninstall can be run again.
 - The texts are copied before uninstalling also from the old `TEXTOS` folder, are always listed again,
   and any read error, long path or failed copy stops the uninstall before anything is deleted.
@@ -48,32 +53,42 @@ All notable changes to this project are documented here. The format follows
   must contain the right boot program, not empty.
 - Update and uninstall check that the disk still holds the installation shown on the screen.
 - A retry after an interrupted grow (the table larger than the volume) finishes growing the volume, in
-  the engine and in *Disks and partitions*.
-- The safety copy in `FOLIO/BACKUP` never overwrites an earlier one.
+  the engine and in *Disks and partitions* (a *Finish resizing* button). A retry after a shrink
+  whose table update failed only writes the table.
+- The safety copy in `FOLIO/BACKUP` never overwrites an earlier one, and if the folder cannot be
+  listed nothing is written. A directory read error is no longer taken for a missing `CONFIG.INI`.
 
 ### Fixed — your texts
 - Exchanging texts with the USB drive skips a text with unsaved changes, never replaces a file whose
-  previous version could not be saved first, and reports texts it could not copy.
+  previous version could not be saved first (nor one whose existence could not be checked), and reports
+  the texts it could not copy (before the ones it skipped, so the warning is never cut off).
 - Versions of documents with the same name in different folders no longer overwrite each other in
-  `FOLIO/VERSIONS`, nor do two versions saved in the same minute.
+  `FOLIO/VERSIONS`, nor do two versions saved in the same minute. Pruning old versions never removes the
+  one just saved.
 - Tabs, recent documents and the last document reopen only from the volume they came from (by its
-  identity), never from another volume that took the same number.
+  identity), never from another volume that took the same number. A drive without a GPT partition ID
+  (label and size only) is matched only at its recorded number; recent documents keep their place.
 - With `docs_place=usb`, only a removable drive is taken for the USB drive.
 
 ### Fixed — screens
 - The installer's options and the partition list scroll, so every option and partition can be seen and
-  reached; the "Do not turn off" warning appears before the partition manager starts writing.
+  reached; the "Do not turn off" warning appears before the partition manager starts writing. A click
+  on a button never selects a card hidden under it.
 - Texts that promised more than the code does (a fully atomic update, a backup of every boot sector,
   zero-second wait) now say what really happens; messages are no longer cut off (long translations).
 - The installer's shrink offer follows the same EFI partition rule as the engine; no false
   "firmware did not accept a boot entry" warning after a BIOS install; partition sizes use the disk's
-  sector size; the LVM hint gives the safe order (file system first).
+  sector size; the LVM hint gives the whole safe order, partition included. On a BIOS PC, the 0-second
+  wait text says how to reach the other system.
 
 ### Changed
 - Documentation brought up to date with 4.4: the READMEs in all 15 languages (installer, keep
   proportions, 20 lab runs, platform badge with ARM64 and BIOS), the guides on the USB drive
   (`README.txt`, `LEIA-ME.txt`, `INSTALL.txt`, `COMO-INSTALAR.txt`), `ARCHITECTURE.md`,
-  `ROADMAP.md`, `CONTRIBUTING.md`, `SECURITY.md` and the issue and pull request templates.
+  `ROADMAP.md`, `CONTRIBUTING.md`, `SECURITY.md` and the issue and pull request templates. They
+  now say that the partition manager writes to disks too, that copying the texts on uninstall is
+  optional, that only a partition the installer shrank grows back, where the safety copy goes when
+  FolioOS started from a disk, and where to download the beta.
 - Tests and tools are stricter: refusals are checked on the whole disk, file inventories fail on any
   missing, extra or unreadable file, read errors fail comparisons, test tools are built without
   clang/nasm, the build uses a work folder of its own, the lab counts video failures and stops its
@@ -83,7 +98,12 @@ All notable changes to this project are documented here. The format follows
 - `COMO-INSTALAR.txt` and `ROADMAP.md` had paths garbled by lost backslashes, and
   `COMO-INSTALAR.txt` lacked the BIOS step. The guides said FolioOS takes 7 MB; it takes about 60 MB.
 - `tools/readmes.pl` dropped the previous translation of a changed README block on its second
-  run; it now keeps it as a `#~` entry, as `TRANSLATING.md` describes.
+  run; it now keeps it as a `#~` entry, as `TRANSLATING.md` describes. A fuzzy translation stays fuzzy when
+  it is archived and restored.
+- `tools/linux-run.ps1` reported the exit code of an `echo` instead of the script's; `fatcat` reaches the
+  backup GPT when the primary entries cannot be read; the file inventory keeps non-ASCII names apart;
+  `fscheck_test` resize retries finish the table update; `--set-version` checks its buffer.
+- `qemu-lab.ps1 -List` also lists the three dual-boot scenarios.
 
 ## [4.4.0-beta] — 2026-11-18
 

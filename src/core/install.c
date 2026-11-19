@@ -119,7 +119,8 @@ static bool save_disk_start(const BlkDev *dev, const InstallSrc *src, InstallRes
         if (k > 1) { char num[24]; u64_str((u64)k, num); scat(name, "-", sizeof name); scat(name, num, sizeof name); }
         scat(name, ".bin", sizeof name);
         bk_want = name; bk_seen = false;
-        if (src->list) src->list(src->ctx, "FOLIO/BACKUP", bk_entry, 0);
+        /* quem chama garante que a pasta existe: uma lista que falha não é "vazia", e sem saber o que há lá nada é gravado */
+        if (src->list && !src->list(src->ctx, "FOLIO/BACKUP", bk_entry, 0)) { set_err(r, INST_ERR_BACKUP, "FOLIO/BACKUP"); return false; }
         if (!bk_seen) break;
         if (k >= 999) { set_err(r, INST_ERR_BACKUP, name); return false; }
     }
@@ -517,8 +518,9 @@ static void from_w(const u16 *w, char *o, int cap) {
 static Fat fd;                                    /* a partição de dados do FolioOS instalado */
 /* lê um arquivo inteiro de um volume FAT32 pelo caminho ("EFI/FolioOS/FOLIO.ID"); -1 = não existe ou não coube */
 static int fat_get(Fat *v, const char *path, u8 *buf, u32 cap) {
+    v->io_err = false;
     bool ok; FatNode dir = dir_for(v, path, &ok), nf; u16 w[128]; to_w(base_name(path), w, 128);
-    if (!ok || fat_lookup(v, &dir, w, &nf) != FAT_OK) return -1;                 /* não existe */
+    if (!ok || fat_lookup(v, &dir, w, &nf) != FAT_OK) return v->io_err ? -2 : -1; /* não existe (ou não deu para ler a pasta) */
     if (nf.size > cap) return -2;                                                 /* existe, mas não cabe */
     int got = fat_read(v, &nf, 0, buf, nf.size);
     return got == (int)nf.size ? got : -2;                                         /* existe, mas não deu para ler inteiro */
@@ -759,7 +761,22 @@ void install_update(const BlkDev *dev, const InstallSrc *src, const InstallOpts 
     /* 3. a versão nova no FOLIO/INSTALLED.ID */
     prog(97, "FOLIO/INSTALLED.ID");
     if (!fat_mount(&f, dio, 0, fo->part_start)) { set_err(r, INST_ERR_VERIFY, "mount"); return; }   /* o marcador da versão nova tem de ser gravado */
-    if (!write_marker(r, fo->kind == FOUND_WHOLE ? "whole" : "alongside")) return;
+    {   /* o registro da partição que a instalação encolheu ("shrunk=", antes "ntfs=") continua: sem ele a desinstalação
+         * não devolveria o espaço */
+        static u8 old[512]; int n = fat_get(&f, "FOLIO/INSTALLED.ID", old, sizeof old - 1);
+        if (n < -1) { set_err(r, INST_ERR_READ, "FOLIO/INSTALLED.ID"); return; }
+        shrunk_start = shrunk_count = 0;
+        for (int i = 0; n > 0 && i + 5 < n; i++) {
+            int kl = !memcmp(old + i, "shrunk=", 7) ? 7 : !memcmp(old + i, "ntfs=", 5) ? 5 : 0;
+            if (!kl || (i && old[i - 1] != '\n')) continue;
+            int j = i + kl; u64 s0, c0;
+            if (parse_u64((const char *)old, n, &j, &s0) && j < n && old[j] == ',' && (j++, parse_u64((const char *)old, n, &j, &c0))) { shrunk_start = s0; shrunk_count = c0; }
+            break;
+        }
+    }
+    bool mk = write_marker(r, fo->kind == FOUND_WHOLE ? "whole" : "alongside");
+    shrunk_start = shrunk_count = 0;
+    if (!mk) return;
     if (dev->flush && !dev->flush(dev->ctx)) { set_err(r, INST_ERR_WRITE, "flush"); return; }   /* sem confirmação de que chegou ao disco, não é sucesso */
     r->part_lba = fo->part_start; r->part_count = fo->part_count;
     prog(100, "done");
@@ -961,7 +978,8 @@ void part_op_resize(const BlkDev *dev, const InstallSrc *src, uint64_t part_star
         if (rc != NTFS_SHRINK_OK) { set_err(r, INST_ERR_RESIZE, "volume"); return; }
     } else if (new_count < p->count) {
         if (new_count * dev->bs < c.min_bytes) { set_err(r, INST_ERR_RESIZE, ""); return; }
-        int rc = fs_resize(dev, p->fs, p->start, p->count, new_count);       /* o volume, depois a tabela */
+        /* o volume, depois a tabela; o volume já desse tamanho (a tabela não foi gravada da outra vez): só a tabela */
+        int rc = fs_size(dev, p->fs, p->start) == new_count ? NTFS_SHRINK_OK : fs_resize(dev, p->fs, p->start, p->count, new_count);
         if (rc != NTFS_SHRINK_OK) { set_err(r, INST_ERR_RESIZE, "volume"); return; }
         p->count = new_count;
         if (!part_write(dev, &t)) { set_err(r, INST_ERR_WRITE, "partition table"); return; }

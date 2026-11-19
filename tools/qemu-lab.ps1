@@ -2,7 +2,7 @@
 # FolioOS - QEMU lab: boots the real FolioOS on emulated machines and checks it end to end
 #   .\tools\qemu-lab.ps1                 every configuration in the matrix
 #   .\tools\qemu-lab.ps1 -Only q35-std   configurations whose name matches
-#   .\tools\qemu-lab.ps1 -List           list the matrix
+#   .\tools\qemu-lab.ps1 -List           list the matrix and the dual-boot scenarios
 # Needs QEMU (winget install SoftwareFreedomConservancy.QEMU) and a previous .\build.ps1.
 # For each machine: boots a copy of the FAT32 drive image, then through QMP (QEMU's control
 # protocol) takes screenshots, presses keys, moves and clicks the mouse, plays the sound test
@@ -43,7 +43,7 @@ $matrix = @(
     @{ name = "aspect-uefi-q35-std";      sys = "x86_64";  fw = "uefi64"; machine = "q35"; vga = "-vga std";              input = "ps2";    audio = "none"; ini = "resolution=1024x768`r`nkeep_aspect=16:9"; aspect = "1024x576" },
     @{ name = "aspect-bios-pc-std";       sys = "i386";    fw = "bios"; machine = "pc";   vga = "-vga std";               input = "ps2";    audio = "none"; ini = "resolution=1024x768`r`nkeep_aspect=16:9"; aspect = "1024x576" }
 )
-if ($List) { $matrix | ForEach-Object { "{0,-26} {1,-7} {2,-6} {3}  input={4} audio={5}" -f $_.name, $_.fw, $_.machine, $_.vga, $_.input, $_.audio }; return }
+if ($List) { $matrix | ForEach-Object { "{0,-26} {1,-7} {2,-6} {3}  input={4} audio={5}" -f $_.name, $_.fw, $_.machine, $_.vga, $_.input, $_.audio }; "dual-uefi-sata, dual-ntfs-shrink, dual-bios-ide   (install next to another system, then remove)"; return }
 
 # ------------------------------------------------------------ QMP (QEMU Machine Protocol) client
 class Qmp {

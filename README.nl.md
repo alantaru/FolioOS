@@ -350,11 +350,17 @@ meteen in je tekst opstart. Open **Ctrl+K › FolioOS op deze computer installer
   `chkdsk` nodig heeft, BitLocker zonder herstelsleutel, LUKS, LVM, Apple-volumes), met uitleg wat je wel kunt
   doen. ext4 wordt nooit van grootte veranderd: maak ruimte vanuit Linux (GParted) en start de installatie opnieuw.
 - Voordat er iets wordt geschreven, wordt de partitietabel (de eerste en laatste sectoren van de schijf)
-  bewaard in `FOLIO/BACKUP` op de USB-stick. Je teksten kunnen op de computer staan, op de USB-stick of op allebei.
-- **Bijwerken** vanaf een nieuwere USB-stick, of **verwijderen**: je teksten worden eerst naar de USB-stick
-  gekopieerd en de andere partitie groeit terug naar de grootte die ze had.
+  bewaard in `FOLIO/BACKUP` op het station waarvan FolioOS is gestart, normaal de USB-stick. Je teksten
+  kunnen op de computer staan, op de USB-stick of op allebei.
+- **Bijwerken** vanaf een nieuwere USB-stick: alleen de bestanden van FolioOS zelf worden vervangen; je teksten
+  en de partities blijven zoals ze zijn.
+- **Verwijderen**: je kunt je teksten eerst laten kopiëren naar het station waarvan FolioOS is gestart. Als de
+  installatie een partitie heeft verkleind om ruimte te maken, groeit die terug naar de grootte die ze had;
+  anders komt de ruimte vrij.
 - *Instellingen › Systeem › Schijven en partities* is een klein partitiebeheer: een FAT32-partitie maken,
   formatteren, NTFS/FAT32/exFAT verkleinen of vergroten, verwijderen.
+- De 4.4 bèta is een voorlopige versie: download hem via
+  [zijn releasepagina](https://github.com/alantaru/FolioOS/releases/tag/v4.4.1-beta), niet via "latest".
 
 Werkt op pc’s met UEFI en op pc’s met alleen BIOS. **Dit is een bèta:** alle tests slagen op geëmuleerde
 machines, met schijven van Windows en van Linux, maar het heeft nog niet op echte hardware gedraaid: maak
@@ -403,8 +409,8 @@ andere schrijvers een laptop te kiezen.
 
 Nee. Vanaf de USB-stick schrijft FolioOS nooit naar de interne schijf, en installeren op de stick voegt
 alleen bestanden toe: wat er al op staat, blijft. Haal de stick eruit en de pc start weer zijn gewone systeem.
-De schijf wordt alleen aangeraakt als je zelf het installatieprogramma opent, en ook dan wordt niets
-geschreven voordat je bevestigt en de partitietabel op de USB-stick is bewaard.
+De schijf wordt alleen aangeraakt als je zelf het installatieprogramma of *Schijven en partities* opent, en ook
+dan wordt niets geschreven voordat je bevestigt en de partitietabel is bewaard op het station waarvan FolioOS is gestart.
 </details>
 
 <details>
@@ -412,7 +418,7 @@ geschreven voordat je bevestigt en de partitietabel op de USB-stick is bewaard.
 
 Ja, sinds 4.4 (bèta): **Ctrl+K › FolioOS op deze computer installeren**. Het gebruikt vrije ruimte of verkleint
 een NTFS-, FAT32- of exFAT-partitie zonder gegevens te verplaatsen, en bij elke start kies je FolioOS of het
-andere systeem. Verwijderen geeft de ruimte terug. Zie [Installeren op de computer](#15-install-it-on-the-computer-beta).
+andere systeem. Verwijderen laat de partitie die de installatie verkleinde weer groeien (anders komt de ruimte vrij). Zie [Installeren op de computer](#15-install-it-on-the-computer-beta).
 </details>
 
 <details>

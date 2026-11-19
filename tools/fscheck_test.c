@@ -297,16 +297,23 @@ static bool ff_io(void *ctx, u64 lba, u32 n, void *buf, bool w) { return file_rw
 /* o inventário dos arquivos: cada um com o CRC; na comparação, cada caminho guardado tem de aparecer exatamente uma
  * vez, com o mesmo conteúdo. Erro de leitura, de pasta, nome longo demais ou lista cheia: falha (nunca "passa" com
  * um inventário incompleto, nem compara dois erros de leitura como se fossem iguais). */
-typedef struct { char path[300]; u32 crc, size; int seen; } FEnt;
+typedef struct { char path[1024]; u32 crc, size; int seen; } FEnt;
 static FEnt fents[2000]; static int nfe;
 static u8 fbuf[1 << 22];
 static void fat_walk(Fat *v, FatNode *dir, const char *rel, bool record, int *bad) {
     u32 ck = 0; u16 nm[256]; FatNode n;
     v->io_err = false;
     while (fat_readdir(v, dir, &ck, nm, &n) == 1) {
-        char name[256]; int k = 0; for (; nm[k] && k < 255; k++) name[k] = nm[k] < 128 ? (char)nm[k] : '?'; name[k] = 0;
+        char name[800]; int k = 0;                      /* em UTF-8: dois nomes diferentes nunca viram a mesma chave */
+        for (int j = 0; nm[j]; j++) {
+            u16 c = nm[j];
+            if (c < 0x80) name[k++] = (char)c;
+            else if (c < 0x800) { name[k++] = (char)(0xC0 | c >> 6); name[k++] = (char)(0x80 | (c & 0x3F)); }
+            else { name[k++] = (char)(0xE0 | c >> 12); name[k++] = (char)(0x80 | ((c >> 6) & 0x3F)); name[k++] = (char)(0x80 | (c & 0x3F)); }
+        }
+        name[k] = 0;
         if (!strcmp(name, ".") || !strcmp(name, "..")) continue;
-        char p[300];
+        char p[1024];
         if ((size_t)snprintf(p, sizeof p, "%s/%s", rel, name) >= sizeof p) { fprintf(stderr, "  caminho longo demais: %s/%s\n", rel, name); (*bad)++; continue; }
         if (n.attr & 0x10) { fat_walk(v, &n, p, record, bad); v->io_err = false; continue; }
         u32 got = 0; bool rd_ok = true;                 /* em partes: qualquer tamanho */
@@ -482,13 +489,15 @@ static int resize_image(const char *path, unsigned long long mib) {
         if (part_overlaps(&d, &t, p->start, ns, k)) { fprintf(stderr, "não há espaço livre depois da partição\n"); return 1; }
         p->count = ns; if (!part_write(&d, &t)) { fprintf(stderr, "part_write\n"); return 1; }
     }
-    rc = fs_resize(&d, p->fs, p->start, p->count, ns);
+    /* o volume já com esse tamanho (um encolhimento cuja tabela não foi gravada): só falta a tabela */
+    rc = ns == vs ? NTFS_SHRINK_OK : fs_resize(&d, p->fs, p->start, p->count, ns);
     if (rc != NTFS_SHRINK_OK) {
         if (grow) fprintf(stderr, "redimensionar: %d — a partição já tem %llu MiB, mas o volume não cresceu; rode de novo com o mesmo tamanho para terminar\n", rc, mib);
         else fprintf(stderr, "redimensionar: %d\n", rc);
         return 1;
     }
-    if (!grow) { p->count = ns; if (!part_write(&d, &t)) { fprintf(stderr, "part_write\n"); return 1; } }   /* o volume primeiro, depois a tabela */
+    /* o volume primeiro, depois a tabela: ao encolher, e também quando a partição ficou maior que o pedido */
+    if (p->count != ns) { p->count = ns; if (!part_write(&d, &t)) { fprintf(stderr, "part_write\n"); return 1; } }
     if (fflush(ff) || fclose(ff)) { fprintf(stderr, "gravar a imagem\n"); return 1; }
     printf("%s %s para %llu MiB\n", p->fs == FS_NTFS ? "NTFS" : p->fs == FS_EXFAT ? "exFAT" : "FAT32", grow ? "crescido" : "encolhido", mib);
     return 0;

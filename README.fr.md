@@ -354,11 +354,17 @@ directement sur votre texte. Ouvrez **Ctrl+K › Installer FolioOS sur cet ordin
   de `chkdsk`, BitLocker sans la clé de récupération, LUKS, LVM, volumes Apple) et explique quoi faire à la place.
   ext4 n’est jamais redimensionné : faites de la place depuis Linux (GParted) et relancez l’installateur.
 - Avant toute écriture, la table de partitions (les premiers et les derniers secteurs du
-  disque) est enregistrée dans `FOLIO/BACKUP` sur la clé USB. Vos textes peuvent vivre sur l’ordinateur, sur la clé USB ou sur les deux.
-- **Mettez à jour** depuis une clé plus récente, ou **désinstallez** : vos textes sont d’abord copiés sur la clé
-  USB, et l’autre partition retrouve la taille qu’elle avait.
+  disque) est enregistrée dans `FOLIO/BACKUP` sur le support depuis lequel FolioOS a démarré, normalement la
+  clé USB. Vos textes peuvent vivre sur l’ordinateur, sur la clé USB ou sur les deux.
+- **Mettez à jour** depuis une clé plus récente : seuls les fichiers de FolioOS sont remplacés ; vos textes et
+  les partitions restent tels quels.
+- **Désinstallez** : vous pouvez d’abord faire copier vos textes sur le support depuis lequel FolioOS a démarré.
+  Si l’installateur a réduit une partition pour faire de la place, elle retrouve la taille qu’elle avait ;
+  sinon, l’espace devient libre.
 - *Réglages › Système › Disques et partitions* est un petit gestionnaire de partitions : créer une partition
   FAT32, formater, réduire ou agrandir NTFS/FAT32/exFAT, supprimer.
+- La 4.4 bêta est une préversion : téléchargez-la depuis
+  [sa page de version](https://github.com/alantaru/FolioOS/releases/tag/v4.4.1-beta), pas depuis « latest ».
 
 Fonctionne sur les PC UEFI et sur les PC à BIOS seul. **C’est une bêta :** elle réussit tous les tests sur des
 machines émulées, avec des disques créés par Windows et par Linux, mais n’a pas encore tourné sur du vrai
@@ -405,8 +411,9 @@ auteurs à choisir un portable.
 
 Non. Lancé depuis la clé USB, FolioOS n’écrit jamais sur le disque interne, et l’installer sur la clé ne fait
 qu’ajouter des fichiers : ce qui s’y trouvait reste. Retirez la clé et le PC redémarre sur son système habituel.
-Le disque n’est touché que si vous ouvrez vous-même l’installateur, et même alors rien n’est écrit avant
-votre confirmation et la sauvegarde de la table de partitions sur la clé USB.
+Le disque n’est touché que si vous ouvrez vous-même l’installateur ou *Disques et partitions*, et même alors
+rien n’est écrit avant votre confirmation et la sauvegarde de la table de partitions sur le support depuis
+lequel FolioOS a démarré.
 </details>
 
 <details>
@@ -414,7 +421,7 @@ votre confirmation et la sauvegarde de la table de partitions sur la clé USB.
 
 Oui, depuis la 4.4 (bêta) : **Ctrl+K › Installer FolioOS sur cet ordinateur**. Il utilise l’espace libre ou
 réduit une partition NTFS, FAT32 ou exFAT sans déplacer de données, et chaque démarrage vous laisse choisir
-FolioOS ou l’autre système. La désinstallation rend l’espace. Voir [L’installer sur l’ordinateur](#15-install-it-on-the-computer-beta).
+FolioOS ou l’autre système. La désinstallation agrandit à nouveau la partition que l’installateur a réduite (sinon, l’espace devient libre). Voir [L’installer sur l’ordinateur](#15-install-it-on-the-computer-beta).
 </details>
 
 <details>

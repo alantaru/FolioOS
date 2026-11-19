@@ -61,7 +61,7 @@ try {
     for ($i = 0; $i -lt $b64.Length; $i += 600) { Send ("echo " + $b64.Substring($i, [Math]::Min(600, $b64.Length - $i)) + " >> /tmp/s.b64") }
     # markers unique to this run, each on a line of its own: what the script prints can never be taken for them
     $tok = [guid]::NewGuid().ToString("N").Substring(0, 16)
-    Send "base64 -d /tmp/s.b64 > /tmp/s.sh; echo; echo ===BEGIN-$tok===; sh /tmp/s.sh 2>&1; echo; echo ===END-$tok=`$?==="
+    Send "base64 -d /tmp/s.b64 > /tmp/s.sh; echo; echo ===BEGIN-$tok===; sh /tmp/s.sh 2>&1; rc=`$?; echo; echo ===END-$tok=`$rc==="
     $r = Read-Until "(?m)^===END-$tok=\d+===\r?$" 900
     $mEnd = [regex]::Match($r, "(?m)^===END-$tok=(\d+)===\r?$"); $mBeg = [regex]::Match($r, "(?m)^===BEGIN-$tok===\r?$")
     if (-not $mEnd.Success -or -not $mBeg.Success -or $mBeg.Index -gt $mEnd.Index) { throw "guest output without the run's BEGIN/END markers" }

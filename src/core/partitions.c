@@ -16,9 +16,11 @@ static struct { int k; DiskInfo di; char why[96]; } dsk[PD];
 static int ndsk;
 static PartTable tab[PD];                                                     /* a tabela de cada disco, como foi lida */
 static FsCheck cv[PD][PART_MAX];
+static u64 vsz_of[PD][PART_MAX];                                              /* setores do volume (0 = não sei), lidos no scan */
 static Row rows[PD * PR]; static int nrows, cur = -1, st;
 static float size_mb, size_lo, size_hi;                                       /* criar/redimensionar: o tamanho escolhido */
 static char label[12] = "DATA", word[48];
+static u64 finish_count;                 /* "Terminar de redimensionar": o tamanho exato da partição (0 = redimensionar normal) */
 static bool pending; static int pend_op, pend_wait;   /* a operação confirmada e quantos quadros esperar (o aviso de trabalho aparece antes) */
 static InstallResult res;
 static char backup_name[64];
@@ -45,7 +47,7 @@ static void scan(void) {
         else if (!dsk[d].why[0] && t->scheme != SCHEME_NONE && !part_editable(t))
             str_copy(dsk[d].why, L("FolioOS cannot change this disk's partition table safely: it is left as it is"), sizeof dsk[d].why);
         for (int p = 0; p < t->n; p++) {
-            cv[d][p].verdict = SAFE_OK; cv[d][p].min_bytes = 0;
+            cv[d][p].verdict = SAFE_OK; cv[d][p].min_bytes = 0; vsz_of[d][p] = fs_resizable(t->p[p].fs) ? fs_size(&b, t->p[p].fs, t->p[p].start) : 0;
             if (t->p[p].fs == FS_NTFS || t->p[p].fs == FS_EXT || t->p[p].fs == FS_FAT16 || t->p[p].fs == FS_FAT32 || t->p[p].fs == FS_EXFAT) fs_check(&b, &t->p[p], &cv[d][p]);
         }
         /* partições e espaços livres na ordem do disco */
@@ -69,7 +71,7 @@ static void scan(void) {
 }
 void partitions_open(void) {
     if (pending) return;
-    cur = -1; st = PS_LIST; scan();
+    cur = -1; st = PS_LIST; finish_count = 0; scan();
     win_parts.r.w = MIN(SI(700), ui.W - SI(40)); win_parts.r.h = MIN(SI(640), ui.H - SI(60));
     win_parts.min_w = SI(520); win_parts.min_h = SI(440);
     win_parts.centered_once = false; win_parts.nav = -1;
@@ -100,6 +102,7 @@ void partitions_poll(void) {
     if (!pending) return;
     if (pend_wait > 0) { pend_wait--; ui.redraw = true; return; }   /* primeiro um quadro com "Não desligue…" na tela */
     pending = false;
+    { paths_ensure(app_boot_vol(), DIR_FOLIO); char bd[200]; fmt(bd, sizeof bd, "%s/BACKUP", paths_dir(DIR_FOLIO)); pal_mkdir(app_boot_vol(), bd); }   /* o motor lista essa pasta antes da cópia de segurança */
     Row rw = rows[cur]; BlkDev b; InstallSrc s; memset(&s, 0, sizeof s);
     DateTime t; pal_now(&t);
     fmt(s.date, sizeof s.date, "%04d-%02d-%02d-%02d%02d%02d", t.year, t.month, t.day, t.hour, t.min, t.sec);
@@ -109,7 +112,7 @@ void partitions_poll(void) {
     memset(&res, 0, sizeof res);
     if (!s.buf || !disk_dev(dsk[rw.d].k, &b)) res.code = INST_ERR_WRITE;
     else {
-        u64 ns = (u64)size_mb * 2048;
+        u64 ns = finish_count ? finish_count : (u64)size_mb * 2048;   /* terminar: exatamente o tamanho da partição */
         int op = pend_op;
         if (op == PS_CREATE) part_op_create(&b, &s, rw.start, MIN(ns, rw.count), label, &res);
         else if (op == PS_RESIZE) part_op_resize(&b, &s, rw.start, ns, &res);
@@ -122,7 +125,7 @@ void partitions_poll(void) {
     else fmt(m, sizeof m, res.path[0] ? "%s: %s" : "%s", L(install_error(res.code)), res.path);
     ui_toast(m);
     dbg("partitions: op %d -> %d (%s)", st, res.code, res.path);
-    st = PS_LIST; word[0] = 0; win_parts.nav = -1; ui.focus = 0;
+    st = PS_LIST; word[0] = 0; finish_count = 0; win_parts.nav = -1; ui.focus = 0;
     scan();
     ui.redraw = true;
 }
@@ -199,7 +202,7 @@ static void parts_body(Window *w, Rect r) {
                 if (dsk[rw->d].why[0]) y = wrap(f, S(12.5f), x + S(12), y, wd - S(12), dsk[rw->d].why, red);
             }
             Rect it = rect(x, (int)y + SI(2), wd, SI(32));
-            bool fire = ui_item(it), on = i == cur;
+            bool fire = ui_item_in(it, area), on = i == cur;   /* clique só na parte visível da linha */
             if (on) gfx_rrect(it, S(8), col_alpha(T->accent, 0.14f)); else if (ui_hover(it)) gfx_rrect(it, S(8), col_alpha(T->text, 0.06f));
             row_text(rw, line, sizeof line);
             draw_text_ellipsis(f, S(13.5f), it.x + S(14), it.y + it.h * 0.5f + S(5), it.w - S(24), line, rw->free ? dim : T->panel_text);
@@ -220,10 +223,18 @@ static void parts_body(Window *w, Rect r) {
                 }
             } else {
                 Part *p = &tab[rw->d].p[rw->part]; FsCheck *c = &cv[rw->d][rw->part];
-                if (fs_resizable(p->fs) && c->verdict == SAFE_OK && c->min_bytes) {
+                /* um crescimento interrompido: a partição já maior que o volume (o NTFS fica marcado para o chkdsk, e o
+                 * mínimo não é calculado). Oferece só terminar, com o mesmo tamanho; o motor confere o resto */
+                u64 vsz = (c->verdict == SAFE_OK || (c->verdict == SAFE_DIRTY && p->fs == FS_NTFS)) ? vsz_of[rw->d][rw->part] : 0;
+                if (vsz && vsz + 2048 <= rw->count) {
+                    if (ui_button(rect(bx, by, SI(220), SI(40)), L("Finish resizing"), BTN_PRIMARY)) {
+                        st = PS_RESIZE; size_lo = size_hi = size_mb = (float)(rw->count >> 11); finish_count = rw->count; w->nav = -1;
+                    }
+                    bx += SI(230);
+                } else if (fs_resizable(p->fs) && c->verdict == SAFE_OK && c->min_bytes) {
                     if (ui_button(rect(bx, by, SI(150), SI(40)), L("Resize"), BTN_PRIMARY)) {
                         u64 lim = grow_limit(rw);
-                        st = PS_RESIZE; size_lo = (float)((c->min_bytes + (1 << 20) - 1) >> 20); size_hi = (float)(lim >> 11); size_mb = (float)(rw->count >> 11); w->nav = -1;
+                        st = PS_RESIZE; finish_count = 0; size_lo = (float)((c->min_bytes + (1 << 20) - 1) >> 20); size_hi = (float)(lim >> 11); size_mb = (float)(rw->count >> 11); w->nav = -1;
                     }
                     bx += SI(160);
                 }
@@ -249,11 +260,11 @@ static void parts_body(Window *w, Rect r) {
         if (st == PS_CREATE) fmt(line, sizeof line, L("+ FAT32 · %s, in this free space"), a);
         else { disk_size_text(rw->count * 512, b2, sizeof b2); fmt(line, sizeof line, L("%s%s: %s → %s"), part_fs_name(t->p[rw->part].fs), "", b2, a); }
         y = wrap(fb, S(13.5f), x + S(12), y, wd - S(12), line, T->accent) + S(6);
-        ui_slider(rect(x, (int)y, wd, SI(52)), &size_mb, size_lo, size_hi, L("Size"), a);
+        if (!finish_count) ui_slider(rect(x, (int)y, wd, SI(52)), &size_mb, size_lo, size_hi, L("Size"), a);   /* terminar: o tamanho é o da partição */
         y += S(58);
         if (st == PS_RESIZE) y = wrap(f, S(13), x, y, wd, t->p[rw->part].fs == FS_NTFS ? L("No file is moved: FolioOS only takes free space from the end of that partition. The next time Windows starts, it checks the partition (chkdsk) once; this is expected.") : L("No file is moved: FolioOS only takes free space from the end of that partition."), dim);
         {   /* mesmo tamanho da partição só vale para terminar um crescimento interrompido (o volume ficou menor) */
-            BlkDev bd; u64 vs = st == PS_RESIZE && disk_dev(dsk[rw->d].k, &bd) ? fs_size(&bd, t->p[rw->part].fs, rw->start) : 0;
+            u64 vs = st == PS_RESIZE ? vsz_of[rw->d][rw->part] : 0;
             ok = (u64)size_mb != (rw->count >> 11) || st == PS_CREATE || (vs && vs < rw->count && (u64)size_mb == (rw->count >> 11));
         }
     }
@@ -270,7 +281,7 @@ static void parts_body(Window *w, Rect r) {
         ui_textfield(rect(x, (int)y, SI(260), SI(40)), word, sizeof word, cw, false);
         ok = word_ok(word, cw);
     }
-    if (ui_button(rect(x, by, SI(140), SI(40)), L("Back"), BTN_GHOST)) { st = PS_LIST; ui.focus = 0; w->nav = -1; return; }
+    if (ui_button(rect(x, by, SI(140), SI(40)), L("Back"), BTN_GHOST)) { st = PS_LIST; finish_count = 0; ui.focus = 0; w->nav = -1; return; }
     const char *go = st == PS_CREATE ? L("Create") : st == PS_RESIZE ? L("Apply") : st == PS_FORMAT ? L("Format") : L("Delete");
     if (ui_button(rect(x + wd - SI(200), by, SI(200), SI(40)), go, ok ? (need_word ? BTN_DANGER : BTN_PRIMARY) : BTN_SUBTLE)) {
         if (ok) { pending = true; pend_op = st; pend_wait = 1; st = PS_WORKING; ui.focus = 0; w->nav = -1; ui.redraw = true; }   /* o aviso aparece antes de qualquer gravação */

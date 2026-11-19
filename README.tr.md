@@ -348,12 +348,17 @@ açılır. **Ctrl+K › FolioOS’u bu bilgisayara kur** komutunu açın (ya da 
   Güvenli olmayanı reddeder (hazırda bekleyen ya da Hızlı Başlatma açık Windows, `chkdsk` gerektiren bir birim,
   kurtarma anahtarı olmadan BitLocker, LUKS, LVM, Apple birimleri) ve bunun yerine ne yapılacağını açıklar.
   ext4 asla yeniden boyutlandırılmaz: Linux’tan yer açın (GParted) ve kurulumu yeniden çalıştırın.
-- Herhangi bir şey yazılmadan önce bölüm tablosu (diskin ilk ve son sektörleri) USB bellekteki
-  `FOLIO/BACKUP` klasörüne kaydedilir. Metinleriniz bilgisayarda, USB bellekte ya da her ikisinde durabilir.
-- Daha yeni bir USB bellekten **güncelleyin** ya da **kaldırın**: metinleriniz önce USB belleğe kopyalanır ve
-  diğer bölüm eski boyutuna geri büyür.
+- Herhangi bir şey yazılmadan önce bölüm tablosu (diskin ilk ve son sektörleri), FolioOS’un başladığı
+  sürücüdeki (genellikle USB bellek) `FOLIO/BACKUP` klasörüne kaydedilir. Metinleriniz bilgisayarda, USB
+  bellekte ya da her ikisinde durabilir.
+- Daha yeni bir USB bellekten **güncelleyin**: yalnızca FolioOS’un kendi dosyaları değiştirilir; metinleriniz
+  ve bölümler olduğu gibi kalır.
+- **Kaldırın**: önce metinlerinizi FolioOS’un başladığı sürücüye kopyalatabilirsiniz. Kurulum yer açmak için
+  bir bölümü küçülttüyse o bölüm eski boyutuna geri büyür; aksi hâlde alan boş kalır.
 - *Ayarlar › Sistem › Diskler ve bölümler* küçük bir bölüm yöneticisidir: FAT32 bölümü oluşturma, biçimlendirme,
   NTFS/FAT32/exFAT küçültme veya büyütme, silme.
+- 4.4 beta bir ön sürümdür: onu “latest” yerine
+  [sürüm sayfasından](https://github.com/alantaru/FolioOS/releases/tag/v4.4.1-beta) indirin.
 
 UEFI’li PC’lerde ve yalnızca BIOS’lu PC’lerde çalışır. **Bu bir beta:** Windows ve Linux’un oluşturduğu
 disklerle, öykünülmüş makinelerdeki tüm testleri geçiyor, ama henüz gerçek donanımda çalışmadı: önce
@@ -402,8 +407,8 @@ bile diğer yazarların dizüstü seçmesine yardımcı olur.
 
 Hayır. USB bellekten çalışırken FolioOS dahili diske asla yazmaz; belleğe kurmak da yalnızca dosya ekler,
 orada olanlar kalır. Belleği çıkarın, bilgisayar her zamanki sistemini yeniden başlatır.
-Diske yalnızca kurulumu kendiniz açarsanız dokunulur; o zaman bile siz onaylamadan ve bölüm tablosu USB
-belleğe kaydedilmeden hiçbir şey yazılmaz.
+Diske yalnızca kurulumu ya da *Diskler ve bölümler*’i kendiniz açarsanız dokunulur; o zaman bile siz onaylamadan
+ve bölüm tablosu FolioOS’un başladığı sürücüye kaydedilmeden hiçbir şey yazılmaz.
 </details>
 
 <details>
@@ -411,7 +416,7 @@ belleğe kaydedilmeden hiçbir şey yazılmaz.
 
 Evet, 4.4’ten (beta) beri: **Ctrl+K › FolioOS’u bu bilgisayara kur**. Boş alanı kullanır ya da bir NTFS, FAT32
 veya exFAT bölümünü veri taşımadan küçültür; her açılışta FolioOS’u ya da diğer sistemi seçersiniz.
-Kaldırınca alan geri verilir. Bkz. [Bilgisayara kurun](#15-install-it-on-the-computer-beta).
+Kaldırınca, kurulumun küçülttüğü bölüm yeniden büyür (aksi hâlde alan boş kalır). Bkz. [Bilgisayara kurun](#15-install-it-on-the-computer-beta).
 </details>
 
 <details>

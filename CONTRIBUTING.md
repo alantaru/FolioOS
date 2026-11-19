@@ -25,8 +25,8 @@ documentation and code.
 - `.\build.ps1` builds everything and runs the full test suite (simulator, real UEFI binary
   inside `efi_host`, exports, translations, partition tables, installer, file-system checks).
   It must pass before a pull request is merged; CI runs it on every pull request.
-- `.\tools\qemu-lab.ps1` boots the real binaries on 20 emulated machines (`-List` shows them,
-  `-Only <regex>` runs some). Set `FOLIO_WORK` to a folder on a roomy disk if `C:` is short on
+- `.\tools\qemu-lab.ps1` boots the real binaries on 17 emulated machines and runs 3 dual-boot
+  scenarios (`-List` shows them all, `-Only <regex>` runs some). Set `FOLIO_WORK` to a folder on a roomy disk if `C:` is short on
   space: the lab and the disk-image tests write large images there.
 - `.\build\folio_sim.exe` is the fastest way to work: the same core code in a window.
 - On a Mac, `./build_macos.sh --test` builds the simulator and runs the same scripted tests.

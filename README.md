@@ -302,11 +302,17 @@ straight into your writing. Open **Ctrl+K › Install FolioOS on this computer**
   without the recovery key, LUKS, LVM, Apple volumes — and explains what to do instead. ext4 is never
   resized: make room from Linux (GParted) and run the installer again.
 - Before anything is written, the partition table (the first and last sectors of the disk) is saved to
-  `FOLIO/BACKUP` on the USB drive. Your texts can live on the computer, on the USB drive, or on both.
-- **Update** from a newer USB drive, or **uninstall**: your texts are copied to the USB drive first, and
-  the other partition grows back to the size it had.
+  `FOLIO/BACKUP` on the drive FolioOS started from — normally the USB drive. Your texts can live on the
+  computer, on the USB drive, or on both.
+- **Update** from a newer USB drive: only FolioOS's own files are replaced; your texts and the partitions
+  stay as they are.
+- **Uninstall**: you can have your texts copied to the drive FolioOS started from first. If the installer
+  shrank a partition to make room, that partition grows back to the size it had; otherwise the space
+  becomes free.
 - *Settings › System › Disks and partitions* is a small partition manager: create a FAT32 partition,
   format, shrink or grow NTFS/FAT32/exFAT, delete.
+- The 4.4 beta is a pre-release: download it from
+  [its release page](https://github.com/alantaru/FolioOS/releases/tag/v4.4.1-beta), not from "latest".
 
 Works on UEFI PCs and on PCs with BIOS only. **This is a beta:** it passes every test on emulated
 machines, with disks made by Windows and by Linux, but has not run on real hardware yet — back up first,
@@ -349,8 +355,8 @@ writers pick a laptop.
 
 No. Running from the USB drive, FolioOS never writes to the internal disk, and installing it on the drive
 only adds files — what is already there stays. Take the drive out and the PC boots its usual system again.
-The disk is only touched if you open the installer yourself, and even then nothing is written before you
-confirm and the partition table is saved to the USB drive.
+The disk is only touched if you open the installer or *Disks and partitions* yourself, and even then
+nothing is written before you confirm and the partition table is saved to the drive FolioOS started from.
 </details>
 
 <details>
@@ -358,7 +364,7 @@ confirm and the partition table is saved to the USB drive.
 
 Yes, since 4.4 (beta): **Ctrl+K › Install FolioOS on this computer**. It uses free space, or shrinks an
 NTFS, FAT32 or exFAT partition without moving data, and each start lets you pick FolioOS or the other
-system. Uninstalling gives the space back. See [Install it on the computer](#15-install-it-on-the-computer-beta).
+system. Uninstalling grows back a partition the installer shrank (otherwise the space becomes free). See [Install it on the computer](#15-install-it-on-the-computer-beta).
 </details>
 
 <details>

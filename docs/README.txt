@@ -111,10 +111,13 @@ INSTALLING ON THIS COMPUTER (beta)
      to do instead. On a disk with BitLocker it asks you to confirm you have the
      recovery key. ext4 is never resized: make room from Linux (GParted) first.
    - Before anything is written, the partition table (the first and last sectors
-     of the disk) is saved to FOLIO\BACKUP on this drive. Your texts can live on the computer, on this
-     drive, or on both (Settings > System > TEXTS).
-   - Update: start from a newer USB drive and choose "Update". Uninstall: your
-     texts are copied to this drive first, then the other partition grows back.
+     of the disk) is saved to FOLIO\BACKUP on the drive FolioOS started from
+     (normally this one). Your texts can live on the computer, on this drive, or
+     on both (Settings > System > TEXTS).
+   - Update: start from a newer USB drive and choose "Update"; only FolioOS's own
+     files are replaced. Uninstall: you can have your texts copied to this drive
+     first. If the installer shrank a partition to make room, it grows back;
+     otherwise the space becomes free.
    - Settings > System > "Disks and partitions" is a small partition manager.
    This is a beta: it passes every test on emulated machines, but has not run on
    real hardware yet. Back up first, or use a spare disk.

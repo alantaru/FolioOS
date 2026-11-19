@@ -165,11 +165,14 @@ INSTALAR NO COMPUTADOR (beta)
      confirmar que tem a chave de recuperação. ext4 nunca é redimensionado:
      abra espaço pelo Linux (GParted) antes.
    - Antes de gravar qualquer coisa, a tabela de partições (os primeiros e os
-     últimos setores do disco) é salva em FOLIO\BACKUP neste pen-drive. Seus textos podem ficar no
+     últimos setores do disco) é salva em FOLIO\BACKUP na unidade de onde o
+     FolioOS iniciou (normalmente este pen-drive). Seus textos podem ficar no
      computador, neste pen-drive ou nos dois (Ajustes > Sistema > TEXTOS).
-   - Atualizar: inicie por um pen-drive mais novo e escolha "Atualizar".
-     Desinstalar: seus textos são copiados antes para este pen-drive, e depois a
-     outra partição cresce de volta.
+   - Atualizar: inicie por um pen-drive mais novo e escolha "Atualizar"; só os
+     arquivos do próprio FolioOS são trocados.
+     Desinstalar: você pode ter seus textos copiados antes para este pen-drive. Se
+     o instalador encolheu uma partição para abrir espaço, ela cresce de volta;
+     senão, o espaço fica livre.
    - Ajustes > Sistema > "Discos e partições" é um pequeno gerenciador de
      partições.
    É uma beta: passa em todos os testes em máquinas emuladas, mas ainda não

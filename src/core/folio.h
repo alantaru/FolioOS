@@ -518,6 +518,7 @@ void   ui_tooltip(const void *id, Rect r, const char *text);
 enum { NAV_ITEM, NAV_ADJ, NAV_TEXT, NAV_LIST };
 bool   ui_nav(Rect r, int kind);           /* registra um item; true = é o item com foco */
 bool   ui_item(Rect r);                     /* item clicável genérico: clique ou Enter/Espaço */
+bool   ui_item_in(Rect r, Rect vis);        /* o mesmo numa lista que rola: clique só na parte visível */
 void   ui_reveal(float *scroll, Rect view); /* rola para mostrar o item focado (depois de desenhar) */
 void   wm_focus(Window *w);                 /* foco de teclado para a janela (0 = texto) */
 void   wm_cycle_focus(void);                /* Ctrl+F6: texto → janelas abertas → texto */

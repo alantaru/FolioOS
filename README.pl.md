@@ -349,11 +349,17 @@ uruchamiał się w twoim tekście. Otwórz **Ctrl+K › Zainstaluj FolioOS na ty
   `chkdsk`, BitLocker bez klucza odzyskiwania, LUKS, LVM, woluminy Apple) i wyjaśnia, co zrobić zamiast tego.
   ext4 nigdy nie zmienia rozmiaru: zrób miejsce z poziomu Linuksa (GParted) i uruchom instalator ponownie.
 - Zanim cokolwiek zostanie zapisane, tablica partycji (pierwsze i ostatnie sektory dysku) trafia do
-  `FOLIO/BACKUP` na pendrivie. Twoje teksty mogą być na komputerze, na pendrivie albo w obu miejscach.
-- **Aktualizuj** z nowszego pendrive’a albo **odinstaluj**: twoje teksty najpierw są kopiowane na pendrive,
-  a druga partycja wraca do swojego poprzedniego rozmiaru.
+  `FOLIO/BACKUP` na nośniku, z którego uruchomił się FolioOS – zwykle na pendrivie. Twoje teksty mogą być na
+  komputerze, na pendrivie albo w obu miejscach.
+- **Aktualizuj** z nowszego pendrive’a: wymieniane są tylko pliki samego FolioOS; twoje teksty i partycje
+  zostają bez zmian.
+- **Odinstaluj**: najpierw możesz skopiować swoje teksty na nośnik, z którego uruchomił się FolioOS. Jeśli
+  instalator zmniejszył partycję, żeby zrobić miejsce, wraca ona do swojego poprzedniego rozmiaru; w przeciwnym
+  razie miejsce staje się wolne.
 - *Ustawienia › System › Dyski i partycje* to mały menedżer partycji: utworzenie partycji FAT32, formatowanie,
   zmniejszanie lub powiększanie NTFS/FAT32/exFAT, usuwanie.
+- 4.4 beta to wersja przedpremierowa: pobierz ją ze
+  [strony wydania](https://github.com/alantaru/FolioOS/releases/tag/v4.4.1-beta), nie z „latest”.
 
 Działa na komputerach z UEFI i na komputerach tylko z BIOS-em. **To wersja beta:** przechodzi wszystkie testy
 na emulowanych maszynach, z dyskami utworzonymi przez Windows i przez Linuksa, ale nie działała jeszcze na
@@ -402,8 +408,8 @@ pomaga innym piszącym wybrać laptopa.
 
 Nie. Uruchomiony z pendrive’a FolioOS nigdy nie zapisuje niczego na wewnętrznym dysku, a instalacja na pendrivie
 tylko dodaje pliki – to, co już na nim było, zostaje. Wyjmij pendrive, a komputer znów uruchomi swój zwykły system.
-Dysk zostaje dotknięty tylko wtedy, gdy sam otworzysz instalator, a nawet wtedy nic nie jest zapisywane, zanim
-potwierdzisz i zanim tablica partycji zostanie zapisana na pendrivie.
+Dysk zostaje dotknięty tylko wtedy, gdy sam otworzysz instalator albo *Dyski i partycje*, a nawet wtedy nic nie
+jest zapisywane, zanim potwierdzisz i zanim tablica partycji zostanie zapisana na nośniku, z którego uruchomił się FolioOS.
 </details>
 
 <details>
@@ -411,7 +417,7 @@ potwierdzisz i zanim tablica partycji zostanie zapisana na pendrivie.
 
 Tak, od wersji 4.4 (beta): **Ctrl+K › Zainstaluj FolioOS na tym komputerze**. Używa wolnego miejsca albo
 zmniejsza partycję NTFS, FAT32 lub exFAT bez przenoszenia danych, a przy każdym starcie wybierasz FolioOS
-albo drugi system. Odinstalowanie oddaje miejsce. Zobacz [Zainstaluj na komputerze](#15-install-it-on-the-computer-beta).
+albo drugi system. Odinstalowanie powiększa z powrotem partycję zmniejszoną przez instalator (w przeciwnym razie miejsce staje się wolne). Zobacz [Zainstaluj na komputerze](#15-install-it-on-the-computer-beta).
 </details>
 
 <details>

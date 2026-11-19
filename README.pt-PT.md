@@ -349,11 +349,17 @@ diretamente na sua escrita. Abra **Ctrl+K › Instalar o FolioOS neste computado
   BitLocker sem a chave de recuperação, LUKS, LVM, volumes da Apple) e explica o que fazer em alternativa.
   ext4 nunca é redimensionado: liberte espaço a partir do Linux (GParted) e volte a abrir o instalador.
 - Antes de escrever o que quer que seja, a tabela de partições (os primeiros e os últimos setores do
-  disco) é guardada em `FOLIO/BACKUP` na pen USB. Os seus textos podem ficar no computador, na pen USB ou em ambos.
-- **Atualize** a partir de uma pen mais recente, ou **desinstale**: os seus textos são primeiro copiados para
-  a pen USB, e a outra partição volta a crescer até ao tamanho que tinha.
+  disco) é guardada em `FOLIO/BACKUP` na unidade a partir da qual o FolioOS arrancou, normalmente a pen USB.
+  Os seus textos podem ficar no computador, na pen USB ou em ambos.
+- **Atualize** a partir de uma pen mais recente: só os ficheiros do próprio FolioOS são substituídos; os seus
+  textos e as partições ficam como estão.
+- **Desinstale**: antes, pode ter os seus textos copiados para a unidade a partir da qual o FolioOS arrancou.
+  Se o instalador reduziu uma partição para libertar espaço, essa partição volta a crescer até ao tamanho que
+  tinha; caso contrário, o espaço fica livre.
 - *Definições › Sistema › Discos e partições* é um pequeno gestor de partições: criar uma partição FAT32,
   formatar, reduzir ou aumentar NTFS/FAT32/exFAT, apagar.
+- A 4.4 beta é uma pré-versão: transfira-a a partir da
+  [página da versão](https://github.com/alantaru/FolioOS/releases/tag/v4.4.1-beta), não da "latest".
 
 Funciona em PCs com UEFI e em PCs só com BIOS. **É uma beta:** passa em todos os testes em máquinas
 emuladas, com discos criados pelo Windows e pelo Linux, mas ainda não correu em hardware real: faça
@@ -402,8 +408,8 @@ ajuda outros escritores a escolher um portátil.
 
 Não. A correr a partir da pen USB, o FolioOS nunca escreve no disco interno, e instalá-lo na pen só
 acrescenta ficheiros: o que já lá estava fica. Retire a pen e o PC volta a arrancar o sistema de sempre.
-O disco só é tocado se for o utilizador a abrir o instalador, e mesmo assim nada é escrito antes de
-confirmar e de a tabela de partições ser guardada na pen USB.
+O disco só é tocado se for o utilizador a abrir o instalador ou *Discos e partições*, e mesmo assim nada é
+escrito antes de confirmar e de a tabela de partições ser guardada na unidade a partir da qual o FolioOS arrancou.
 </details>
 
 <details>
@@ -411,7 +417,7 @@ confirmar e de a tabela de partições ser guardada na pen USB.
 
 Sim, desde a 4.4 (beta): **Ctrl+K › Instalar o FolioOS neste computador**. Usa o espaço livre ou reduz uma
 partição NTFS, FAT32 ou exFAT sem mover dados, e em cada arranque escolhe o FolioOS ou o outro sistema.
-Desinstalar devolve o espaço. Veja [Instalar no computador](#15-install-it-on-the-computer-beta).
+Desinstalar faz crescer de novo a partição que o instalador reduziu (caso contrário, o espaço fica livre). Veja [Instalar no computador](#15-install-it-on-the-computer-beta).
 </details>
 
 <details>

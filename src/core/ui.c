@@ -207,6 +207,12 @@ bool ui_item(Rect r) {
     if (hv) ui.cursor = 2;
     return (ui.in.pressed && hv) || (f && ui.nav_fire);
 }
+/* o mesmo, numa lista que rola: o clique só conta na parte visível (vis); o teclado alcança o item inteiro */
+bool ui_item_in(Rect r, Rect vis) {
+    bool f = ui_nav(r, NAV_ITEM), hv = ui_hover(rect_clip(r, vis));
+    if (hv) ui.cursor = 2;
+    return (ui.in.pressed && hv) || (f && ui.nav_fire);
+}
 void ui_reveal(float *scroll, Rect view) {
     if (!ui.nav_reveal || !ui.nav_found || !ui.cur_win || ui.cur_win != ui.key_win) return;
     Rect r = ui.nav_r; int pad = SI(14);
@@ -363,9 +369,9 @@ void ui_draw_toasts(void) {
         float age = (float)(ui.in.now - toasts[i].t) / 1000.0f, life = toast_secs(toasts[i].msg);
         if (age > life) { memmove(toasts + i, toasts + i + 1, sizeof(Toast) * (usize)(ntoasts - i - 1)); ntoasts--; continue; }
         float a = age < 0.25f ? age / 0.25f : age > life - 0.5f ? (life - age) / 0.5f : 1.0f;
-        /* em linhas que cabem na tela (no máximo 8) */
-        const char *m = toasts[i].msg; int len = str_len(m), st[8], ln[8], nl = 0; float maxw = (float)ui.W - S(120), w = 0;
-        for (int p = 0; p < len && nl < 8; ) {
+        /* em linhas que cabem na tela (no máximo 12) */
+        const char *m = toasts[i].msg; int len = str_len(m), st[12], ln[12], nl = 0; float maxw = (float)ui.W - S(120), w = 0;
+        for (int p = 0; p < len && nl < 12; ) {
             int n = text_fit(f, px, m + p, len - p, maxw);
             if (n <= 0) n = utf8_next(m + p, len - p, 0);
             if (p + n < len) { int k = n; while (k > 0 && m[p + k] != ' ') k--; if (k > 0) n = k; }

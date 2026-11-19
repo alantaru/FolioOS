@@ -1658,12 +1658,13 @@ bool pal_boot_other(char *name, int cap) {
 void pal_boot_other_start(void) {
     if (other_num < 0) return;
     {   /* registra a tentativa antes de pedir o BootNext */
+        /* sem o registro, uma entrada que falha seria pedida de novo a cada início: então nada de pedido automático
+         * nem pelo Esc (fica no FolioOS; o menu de boot do firmware continua valendo). Gravar uma variável NV quase nunca falha. */
         CHAR16 tn[24]; boot_var_name(tn, "FolioOSBootTry", -1); u32 now;
-        if (boot_count(&now)) {
-            u8 rec[6] = { (u8)other_num, (u8)(other_num >> 8), (u8)now, (u8)(now >> 8), (u8)(now >> 16), (u8)(now >> 24) };
-            EFI_RUNTIME_SERVICES *rt = ST->RuntimeServices;
-            if (rt && rt->SetVariable) rt->SetVariable(tn, &folio_var, 7, sizeof rec, rec);
-        }
+        EFI_RUNTIME_SERVICES *rt = ST->RuntimeServices;
+        if (!boot_count(&now) || !rt || !rt->SetVariable) { dbg("boot chooser: cannot record the attempt; staying in FolioOS"); return; }
+        u8 rec[6] = { (u8)other_num, (u8)(other_num >> 8), (u8)now, (u8)(now >> 8), (u8)(now >> 16), (u8)(now >> 24) };
+        if (EFI_ERROR(rt->SetVariable(tn, &folio_var, 7, sizeof rec, rec))) { dbg("boot chooser: cannot record the attempt; staying in FolioOS"); return; }
     }
     CHAR16 nm[16]; boot_var_name(nm, "BootNext", -1);
     u16 n = (u16)other_num;
