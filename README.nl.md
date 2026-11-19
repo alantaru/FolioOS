@@ -356,8 +356,8 @@ meteen in je tekst opstart. Open **Ctrl+K › FolioOS op deze computer installer
   en de partities blijven zoals ze zijn.
 - **Verwijderen**: je kunt je teksten eerst laten kopiëren naar het station waarvan FolioOS is gestart. Als de
   installatie een partitie heeft verkleind om ruimte te maken, groeit die terug naar de grootte die ze had,
-  zolang de ruimte erachter nog vrij is; anders komt de ruimte vrij. Staat Windows in sluimerstand (of gebruikt
-  het Snel opstarten), dan vraagt FolioOS je het eerst volledig af te sluiten en verandert het niets.
+  zolang de ruimte erachter nog vrij is; anders komt de ruimte vrij. Moet die partitie terug groeien en staat Windows in
+  sluimerstand (of gebruikt het Snel opstarten), dan vraagt FolioOS je het eerst volledig af te sluiten en verandert het niets.
 - *Instellingen › Systeem › Schijven en partities* is een klein partitiebeheer: een FAT32-partitie maken,
   formatteren, NTFS/FAT32/exFAT verkleinen of vergroten, verwijderen.
 - De 4.4 bèta is een voorlopige versie: download hem via
@@ -410,8 +410,8 @@ andere schrijvers een laptop te kiezen.
 
 Nee. Vanaf de USB-stick schrijft FolioOS alleen naar de interne schijf als je daarom vraagt: een tekst opslaan
 op een van de volumes schrijft dat bestand, en alleen het installatieprogramma en *Schijven en partities*
-veranderen partities; ook dan wordt niets geschreven voordat je bevestigt en de partitietabel is bewaard op het
-station waarvan FolioOS is gestart. Installeren op de stick voegt alleen bestanden toe: wat er al op staat,
+veranderen partities; ook dan verandert er geen partitie voordat je bevestigt en de partitietabel is bewaard op het
+station waarvan FolioOS is gestart (je open teksten worden eerst opgeslagen, waar ze staan). Installeren op de stick voegt alleen bestanden toe: wat er al op staat,
 blijft. Haal de stick eruit en de pc start weer zijn gewone systeem.
 </details>
 

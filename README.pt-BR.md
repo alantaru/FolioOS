@@ -353,8 +353,8 @@ iniciar direto na sua escrita. Abra **Ctrl+K › Instalar o FolioOS neste comput
   partições ficam como estão.
 - **Desinstale**: antes, você pode ter seus textos copiados para a unidade de onde o FolioOS iniciou. Se o
   instalador encolheu uma partição para abrir espaço, ela cresce de volta ao tamanho que tinha, desde que o
-  espaço depois dela ainda esteja livre; senão, o espaço fica livre. Se o Windows estiver hibernado (ou usar a
-  Inicialização Rápida), o FolioOS pede que você o desligue por completo antes e não muda nada.
+  espaço depois dela ainda esteja livre; senão, o espaço fica livre. Se essa partição precisar crescer e o Windows
+  estiver hibernado (ou usar a Inicialização Rápida), o FolioOS pede que você o desligue por completo antes e não muda nada.
 - *Ajustes › Sistema › Discos e partições* é um pequeno gerenciador de partições: criar uma partição FAT32,
   formatar, encolher ou aumentar NTFS/FAT32/exFAT, apagar.
 - A 4.4 beta é uma pré-versão: baixe-a pela
@@ -406,8 +406,9 @@ ajuda outros escritores a escolher um notebook.
 <summary><b>Ele vai apagar o meu computador ou o meu pen-drive?</b></summary>
 
 Não. Rodando do pen-drive, o FolioOS só grava no disco interno quando você pede: salvar um texto num dos
-volumes dele grava esse arquivo, e só o instalador e *Discos e partições* mudam partições; mesmo assim, nada é
-gravado antes de você confirmar e de a tabela de partições ser salva na unidade de onde o FolioOS iniciou.
+volumes dele grava esse arquivo, e só o instalador e *Discos e partições* mudam partições; mesmo assim, nenhuma
+partição muda antes de você confirmar e de a tabela de partições ser salva na unidade de onde o FolioOS iniciou
+(seus textos abertos são salvos antes, onde estão).
 Instalá-lo no pen-drive só acrescenta arquivos: o que já estava lá continua. Tire o pen-drive e o PC volta a
 iniciar o sistema de sempre.
 </details>

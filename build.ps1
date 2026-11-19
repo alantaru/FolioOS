@@ -330,6 +330,9 @@ if (-not $NoTests) {
             Run .\build\fat32_test.exe @("$ft\$($k[0]).img", "--fsck") | Out-Null
         }
         if (@(Get-ChildItem "$ft\src\FOLIO\BACKUP\disk-*.bin").Count -ne 2) { throw "installer: safety copies missing from the USB drive" }
+        # the whole disk over an MBR with logical partitions: the safety copy also keeps both EBRs (with their LBAs)
+        Run .\build\install_test.exe @("$ft\src", "$ft\mbrlog.img", "600", "--mbr-logical") | Out-Null
+        Remove-Item -Force "$ft\mbrlog.img"
         # phase 2: next to Windows (EFI, MSR, a hole in the table, C:, recovery at the end): only one new entry,
         # every other entry and partition byte-for-byte the same, \EFI\FolioOS on the EFI partition, both volumes consistent
         Run .\build\install_test.exe @("$ft\src", "$ft\win.img", "1400", "--windows") | Out-Null

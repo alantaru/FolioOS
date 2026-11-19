@@ -102,7 +102,8 @@ static void prog(int pct, const char *what) { if (S->progress) S->progress(S->ct
 
 /* 1 e 2: a origem tem o sistema? cópia de segurança do começo (MBR + GPT) e do fim (GPT de reserva) do disco */
 /* a cópia de segurança do começo (MBR + GPT) e do fim (GPT de reserva) do disco, em FOLIO/BACKUP/disk-<data>.bin
- * no pendrive: um cabeçalho de 512 bytes ("FOLIOBAK" + setores do disco), os 34 primeiros e os 33 últimos setores */
+ * no pendrive: um cabeçalho de 512 bytes ("FOLIOBAK" + setores do disco), os 34 primeiros e os 33 últimos setores
+ * e, num MBR com partições lógicas, os setores EBR (o cabeçalho diz quantos e onde: veja save_disk_start) */
 static const char *bk_want; static bool bk_seen;
 static void bk_entry(void *u, const char *name, bool is_dir, u64 size) { (void)u; (void)size; if (!is_dir && sieq(name, bk_want)) bk_seen = true; }
 static void u64_str(u64 v, char *o);
@@ -111,6 +112,29 @@ static bool save_disk_start(const BlkDev *dev, const InstallSrc *src, InstallRes
     memcpy(b, "FOLIOBAK", 8); for (int i = 0; i < 8; i++) b[8 + i] = (u8)(dev->nsec >> (8 * i));
     memset(b + 16, 0, 512 - 16);
     if (!dev->rw(dev->ctx, 0, n, b + 512, false) || !dev->rw(dev->ctx, dev->nsec - 33, 33, b + 512 + n * 512, false)) { set_err(r, INST_ERR_READ, "disk"); return false; }
+    /* MBR com partições lógicas: os registros delas (EBR) ficam dentro da estendida, fora dos setores acima. Vão
+     * depois deles, um setor cada; o cabeçalho guarda quantos ("EBR" + u32 no byte 16) e o LBA de cada um (u64 a
+     * partir do byte 24). Uma corrente que não dá para ler inteira, ou longa demais, para tudo antes de gravar. */
+    u32 nebr = 0, size = 512 + (n + 33) * 512;
+    const u8 *mbr = b + 512;
+    if (mbr[510] == 0x55 && mbr[511] == 0xAA) for (int i = 0; i < 4; i++) {
+        const u8 *e = mbr + 446 + 16 * i;
+        if (e[4] != 0x05 && e[4] != 0x0F && e[4] != 0x85) continue;
+        u64 ext = (u64)e[8] | (u64)e[9] << 8 | (u64)e[10] << 16 | (u64)e[11] << 24, at = ext;
+        while (at) {
+            if (nebr >= 59 || size + 512 > BSZ || at >= dev->nsec) { set_err(r, INST_ERR_BACKUP, "EBR"); return false; }
+            u8 *s = b + size;
+            if (!dev->rw(dev->ctx, at, 1, s, false)) { set_err(r, INST_ERR_READ, "EBR"); return false; }
+            for (int k = 0; k < 8; k++) b[24 + 8 * nebr + k] = (u8)(at >> (8 * k));
+            nebr++; size += 512;
+            if (s[510] != 0x55 || s[511] != 0xAA) break;
+            const u8 *nx = s + 446 + 16;              /* a 2ª entrada aponta o próximo EBR, relativo ao começo da estendida */
+            u64 rel = (u64)nx[8] | (u64)nx[9] << 8 | (u64)nx[10] << 16 | (u64)nx[11] << 24;
+            at = (nx[4] == 0x05 || nx[4] == 0x0F || nx[4] == 0x85) && rel ? ext + rel : 0;
+        }
+        break;
+    }
+    if (nebr) { memcpy(b + 16, "EBR", 3); b[20] = (u8)nebr; }
     /* um nome que ainda não existe em FOLIO/BACKUP: uma nova tentativa (ou outro disco) no mesmo minuto não pode
      * trocar a cópia original pela de uma tabela que a tentativa anterior já mudou */
     static char name[64];
@@ -124,7 +148,7 @@ static bool save_disk_start(const BlkDev *dev, const InstallSrc *src, InstallRes
         if (!bk_seen) break;
         if (k >= 999) { set_err(r, INST_ERR_BACKUP, name); return false; }
     }
-    if (!src->backup || !src->backup(src->ctx, name, b, 512 + (n + 33) * 512)) { set_err(r, INST_ERR_BACKUP, name); return false; }
+    if (!src->backup || !src->backup(src->ctx, name, b, size)) { set_err(r, INST_ERR_BACKUP, name); return false; }
     return true;
 }
 static bool prepare(const BlkDev *dev, const InstallSrc *src, const InstallOpts *o, InstallResult *r) {

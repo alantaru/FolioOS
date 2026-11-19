@@ -118,7 +118,8 @@ INSTALLING ON THIS COMPUTER (beta)
      files are replaced. Uninstall: you can have your texts copied to this drive
      first. If the installer shrank a partition to make room, it grows back
      when the space after it is still free; otherwise the space becomes free.
-     If Windows is hibernated (or uses Fast Startup), shut it down fully first.
+     If it has to grow back and Windows is hibernated (or uses Fast Startup),
+     shut Windows down fully first.
    - Settings > System > "Disks and partitions" is a small partition manager.
    This is a beta: it passes every test on emulated machines, but has not run on
    real hardware yet. Back up first, or use a spare disk.

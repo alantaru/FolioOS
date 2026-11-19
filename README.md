@@ -308,8 +308,8 @@ straight into your writing. Open **Ctrl+K › Install FolioOS on this computer**
   stay as they are.
 - **Uninstall**: you can have your texts copied to the drive FolioOS started from first. If the installer
   shrank a partition to make room, that partition grows back to the size it had, as long as the space
-  after it is still free; otherwise the space becomes free. If Windows is hibernated (or uses Fast
-  Startup), FolioOS asks you to shut it down fully first and changes nothing.
+  after it is still free; otherwise the space becomes free. If that partition has to grow back and Windows
+  is hibernated (or uses Fast Startup), FolioOS asks you to shut it down fully first and changes nothing.
 - *Settings › System › Disks and partitions* is a small partition manager: create a FAT32 partition,
   format, shrink or grow NTFS/FAT32/exFAT, delete.
 - The 4.4 beta is a pre-release: download it from
@@ -356,8 +356,8 @@ writers pick a laptop.
 
 No. Running from the USB drive, FolioOS writes to the internal disk only when you ask it to: saving a text
 on one of its volumes writes that file, and only the installer and *Disks and partitions* change
-partitions — even then, nothing is written before you confirm and the partition table is saved to the
-drive FolioOS started from. Installing it on the USB drive only adds files — what is already there
+partitions — even then, no partition changes before you confirm and the partition table is saved to the
+drive FolioOS started from (your open texts are saved first, where they are). Installing it on the USB drive only adds files — what is already there
 stays. Take the drive out and the PC boots its usual system again.
 </details>
 

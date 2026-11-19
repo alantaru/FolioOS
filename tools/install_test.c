@@ -63,7 +63,9 @@ static bool s_save(void *ctx, const char *path, const void *data, u32 n) {
     FILE *f = _wfopen(w, L"wb"); if (!f) return false;
     bool ok = fwrite(data, 1, n, f) == n; fclose(f); return ok;
 }
+static u8 last_bk[1 << 17]; static u32 last_bk_n;   /* a última cópia de segurança, para conferir (--mbr-logical) */
 static bool s_backup(void *ctx, const char *name, const void *data, u32 n) {
+    if (n <= sizeof last_bk) { memcpy(last_bk, data, n); last_bk_n = n; }
     (void)ctx; wchar_t w[1024]; full("FOLIO/BACKUP", w); CreateDirectoryW(w, 0);
     char rel[256]; snprintf(rel, sizeof rel, "FOLIO/BACKUP/%s", name); full(rel, w);
     FILE *f = _wfopen(w, L"wb"); if (!f) return false;
@@ -299,7 +301,7 @@ int main(int argc, char **argv) {
     char *mend; u64 mb = strtoull(argv[3], &mend, 10);
     if (!argv[3][0] || *mend || !mb || mb > (16ull << 20)) { fprintf(stderr, "tamanho inválido: \"%s\" (MB)\n", argv[3]); return 2; }
     InstallOpts o = { 0 }; o.label = "FOLIO"; o.efi_name = "BOOTX64.EFI"; o.version = "test";
-    bool windows = false, alongside = false, shrink = false, remove_mode = false, update_mode = false;
+    bool windows = false, alongside = false, shrink = false, remove_mode = false, update_mode = false, mbr_logical = false;
     for (int i = 4; i < argc; i++) {
         if (!strcmp(argv[i], "--bios")) o.bios = true;
         if (!strcmp(argv[i], "--docs-stick")) o.docs = INST_DOCS_STICK;
@@ -310,6 +312,7 @@ int main(int argc, char **argv) {
         if (!strcmp(argv[i], "--shrink-ntfs")) alongside = shrink = true;
         if (!strcmp(argv[i], "--remove")) remove_mode = true;
         if (!strcmp(argv[i], "--update")) update_mode = true;
+        if (!strcmp(argv[i], "--mbr-logical")) mbr_logical = true;
         if (!strcmp(argv[i], "--winefi") && i + 1 < argc) winefi = argv[++i];
         if (!strcmp(argv[i], "--windows-bios") && i + 1 < argc) winbios = argv[++i];
         if (!strcmp(argv[i], "--mbr-fat32") && i + 1 < argc) mbrfat = argv[++i];
@@ -482,9 +485,35 @@ int main(int argc, char **argv) {
                f.ntfs >= 0 ? "a partição de antes cresceu de volta" : "o espaço ficou livre");
         return 0;
     }
+    /* --mbr-logical: o disco tem um MBR com uma estendida e duas partições lógicas (dois EBRs, em 2048 e 3072); a cópia
+     * de segurança do disco inteiro tem de levar os dois EBRs, com os LBAs, para a tabela antiga poder voltar */
+    static u8 ebr[2][512];
+    if (!alongside && mbr_logical) {
+        static u8 m[512]; memset(m, 0, sizeof m);
+        u8 *e = m + 446; e[4] = 0x0F; e[8] = 0x00; e[9] = 0x08; e[12] = 0x00; e[13] = 0x10;            /* estendida: 2048, 4096 setores */
+        m[510] = 0x55; m[511] = 0xAA;
+        for (int k = 0; k < 2; k++) {
+            u8 *b = ebr[k]; memset(b, 0, 512);
+            b[446 + 4] = 0x07; b[446 + 8] = 63; b[446 + 12] = 100;                                        /* a lógica, 63 setores depois do EBR */
+            if (!k) { b[462 + 4] = 0x05; b[462 + 9] = 0x04; b[462 + 13] = 0x04; }                         /* o próximo EBR: estendida + 1024 */
+            b[510] = 0x55; b[511] = 0xAA;
+            if (!dio(0, 2048 + 1024 * (u64)k, 1, b, true)) { fprintf(stderr, "FALHA: montar o EBR\n"); return 1; }
+        }
+        if (!dio(0, 0, 1, m, true)) { fprintf(stderr, "FALHA: montar o MBR\n"); return 1; }
+    }
     if (!alongside) {
         install_whole_disk(&d, &s, &o, &r);
         if (r.code) { fclose(img); fprintf(stderr, "FALHA: %s: %s\n", install_error(r.code), r.path); return 1; }
+        if (mbr_logical) {
+            const u8 *h = last_bk; u32 want = 512 + 67 * 512 + 2 * 512;
+            bool ok = last_bk_n == want && !memcmp(h + 16, "EBR", 3) && h[20] == 2;
+            for (int k = 0; ok && k < 2; k++) {
+                u64 at = 0; for (int j = 0; j < 8; j++) at |= (u64)h[24 + 8 * k + j] << (8 * j);
+                ok = at == 2048 + 1024 * (u64)k && !memcmp(h + 512 + 67 * 512 + 512 * k, ebr[k], 512);
+            }
+            if (!ok) { fclose(img); fprintf(stderr, "FALHA: a cópia de segurança não tem os dois EBRs das partições lógicas (%u bytes)\n", last_bk_n); return 1; }
+            printf("cópia de segurança com os 2 EBRs das partições lógicas\n");
+        }
         {   /* onde ficam os textos: docs_place= no CONFIG.INI instalado; no pendrive, DOCUMENTS não vai para o disco */
             static Fat v; static char cfg[16384]; int fails = 0;
             const char *want = o.docs == INST_DOCS_STICK ? "docs_place=usb" : o.docs == INST_DOCS_BOTH ? "docs_place=both" : "docs_place=computer";

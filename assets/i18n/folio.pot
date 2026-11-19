@@ -1206,7 +1206,7 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: src/core/app.c:1694 src/core/app.c:1695 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:245 src/core/partitions.c:287
+#: src/core/app.c:1694 src/core/app.c:1695 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:248 src/core/partitions.c:290
 msgid "Delete"
 msgstr ""
 
@@ -1962,7 +1962,7 @@ msgstr ""
 msgid "Delete \"%s\"? This cannot be undone."
 msgstr ""
 
-#: src/core/filedlg.c:327 src/core/partitions.c:265
+#: src/core/filedlg.c:327 src/core/partitions.c:268
 msgid "Size"
 msgstr ""
 
@@ -2145,79 +2145,79 @@ msgstr ""
 msgid "Input: Katakana"
 msgstr ""
 
-#: src/core/install.c:1024
+#: src/core/install.c:1048
 msgid "Done"
 msgstr ""
 
-#: src/core/install.c:1025
+#: src/core/install.c:1049
 msgid "Could not read"
 msgstr ""
 
-#: src/core/install.c:1026
+#: src/core/install.c:1050
 msgid "Could not write to the disk"
 msgstr ""
 
-#: src/core/install.c:1027
+#: src/core/install.c:1051
 msgid "The disk is too small (at least 512 MB)"
 msgstr ""
 
-#: src/core/install.c:1028
+#: src/core/install.c:1052
 msgid "Could not save the safety copy to the USB drive"
 msgstr ""
 
-#: src/core/install.c:1029
+#: src/core/install.c:1053
 msgid "Could not format the new partition"
 msgstr ""
 
-#: src/core/install.c:1030
+#: src/core/install.c:1054
 msgid "Could not copy"
 msgstr ""
 
-#: src/core/install.c:1031
+#: src/core/install.c:1055
 msgid "A copied file did not match the original"
 msgstr ""
 
-#: src/core/install.c:1032
+#: src/core/install.c:1056
 msgid "The BIOS boot code is missing from the USB drive"
 msgstr ""
 
-#: src/core/install.c:1033
+#: src/core/install.c:1057
 msgid "The USB drive does not have a complete FolioOS"
 msgstr ""
 
-#: src/core/install.c:1034
+#: src/core/install.c:1058
 msgid "This disk does not use a GPT partition table"
 msgstr ""
 
-#: src/core/install.c:1035
+#: src/core/install.c:1059
 msgid "No FAT32 EFI system partition was found on this disk"
 msgstr ""
 
-#: src/core/install.c:1036
+#: src/core/install.c:1060
 msgid "The EFI system partition is full"
 msgstr ""
 
-#: src/core/install.c:1037
+#: src/core/install.c:1061
 msgid "The chosen space is not free"
 msgstr ""
 
-#: src/core/install.c:1038
+#: src/core/install.c:1062
 msgid "Could not shrink the other system's partition"
 msgstr ""
 
-#: src/core/install.c:1039
+#: src/core/install.c:1063
 msgid "Could not give the space back to the other system's partition"
 msgstr ""
 
-#: src/core/install.c:1040
+#: src/core/install.c:1064
 msgid "This partition cannot change to that size without moving data"
 msgstr ""
 
-#: src/core/install.c:1041 src/core/partitions.c:48
+#: src/core/install.c:1065 src/core/partitions.c:48
 msgid "FolioOS cannot change this disk's partition table safely: it is left as it is"
 msgstr ""
 
-#: src/core/install.c:1042
+#: src/core/install.c:1066
 msgid "Error"
 msgstr ""
 
@@ -2353,7 +2353,7 @@ msgstr ""
 msgid "Before anything is written, the partition table (the first and last sectors of the disk) is saved to %s on this USB drive."
 msgstr ""
 
-#: src/core/installer.c:362 src/core/installer.c:403 src/core/installer.c:458 src/core/installer.c:481 src/core/partitions.c:286
+#: src/core/installer.c:362 src/core/installer.c:403 src/core/installer.c:458 src/core/installer.c:481 src/core/partitions.c:289
 msgid "Back"
 msgstr ""
 
@@ -2370,7 +2370,7 @@ msgstr ""
 msgid "− FolioOS · FAT32 · %s"
 msgstr ""
 
-#: src/core/installer.c:378 src/core/installer.c:426 src/core/partitions.c:263
+#: src/core/installer.c:378 src/core/installer.c:426 src/core/partitions.c:266
 #, c-format
 msgid "%s%s: %s → %s"
 msgstr ""
@@ -2402,7 +2402,7 @@ msgstr ""
 msgid "The next time Windows starts, it checks its partition (chkdsk) once; this is expected."
 msgstr ""
 
-#: src/core/installer.c:394 src/core/installer.c:466 src/core/partitions.c:257
+#: src/core/installer.c:394 src/core/installer.c:466 src/core/partitions.c:260
 msgid "ERASE"
 msgstr ""
 
@@ -2411,7 +2411,7 @@ msgstr ""
 msgid "Your texts on this computer will be lost. To confirm, type %s:"
 msgstr ""
 
-#: src/core/installer.c:398 src/core/installer.c:406 src/core/installer.c:476 src/core/installer.c:484 src/core/partitions.c:281 src/core/partitions.c:290
+#: src/core/installer.c:398 src/core/installer.c:406 src/core/installer.c:476 src/core/installer.c:484 src/core/partitions.c:284 src/core/partitions.c:293
 #, c-format
 msgid "To confirm, type %s:"
 msgstr ""
@@ -2433,11 +2433,11 @@ msgstr ""
 msgid "Size for FolioOS"
 msgstr ""
 
-#: src/core/installer.c:433 src/core/partitions.c:267
+#: src/core/installer.c:433 src/core/partitions.c:270
 msgid "No file is moved: FolioOS only takes free space from the end of that partition. The next time Windows starts, it checks the partition (chkdsk) once; this is expected."
 msgstr ""
 
-#: src/core/installer.c:433 src/core/partitions.c:267
+#: src/core/installer.c:433 src/core/partitions.c:270
 msgid "No file is moved: FolioOS only takes free space from the end of that partition."
 msgstr ""
 
@@ -2700,40 +2700,40 @@ msgstr ""
 msgid "Finish resizing"
 msgstr ""
 
-#: src/core/partitions.c:237
+#: src/core/partitions.c:240
 msgid "Resize"
 msgstr ""
 
-#: src/core/partitions.c:243
+#: src/core/partitions.c:246
 msgid "Format as FAT32"
 msgstr ""
 
-#: src/core/partitions.c:262
+#: src/core/partitions.c:265
 #, c-format
 msgid "+ FAT32 · %s, in this free space"
 msgstr ""
 
-#: src/core/partitions.c:274
+#: src/core/partitions.c:277
 msgid "Name of the new volume:"
 msgstr ""
 
-#: src/core/partitions.c:278
+#: src/core/partitions.c:281
 msgid "Everything on this partition will be erased; it becomes an empty FAT32 volume."
 msgstr ""
 
-#: src/core/partitions.c:279
+#: src/core/partitions.c:282
 msgid "This partition and everything on it will be erased; its space becomes free."
 msgstr ""
 
-#: src/core/partitions.c:287
+#: src/core/partitions.c:290
 msgid "Create"
 msgstr ""
 
-#: src/core/partitions.c:287
+#: src/core/partitions.c:290
 msgid "Apply"
 msgstr ""
 
-#: src/core/partitions.c:287
+#: src/core/partitions.c:290
 msgid "Format"
 msgstr ""
 

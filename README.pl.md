@@ -355,8 +355,8 @@ uruchamiał się w twoim tekście. Otwórz **Ctrl+K › Zainstaluj FolioOS na ty
   zostają bez zmian.
 - **Odinstaluj**: najpierw możesz skopiować swoje teksty na nośnik, z którego uruchomił się FolioOS. Jeśli
   instalator zmniejszył partycję, żeby zrobić miejsce, wraca ona do swojego poprzedniego rozmiaru, o ile
-  miejsce za nią jest nadal wolne; w przeciwnym razie miejsce staje się wolne. Jeśli Windows jest w hibernacji
-  (lub używa szybkiego uruchamiania), FolioOS prosi, by najpierw całkowicie go wyłączyć, i niczego nie zmienia.
+  miejsce za nią jest nadal wolne; w przeciwnym razie miejsce staje się wolne. Jeśli ta partycja ma się powiększyć, a Windows jest
+  w hibernacji (lub używa szybkiego uruchamiania), FolioOS prosi, by najpierw całkowicie go wyłączyć, i niczego nie zmienia.
 - *Ustawienia › System › Dyski i partycje* to mały menedżer partycji: utworzenie partycji FAT32, formatowanie,
   zmniejszanie lub powiększanie NTFS/FAT32/exFAT, usuwanie.
 - 4.4 beta to wersja przedpremierowa: pobierz ją ze
@@ -409,8 +409,8 @@ pomaga innym piszącym wybrać laptopa.
 
 Nie. Uruchomiony z pendrive’a FolioOS zapisuje na wewnętrznym dysku tylko wtedy, gdy o to poprosisz: zapisanie
 tekstu na jednym z jego woluminów zapisuje ten plik, a partycje zmieniają tylko instalator i *Dyski i partycje*;
-nawet wtedy nic nie jest zapisywane, zanim potwierdzisz i zanim tablica partycji zostanie zapisana na nośniku, z
-którego uruchomił się FolioOS. Instalacja na pendrivie tylko dodaje pliki – to, co już na nim było, zostaje.
+nawet wtedy żadna partycja się nie zmienia, zanim potwierdzisz i zanim tablica partycji zostanie zapisana na
+nośniku, z którego uruchomił się FolioOS (otwarte teksty są najpierw zapisywane tam, gdzie są). Instalacja na pendrivie tylko dodaje pliki – to, co już na nim było, zostaje.
 Wyjmij pendrive, a komputer znów uruchomi swój zwykły system.
 </details>
 

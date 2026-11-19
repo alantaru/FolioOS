@@ -355,7 +355,7 @@ diretamente na sua escrita. Abra **Ctrl+K › Instalar o FolioOS neste computado
   textos e as partições ficam como estão.
 - **Desinstale**: antes, pode ter os seus textos copiados para a unidade a partir da qual o FolioOS arrancou.
   Se o instalador reduziu uma partição para libertar espaço, essa partição volta a crescer até ao tamanho que
-  tinha, desde que o espaço a seguir ainda esteja livre; caso contrário, o espaço fica livre. Se o Windows
+  tinha, desde que o espaço a seguir ainda esteja livre; caso contrário, o espaço fica livre. Se essa partição tiver de crescer e o Windows
   estiver em hibernação (ou usar o Arranque Rápido), o FolioOS pede que o encerre por completo antes e não
   altera nada.
 - *Definições › Sistema › Discos e partições* é um pequeno gestor de partições: criar uma partição FAT32,
@@ -410,8 +410,8 @@ ajuda outros escritores a escolher um portátil.
 
 Não. A correr a partir da pen USB, o FolioOS só escreve no disco interno quando o utilizador pede: guardar um
 texto num dos seus volumes escreve esse ficheiro, e só o instalador e *Discos e partições* alteram partições;
-mesmo assim, nada é escrito antes de confirmar e de a tabela de partições ser guardada na unidade a partir da
-qual o FolioOS arrancou. Instalá-lo na pen só acrescenta ficheiros: o que já lá estava fica. Retire a pen e o
+mesmo assim, nenhuma partição muda antes de confirmar e de a tabela de partições ser guardada na unidade a
+partir da qual o FolioOS arrancou (os textos abertos são guardados antes, onde estão). Instalá-lo na pen só acrescenta ficheiros: o que já lá estava fica. Retire a pen e o
 PC volta a arrancar o sistema de sempre.
 </details>
 

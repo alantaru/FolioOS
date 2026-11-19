@@ -360,8 +360,8 @@ in dein Schreiben startet. Öffne **Strg+K › FolioOS auf diesem Computer insta
   Texte und die Partitionen bleiben, wie sie sind.
 - **Deinstallieren**: Deine Texte können vorher auf das Laufwerk kopiert werden, von dem FolioOS gestartet
   wurde. Hat der Installer eine Partition verkleinert, um Platz zu schaffen, wächst sie wieder auf ihre frühere
-  Größe, sofern der Platz dahinter noch frei ist; sonst wird der Platz frei. Ist Windows im Ruhezustand (oder
-  nutzt den Schnellstart), bittet FolioOS dich, es zuerst vollständig herunterzufahren, und ändert nichts.
+  Größe, sofern der Platz dahinter noch frei ist; sonst wird der Platz frei. Muss diese Partition wieder wachsen und ist
+  Windows im Ruhezustand (oder nutzt den Schnellstart), bittet FolioOS dich, es zuerst vollständig herunterzufahren, und ändert nichts.
 - *Einstellungen › System › Datenträger und Partitionen* ist eine kleine Partitionsverwaltung: FAT32-Partition
   anlegen, formatieren, NTFS/FAT32/exFAT verkleinern oder vergrößern, löschen.
 - Die 4.4 Beta ist eine Vorabversion: Lade sie von
@@ -414,8 +414,9 @@ anderen Schreibenden bei der Wahl eines Laptops.
 
 Nein. Vom USB-Stick aus schreibt FolioOS nur dann auf die interne Festplatte, wenn du es darum bittest: Einen
 Text auf einem ihrer Volumes zu speichern, schreibt diese Datei, und nur der Installer und *Datenträger und
-Partitionen* ändern Partitionen – und selbst dann wird nichts geschrieben, bevor du bestätigst und die
-Partitionstabelle auf dem Laufwerk gesichert ist, von dem FolioOS gestartet wurde. Die Installation auf dem
+Partitionen* ändern Partitionen – und selbst dann ändert sich keine Partition, bevor du bestätigst und die
+Partitionstabelle auf dem Laufwerk gesichert ist, von dem FolioOS gestartet wurde (deine offenen Texte werden
+vorher dort gespeichert, wo sie liegen). Die Installation auf dem
 Stick fügt nur Dateien hinzu – was schon darauf ist, bleibt. Zieh den Stick ab, und der PC startet wieder sein
 gewohntes System.
 </details>

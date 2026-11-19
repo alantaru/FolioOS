@@ -41,7 +41,8 @@ All notable changes to this project are documented here. The format follows
   cannot apply the change twice.
 - Deleting a partition shorter than 32 sectors no longer zeroes the start of the next one.
 - Installing on a whole disk stops if the current partition table cannot be read (a blank disk or a
-  damaged table still reads fine).
+  damaged table still reads fine). Over an MBR with logical partitions, the safety copy also keeps
+  their EBR sectors (with their positions), so the old table can be restored.
 - Installing next to another system checks that the new partition fits in the table (MBR with four
   primaries) before shrinking anything.
 - Uninstalling only grows back a partition the installer itself shrank (recorded at install time); a
@@ -58,7 +59,8 @@ All notable changes to this project are documented here. The format follows
 - A retry after an interrupted grow (the table larger than the volume) finishes growing the volume, in
   the engine and in *Disks and partitions* (a *Finish resizing* button). A retry after a shrink
   whose table update failed only writes the table. This also works for an NTFS volume already marked for `chkdsk`,
-  and exFAT finishes a pending bitmap update first.
+  and exFAT finishes a pending bitmap update first. In *Disks and partitions*, *Finish resizing* is shown next to
+  *Resize*, not instead of it.
 - The safety copy in `FOLIO/BACKUP` never overwrites an earlier one, and if the folder cannot be
   listed nothing is written. A directory read error is no longer taken for a missing `CONFIG.INI`.
 

@@ -224,7 +224,7 @@ static void parts_body(Window *w, Rect r) {
             } else {
                 Part *p = &tab[rw->d].p[rw->part]; FsCheck *c = &cv[rw->d][rw->part];
                 /* um crescimento interrompido: a partição já maior que o volume (o NTFS fica marcado para o chkdsk, e o
-                 * mínimo não é calculado). Oferece só terminar, com o mesmo tamanho; o motor confere o resto */
+                 * mínimo não é calculado). Oferece terminar, com o mesmo tamanho; o motor confere o resto */
                 u64 vsz = (c->verdict == SAFE_OK || (c->verdict == SAFE_DIRTY && p->fs == FS_NTFS)) ? vsz_of[rw->d][rw->part] : 0;
                 /* NTFS ocupa a partição inteira (o volume conta a cópia do boot no fim): qualquer diferença é um crescimento
                  * interrompido. FAT32/exFAT podem sobrar uns setores de alinhamento: só a partir de 1 MiB */
@@ -233,7 +233,10 @@ static void parts_body(Window *w, Rect r) {
                         st = PS_RESIZE; size_lo = size_hi = size_mb = (float)(rw->count >> 11); finish_count = rw->count; w->nav = -1;
                     }
                     bx += SI(230);
-                } else if (fs_resizable(p->fs) && c->verdict == SAFE_OK && c->min_bytes) {
+                }
+                /* um NTFS com setores sobrando no fim da partição (sem ter sido um crescimento interrompido) continua
+                 * podendo ser redimensionado: os dois botões aparecem */
+                if (fs_resizable(p->fs) && c->verdict == SAFE_OK && c->min_bytes) {
                     if (ui_button(rect(bx, by, SI(150), SI(40)), L("Resize"), BTN_PRIMARY)) {
                         u64 lim = grow_limit(rw);
                         st = PS_RESIZE; finish_count = 0; size_lo = (float)((c->min_bytes + (1 << 20) - 1) >> 20); size_hi = (float)(lim >> 11); size_mb = (float)(rw->count >> 11); w->nav = -1;
