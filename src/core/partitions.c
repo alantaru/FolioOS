@@ -19,7 +19,7 @@ static FsCheck cv[PD][PART_MAX];
 static Row rows[PD * PR]; static int nrows, cur = -1, st;
 static float size_mb, size_lo, size_hi;                                       /* criar/redimensionar: o tamanho escolhido */
 static char label[12] = "DATA", word[48];
-static bool pending;
+static bool pending; static int pend_op, pend_wait;   /* a operação confirmada e quantos quadros esperar (o aviso de trabalho aparece antes) */
 static InstallResult res;
 static char backup_name[64];
 
@@ -77,29 +77,40 @@ void partitions_open(void) {
 }
 
 /* ------------------------------------------------------------ gravação (no começo do quadro seguinte) */
+/* o motor confere em FOLIO/BACKUP que o nome da cópia ainda não existe (pela lista do pendrive) */
+static bool s_list(void *ctx, const char *dir, void (*cb)(void *, const char *, bool, u64), void *u) {
+    UNUSED(ctx); char p[200]; fmt(p, sizeof p, "/%s", dir);
+    FileEntry *l; int n = pal_list(app_boot_vol(), p, &l);
+    if (n < 0) return false;
+    for (int i = 0; i < n; i++) cb(u, l[i].name, l[i].dir, l[i].size);
+    mem_free(l);
+    return true;
+}
 static bool s_backup(void *ctx, const char *name, const void *data, u32 n) {
     UNUSED(ctx);
     paths_ensure(app_boot_vol(), DIR_FOLIO);
     char d[200], p[260]; fmt(d, sizeof d, "%s/BACKUP", paths_dir(DIR_FOLIO));
     pal_mkdir(app_boot_vol(), d);
     fmt(p, sizeof p, "%s/%s", d, name);
-    str_copy(backup_name, p, sizeof backup_name);
-    return pal_write(app_boot_vol(), p, data, n);
+    if (!pal_write(app_boot_vol(), p, data, n)) return false;
+    str_copy(backup_name, p, sizeof backup_name);      /* só depois de gravada: a tela não anuncia uma cópia que não existe */
+    return true;
 }
 void partitions_poll(void) {
     if (!pending) return;
+    if (pend_wait > 0) { pend_wait--; ui.redraw = true; return; }   /* primeiro um quadro com "Não desligue…" na tela */
     pending = false;
     Row rw = rows[cur]; BlkDev b; InstallSrc s; memset(&s, 0, sizeof s);
     DateTime t; pal_now(&t);
     fmt(s.date, sizeof s.date, "%04d-%02d-%02d-%02d%02d%02d", t.year, t.month, t.day, t.hour, t.min, t.sec);
-    s.backup = s_backup; s.seed = pal_ms() * 0x9E3779B97F4A7C15ull ^ (u64)t.sec << 40;
+    s.backup = s_backup; s.list = s_list; s.seed = pal_ms() * 0x9E3779B97F4A7C15ull ^ (u64)t.sec << 40;
     s.bufsize = 1u << 20; s.buf = mem_alloc(s.bufsize);
     backup_name[0] = 0;
     memset(&res, 0, sizeof res);
     if (!s.buf || !disk_dev(dsk[rw.d].k, &b)) res.code = INST_ERR_WRITE;
     else {
         u64 ns = (u64)size_mb * 2048;
-        int op = st;
+        int op = pend_op;
         if (op == PS_CREATE) part_op_create(&b, &s, rw.start, MIN(ns, rw.count), label, &res);
         else if (op == PS_RESIZE) part_op_resize(&b, &s, rw.start, ns, &res);
         else if (op == PS_FORMAT) part_op_format(&b, &s, rw.start, label, &res);
@@ -134,7 +145,7 @@ static void disk_title(int d, char *o, int cap) {
     fmt(o, cap, "%s · %s · %s", disk_kind_name(dsk[d].di.kind), dsk[d].di.model[0] ? dsk[d].di.model : L("disk"), sz);
 }
 static void row_text(const Row *rw, char *o, int cap) {
-    char sz[24]; disk_size_text(rw->count * 512, sz, sizeof sz);
+    char sz[24]; disk_size_text(rw->count * dsk[rw->d].di.bs, sz, sizeof sz);   /* em setores do próprio disco */
     if (rw->none) { str_copy(o, dsk[rw->d].why[0] ? dsk[rw->d].why : L("Empty: no partitions"), cap); return; }
     if (rw->free) { fmt(o, cap, L("Free space · %s"), sz); return; }
     PartTable *t = &tab[rw->d]; Part *p = &t->p[rw->part];
@@ -171,8 +182,16 @@ static void parts_body(Window *w, Rect r) {
     if (st == PS_LIST) {
         y = wrap(f, S(13.5f), x, y, wd, L("Choose a partition or a free space, then an action. Before anything is written, the start of the disk is saved to FOLIO/BACKUP on this USB drive."), dim) + S(6);
         if (!ndsk) wrap(f, S(14), x, y + S(10), wd, L("No disk was found besides the USB drive FolioOS started from."), T->panel_text);
+        /* a lista rola (roda do mouse, barra, e o teclado leva o item focado para dentro da área): todas as linhas
+         * são alcançáveis, mesmo com muitos discos e partições */
+        static float list_scroll;
+        Rect area = rect(r.x, (int)y, r.w, by - SI(12) - (int)y);
+        if (ui_hover(area) && ui.in.wheel) list_scroll -= ui.in.wheel * SI(60);
+        if (list_scroll < 0) list_scroll = 0;
+        gfx_push_clip(area);
+        float y0 = y; y -= list_scroll;
         int last_d = -1;
-        for (int i = 0; i < nrows && y < by - S(60); i++) {
+        for (int i = 0; i < nrows; i++) {
             Row *rw = &rows[i];
             if (rw->d != last_d) {
                 last_d = rw->d; disk_title(rw->d, line, sizeof line);
@@ -187,6 +206,11 @@ static void parts_body(Window *w, Rect r) {
             if (fire) cur = i;
             y += S(36);
         }
+        float content = y + list_scroll - y0;
+        ui_reveal(&list_scroll, area);
+        gfx_pop_clip();
+        if (content > area.h) ui_scrollbar(rect(r.x + r.w - SI(8), area.y + SI(4), SI(5), area.h - SI(8)), &list_scroll, content, (float)area.h);
+        else list_scroll = 0;
         /* as ações do item escolhido */
         if (cur >= 0 && cur < nrows && !dsk[rows[cur].d].why[0] && !rows[cur].none) {
             Row *rw = &rows[cur]; int bx = x;
@@ -228,7 +252,10 @@ static void parts_body(Window *w, Rect r) {
         ui_slider(rect(x, (int)y, wd, SI(52)), &size_mb, size_lo, size_hi, L("Size"), a);
         y += S(58);
         if (st == PS_RESIZE) y = wrap(f, S(13), x, y, wd, t->p[rw->part].fs == FS_NTFS ? L("No file is moved: FolioOS only takes free space from the end of that partition. The next time Windows starts, it checks the partition (chkdsk) once; this is expected.") : L("No file is moved: FolioOS only takes free space from the end of that partition."), dim);
-        ok = (u64)size_mb != (rw->count >> 11) || st == PS_CREATE;
+        {   /* mesmo tamanho da partição só vale para terminar um crescimento interrompido (o volume ficou menor) */
+            BlkDev bd; u64 vs = st == PS_RESIZE && disk_dev(dsk[rw->d].k, &bd) ? fs_size(&bd, t->p[rw->part].fs, rw->start) : 0;
+            ok = (u64)size_mb != (rw->count >> 11) || st == PS_CREATE || (vs && vs < rw->count && (u64)size_mb == (rw->count >> 11));
+        }
     }
     if (st == PS_CREATE || st == PS_FORMAT) {
         y = wrap(f, S(13.5f), x, y + S(4), wd, L("Name of the new volume:"), T->panel_text) + S(2);
@@ -246,7 +273,7 @@ static void parts_body(Window *w, Rect r) {
     if (ui_button(rect(x, by, SI(140), SI(40)), L("Back"), BTN_GHOST)) { st = PS_LIST; ui.focus = 0; w->nav = -1; return; }
     const char *go = st == PS_CREATE ? L("Create") : st == PS_RESIZE ? L("Apply") : st == PS_FORMAT ? L("Format") : L("Delete");
     if (ui_button(rect(x + wd - SI(200), by, SI(200), SI(40)), go, ok ? (need_word ? BTN_DANGER : BTN_PRIMARY) : BTN_SUBTLE)) {
-        if (ok) { pending = true; ui.focus = 0; w->nav = -1; }
+        if (ok) { pending = true; pend_op = st; pend_wait = 1; st = PS_WORKING; ui.focus = 0; w->nav = -1; ui.redraw = true; }   /* o aviso aparece antes de qualquer gravação */
         else if (need_word) { fmt(line, sizeof line, L("To confirm, type %s:"), cw); ui_toast(line); }
     }
 }

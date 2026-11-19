@@ -13,1674 +13,1680 @@ msgstr ""
 "X-Date-Format: {yyyy}年{month}{d}日\n"
 "X-Decimal: .\n"
 
-#: src/core/app.c:34 src/core/app.c:56 src/core/app.c:276 src/core/filedlg.c:139 src/core/md.c:239
+#: src/core/app.c:34 src/core/app.c:56 src/core/app.c:338 src/core/filedlg.c:139 src/core/md.c:239
 msgid "Untitled"
 msgstr "未命名"
 
-#: src/core/app.c:164
+#: src/core/app.c:226
 msgid "Could not open the file"
 msgstr "无法打开文件"
 
-#: src/core/app.c:288 src/core/app.c:558
+#: src/core/app.c:350 src/core/app.c:630
 msgid "Limit of 16 tabs — close one (Ctrl+W)"
 msgstr "最多 16 个标签页——请关闭一个（Ctrl+W）"
 
-#: src/core/app.c:423
+#: src/core/app.c:484
 msgid "Picking up where you left off"
 msgstr "从上次停下的地方继续"
 
-#: src/core/app.c:441
+#: src/core/app.c:502
 msgid "Close tab without saving?"
 msgstr "不保存就关闭标签页？"
 
-#: src/core/app.c:441
+#: src/core/app.c:502
 msgid "Save changes?"
 msgstr "保存更改？"
 
-#: src/core/app.c:442
+#: src/core/app.c:503
 msgid "The current document has changes that have not been saved yet."
 msgstr "当前文档有尚未保存的更改。"
 
-#: src/core/app.c:442 src/core/app.c:868 src/core/app.c:1004 src/core/filedlg.c:410
+#: src/core/app.c:503 src/core/app.c:940 src/core/app.c:1074 src/core/filedlg.c:410
 msgid "Save"
 msgstr "保存"
 
-#: src/core/app.c:442
+#: src/core/app.c:503
 msgid "Don't save"
 msgstr "不保存"
 
-#: src/core/app.c:534
+#: src/core/app.c:605
 msgid "Connect the USB drive with your texts (a DOCUMENTS folder) first."
 msgstr "请先连接存有你文本的 U 盘（DOCUMENTS 文件夹）。"
 
-#: src/core/app.c:539
+#: src/core/app.c:610
 msgid "The texts on this computer and on the USB drive are already the same."
 msgstr "这台电脑和 U 盘上的文本已经相同。"
 
-#: src/core/app.c:540
+#: src/core/app.c:611
 #, c-format
 msgid "Texts exchanged: %d to the USB drive, %d to this computer."
 msgstr "文本已交换：%d 个到 U 盘，%d 个到这台电脑。"
 
-#: src/core/app.c:541
+#: src/core/app.c:612
 #, c-format
-msgid " %d left as it is (open in another tab, or changed on both sides at the same minute)."
-msgid_plural " %d left as they are (open in another tab, or changed on both sides at the same minute)."
-msgstr[0] " %d 个保持不变（在其他标签页中打开，或两边在同一分钟内都有修改）。"
+msgid " %d left as it is (open in another tab or with unsaved changes, or changed on both sides at the same minute)."
+msgid_plural " %d left as they are (open in another tab or with unsaved changes, or changed on both sides at the same minute)."
+msgstr[0] " %d 个保持原样（在另一个标签页中打开或有未保存的更改，或在同一分钟内两边都被修改）。"
 
-#: src/core/app.c:548
+#: src/core/app.c:613
+#, c-format
+msgid " %d could not be copied (nothing was replaced without its previous version saved)."
+msgid_plural " %d could not be copied (nothing was replaced without its previous version saved)."
+msgstr[0] " %d 个无法复制（在保存旧版本之前不会替换任何内容）。"
+
+#: src/core/app.c:620
 msgid "This format is export-only. Open the matching .md file."
 msgstr "此格式仅用于导出。请打开对应的 .md 文件。"
 
-#: src/core/app.c:569
+#: src/core/app.c:641
 msgid "Failed to create the file"
 msgstr "无法创建文件"
 
-#: src/core/app.c:580
+#: src/core/app.c:652
 msgid "Write error — is the USB drive write-protected or full?"
 msgstr "写入出错——U 盘是否写保护或已满？"
 
-#: src/core/app.c:593 src/core/app.c:609
+#: src/core/app.c:665 src/core/app.c:681
 #, c-format
 msgid "Saved · %s"
 msgstr "已保存 · %s"
 
-#: src/core/app.c:598 src/core/filedlg.c:197
+#: src/core/app.c:670 src/core/filedlg.c:197
 msgid "Export is not available for LaTeX files"
 msgstr "LaTeX 文件无法导出"
 
-#: src/core/app.c:611
+#: src/core/app.c:683
 #, c-format
 msgid "Exported · %s"
 msgstr "已导出 · %s"
 
-#: src/core/app.c:659
+#: src/core/app.c:731
 msgid "Narrow"
 msgstr "窄"
 
-#: src/core/app.c:659
+#: src/core/app.c:731
 msgid "Medium"
 msgstr "中"
 
-#: src/core/app.c:659
+#: src/core/app.c:731
 msgid "Wide"
 msgstr "宽"
 
-#: src/core/app.c:659
+#: src/core/app.c:731
 msgid "Extra"
 msgstr "特宽"
 
-#: src/core/app.c:663
+#: src/core/app.c:735
 msgid "Full screen: the text uses the full width"
 msgstr "全屏：文字占满整个宽度"
 
-#: src/core/app.c:663
+#: src/core/app.c:735
 msgid "Page: text in a column, like on a sheet of paper"
 msgstr "页面：文字排成一栏，像在纸上一样"
 
-#: src/core/app.c:705
+#: src/core/app.c:777
 msgid "Settings"
 msgstr "设置"
 
-#: src/core/app.c:706 src/core/app.c:882 src/core/app.c:1015 src/core/app.c:1757
+#: src/core/app.c:778 src/core/app.c:954 src/core/app.c:1085 src/core/app.c:1827
 msgid "Find and replace"
 msgstr "查找和替换"
 
-#: src/core/app.c:707 src/core/app.c:1015 src/core/app.c:1769
+#: src/core/app.c:779 src/core/app.c:1085 src/core/app.c:1839
 msgid "Outline"
 msgstr "大纲"
 
-#: src/core/app.c:708 src/core/app.c:899 src/core/app.c:1770
+#: src/core/app.c:780 src/core/app.c:971 src/core/app.c:1840
 msgid "Session and goals"
 msgstr "会话与目标"
 
-#: src/core/app.c:709 src/core/app.c:903 src/core/app.c:1019
+#: src/core/app.c:781 src/core/app.c:975 src/core/app.c:1089
 msgid "Keyboard shortcuts"
 msgstr "键盘快捷键"
 
-#: src/core/app.c:710
+#: src/core/app.c:782
 msgid "Commands"
 msgstr "命令"
 
-#: src/core/app.c:711 src/core/app.c:1889
+#: src/core/app.c:783 src/core/app.c:1959
 msgid "Menu"
 msgstr "菜单"
 
-#: src/core/app.c:713
+#: src/core/app.c:785
 msgid "Theme editor"
 msgstr "主题编辑器"
 
-#: src/core/app.c:732
+#: src/core/app.c:804
 #, c-format
 msgid "Tabs on · %d documents open (Ctrl+N new, Ctrl+W close)"
 msgstr "标签页已开启 · 打开了 %d 个文档（Ctrl+N 新建，Ctrl+W 关闭）"
 
-#: src/core/app.c:732
+#: src/core/app.c:804
 msgid "Tabs on (Ctrl+N new tab, Ctrl+W close)"
 msgstr "标签页已开启（Ctrl+N 新建标签页，Ctrl+W 关闭）"
 
-#: src/core/app.c:733
+#: src/core/app.c:805
 msgid "Tabs off — your tabs are kept for when you turn them back on"
 msgstr "标签页已关闭——下次开启时会恢复"
 
-#: src/core/app.c:736
+#: src/core/app.c:808
 msgid "Turn tabs on to use Ctrl+W (Ctrl+K → Tabs, or the button at the top)"
 msgstr "开启标签页即可使用 Ctrl+W（Ctrl+K → 标签页，或顶部的按钮）"
 
-#: src/core/app.c:748
+#: src/core/app.c:820
 msgid "Focus off"
 msgstr "专注已关闭"
 
-#: src/core/app.c:748
+#: src/core/app.c:820
 msgid "Focus on sentence"
 msgstr "专注于句子"
 
-#: src/core/app.c:748
+#: src/core/app.c:820
 msgid "Focus on paragraph"
 msgstr "专注于段落"
 
-#: src/core/app.c:748
+#: src/core/app.c:820
 msgid "Focus on line"
 msgstr "专注于行"
 
-#: src/core/app.c:751
+#: src/core/app.c:823
 msgid "Typewriter: current line always centered"
 msgstr "打字机：当前行始终居中"
 
-#: src/core/app.c:751
+#: src/core/app.c:823
 msgid "Typewriter off"
 msgstr "打字机已关闭"
 
-#: src/core/app.c:752
+#: src/core/app.c:824
 msgid "Zen mode — Esc or move the mouse to the top to leave"
 msgstr "禅模式——按 Esc 或将鼠标移到顶部退出"
 
-#: src/core/app.c:752
+#: src/core/app.c:824
 msgid "Zen mode off"
 msgstr "禅模式已关闭"
 
-#: src/core/app.c:773
+#: src/core/app.c:845
 #, c-format
 msgid "Theme: %s"
 msgstr "主题：%s"
 
-#: src/core/app.c:774
+#: src/core/app.c:846
 #, c-format
 msgid "Font: %s"
 msgstr "字体：%s"
 
-#: src/core/app.c:787
+#: src/core/app.c:859
 msgid "Sprint stopped"
 msgstr "冲刺已中断"
 
-#: src/core/app.c:790
+#: src/core/app.c:862
 #, c-format
 msgid "%d-minute sprint started. Happy writing!"
 msgstr "%d 分钟冲刺已开始。写作愉快！"
 
-#: src/core/app.c:793
+#: src/core/app.c:865
 msgid "Hemingway mode: deleting is disabled"
 msgstr "海明威模式：已禁用删除"
 
-#: src/core/app.c:793
+#: src/core/app.c:865
 msgid "Hemingway mode off"
 msgstr "海明威模式已关闭"
 
-#: src/core/app.c:794
+#: src/core/app.c:866
 msgid "Markup hidden outside the current paragraph"
 msgstr "当前段落以外的标记已隐藏"
 
-#: src/core/app.c:794
+#: src/core/app.c:866
 msgid "Markup always visible"
 msgstr "标记始终可见"
 
-#: src/core/app.c:795
+#: src/core/app.c:867
 msgid "Smart typography on (— “ ” …)"
 msgstr "智能排版已开启（— “ ” …）"
 
-#: src/core/app.c:795
+#: src/core/app.c:867
 msgid "Smart typography off"
 msgstr "智能排版已关闭"
 
-#: src/core/app.c:807
+#: src/core/app.c:879
 #, c-format
 msgid "Page %s"
 msgstr "页面：%s"
 
-#: src/core/app.c:815 src/core/editor.c:757 src/core/preview.c:252
+#: src/core/app.c:887 src/core/editor.c:757 src/core/preview.c:252
 msgid "This is the last chapter"
 msgstr "这是最后一章"
 
-#: src/core/app.c:832
+#: src/core/app.c:904
 msgid "Mouse and touchpad off: keyboard only (Ctrl+K → Mouse turns them back on)"
 msgstr "鼠标和触摸板已关闭：仅用键盘（Ctrl+K → 鼠标 可重新开启）"
 
-#: src/core/app.c:832
+#: src/core/app.c:904
 msgid "Mouse and touchpad on"
 msgstr "鼠标和触摸板已开启"
 
-#: src/core/app.c:843
+#: src/core/app.c:915
 msgid "Could not read the language file"
 msgstr "无法读取语言文件"
 
-#: src/core/app.c:847
+#: src/core/app.c:919
 #, c-format
 msgid "This language needs fonts (%s) that are missing from %s. Copy FolioOS.zip to the USB drive again."
 msgstr "此语言需要的字体（%s）在 %s 中缺失。请重新将 FolioOS.zip 复制到 U 盘。"
 
-#: src/core/app.c:860
+#: src/core/app.c:932
 msgid "New document"
 msgstr "新建文档"
 
-#: src/core/app.c:860 src/core/app.c:1003
+#: src/core/app.c:932 src/core/app.c:1073
 msgid "Ctrl+N"
 msgstr "Ctrl+N"
 
-#: src/core/app.c:861
+#: src/core/app.c:933
 msgid "Tabs: several documents (on/off)"
 msgstr "标签页：多个文档（开/关）"
 
-#: src/core/app.c:862
+#: src/core/app.c:934
 msgid "Close tab"
 msgstr "关闭标签页"
 
-#: src/core/app.c:862
+#: src/core/app.c:934
 msgid "Ctrl+W"
 msgstr "Ctrl+W"
 
-#: src/core/app.c:863
+#: src/core/app.c:935
 msgid "Next tab"
 msgstr "下一个标签页"
 
-#: src/core/app.c:863
+#: src/core/app.c:935
 msgid "Ctrl+Tab"
 msgstr "Ctrl+Tab"
 
-#: src/core/app.c:864
+#: src/core/app.c:936
 msgid "Previous tab"
 msgstr "上一个标签页"
 
-#: src/core/app.c:864
+#: src/core/app.c:936
 msgid "Ctrl+Shift+Tab"
 msgstr "Ctrl+Shift+Tab"
 
-#: src/core/app.c:865
+#: src/core/app.c:937
 msgid "Create a custom theme (colors and fonts)"
 msgstr "创建自定义主题（颜色和字体）"
 
-#: src/core/app.c:866
+#: src/core/app.c:938
 msgid "Edit the current theme"
 msgstr "编辑当前主题"
 
-#: src/core/app.c:867 src/core/app.c:1003
+#: src/core/app.c:939 src/core/app.c:1073
 msgid "Open…"
 msgstr "打开…"
 
-#: src/core/app.c:867 src/core/app.c:1003
+#: src/core/app.c:939 src/core/app.c:1073
 msgid "Ctrl+O"
 msgstr "Ctrl+O"
 
-#: src/core/app.c:868 src/core/app.c:1004
+#: src/core/app.c:940 src/core/app.c:1074
 msgid "Ctrl+S"
 msgstr "Ctrl+S"
 
-#: src/core/app.c:869 src/core/app.c:1004
+#: src/core/app.c:941 src/core/app.c:1074
 msgid "Save as / Export…"
 msgstr "另存为 / 导出…"
 
-#: src/core/app.c:869 src/core/app.c:1004 src/core/app.c:1754
+#: src/core/app.c:941 src/core/app.c:1074 src/core/app.c:1824
 msgid "Ctrl+Shift+S"
 msgstr "Ctrl+Shift+S"
 
-#: src/core/app.c:870
+#: src/core/app.c:942
 msgid "Reading mode (formatted Markdown)"
 msgstr "阅读模式（格式化的 Markdown）"
 
-#: src/core/app.c:870 src/core/app.c:1756
+#: src/core/app.c:942 src/core/app.c:1826
 msgid "Ctrl+P"
 msgstr "Ctrl+P"
 
-#: src/core/app.c:871
+#: src/core/app.c:943
 msgid "Reading auto-scroll (on/off)"
 msgstr "阅读时自动滚动（开/关）"
 
-#: src/core/app.c:871 src/core/app.c:1763
+#: src/core/app.c:943 src/core/app.c:1833
 msgid "Enter (reading)"
 msgstr "Enter（阅读）"
 
-#: src/core/app.c:872
+#: src/core/app.c:944
 msgid "Next chapter"
 msgstr "下一章"
 
-#: src/core/app.c:872
+#: src/core/app.c:944
 msgid "Ctrl+PgDn"
 msgstr "Ctrl+PgDn"
 
-#: src/core/app.c:873
+#: src/core/app.c:945
 msgid "Previous chapter"
 msgstr "上一章"
 
-#: src/core/app.c:873
+#: src/core/app.c:945
 msgid "Ctrl+PgUp"
 msgstr "Ctrl+PgUp"
 
-#: src/core/app.c:874
+#: src/core/app.c:946
 msgid "Go to the last edit"
 msgstr "转到上次编辑处"
 
-#: src/core/app.c:874 src/core/app.c:1761
+#: src/core/app.c:946 src/core/app.c:1831
 msgid "Ctrl+J"
 msgstr "Ctrl+J"
 
-#: src/core/app.c:875 src/core/app.c:1760
+#: src/core/app.c:947 src/core/app.c:1830
 msgid "Duplicate paragraph"
 msgstr "复制段落"
 
-#: src/core/app.c:875 src/core/app.c:1760
+#: src/core/app.c:947 src/core/app.c:1830
 msgid "Ctrl+D"
 msgstr "Ctrl+D"
 
-#: src/core/app.c:876 src/core/app.c:1760
+#: src/core/app.c:948 src/core/app.c:1830
 msgid "Delete paragraph"
 msgstr "删除段落"
 
-#: src/core/app.c:876 src/core/app.c:1760
+#: src/core/app.c:948 src/core/app.c:1830
 msgid "Ctrl+Shift+K"
 msgstr "Ctrl+Shift+K"
 
-#: src/core/app.c:877
+#: src/core/app.c:949
 msgid "Change case"
 msgstr "大小写"
 
-#: src/core/app.c:877 src/core/app.c:1762
+#: src/core/app.c:949 src/core/app.c:1832
 msgid "Shift+F3"
 msgstr "Shift+F3"
 
-#: src/core/app.c:878
+#: src/core/app.c:950
 msgid "Insert today's date"
 msgstr "插入今天的日期"
 
-#: src/core/app.c:879
+#: src/core/app.c:951
 msgid "Focus mode (sentence / paragraph / line)"
 msgstr "专注模式（句子 / 段落 / 行）"
 
-#: src/core/app.c:880
+#: src/core/app.c:952
 msgid "Typewriter (centered line)"
 msgstr "打字机（行居中）"
 
-#: src/core/app.c:881
+#: src/core/app.c:953
 msgid "Zen mode (no bars)"
 msgstr "禅模式（无工具栏）"
 
-#: src/core/app.c:882 src/core/app.c:1015 src/core/app.c:1757
+#: src/core/app.c:954 src/core/app.c:1085 src/core/app.c:1827
 msgid "Ctrl+F"
 msgstr "Ctrl+F"
 
-#: src/core/app.c:883
+#: src/core/app.c:955
 msgid "Document outline"
 msgstr "文档大纲"
 
-#: src/core/app.c:884
+#: src/core/app.c:956
 msgid "Appearance: themes and typography"
 msgstr "外观：主题和排版"
 
-#: src/core/app.c:885 src/core/app.c:1766
+#: src/core/app.c:957 src/core/app.c:1836
 msgid "Next theme"
 msgstr "下一个主题"
 
-#: src/core/app.c:885 src/core/app.c:1766
+#: src/core/app.c:957 src/core/app.c:1836
 msgid "Ctrl+T"
 msgstr "Ctrl+T"
 
-#: src/core/app.c:886
+#: src/core/app.c:958
 msgid "Next font"
 msgstr "下一个字体"
 
-#: src/core/app.c:886
+#: src/core/app.c:958
 msgid "Ctrl+Shift+T"
 msgstr "Ctrl+Shift+T"
 
-#: src/core/app.c:887
+#: src/core/app.c:959
 msgid "Larger text"
 msgstr "放大文字"
 
-#: src/core/app.c:887
+#: src/core/app.c:959
 msgid "Ctrl+="
 msgstr "Ctrl+="
 
-#: src/core/app.c:888
+#: src/core/app.c:960
 msgid "Smaller text"
 msgstr "缩小文字"
 
-#: src/core/app.c:888
+#: src/core/app.c:960
 msgid "Ctrl+-"
 msgstr "Ctrl+-"
 
-#: src/core/app.c:889
+#: src/core/app.c:961
 msgid "Page or full screen (text width)"
 msgstr "页面或全屏（文字宽度）"
 
-#: src/core/app.c:890
+#: src/core/app.c:962
 msgid "Page size: narrow · medium · wide · extra"
 msgstr "页面大小：窄 · 中 · 宽 · 特宽"
 
-#: src/core/app.c:891
+#: src/core/app.c:963
 msgid "Paper sheet (show/hide)"
 msgstr "纸张（显示/隐藏）"
 
-#: src/core/app.c:892 src/core/app.c:1018
+#: src/core/app.c:964 src/core/app.c:1088
 msgid "Writing settings"
 msgstr "写作设置"
 
-#: src/core/app.c:893
+#: src/core/app.c:965
 msgid "Music: play / pause"
 msgstr "音乐：播放 / 暂停"
 
-#: src/core/app.c:894
+#: src/core/app.c:966
 msgid "Music: next track"
 msgstr "音乐：下一首"
 
-#: src/core/app.c:895
+#: src/core/app.c:967
 msgid "Music: previous track"
 msgstr "音乐：上一首"
 
-#: src/core/app.c:896 src/core/app.c:1769
+#: src/core/app.c:968 src/core/app.c:1839
 msgid "Music player"
 msgstr "音乐播放器"
 
-#: src/core/app.c:897
+#: src/core/app.c:969
 msgid "Sound test (chime)"
 msgstr "声音测试（铃声）"
 
-#: src/core/app.c:898
+#: src/core/app.c:970
 msgid "Start / stop writing sprint"
 msgstr "开始 / 停止写作冲刺"
 
-#: src/core/app.c:900
+#: src/core/app.c:972
 msgid "Hemingway mode (no deleting)"
 msgstr "海明威模式（不可删除）"
 
-#: src/core/app.c:901
+#: src/core/app.c:973
 msgid "Hide markup outside the paragraph"
 msgstr "隐藏段落以外的标记"
 
-#: src/core/app.c:902
+#: src/core/app.c:974
 msgid "Smart typography (— “ ” …)"
 msgstr "智能排版（— “ ” …）"
 
-#: src/core/app.c:904 src/core/app.c:1764
+#: src/core/app.c:976 src/core/app.c:1834
 msgid "Menu and recent documents"
 msgstr "菜单和最近的文档"
 
-#: src/core/app.c:904 src/core/app.c:1764
+#: src/core/app.c:976 src/core/app.c:1834
 msgid "Alt+M"
 msgstr "Alt+M"
 
-#: src/core/app.c:905
+#: src/core/app.c:977
 msgid "Keyboard focus: text or the next window"
 msgstr "键盘焦点：文本或下一个窗口"
 
-#: src/core/app.c:905 src/core/app.c:1774
+#: src/core/app.c:977 src/core/app.c:1844
 msgid "Ctrl+F6"
 msgstr "Ctrl+F6"
 
-#: src/core/app.c:906
+#: src/core/app.c:978
 msgid "Mouse and touchpad (on/off)"
 msgstr "鼠标和触摸板（开/关）"
 
-#: src/core/app.c:907 src/core/app.c:1776
+#: src/core/app.c:979 src/core/app.c:1846
 msgid "Input method on/off (Korean, Japanese)"
 msgstr "输入法 开/关（韩语、日语）"
 
-#: src/core/app.c:907 src/core/app.c:1776
+#: src/core/app.c:979 src/core/app.c:1846
 msgid "Ctrl+Space"
 msgstr "Ctrl+空格"
 
-#: src/core/app.c:908
+#: src/core/app.c:980
 msgid "Language and keyboard"
 msgstr "语言和键盘"
 
-#: src/core/app.c:909 src/core/installer.c:38
+#: src/core/app.c:981 src/core/installer.c:38
 msgid "Install FolioOS on this computer"
 msgstr "将 FolioOS 安装到这台电脑"
 
-#: src/core/app.c:910
+#: src/core/app.c:982
 msgid "Update FolioOS on this computer"
 msgstr "更新这台电脑上的 FolioOS"
 
-#: src/core/app.c:911 src/core/app.c:1315
+#: src/core/app.c:983 src/core/app.c:1385
 msgid "Exchange texts with the USB drive"
 msgstr "与 U 盘交换文本"
 
-#: src/core/app.c:912
+#: src/core/app.c:984
 msgid "Remove FolioOS from this computer"
 msgstr "从这台电脑移除 FolioOS"
 
-#: src/core/app.c:913 src/core/partitions.c:27
+#: src/core/app.c:985 src/core/partitions.c:27
 msgid "Disks and partitions"
 msgstr "磁盘和分区"
 
-#: src/core/app.c:914
+#: src/core/app.c:986
 msgid "Restart the computer"
 msgstr "重新启动电脑"
 
-#: src/core/app.c:915
+#: src/core/app.c:987
 msgid "Shut down the computer"
 msgstr "关闭电脑"
 
-#: src/core/app.c:915 src/core/app.c:1021 src/core/app.c:1772
+#: src/core/app.c:987 src/core/app.c:1091 src/core/app.c:1842
 msgid "Ctrl+Q"
 msgstr "Ctrl+Q"
 
-#: src/core/app.c:937
+#: src/core/app.c:1009
 msgid "Type a command…"
 msgstr "输入命令…"
 
-#: src/core/app.c:968
+#: src/core/app.c:1040
 msgid "No command found"
 msgstr "未找到命令"
 
-#: src/core/app.c:994
+#: src/core/app.c:1064
 msgid "File not found (a different USB drive?)"
 msgstr "找不到文件（换了一个 U 盘？）"
 
-#: src/core/app.c:1002
+#: src/core/app.c:1072
 msgid "DOCUMENT"
 msgstr "文档"
 
-#: src/core/app.c:1003
+#: src/core/app.c:1073
 msgid "New"
 msgstr "新建"
 
-#: src/core/app.c:1010
+#: src/core/app.c:1080
 msgid "RECENT"
 msgstr "最近"
 
-#: src/core/app.c:1014
+#: src/core/app.c:1084
 msgid "WRITING"
 msgstr "写作"
 
-#: src/core/app.c:1016
+#: src/core/app.c:1086
 msgid "Session, goals and sprint"
 msgstr "会话、目标和冲刺"
 
-#: src/core/app.c:1017
+#: src/core/app.c:1087
 msgid "PREFERENCES"
 msgstr "偏好设置"
 
-#: src/core/app.c:1018 src/core/app.c:1109 src/core/app.c:1771
+#: src/core/app.c:1088 src/core/app.c:1179 src/core/app.c:1841
 msgid "Appearance"
 msgstr "外观"
 
-#: src/core/app.c:1021 src/core/app.c:1345 src/core/app.c:1772
+#: src/core/app.c:1091 src/core/app.c:1415 src/core/app.c:1842
 msgid "Shut down"
 msgstr "关机"
 
-#: src/core/app.c:1086
+#: src/core/app.c:1156
 #, c-format
 msgid "Diagnostics saved to %s"
 msgstr "诊断信息已保存到 %s"
 
-#: src/core/app.c:1086
+#: src/core/app.c:1156
 msgid "Could not save the diagnostics"
 msgstr "无法保存诊断信息"
 
-#: src/core/app.c:1103
+#: src/core/app.c:1173
 msgid "Display restored: automatic resolution and rotation"
 msgstr "显示已恢复：自动分辨率和旋转"
 
-#: src/core/app.c:1109
+#: src/core/app.c:1179
 msgid "Writing"
 msgstr "写作"
 
-#: src/core/app.c:1109
+#: src/core/app.c:1179
 msgid "System"
 msgstr "系统"
 
-#: src/core/app.c:1119
+#: src/core/app.c:1189
 msgid "THEMES"
 msgstr "主题"
 
-#: src/core/app.c:1126
+#: src/core/app.c:1196
 msgid "+  Create my theme"
 msgstr "+  创建我的主题"
 
-#: src/core/app.c:1127
+#: src/core/app.c:1197
 msgid "Edit this theme"
 msgstr "编辑此主题"
 
-#: src/core/app.c:1129
+#: src/core/app.c:1199
 #, c-format
 msgid "Mix colors and fonts; themes are saved in %s (editable .INI files)."
 msgstr "自由搭配颜色和字体；主题保存在 %s（可编辑的 .INI 文件）。"
 
-#: src/core/app.c:1131
+#: src/core/app.c:1201
 msgid "TEXT FONT"
 msgstr "正文字体"
 
-#: src/core/app.c:1140
+#: src/core/app.c:1210
 msgid "The quick brown fox jumps — “Hello!”"
 msgstr "天地玄黄，宇宙洪荒 — “你好！”"
 
-#: src/core/app.c:1146
+#: src/core/app.c:1216
 #, c-format
 msgid "Add .ttf fonts to %s (subfolders work too) and restart."
 msgstr "将 .ttf 字体放入 %s（子文件夹也可以）然后重启。"
 
-#: src/core/app.c:1147
+#: src/core/app.c:1217
 msgid "Included writing fonts: Literata, Lora, EB Garamond, iA Writer, Special Elite and more."
 msgstr "已附带写作字体：Literata、Lora、EB Garamond、iA Writer、Special Elite 等。"
 
-#: src/core/app.c:1149
+#: src/core/app.c:1219
 msgid "TYPOGRAPHY"
 msgstr "排版"
 
-#: src/core/app.c:1150
+#: src/core/app.c:1220
 #, c-format
 msgid "%d px"
 msgstr "%d px"
 
-#: src/core/app.c:1151
+#: src/core/app.c:1221
 msgid "Text size"
 msgstr "文字大小"
 
-#: src/core/app.c:1154
+#: src/core/app.c:1224
 msgid "Line spacing"
 msgstr "行距"
 
-#: src/core/app.c:1156
+#: src/core/app.c:1226
 #, c-format
 msgid "%.2f lines"
 msgstr "%.2f 行"
 
-#: src/core/app.c:1157
+#: src/core/app.c:1227
 msgid "Space between paragraphs"
 msgstr "段落间距"
 
-#: src/core/app.c:1159
+#: src/core/app.c:1229
 msgid "First-line indent for paragraphs (book style)"
 msgstr "段首缩进（书籍样式）"
 
-#: src/core/app.c:1161
+#: src/core/app.c:1231
 msgid "PAGE"
 msgstr "页面"
 
-#: src/core/app.c:1163
+#: src/core/app.c:1233
 msgid "Page"
 msgstr "页面"
 
-#: src/core/app.c:1163
+#: src/core/app.c:1233
 msgid "Full screen"
 msgstr "全屏"
 
-#: src/core/app.c:1172
+#: src/core/app.c:1242
 #, c-format
 msgid "%d px (~%d characters per line)"
 msgstr "%d px（每行约 %d 个字符）"
 
-#: src/core/app.c:1173
+#: src/core/app.c:1243
 msgid "Page width"
 msgstr "页面宽度"
 
-#: src/core/app.c:1175
+#: src/core/app.c:1245
 msgid "Paper sheet on the desk (light themes)"
 msgstr "桌面上的纸张（浅色主题）"
 
-#: src/core/app.c:1178
+#: src/core/app.c:1248
 msgid "The text fills the whole screen width, with no sheet."
 msgstr "文字占满整个屏幕宽度，没有纸张。"
 
-#: src/core/app.c:1182
+#: src/core/app.c:1252
 msgid "FOCUS MODE"
 msgstr "专注模式"
 
-#: src/core/app.c:1183
+#: src/core/app.c:1253
 msgid "Off"
 msgstr "关"
 
-#: src/core/app.c:1183
+#: src/core/app.c:1253
 msgid "Sentence"
 msgstr "句子"
 
-#: src/core/app.c:1183
+#: src/core/app.c:1253
 msgid "Paragraph"
 msgstr "段落"
 
-#: src/core/app.c:1183
+#: src/core/app.c:1253
 msgid "Line"
 msgstr "行"
 
-#: src/core/app.c:1186
+#: src/core/app.c:1256
 msgid "EDITOR"
 msgstr "编辑器"
 
-#: src/core/app.c:1188
+#: src/core/app.c:1258
 msgid "Typewriter — current line in the center"
 msgstr "打字机——当前行居中"
 
-#: src/core/app.c:1189
+#: src/core/app.c:1259
 msgid "Live Markdown (headings, bold, lists)"
 msgstr "实时 Markdown（标题、粗体、列表）"
 
-#: src/core/app.c:1190
+#: src/core/app.c:1260
 msgid "Hide markup outside the current paragraph"
 msgstr "隐藏当前段落以外的标记"
 
-#: src/core/app.c:1191
+#: src/core/app.c:1261
 msgid "Smart typography:  --  →  —   \"\"  →  “”   ...  →  …"
 msgstr "智能排版：  --  →  —   \"\"  →  “”   ...  →  …"
 
-#: src/core/app.c:1192
+#: src/core/app.c:1262
 msgid "Hemingway mode — deleting is not allowed"
 msgstr "海明威模式——不允许删除"
 
-#: src/core/app.c:1193
+#: src/core/app.c:1263
 msgid "Hide the bars while writing"
 msgstr "写作时隐藏工具栏"
 
-#: src/core/app.c:1194
+#: src/core/app.c:1264
 msgid "Blinking cursor"
 msgstr "光标闪烁"
 
-#: src/core/app.c:1195
+#: src/core/app.c:1265
 msgid "Smooth cursor movement"
 msgstr "光标平滑移动"
 
-#: src/core/app.c:1202
+#: src/core/app.c:1272
 msgid "Tabs — several open documents, remembered after a restart"
 msgstr "标签页——可同时打开多个文档，重启后仍会保留"
 
-#: src/core/app.c:1205
+#: src/core/app.c:1275
 msgid "GOALS AND SAVING"
 msgstr "目标与保存"
 
-#: src/core/app.c:1206 src/core/app.c:1714 src/core/app.c:1966
+#: src/core/app.c:1276 src/core/app.c:1784 src/core/app.c:2036
 #, c-format
 msgid "%d word"
 msgid_plural "%d words"
 msgstr[0] "%d 字"
 
-#: src/core/app.c:1207
+#: src/core/app.c:1277
 msgid "Session goal"
 msgstr "本次会话目标"
 
-#: src/core/app.c:1209 src/core/app.c:1716 src/core/app.c:1931
+#: src/core/app.c:1279 src/core/app.c:1786 src/core/app.c:2001
 #, c-format
 msgid "%d min"
 msgstr "%d 分钟"
 
-#: src/core/app.c:1210
+#: src/core/app.c:1280
 msgid "Sprint length"
 msgstr "冲刺时长"
 
-#: src/core/app.c:1212
+#: src/core/app.c:1282
 #, c-format
 msgid "every %d s"
 msgstr "每 %d 秒"
 
-#: src/core/app.c:1213
+#: src/core/app.c:1283
 msgid "Autosave"
 msgstr "自动保存"
 
-#: src/core/app.c:1216
+#: src/core/app.c:1286
 msgid "LANGUAGE AND KEYBOARD"
 msgstr "语言和键盘"
 
-#: src/core/app.c:1219
+#: src/core/app.c:1289
 msgid "Language"
 msgstr "语言"
 
-#: src/core/app.c:1224
+#: src/core/app.c:1294
 msgid "Keyboard"
 msgstr "键盘"
 
-#: src/core/app.c:1233
+#: src/core/app.c:1303
 #, c-format
 msgid "Languages: %s · keyboards: %s (text files anyone can add)"
 msgstr "语言：%s · 键盘：%s（任何人都能添加的文本文件）"
 
-#: src/core/app.c:1237
+#: src/core/app.c:1307
 msgid "DISPLAY AND POINTER"
 msgstr "显示与指针"
 
-#: src/core/app.c:1238
+#: src/core/app.c:1308
 msgid "Auto"
 msgstr "自动"
 
-#: src/core/app.c:1243
+#: src/core/app.c:1313
 msgid "Rotate: auto"
 msgstr "旋转：自动"
 
-#: src/core/app.c:1251
+#: src/core/app.c:1321
 #, c-format
 msgid "Resolution: %dx%d"
 msgstr "分辨率：%dx%d"
 
-#: src/core/app.c:1252
+#: src/core/app.c:1322
 #, c-format
 msgid "Resolution: automatic (%dx%d)"
 msgstr "分辨率：自动（%dx%d）"
 
-#: src/core/app.c:1262
+#: src/core/app.c:1332
 msgid "Restore display"
 msgstr "恢复显示"
 
-#: src/core/app.c:1265
+#: src/core/app.c:1335
 msgid "Proportions: off"
 msgstr "保持比例: 关"
 
-#: src/core/app.c:1265
+#: src/core/app.c:1335
 msgid "Monitor"
 msgstr "显示器"
 
-#: src/core/app.c:1268
+#: src/core/app.c:1338
 msgid "If circles look like ovals, choose the shape of your screen."
 msgstr "如果圆形看起来像椭圆，请选择屏幕的形状。"
 
-#: src/core/app.c:1270
+#: src/core/app.c:1340
 msgid "If the picture looks wrong or goes black: Ctrl+Alt+Home restores it; Ctrl+Alt+arrows rotate the screen."
 msgstr "如果画面异常或黑屏：Ctrl+Alt+Home 可恢复；Ctrl+Alt+方向键可旋转屏幕。"
 
-#: src/core/app.c:1274
+#: src/core/app.c:1344
 msgid "Mouse / touchpad speed"
 msgstr "鼠标 / 触控板速度"
 
-#: src/core/app.c:1276
+#: src/core/app.c:1346
 msgid "Automatic"
 msgstr "自动"
 
-#: src/core/app.c:1276
+#: src/core/app.c:1346
 msgid "Touchpad"
 msgstr "触控板"
 
-#: src/core/app.c:1276
+#: src/core/app.c:1346
 msgid "Touch screen"
 msgstr "触摸屏"
 
-#: src/core/app.c:1279
+#: src/core/app.c:1349
 msgid "If the pointer jumps to the corners when you use the touchpad, choose Touchpad."
 msgstr "如果使用触控板时指针跳到角落，请选择“触控板”。"
 
-#: src/core/app.c:1282
+#: src/core/app.c:1352
 msgid "Use the mouse and touchpad (off = keyboard only)"
 msgstr "使用鼠标和触摸板（关闭 = 仅用键盘）"
 
-#: src/core/app.c:1284
+#: src/core/app.c:1354
 msgid "SOUND"
 msgstr "声音"
 
-#: src/core/app.c:1285
+#: src/core/app.c:1355
 msgid "Turn on the amplifier through GPIO (some laptops; applies after a restart)"
 msgstr "通过 GPIO 打开功放（部分笔记本；重启后生效）"
 
-#: src/core/app.c:1287
+#: src/core/app.c:1357
 msgid "Test sound"
 msgstr "测试声音"
 
-#: src/core/app.c:1288
+#: src/core/app.c:1358
 msgid "Save diagnostics"
 msgstr "保存诊断信息"
 
-#: src/core/app.c:1290
+#: src/core/app.c:1360
 #, c-format
 msgid "The diagnostics go to %s on the USB drive (it opens on any computer)."
 msgstr "诊断信息会保存到 U 盘上的 %s（任何电脑都能打开）。"
 
-#: src/core/app.c:1292
+#: src/core/app.c:1362
 msgid "STARTUP"
 msgstr "启动"
 
-#: src/core/app.c:1293
+#: src/core/app.c:1363
 msgid "FolioOS splash screen"
 msgstr "FolioOS 启动画面"
 
-#: src/core/app.c:1298
+#: src/core/app.c:1368
 msgid "Splash duration (any key skips it)"
 msgstr "启动画面时长（按任意键可跳过）"
 
-#: src/core/app.c:1305
+#: src/core/app.c:1375
 msgid "TEXTS"
 msgstr "文本"
 
-#: src/core/app.c:1306
+#: src/core/app.c:1376
 msgid "This computer"
 msgstr "这台电脑"
 
-#: src/core/app.c:1306
+#: src/core/app.c:1376
 msgid "USB drive"
 msgstr "U 盘"
 
-#: src/core/app.c:1306
+#: src/core/app.c:1376
 msgid "Both"
 msgstr "两者"
 
-#: src/core/app.c:1309
+#: src/core/app.c:1379
 msgid "Your texts stay on the USB drive and go with you; without it, new texts are saved on this computer."
 msgstr "你的文本保存在 U 盘上，随身携带；没有 U 盘时，新文本保存在这台电脑上。"
 
-#: src/core/app.c:1310
+#: src/core/app.c:1380
 msgid "Your texts are on this computer; the button copies the newest version of each text in both directions. Nothing is deleted."
 msgstr "你的文本在这台电脑上；按钮会把每个文本的最新版本双向复制。不会删除任何内容。"
 
-#: src/core/app.c:1311
+#: src/core/app.c:1381
 msgid "Your texts are on this computer."
 msgstr "你的文本在这台电脑上。"
 
-#: src/core/app.c:1322
+#: src/core/app.c:1392
 msgid "Wait for a key before starting the other system"
 msgstr "启动另一个系统前等待按键"
 
-#: src/core/app.c:1327
+#: src/core/app.c:1397
 msgid "Without a key, the other system starts as usual."
 msgstr "如果不按键，另一个系统会照常启动。"
 
-#: src/core/app.c:1327
+#: src/core/app.c:1397
 msgid "0 s: the computer always starts FolioOS."
 msgstr "0 秒：电脑总是启动 FolioOS。"
 
-#: src/core/app.c:1330
+#: src/core/app.c:1400
 msgid "ABOUT"
 msgstr "关于"
 
-#: src/core/app.c:1333
+#: src/core/app.c:1403
 #, c-format
 msgid "FolioOS %s · %s · %dx%d"
 msgstr "FolioOS %s · %s · %dx%d"
 
-#: src/core/app.c:1334
+#: src/core/app.c:1404
 #, c-format
 msgid "Memory: %d MB used of %d MB · %d fonts · %d themes"
 msgstr "内存：已用 %d MB / 共 %d MB · %d 种字体 · %d 个主题"
 
-#: src/core/app.c:1335
+#: src/core/app.c:1405
 #, c-format
 msgid "Audio: %s"
 msgstr "音频：%s"
 
-#: src/core/app.c:1340
+#: src/core/app.c:1410
 msgid "Install FolioOS on this computer…"
 msgstr "将 FolioOS 安装到这台电脑…"
 
-#: src/core/app.c:1342
+#: src/core/app.c:1412
 msgid "Disks and partitions…"
 msgstr "磁盘和分区…"
 
-#: src/core/app.c:1344 src/core/installer.c:496
+#: src/core/app.c:1414 src/core/installer.c:519
 msgid "Restart"
 msgstr "重新启动"
 
-#: src/core/app.c:1364
+#: src/core/app.c:1434
 msgid "Desk (background)"
 msgstr "桌面（背景）"
 
-#: src/core/app.c:1364
+#: src/core/app.c:1434
 msgid "Paper"
 msgstr "纸张"
 
-#: src/core/app.c:1364 src/core/app.c:1565
+#: src/core/app.c:1434 src/core/app.c:1635
 msgid "Text"
 msgstr "文字"
 
-#: src/core/app.c:1364
+#: src/core/app.c:1434
 msgid "Faded text"
 msgstr "淡化文字"
 
-#: src/core/app.c:1364
+#: src/core/app.c:1434
 msgid "Subtle lines"
 msgstr "细线"
 
-#: src/core/app.c:1364
+#: src/core/app.c:1434
 msgid "Accent"
 msgstr "强调色"
 
-#: src/core/app.c:1364
+#: src/core/app.c:1434
 msgid "Selection"
 msgstr "选区"
 
-#: src/core/app.c:1364
+#: src/core/app.c:1434
 msgid "Cursor"
 msgstr "光标"
 
-#: src/core/app.c:1365
+#: src/core/app.c:1435
 msgid "Bars"
 msgstr "工具栏"
 
-#: src/core/app.c:1365
+#: src/core/app.c:1435
 msgid "Bar text"
 msgstr "工具栏文字"
 
-#: src/core/app.c:1365
+#: src/core/app.c:1435
 msgid "Borders"
 msgstr "边框"
 
-#: src/core/app.c:1365
+#: src/core/app.c:1435
 msgid "Panels"
 msgstr "面板"
 
-#: src/core/app.c:1365
+#: src/core/app.c:1435
 msgid "Panel text"
 msgstr "面板文字"
 
-#: src/core/app.c:1365
+#: src/core/app.c:1435
 msgid "Headings"
 msgstr "标题"
 
-#: src/core/app.c:1365
+#: src/core/app.c:1435
 msgid "Code background"
 msgstr "代码背景"
 
-#: src/core/app.c:1365
+#: src/core/app.c:1435
 msgid "Highlighter"
 msgstr "荧光笔"
 
-#: src/core/app.c:1399
+#: src/core/app.c:1469
 msgid "My theme"
 msgstr "我的主题"
 
-#: src/core/app.c:1400
+#: src/core/app.c:1470
 #, c-format
 msgid "My theme %d"
 msgstr "我的主题 %d"
 
-#: src/core/app.c:1423
+#: src/core/app.c:1493
 msgid "Give the theme a name"
 msgstr "给主题起个名字"
 
-#: src/core/app.c:1425
+#: src/core/app.c:1495
 msgid "That name belongs to a built-in theme — choose another"
 msgstr "这是内置主题的名字——请换一个"
 
-#: src/core/app.c:1426
+#: src/core/app.c:1496
 msgid "You already have a theme with that name"
 msgstr "你已经有同名的主题了"
 
-#: src/core/app.c:1429
+#: src/core/app.c:1499
 #, c-format
 msgid "Could not write to %s (is the USB drive write-protected or full?)"
 msgstr "无法写入 %s（U 盘是否写保护或已满？）"
 
-#: src/core/app.c:1434
+#: src/core/app.c:1504
 #, c-format
 msgid "Theme “%s” saved to %s"
 msgstr "主题“%s”已保存到 %s"
 
-#: src/core/app.c:1446
+#: src/core/app.c:1516
 msgid "Theme deleted"
 msgstr "主题已删除"
 
-#: src/core/app.c:1477
+#: src/core/app.c:1547
 msgid "THEME NAME"
 msgstr "主题名称"
 
-#: src/core/app.c:1478
+#: src/core/app.c:1548
 msgid "Theme name"
 msgstr "主题名称"
 
-#: src/core/app.c:1481
+#: src/core/app.c:1551
 msgid "STARTING POINT"
 msgstr "起点"
 
-#: src/core/app.c:1484
+#: src/core/app.c:1554
 msgid "Colors from"
 msgstr "颜色来自"
 
-#: src/core/app.c:1486
+#: src/core/app.c:1556
 msgid "Use all"
 msgstr "全部使用"
 
-#: src/core/app.c:1493
+#: src/core/app.c:1563
 msgid "Or mix: pick a color below and take it from any built-in theme."
 msgstr "或者自由搭配：在下方选一种颜色，从任意内置主题中取用。"
 
-#: src/core/app.c:1497
+#: src/core/app.c:1567
 msgid "COLORS"
 msgstr "颜色"
 
-#: src/core/app.c:1526
+#: src/core/app.c:1596
 msgid "hex code"
 msgstr "十六进制代码"
 
-#: src/core/app.c:1530
+#: src/core/app.c:1600
 msgid "Hue"
 msgstr "色相"
 
-#: src/core/app.c:1533
+#: src/core/app.c:1603
 msgid "Saturation"
 msgstr "饱和度"
 
-#: src/core/app.c:1536
+#: src/core/app.c:1606
 msgid "Lightness"
 msgstr "亮度"
 
-#: src/core/app.c:1540
+#: src/core/app.c:1610
 msgid "Take from a built-in theme:"
 msgstr "从内置主题中取色："
 
-#: src/core/app.c:1563
+#: src/core/app.c:1633
 msgid "THEME FONTS"
 msgstr "主题字体"
 
-#: src/core/app.c:1570
+#: src/core/app.c:1640
 #, c-format
 msgid "Default (%s)"
 msgstr "默认（%s）"
 
-#: src/core/app.c:1571
+#: src/core/app.c:1641
 msgid "Interface"
 msgstr "界面"
 
-#: src/core/app.c:1579
+#: src/core/app.c:1649
 msgid "Interface = bars, menus and windows."
 msgstr "界面 = 工具栏、菜单和窗口。"
 
-#: src/core/app.c:1583
+#: src/core/app.c:1653
 msgid "DESK AND PAPER"
 msgstr "桌面与纸张"
 
-#: src/core/app.c:1584
+#: src/core/app.c:1654
 msgid "Paper sheet on the desk"
 msgstr "桌面上的纸张"
 
-#: src/core/app.c:1588
+#: src/core/app.c:1658
 msgid "Vignette at the desk edges"
 msgstr "桌面边缘暗角"
 
-#: src/core/app.c:1599
+#: src/core/app.c:1669
 msgid "Save theme"
 msgstr "保存主题"
 
-#: src/core/app.c:1600 src/core/filedlg.c:60 src/core/filedlg.c:73 src/core/filedlg.c:411 src/core/filedlg.c:442 src/core/installer.c:319
+#: src/core/app.c:1670 src/core/filedlg.c:60 src/core/filedlg.c:73 src/core/filedlg.c:411 src/core/filedlg.c:442 src/core/installer.c:339
 msgid "Cancel"
 msgstr "取消"
 
-#: src/core/app.c:1601 src/core/app.c:1602 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:208 src/core/partitions.c:247
+#: src/core/app.c:1671 src/core/app.c:1672 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:232 src/core/partitions.c:274
 msgid "Delete"
 msgstr "删除"
 
-#: src/core/app.c:1602
+#: src/core/app.c:1672
 msgid "Delete theme?"
 msgstr "删除主题？"
 
-#: src/core/app.c:1602
+#: src/core/app.c:1672
 #, c-format
 msgid "The theme file in %s will be deleted."
 msgstr "%s 中的主题文件将被删除。"
 
-#: src/core/app.c:1609
+#: src/core/app.c:1679
 msgid "Find"
 msgstr "查找"
 
-#: src/core/app.c:1610
+#: src/core/app.c:1680
 msgid "Previous (Shift+Enter)"
 msgstr "上一个（Shift+Enter）"
 
-#: src/core/app.c:1611
+#: src/core/app.c:1681
 msgid "Next (Enter)"
 msgstr "下一个（Enter）"
 
-#: src/core/app.c:1612
+#: src/core/app.c:1682
 msgid "Replace with"
 msgstr "替换为"
 
-#: src/core/app.c:1614 src/core/filedlg.c:204
+#: src/core/app.c:1684 src/core/filedlg.c:204
 msgid "Replace"
 msgstr "替换"
 
-#: src/core/app.c:1615
+#: src/core/app.c:1685
 msgid "Replace all"
 msgstr "全部替换"
 
-#: src/core/app.c:1617
+#: src/core/app.c:1687
 #, c-format
 msgid "%d replacement"
 msgid_plural "%d replacements"
 msgstr[0] "已替换 %d 处"
 
-#: src/core/app.c:1624
+#: src/core/app.c:1694
 msgid "Nothing found"
 msgstr "未找到任何内容"
 
-#: src/core/app.c:1631
+#: src/core/app.c:1701
 #, c-format
 msgid "%d match"
 msgid_plural "%d matches"
 msgstr[0] "%d 处匹配"
 
-#: src/core/app.c:1669
+#: src/core/app.c:1739
 msgid "(untitled)"
 msgstr "（未命名）"
 
-#: src/core/app.c:1678
+#: src/core/app.c:1748
 msgid "No headings yet."
 msgstr "还没有标题。"
 
-#: src/core/app.c:1679
+#: src/core/app.c:1749
 msgid "Start a line with # to create chapters."
 msgstr "以 # 开头的行会成为章节。"
 
-#: src/core/app.c:1708
+#: src/core/app.c:1778
 #, c-format
 msgid "goal of %d reached"
 msgstr "已达成 %d 字目标"
 
-#: src/core/app.c:1708
+#: src/core/app.c:1778
 #, c-format
 msgid "of %d words today"
 msgstr "/ 今日目标 %d 字"
 
-#: src/core/app.c:1709
+#: src/core/app.c:1779
 msgid "words today"
 msgstr "今日字数"
 
-#: src/core/app.c:1714
+#: src/core/app.c:1784
 msgid "This document"
 msgstr "本文档"
 
-#: src/core/app.c:1715
+#: src/core/app.c:1785
 msgid "This session"
 msgstr "本次会话"
 
-#: src/core/app.c:1715
+#: src/core/app.c:1785
 #, c-format
 msgid "+%d in %dh%02d"
 msgstr "%2$d 小时 %3$02d 分内 +%1$d"
 
-#: src/core/app.c:1716
+#: src/core/app.c:1786
 msgid "Estimated reading"
 msgstr "预计阅读时间"
 
-#: src/core/app.c:1717
+#: src/core/app.c:1787
 msgid "Pace"
 msgstr "速度"
 
-#: src/core/app.c:1717
+#: src/core/app.c:1787
 #, c-format
 msgid "%d words/h"
 msgstr "每小时 %d 字"
 
-#: src/core/app.c:1728
+#: src/core/app.c:1798
 msgid "15 min"
 msgstr "15 分钟"
 
-#: src/core/app.c:1728
+#: src/core/app.c:1798
 msgid "25 min"
 msgstr "25 分钟"
 
-#: src/core/app.c:1728
+#: src/core/app.c:1798
 msgid "45 min"
 msgstr "45 分钟"
 
-#: src/core/app.c:1728
+#: src/core/app.c:1798
 msgid "60 min"
 msgstr "60 分钟"
 
-#: src/core/app.c:1733
+#: src/core/app.c:1803
 msgid "Start sprint"
 msgstr "开始冲刺"
 
-#: src/core/app.c:1739
+#: src/core/app.c:1809
 #, c-format
 msgid "+%d word in this sprint"
 msgid_plural "+%d words in this sprint"
 msgstr[0] "本次冲刺 +%d 字"
 
-#: src/core/app.c:1742
+#: src/core/app.c:1812
 msgid "Stop sprint"
 msgstr "停止冲刺"
 
-#: src/core/app.c:1754
+#: src/core/app.c:1824
 msgid "Ctrl+N / O / S"
 msgstr "Ctrl+N / O / S"
 
-#: src/core/app.c:1754
+#: src/core/app.c:1824
 msgid "New · Open · Save"
 msgstr "新建 · 打开 · 保存"
 
-#: src/core/app.c:1754 src/core/filedlg.c:122
+#: src/core/app.c:1824 src/core/filedlg.c:122
 msgid "Save as / Export"
 msgstr "另存为 / 导出"
 
-#: src/core/app.c:1755
+#: src/core/app.c:1825
 msgid "Ctrl+W · Ctrl+Tab"
 msgstr "Ctrl+W · Ctrl+Tab"
 
-#: src/core/app.c:1755
+#: src/core/app.c:1825
 msgid "Tabs: close · next"
 msgstr "标签页：关闭 · 下一个"
 
-#: src/core/app.c:1755
+#: src/core/app.c:1825
 msgid "Alt+1…9"
 msgstr "Alt+1…9"
 
-#: src/core/app.c:1755
+#: src/core/app.c:1825
 msgid "Go to tab 1…9"
 msgstr "转到第 1…9 个标签页"
 
-#: src/core/app.c:1756
+#: src/core/app.c:1826
 msgid "Ctrl+K"
 msgstr "Ctrl+K"
 
-#: src/core/app.c:1756
+#: src/core/app.c:1826
 msgid "Command palette"
 msgstr "命令面板"
 
-#: src/core/app.c:1756
+#: src/core/app.c:1826
 msgid "Reading (formatted Markdown)"
 msgstr "阅读（格式化的 Markdown）"
 
-#: src/core/app.c:1757
+#: src/core/app.c:1827
 msgid "Ctrl+Z / Y"
 msgstr "Ctrl+Z / Y"
 
-#: src/core/app.c:1757
+#: src/core/app.c:1827
 msgid "Undo · Redo"
 msgstr "撤销 · 重做"
 
-#: src/core/app.c:1758
+#: src/core/app.c:1828
 msgid "Ctrl+B / I"
 msgstr "Ctrl+B / I"
 
-#: src/core/app.c:1758
+#: src/core/app.c:1828
 msgid "Bold · Italic"
 msgstr "粗体 · 斜体"
 
-#: src/core/app.c:1758
+#: src/core/app.c:1828
 msgid "Ctrl+1…6 / 0"
 msgstr "Ctrl+1…6 / 0"
 
-#: src/core/app.c:1758
+#: src/core/app.c:1828
 msgid "Heading level 1–6 · Text"
 msgstr "1–6 级标题 · 正文"
 
-#: src/core/app.c:1759
+#: src/core/app.c:1829
 msgid "Alt+↑ / ↓"
 msgstr "Alt+↑ / ↓"
 
-#: src/core/app.c:1759
+#: src/core/app.c:1829
 msgid "Move paragraph"
 msgstr "移动段落"
 
-#: src/core/app.c:1759
+#: src/core/app.c:1829
 msgid "Tab / Shift+Tab"
 msgstr "Tab / Shift+Tab"
 
-#: src/core/app.c:1759
+#: src/core/app.c:1829
 msgid "Indent list item"
 msgstr "缩进列表项"
 
-#: src/core/app.c:1761
+#: src/core/app.c:1831
 msgid "Ctrl+PgUp / PgDn"
 msgstr "Ctrl+PgUp / PgDn"
 
-#: src/core/app.c:1761
+#: src/core/app.c:1831
 msgid "Previous · next chapter"
 msgstr "上一章 · 下一章"
 
-#: src/core/app.c:1761
+#: src/core/app.c:1831
 msgid "Jump to and back from the last edit"
 msgstr "在上次编辑处来回跳转"
 
-#: src/core/app.c:1762
+#: src/core/app.c:1832
 msgid "lowercase → Title Case → UPPERCASE"
 msgstr "小写 → 首字母大写 → 全部大写"
 
-#: src/core/app.c:1762
+#: src/core/app.c:1832
 msgid "Select and type ( \" *"
 msgstr "选中后输入 ( \" *"
 
-#: src/core/app.c:1762
+#: src/core/app.c:1832
 msgid "Wraps the selection"
 msgstr "包裹所选内容"
 
-#: src/core/app.c:1763
+#: src/core/app.c:1833
 msgid "← / → · Space (reading)"
 msgstr "← / → · 空格（阅读）"
 
-#: src/core/app.c:1763
+#: src/core/app.c:1833
 msgid "Previous · next page"
 msgstr "上一页 · 下一页"
 
-#: src/core/app.c:1763
+#: src/core/app.c:1833
 msgid "Auto-scroll on/off"
 msgstr "自动滚动 开/关"
 
-#: src/core/app.c:1764
+#: src/core/app.c:1834
 msgid "+ / − (reading)"
 msgstr "+ / −（阅读）"
 
-#: src/core/app.c:1764
+#: src/core/app.c:1834
 msgid "Auto-scroll speed"
 msgstr "自动滚动速度"
 
-#: src/core/app.c:1765
+#: src/core/app.c:1835
 msgid "Ctrl+← / →"
 msgstr "Ctrl+← / →"
 
-#: src/core/app.c:1765
+#: src/core/app.c:1835
 msgid "Previous / next word"
 msgstr "上一个 / 下一个词"
 
-#: src/core/app.c:1765
+#: src/core/app.c:1835
 msgid "Ctrl+Home / End"
 msgstr "Ctrl+Home / End"
 
-#: src/core/app.c:1765
+#: src/core/app.c:1835
 msgid "Start · end of the text"
 msgstr "文本开头 · 结尾"
 
-#: src/core/app.c:1766
+#: src/core/app.c:1836
 msgid "Ctrl+= / -"
 msgstr "Ctrl+= / -"
 
-#: src/core/app.c:1766
+#: src/core/app.c:1836
 msgid "Larger · smaller text"
 msgstr "放大 · 缩小文字"
 
-#: src/core/app.c:1767
+#: src/core/app.c:1837
 msgid "This help"
 msgstr "本帮助"
 
-#: src/core/app.c:1767
+#: src/core/app.c:1837
 msgid "Focus mode (sentence/paragraph/line)"
 msgstr "专注模式（句子/段落/行）"
 
-#: src/core/app.c:1768
+#: src/core/app.c:1838
 msgid "Typewriter"
 msgstr "打字机"
 
-#: src/core/app.c:1768
+#: src/core/app.c:1838
 msgid "Writing sprint"
 msgstr "写作冲刺"
 
-#: src/core/app.c:1770
+#: src/core/app.c:1840
 msgid "F7 / F8 / F9"
 msgstr "F7 / F8 / F9"
 
-#: src/core/app.c:1770
+#: src/core/app.c:1840
 msgid "Previous track · Play/pause · Next"
 msgstr "上一首 · 播放/暂停 · 下一首"
 
-#: src/core/app.c:1771
+#: src/core/app.c:1841
 msgid "Zen mode"
 msgstr "禅模式"
 
-#: src/core/app.c:1772
+#: src/core/app.c:1842
 msgid "Esc"
 msgstr "Esc"
 
-#: src/core/app.c:1772
+#: src/core/app.c:1842
 msgid "Close window · leave zen/reading"
 msgstr "关闭窗口 · 退出禅模式/阅读"
 
-#: src/core/app.c:1773
+#: src/core/app.c:1843
 msgid "Tab · ↑ ↓ (windows)"
 msgstr "Tab · ↑ ↓（窗口）"
 
-#: src/core/app.c:1773
+#: src/core/app.c:1843
 msgid "Move between buttons and options"
 msgstr "在按钮和选项之间移动"
 
-#: src/core/app.c:1773
+#: src/core/app.c:1843
 msgid "Enter · Space · ← →"
 msgstr "Enter · 空格 · ← →"
 
-#: src/core/app.c:1773
+#: src/core/app.c:1843
 msgid "Press · adjust the focused option"
 msgstr "执行 · 调整当前选项"
 
-#: src/core/app.c:1774
+#: src/core/app.c:1844
 msgid "Keyboard between the text and the windows"
 msgstr "键盘在文本和窗口之间切换"
 
-#: src/core/app.c:1774
+#: src/core/app.c:1844
 msgid "Ctrl+Shift+← / →"
 msgstr "Ctrl+Shift+← / →"
 
-#: src/core/app.c:1774
+#: src/core/app.c:1844
 msgid "Select word by word"
 msgstr "逐词选择"
 
-#: src/core/app.c:1775
+#: src/core/app.c:1845
 msgid "Become — and … (smart typography)"
 msgstr "自动变为 — 和 …（智能排版）"
 
-#: src/core/app.c:1775
+#: src/core/app.c:1845
 msgid "Alt+F7 / Alt+F8"
 msgstr "Alt+F7 / Alt+F8"
 
-#: src/core/app.c:1775
+#: src/core/app.c:1845
 msgid "Move · resize the window (arrows, Enter)"
 msgstr "移动 · 调整窗口大小（方向键，Enter）"
 
-#: src/core/app.c:1852
+#: src/core/app.c:1922
 #, c-format
 msgid "Untitled — kept in %s until you save it"
 msgstr "未命名——保存前暂存在 %s"
 
-#: src/core/app.c:1859
+#: src/core/app.c:1929
 msgid "New tab (Ctrl+N)"
 msgstr "新建标签页（Ctrl+N）"
 
-#: src/core/app.c:1878
+#: src/core/app.c:1948
 msgid "Not saved yet (Ctrl+S)"
 msgstr "尚未保存（Ctrl+S）"
 
-#: src/core/app.c:1893
+#: src/core/app.c:1963
 #, c-format
 msgid "Playing: %s (F6)"
 msgstr "正在播放：%s（F6）"
 
-#: src/core/app.c:1894
+#: src/core/app.c:1964
 msgid "Music (F6)"
 msgstr "音乐（F6）"
 
-#: src/core/app.c:1894
+#: src/core/app.c:1964
 #, c-format
 msgid "Music (F6) — put MP3 files in the %s folder"
 msgstr "音乐（F6）——请把 MP3 文件放进 %s 文件夹"
 
-#: src/core/app.c:1896
+#: src/core/app.c:1966
 msgid "Tabs on — click to turn off"
 msgstr "标签页已开启——点击关闭"
 
-#: src/core/app.c:1896
+#: src/core/app.c:1966
 msgid "Tabs: open several documents (like in Sublime Text)"
 msgstr "标签页：同时打开多个文档（类似 Sublime Text）"
 
-#: src/core/app.c:1897
+#: src/core/app.c:1967
 msgid "Zen mode (F11)"
 msgstr "禅模式（F11）"
 
-#: src/core/app.c:1898
+#: src/core/app.c:1968
 msgid "Typewriter (F3)"
 msgstr "打字机（F3）"
 
-#: src/core/app.c:1899
+#: src/core/app.c:1969
 msgid "Reading (Ctrl+P)"
 msgstr "阅读（Ctrl+P）"
 
-#: src/core/app.c:1901
+#: src/core/app.c:1971
 msgid "Appearance (F12)"
 msgstr "外观（F12）"
 
-#: src/core/app.c:1902
+#: src/core/app.c:1972
 msgid "Commands (Ctrl+K)"
 msgstr "命令（Ctrl+K）"
 
-#: src/core/app.c:1914
+#: src/core/app.c:1984
 msgid "Next track (F9)"
 msgstr "下一首（F9）"
 
-#: src/core/app.c:1916
+#: src/core/app.c:1986
 msgid "Pause (F8)"
 msgstr "暂停（F8）"
 
-#: src/core/app.c:1916
+#: src/core/app.c:1986
 msgid "Play (F8)"
 msgstr "播放（F8）"
 
-#: src/core/app.c:1918
+#: src/core/app.c:1988
 msgid "Previous track (F7)"
 msgstr "上一首（F7）"
 
-#: src/core/app.c:1931
+#: src/core/app.c:2001
 #, c-format
 msgid "%d h %02d min"
 msgstr "%d 小时 %02d 分钟"
 
-#: src/core/app.c:1959
+#: src/core/app.c:2029
 msgid " · end of the text"
 msgstr " · 文本结尾"
 
-#: src/core/app.c:1960
+#: src/core/app.c:2030
 #, c-format
 msgid " · %s · %s to the end of the chapter · %s in total"
 msgstr " · %s · 距本章结束 %s · 共 %s"
 
-#: src/core/app.c:1961
+#: src/core/app.c:2031
 #, c-format
 msgid " · %s · %s of reading left"
 msgstr " · %s · 还需阅读 %s"
 
-#: src/core/app.c:1962
+#: src/core/app.c:2032
 #, c-format
 msgid " · %s of reading left"
 msgstr " · 还需阅读 %s"
 
-#: src/core/app.c:1965
+#: src/core/app.c:2035
 #, c-format
 msgid "%d of %d word"
 msgid_plural "%d of %d words"
 msgstr[0] "%d / %d 字"
 
-#: src/core/app.c:1971
+#: src/core/app.c:2041
 #, c-format
 msgid "Today: %d words · %d min reading"
 msgstr "今天：%d 字 · 阅读 %d 分钟"
 
-#: src/core/app.c:2181
+#: src/core/app.c:2251
 msgid "The USB drive with your texts is not connected: new texts are saved on this computer for now."
 msgstr "存有你文本的 U 盘未连接：新文本暂时保存在这台电脑上。"
 
-#: src/core/app.c:2212 src/core/app.c:2217
+#: src/core/app.c:2282 src/core/app.c:2287
 msgid "Welcome back. Picking up where you left off."
 msgstr "欢迎回来。从上次停下的地方继续。"
 
-#: src/core/app.c:2212
+#: src/core/app.c:2282
 #, c-format
 msgid "Welcome back: %d tab reopened."
 msgid_plural "Welcome back: %d tabs reopened."
 msgstr[0] "欢迎回来：已重新打开 %d 个标签页。"
 
-#: src/core/app.c:2216
+#: src/core/app.c:2286
 msgid "Welcome back. Reading continues where you left off."
 msgstr "欢迎回来。阅读从上次停下的地方继续。"
 
-#: src/core/app.c:2221
+#: src/core/app.c:2291
 msgid "Unsaved draft recovered"
 msgstr "已恢复未保存的草稿"
 
-#: src/core/app.c:2226
+#: src/core/app.c:2296
 msgid ""
 "# Welcome to FolioOS\n"
 "\n"
@@ -1714,27 +1720,27 @@ msgstr ""
 "\n"
 "删掉这段文字（Ctrl+A），开始你的故事。\n"
 
-#: src/core/app.c:2355
+#: src/core/app.c:2425
 #, c-format
 msgid "Sprint finished: %d word. Breathe and stretch."
 msgid_plural "Sprint finished: %d words. Breathe and stretch."
 msgstr[0] "冲刺结束：%d 字。深呼吸，伸个懒腰。"
 
-#: src/core/chooser.c:17
+#: src/core/chooser.c:18
 msgid "the other system"
 msgstr "另一个系统"
 
-#: src/core/chooser.c:34
+#: src/core/chooser.c:35
 msgid "Press any key to write"
 msgstr "按任意键开始写作"
 
-#: src/core/chooser.c:36
+#: src/core/chooser.c:37
 #, c-format
 msgid "Starting %2$s in %1$d second…"
 msgid_plural "Starting %2$s in %1$d seconds…"
 msgstr[0] "%1$d 秒后启动 %2$s…"
 
-#: src/core/chooser.c:38
+#: src/core/chooser.c:39
 #, c-format
 msgid "Esc: start %s now"
 msgstr "Esc：立即启动 %s"
@@ -1957,7 +1963,7 @@ msgstr "删除文件夹“%s”及其所有内容？此操作无法撤销。"
 msgid "Delete \"%s\"? This cannot be undone."
 msgstr "删除“%s”？此操作无法撤销。"
 
-#: src/core/filedlg.c:327 src/core/partitions.c:228
+#: src/core/filedlg.c:327 src/core/partitions.c:252
 msgid "Size"
 msgstr "大小"
 
@@ -1995,79 +2001,79 @@ msgstr[0] "%d 个项目"
 msgid "Open"
 msgstr "打开"
 
-#: src/core/fscheck.c:815
+#: src/core/fscheck.c:882
 msgid "This partition is encrypted with BitLocker. To make room, shrink it in Windows (Disk Management, Shrink Volume) or turn BitLocker off first."
 msgstr "此分区已用 BitLocker 加密。要腾出空间，请在 Windows 中压缩它（磁盘管理 → 压缩卷），或先关闭 BitLocker。"
 
-#: src/core/fscheck.c:816
+#: src/core/fscheck.c:883
 msgid "This partition is encrypted (LUKS). To make room, shrink it from Linux with the encryption tools."
 msgstr "此分区已加密（LUKS）。要腾出空间，请在 Linux 中用加密工具缩小它。"
 
-#: src/core/fscheck.c:817
-msgid "This partition holds LVM volumes. To make room, shrink them from Linux (lvreduce, then pvresize)."
-msgstr "此分区包含 LVM 卷。要腾出空间，请在 Linux 中缩小它们（先 lvreduce，再 pvresize）。"
+#: src/core/fscheck.c:884
+msgid "This partition holds LVM volumes. To make room, free space from Linux: shrink the file system first, then its logical volume (lvreduce --resizefs), then the physical volume (pvresize)."
+msgstr "此分区包含 LVM 卷。要腾出空间，请在 Linux 中操作：先缩小文件系统，再缩小逻辑卷（lvreduce --resizefs），然后缩小物理卷（pvresize）。"
 
-#: src/core/fscheck.c:818
+#: src/core/fscheck.c:885
 msgid "This is a Mac partition (APFS or HFS+). To make room, use Disk Utility on the Mac."
 msgstr "这是 Mac 分区（APFS 或 HFS+）。要腾出空间，请在 Mac 上使用磁盘工具。"
 
-#: src/core/fscheck.c:819
+#: src/core/fscheck.c:886
 msgid "Windows is hibernated or uses Fast Startup. Start Windows, then shut it down while holding Shift (or turn Fast Startup off in Power Options), and try again."
 msgstr "Windows 处于休眠状态或启用了快速启动。请启动 Windows，按住 Shift 键关机（或在电源选项中关闭快速启动），然后重试。"
 
-#: src/core/fscheck.c:820
+#: src/core/fscheck.c:887
 msgid "Windows marked this partition as needing a check. Start Windows, run chkdsk /f on it, and try again."
 msgstr "Windows 已将此分区标记为需要检查。请启动 Windows，对它运行 chkdsk /f，然后重试。"
 
-#: src/core/fscheck.c:821
+#: src/core/fscheck.c:888
 msgid "This Linux partition was not unmounted cleanly. Start Linux and shut it down normally, then try again."
 msgstr "此 Linux 分区未正常卸载。请启动 Linux 并正常关机，然后重试。"
 
-#: src/core/fscheck.c:822
+#: src/core/fscheck.c:889
 msgid "Linux found errors on this partition. Check it with fsck from Linux, then try again."
 msgstr "Linux 在此分区上发现了错误。请在 Linux 中用 fsck 检查它，然后重试。"
 
-#: src/core/fscheck.c:823
+#: src/core/fscheck.c:890
 msgid "This partition could not be read safely, so FolioOS will not change it."
 msgstr "无法安全地读取此分区，因此 FolioOS 不会更改它。"
 
-#: src/core/fscheck.c:824
+#: src/core/fscheck.c:891
 msgid "FolioOS cannot resize this file system yet."
 msgstr "FolioOS 暂时还不能调整此文件系统的大小。"
 
-#: src/core/fscheck.c:830
+#: src/core/fscheck.c:897
 msgid "encrypted (BitLocker)"
 msgstr "已加密（BitLocker）"
 
-#: src/core/fscheck.c:831
+#: src/core/fscheck.c:898
 msgid "encrypted (LUKS)"
 msgstr "已加密（LUKS）"
 
-#: src/core/fscheck.c:833
+#: src/core/fscheck.c:900
 msgid "Mac (APFS/HFS+)"
 msgstr "Mac（APFS/HFS+）"
 
-#: src/core/fscheck.c:834
+#: src/core/fscheck.c:901
 msgid "Windows hibernated or Fast Startup"
 msgstr "Windows 休眠或快速启动"
 
-#: src/core/fscheck.c:835
+#: src/core/fscheck.c:902
 msgid "needs a check (chkdsk)"
 msgstr "需要检查（chkdsk）"
 
-#: src/core/fscheck.c:836
+#: src/core/fscheck.c:903
 msgid "not unmounted cleanly"
 msgstr "未正常卸载"
 
-#: src/core/fscheck.c:837
+#: src/core/fscheck.c:904
 msgid "has errors (fsck)"
 msgstr "有错误（fsck）"
 
-#: src/core/fscheck.c:838
+#: src/core/fscheck.c:905
 msgid "unreadable"
 msgstr "无法读取"
 
-#: src/core/fscheck.c:839
+#: src/core/fscheck.c:906
 msgid "cannot be resized yet"
 msgstr "暂不能调整大小"
 
@@ -2139,79 +2145,79 @@ msgstr "输入：平假名"
 msgid "Input: Katakana"
 msgstr "输入：片假名"
 
-#: src/core/install.c:889
+#: src/core/install.c:984
 msgid "Done"
 msgstr "完成"
 
-#: src/core/install.c:890
+#: src/core/install.c:985
 msgid "Could not read"
 msgstr "无法读取"
 
-#: src/core/install.c:891
+#: src/core/install.c:986
 msgid "Could not write to the disk"
 msgstr "无法写入磁盘"
 
-#: src/core/install.c:892
+#: src/core/install.c:987
 msgid "The disk is too small (at least 512 MB)"
 msgstr "磁盘太小（至少需要 512 MB）"
 
-#: src/core/install.c:893
+#: src/core/install.c:988
 msgid "Could not save the safety copy to the USB drive"
 msgstr "无法把安全副本保存到 U 盘"
 
-#: src/core/install.c:894
+#: src/core/install.c:989
 msgid "Could not format the new partition"
 msgstr "无法格式化新分区"
 
-#: src/core/install.c:895
+#: src/core/install.c:990
 msgid "Could not copy"
 msgstr "无法复制"
 
-#: src/core/install.c:896
+#: src/core/install.c:991
 msgid "A copied file did not match the original"
 msgstr "复制的文件与原文件不一致"
 
-#: src/core/install.c:897
+#: src/core/install.c:992
 msgid "The BIOS boot code is missing from the USB drive"
 msgstr "U 盘上缺少 BIOS 引导代码"
 
-#: src/core/install.c:898
+#: src/core/install.c:993
 msgid "The USB drive does not have a complete FolioOS"
 msgstr "U 盘上的 FolioOS 不完整"
 
-#: src/core/install.c:899
+#: src/core/install.c:994
 msgid "This disk does not use a GPT partition table"
 msgstr "此磁盘没有使用 GPT 分区表"
 
-#: src/core/install.c:900
+#: src/core/install.c:995
 msgid "No FAT32 EFI system partition was found on this disk"
 msgstr "此磁盘上没有 FAT32 格式的 EFI 系统分区"
 
-#: src/core/install.c:901
+#: src/core/install.c:996
 msgid "The EFI system partition is full"
 msgstr "EFI 系统分区已满"
 
-#: src/core/install.c:902
+#: src/core/install.c:997
 msgid "The chosen space is not free"
 msgstr "所选空间不是空闲的"
 
-#: src/core/install.c:903
+#: src/core/install.c:998
 msgid "Could not shrink the other system's partition"
 msgstr "无法缩小另一个系统的分区"
 
-#: src/core/install.c:904
+#: src/core/install.c:999
 msgid "Could not give the space back to the other system's partition"
 msgstr "无法把空间还给另一个系统的分区"
 
-#: src/core/install.c:905
+#: src/core/install.c:1000
 msgid "This partition cannot change to that size without moving data"
 msgstr "不移动数据就无法把此分区改成这个大小"
 
-#: src/core/install.c:906 src/core/partitions.c:46
+#: src/core/install.c:1001 src/core/partitions.c:46
 msgid "FolioOS cannot change this disk's partition table safely: it is left as it is"
 msgstr "FolioOS 无法安全地更改此磁盘的分区表：将保持原样"
 
-#: src/core/install.c:907
+#: src/core/install.c:1002
 msgid "Error"
 msgstr "错误"
 
@@ -2227,358 +2233,366 @@ msgstr "暂不支持 4096 字节扇区的磁盘。"
 msgid "This disk is too small (at least 512 MB)."
 msgstr "这个磁盘太小（至少需要 512 MB）。"
 
-#: src/core/installer.c:99
+#: src/core/installer.c:101
 msgid "To keep Linux, shrink its partition from Linux (with GParted, for example) and run the installer again: FolioOS will use the free space."
 msgstr "要保留 Linux，请在 Linux 中缩小它的分区（例如使用 GParted），然后重新打开安装程序：FolioOS 会使用空闲空间。"
 
-#: src/core/installer.c:100
+#: src/core/installer.c:102
 msgid "To keep Windows, shrink drive C: in Windows (Disk Management, Shrink Volume) and run the installer again: FolioOS will use the free space."
 msgstr "要保留 Windows，请在 Windows 中压缩 C: 盘（磁盘管理 → 压缩卷），然后重新打开安装程序：FolioOS 会使用空闲空间。"
 
-#: src/core/installer.c:106 src/core/partitions.c:44
+#: src/core/installer.c:108 src/core/partitions.c:44
 msgid "Partition table unreadable"
 msgstr "分区表无法读取"
 
-#: src/core/installer.c:107 src/core/partitions.c:138
+#: src/core/installer.c:109 src/core/partitions.c:149
 msgid "Empty: no partitions"
 msgstr "空：没有分区"
 
-#: src/core/installer.c:113
+#: src/core/installer.c:115
 #, c-format
 msgid "…and %d more partition"
 msgid_plural "…and %d more partitions"
 msgstr[0] "…以及另外 %d 个分区"
 
-#: src/core/installer.c:124 src/core/partitions.c:134
+#: src/core/installer.c:126 src/core/partitions.c:145
 msgid "disk"
 msgstr "磁盘"
 
-#: src/core/installer.c:268
+#: src/core/installer.c:273
 msgid "Your texts:"
 msgstr "你的文本："
 
-#: src/core/installer.c:270
+#: src/core/installer.c:275
 msgid "They stay on this USB drive and go with you; FolioOS on the computer uses them when the drive is connected."
 msgstr "保存在这个 U 盘上，随身携带；连接 U 盘时，电脑上的 FolioOS 会使用它们。"
 
-#: src/core/installer.c:271
+#: src/core/installer.c:276
 msgid "They are copied to the computer; a button in Settings exchanges them with this USB drive."
 msgstr "复制到电脑上；设置中的按钮可以与这个 U 盘交换。"
 
-#: src/core/installer.c:272
+#: src/core/installer.c:277
 msgid "They are copied to the computer."
 msgstr "复制到电脑上。"
 
-#: src/core/installer.c:288
+#: src/core/installer.c:293
 msgid "Install FolioOS next to the system you already have, in the free space, or as the only system on a disk."
 msgstr "把 FolioOS 安装在现有系统旁边的空闲空间里，或作为某个磁盘上唯一的系统。"
 
-#: src/core/installer.c:289
+#: src/core/installer.c:294
 msgid "Choose where:"
 msgstr "选择位置："
 
-#: src/core/installer.c:290 src/core/partitions.c:173
+#: src/core/installer.c:295 src/core/partitions.c:184
 msgid "No disk was found besides the USB drive FolioOS started from."
 msgstr "除了启动 FolioOS 的 U 盘之外，没有找到其他磁盘。"
 
-#: src/core/installer.c:302
+#: src/core/installer.c:315
 msgid "Reinstall the FolioOS program on this disk (your texts and settings stay)"
 msgstr "重新安装此磁盘上的 FolioOS 程序（文本和设置保留）"
 
-#: src/core/installer.c:303
+#: src/core/installer.c:316
 #, c-format
 msgid "Update FolioOS on this disk (%s → %s)"
 msgstr "更新此磁盘上的 FolioOS（%s → %s）"
 
-#: src/core/installer.c:305
+#: src/core/installer.c:318
 msgid "Remove FolioOS from this disk (the disk is left empty)"
 msgstr "从此磁盘移除 FolioOS（磁盘将变为空）"
 
-#: src/core/installer.c:305
+#: src/core/installer.c:318
 msgid "Remove FolioOS from this disk (Windows gets the space back)"
 msgstr "从此磁盘移除 FolioOS（Windows 收回空间）"
 
-#: src/core/installer.c:305
+#: src/core/installer.c:318
 msgid "Remove FolioOS from this disk (the partition before it gets the space back)"
 msgstr "从此磁盘移除 FolioOS（前一个分区收回空间）"
 
-#: src/core/installer.c:305
+#: src/core/installer.c:318
 msgid "Remove FolioOS from this disk (its space becomes free)"
 msgstr "从此磁盘移除 FolioOS（它的空间变为空闲）"
 
-#: src/core/installer.c:306
+#: src/core/installer.c:319
 #, c-format
 msgid "Next to the other system, making room in its %s partition (up to %s)"
 msgstr "在另一个系统旁边，从它的 %s 分区腾出空间（最多 %s）"
 
-#: src/core/installer.c:307
+#: src/core/installer.c:320
 #, c-format
 msgid "Next to the other system, in %s of free space"
 msgstr "在另一个系统旁边，使用 %s 的空闲空间"
 
-#: src/core/installer.c:308
+#: src/core/installer.c:321
 msgid "The whole disk (everything on it is erased)"
 msgstr "整个磁盘（上面的所有内容都会被清除）"
 
-#: src/core/installer.c:320
+#: src/core/installer.c:340
 msgid "Next"
 msgstr "下一步"
 
-#: src/core/installer.c:332
+#: src/core/installer.c:352
 msgid "FolioOS on this disk will be updated:"
 msgstr "将更新此磁盘上的 FolioOS："
 
-#: src/core/installer.c:335
+#: src/core/installer.c:355
 #, c-format
 msgid "Version %s → %s"
 msgstr "版本 %s → %s"
 
-#: src/core/installer.c:337
+#: src/core/installer.c:357
 msgid "Only the program, fonts, languages, themes and keyboards are replaced. Your texts, music and settings stay as they are, and fonts or themes you added are kept."
 msgstr "只替换程序、字体、语言、主题和键盘。你的文本、音乐和设置保持不变，你添加的字体或主题也会保留。"
 
-#: src/core/installer.c:338
-msgid "Each file is replaced only after the new copy has been checked, so a power cut never leaves FolioOS half updated."
-msgstr "每个文件都在新副本校验通过后才替换，因此断电也不会让 FolioOS 只更新一半。"
+#: src/core/installer.c:358
+msgid "Each file is replaced only after its new copy has been checked, and the old copy is kept until the new one is in place. If the update stops in the middle, some files may already be new: start the update again from this USB drive to finish it."
+msgstr "每个文件只有在新副本检查通过后才会被替换，旧副本会保留到新副本就位为止。如果更新中途停止，部分文件可能已经是新的：请从这个 U 盘再次开始更新以完成它。"
 
-#: src/core/installer.c:339 src/core/installer.c:371 src/core/installer.c:423 src/core/installer.c:451
+#: src/core/installer.c:359 src/core/installer.c:391 src/core/installer.c:445 src/core/installer.c:473
 #, c-format
-msgid "Before anything is written, the start of the disk (partition table and boot sectors) is saved to %s on this USB drive."
-msgstr "在写入任何内容之前，磁盘开头（分区表和引导扇区）会先保存到这个 U 盘上的 %s。"
+msgid "Before anything is written, the partition table (the first and last sectors of the disk) is saved to %s on this USB drive."
+msgstr "在写入任何内容之前，分区表（磁盘的开头和末尾扇区）会保存到这个 U 盘的 %s 中。"
 
-#: src/core/installer.c:341 src/core/installer.c:382 src/core/installer.c:435 src/core/installer.c:458 src/core/partitions.c:246
+#: src/core/installer.c:361 src/core/installer.c:402 src/core/installer.c:457 src/core/installer.c:480 src/core/partitions.c:273
 msgid "Back"
 msgstr "返回"
 
-#: src/core/installer.c:342
+#: src/core/installer.c:362
 msgid "Update"
 msgstr "更新"
 
-#: src/core/installer.c:348
+#: src/core/installer.c:368
 msgid "FolioOS will be removed from this disk:"
 msgstr "将从此磁盘移除 FolioOS："
 
-#: src/core/installer.c:352
+#: src/core/installer.c:372
 #, c-format
 msgid "− FolioOS · FAT32 · %s"
 msgstr "− FolioOS · FAT32 · %s"
 
-#: src/core/installer.c:357 src/core/installer.c:405 src/core/partitions.c:226
+#: src/core/installer.c:377 src/core/installer.c:425 src/core/partitions.c:250
 #, c-format
 msgid "%s%s: %s → %s"
 msgstr "%s%s：%s → %s"
 
-#: src/core/installer.c:363
+#: src/core/installer.c:383
 #, c-format
 msgid "Copy the %d text from this computer to the USB drive first (%s)"
 msgid_plural "Copy the %d texts from this computer to the USB drive first (%s)"
 msgstr[0] "先把这台电脑的 %d 个文本复制到 U 盘（%s）"
 
-#: src/core/installer.c:366
+#: src/core/installer.c:386
 msgid "There are no texts on FolioOS's partition."
 msgstr "FolioOS 分区中没有文本。"
 
-#: src/core/installer.c:367
+#: src/core/installer.c:387
 msgid "The disk will be left empty, with no partitions, ready for another system."
 msgstr "磁盘将变为空，没有分区，可以安装其他系统。"
 
-#: src/core/installer.c:368
+#: src/core/installer.c:388
 msgid "The start of the disk gets the other system's original boot code back, and the computer starts it directly again."
 msgstr "磁盘开头会恢复另一个系统原来的启动代码，电脑会重新直接启动它。"
 
-#: src/core/installer.c:369
+#: src/core/installer.c:389
 msgid "The EFI system partition loses only the folder EFI/FolioOS, and the computer starts the other system directly again."
 msgstr "EFI 系统分区只会失去 EFI/FolioOS 文件夹，电脑会重新直接启动另一个系统。"
 
-#: src/core/installer.c:370
+#: src/core/installer.c:390
 msgid "The next time Windows starts, it checks its partition (chkdsk) once; this is expected."
 msgstr "下次启动 Windows 时，它会检查一次该分区（chkdsk），这是正常的。"
 
-#: src/core/installer.c:373 src/core/installer.c:443 src/core/partitions.c:220
+#: src/core/installer.c:393 src/core/installer.c:465 src/core/partitions.c:244
 msgid "ERASE"
 msgstr "ERASE"
 
-#: src/core/installer.c:377
+#: src/core/installer.c:397
 #, c-format
 msgid "Your texts on this computer will be lost. To confirm, type %s:"
 msgstr "这台电脑上的文本将会丢失。要确认，请输入 %s："
 
-#: src/core/installer.c:377 src/core/installer.c:385 src/core/installer.c:453 src/core/installer.c:461 src/core/partitions.c:241 src/core/partitions.c:250
+#: src/core/installer.c:397 src/core/installer.c:405 src/core/installer.c:475 src/core/installer.c:483 src/core/partitions.c:268 src/core/partitions.c:277
 #, c-format
 msgid "To confirm, type %s:"
 msgstr "请输入 %s 以确认："
 
-#: src/core/installer.c:383
+#: src/core/installer.c:403
 msgid "Remove FolioOS"
 msgstr "移除 FolioOS"
 
-#: src/core/installer.c:392
+#: src/core/installer.c:412
 msgid "Nothing on this disk will be erased."
 msgstr "此磁盘上的内容不会被清除。"
 
-#: src/core/installer.c:408
+#: src/core/installer.c:428
 #, c-format
 msgid "+ FolioOS · FAT32 · %s, in the space this frees"
 msgstr "+ FolioOS · FAT32 · %s，位于腾出的空间"
 
-#: src/core/installer.c:410
+#: src/core/installer.c:430
 msgid "Size for FolioOS"
 msgstr "FolioOS 的大小"
 
-#: src/core/installer.c:412 src/core/partitions.c:230
+#: src/core/installer.c:432 src/core/partitions.c:254
 msgid "No file is moved: FolioOS only takes free space from the end of that partition. The next time Windows starts, it checks the partition (chkdsk) once; this is expected."
 msgstr "不会移动任何文件：FolioOS 只占用该分区末尾的可用空间。下次启动 Windows 时，它会检查一次该分区（chkdsk），这是正常的。"
 
-#: src/core/installer.c:412 src/core/partitions.c:230
+#: src/core/installer.c:432 src/core/partitions.c:254
 msgid "No file is moved: FolioOS only takes free space from the end of that partition."
 msgstr "不会移动任何文件：FolioOS 只占用该分区末尾的可用空间。"
 
-#: src/core/installer.c:415
+#: src/core/installer.c:435
 #, c-format
 msgid "+ FolioOS · FAT32 · %s, in the free space"
 msgstr "+ FolioOS · FAT32 · %s，位于空闲空间"
 
-#: src/core/installer.c:417
+#: src/core/installer.c:437
 msgid "The start of the disk gets FolioOS's boot code; the other system's original code is kept, and FolioOS starts it. Your texts, fonts and settings are copied from this USB drive to the new partition."
 msgstr "磁盘开头会写入 FolioOS 的启动代码；另一个系统原来的代码会被保存，并由 FolioOS 启动。你的文本、字体和设置会从这个 U 盘复制到新分区。"
 
-#: src/core/installer.c:418
+#: src/core/installer.c:438
 msgid "The EFI system partition only receives the folder EFI/FolioOS. Your texts, fonts and settings are copied from this USB drive to the new partition."
 msgstr "EFI 系统分区只会多出 EFI/FolioOS 文件夹。你的文字、字体和设置会从这个 U 盘复制到新分区。"
 
-#: src/core/installer.c:420
+#: src/core/installer.c:441
 #, c-format
 msgid "When the computer starts, FolioOS waits %d second for a key; without one, the other system starts as usual."
 msgid_plural "When the computer starts, FolioOS waits %d seconds for a key; without one, the other system starts as usual."
 msgstr[0] "开机时 FolioOS 会等待按键 %d 秒；如果不按键，另一个系统会照常启动。"
 
-#: src/core/installer.c:429
+#: src/core/installer.c:443
+msgid "The wait for a key is set to 0 seconds: the computer starts straight into FolioOS. To start the other system, use the computer's boot menu (or set a wait in Settings › System › Startup)."
+msgstr "等待按键的时间设为 0 秒：电脑会直接进入 FolioOS。要启动另一个系统，请使用电脑的启动菜单（或在 设置 › 系统 › 启动 中设置等待时间）。"
+
+#: src/core/installer.c:451
 msgid "This disk has a partition encrypted with BitLocker. FolioOS does not touch it, but after the startup settings change, Windows may ask once for the BitLocker recovery key. Make sure you have it (it is in your Microsoft account at aka.ms/myrecoverykey, or where you saved or printed it) before you continue."
 msgstr "此磁盘上有一个用 BitLocker 加密的分区。FolioOS 不会改动它，但启动设置更改后，Windows 可能会要求输入一次 BitLocker 恢复密钥。继续之前，请确认你有这个密钥（它保存在你的 Microsoft 帐户 aka.ms/myrecoverykey 中，或在你保存或打印它的地方）。"
 
-#: src/core/installer.c:430 src/core/installer.c:438
+#: src/core/installer.c:452 src/core/installer.c:460
 msgid "I have the BitLocker recovery key"
 msgstr "我有 BitLocker 恢复密钥"
 
-#: src/core/installer.c:433 src/core/installer.c:463
+#: src/core/installer.c:455 src/core/installer.c:485
 msgid "On this computer"
 msgstr "在这台电脑上"
 
-#: src/core/installer.c:433 src/core/installer.c:463
+#: src/core/installer.c:455 src/core/installer.c:485
 msgid "On the USB drive"
 msgstr "在 U 盘上"
 
-#: src/core/installer.c:433 src/core/installer.c:463
+#: src/core/installer.c:455 src/core/installer.c:485
 msgid "On both"
 msgstr "两处都有"
 
-#: src/core/installer.c:436
+#: src/core/installer.c:458
 msgid "Shrink and install"
 msgstr "缩小并安装"
 
-#: src/core/installer.c:436
+#: src/core/installer.c:458
 msgid "Install next to it"
 msgstr "安装在旁边"
 
-#: src/core/installer.c:445
+#: src/core/installer.c:467
 msgid "Everything on this disk will be erased:"
 msgstr "此磁盘上的所有内容都会被清除："
 
-#: src/core/installer.c:450
+#: src/core/installer.c:472
 msgid "FolioOS gets one partition that fills the disk, with your texts, fonts and settings copied from this USB drive."
 msgstr "FolioOS 会创建一个占满整个磁盘的分区，并从这个 U 盘复制你的文字、字体和设置。"
 
-#: src/core/installer.c:459
+#: src/core/installer.c:481
 msgid "Erase and install"
 msgstr "清除并安装"
 
-#: src/core/installer.c:467
+#: src/core/installer.c:489
 msgid "Removing FolioOS… Do not turn off the computer or remove the USB drive."
 msgstr "正在移除 FolioOS… 请勿关闭电脑或拔出 U 盘。"
 
-#: src/core/installer.c:467
+#: src/core/installer.c:489
 msgid "Updating FolioOS… Do not turn off the computer or remove the USB drive."
 msgstr "正在更新 FolioOS… 请勿关闭电脑或拔出 U 盘。"
 
-#: src/core/installer.c:467
+#: src/core/installer.c:489
 msgid "Installing FolioOS… Do not turn off the computer or remove the USB drive."
 msgstr "正在安装 FolioOS… 请不要关闭电脑，也不要拔出 U 盘。"
 
-#: src/core/installer.c:479
+#: src/core/installer.c:501
 msgid "FolioOS on this disk is up to date."
 msgstr "此磁盘上的 FolioOS 已是最新。"
 
-#: src/core/installer.c:480
+#: src/core/installer.c:502
 msgid "Remove the USB drive and restart. Your texts and settings are where they were."
 msgstr "拔出 U 盘并重新启动。你的文本和设置都在原处。"
 
-#: src/core/installer.c:482
+#: src/core/installer.c:504
 msgid "FolioOS was removed from this computer."
 msgstr "已从这台电脑移除 FolioOS。"
 
-#: src/core/installer.c:483
+#: src/core/installer.c:505
 #, c-format
 msgid "The texts from the computer are on this USB drive, in %s."
 msgstr "电脑中的文本在这个 U 盘的 %s 中。"
 
-#: src/core/installer.c:484
+#: src/core/installer.c:506
 msgid "The disk is empty now: install another system on it, or FolioOS again from this USB drive."
 msgstr "磁盘现在是空的：可以在上面安装其他系统，或用这个 U 盘重新安装 FolioOS。"
 
-#: src/core/installer.c:484
+#: src/core/installer.c:506
 msgid "Remove the USB drive and restart: the computer starts the other system as before."
 msgstr "拔出 U 盘并重新启动：电脑会像以前一样启动另一个系统。"
 
-#: src/core/installer.c:485
+#: src/core/installer.c:507
 msgid "The firmware did not let FolioOS remove its boot entry; if the computer still lists FolioOS at startup, remove it in the firmware settings."
 msgstr "固件不允许 FolioOS 移除它的启动项；如果开机时仍显示 FolioOS，请在固件设置中将其移除。"
 
-#: src/core/installer.c:487
+#: src/core/installer.c:509
 msgid "FolioOS is installed next to the other system."
 msgstr "FolioOS 已安装在另一个系统旁边。"
 
-#: src/core/installer.c:488
+#: src/core/installer.c:510
 msgid "Remove the USB drive and restart. FolioOS starts first and waits a few seconds for a key; without one, the other system starts as usual."
 msgstr "拔出 U 盘并重新启动。FolioOS 会先启动并等待几秒钟；如果不按键，另一个系统会照常启动。"
 
-#: src/core/installer.c:490
+#: src/core/installer.c:511
+msgid "Remove the USB drive and restart. FolioOS starts directly (the wait for a key is 0 seconds); to start the other system, use the computer's boot menu."
+msgstr "拔下 U 盘并重启。FolioOS 会直接启动（等待按键的时间为 0 秒）；要启动另一个系统，请使用电脑的启动菜单。"
+
+#: src/core/installer.c:513
 msgid "FolioOS is installed on this computer."
 msgstr "FolioOS 已安装到这台电脑。"
 
-#: src/core/installer.c:491
+#: src/core/installer.c:514
 msgid "Remove the USB drive and restart. From now on the computer starts straight into FolioOS; your texts are in DOCUMENTS on the disk."
 msgstr "拔出 U 盘并重新启动。以后电脑会直接进入 FolioOS；你的文字在磁盘上的 DOCUMENTS 中。"
 
-#: src/core/installer.c:493
+#: src/core/installer.c:516
 msgid "The firmware did not accept a new boot entry: choose FolioOS in the computer's boot menu (often F12, F8 or Esc right after power-on)."
 msgstr "固件没有接受新的启动项：请在电脑的启动菜单中选择 FolioOS（通常在开机后立即按 F12、F8 或 Esc）。"
 
-#: src/core/installer.c:494 src/core/installer.c:503
+#: src/core/installer.c:517 src/core/installer.c:526
 #, c-format
 msgid "The previous start of the disk is saved in %s."
 msgstr "磁盘原来的开头已保存在 %s。"
 
-#: src/core/installer.c:495 src/core/installer.c:505
+#: src/core/installer.c:518 src/core/installer.c:528
 msgid "Close"
 msgstr "关闭"
 
-#: src/core/installer.c:500
+#: src/core/installer.c:523
 msgid "The removal did not finish."
 msgstr "移除未完成。"
 
-#: src/core/installer.c:500
-msgid "The update did not finish. FolioOS on the disk still works: every file is either the old or the new one."
-msgstr "更新未完成。磁盘上的 FolioOS 仍可使用：每个文件要么是旧的，要么是新的。"
+#: src/core/installer.c:523
+msgid "The update did not finish. Some files on the disk may already be the new ones: start the update again from this USB drive to finish it."
+msgstr "更新没有完成。磁盘上的部分文件可能已经是新的：请从这个 U 盘再次开始更新以完成它。"
 
-#: src/core/installer.c:500
+#: src/core/installer.c:523
 msgid "The installation did not finish."
 msgstr "安装未完成。"
 
-#: src/core/installer.c:504
+#: src/core/installer.c:527
 msgid "Your texts on this USB drive were not touched. You can try again, or keep using FolioOS from the USB drive."
 msgstr "这个 U 盘上的文字没有被改动。你可以再试一次，或继续从 U 盘使用 FolioOS。"
 
-#: src/core/installer.c:506
+#: src/core/installer.c:529
 msgid "Try again"
 msgstr "重试"
 
@@ -2648,61 +2662,61 @@ msgid "%d track · %s"
 msgid_plural "%d tracks · %s"
 msgstr[0] "%d 首曲目 · %s"
 
-#: src/core/partitions.c:110
+#: src/core/partitions.c:121
 msgid "Done. The previous start of the disk is saved on this USB drive."
 msgstr "完成。磁盘原来的开头部分已保存在这个 U 盘上。"
 
-#: src/core/partitions.c:139
+#: src/core/partitions.c:150
 #, c-format
 msgid "Free space · %s"
 msgstr "可用空间 · %s"
 
-#: src/core/partitions.c:169
+#: src/core/partitions.c:180
 msgid "Working… Do not turn off the computer or remove the USB drive."
 msgstr "正在处理… 请勿关闭电脑或拔出 U 盘。"
 
-#: src/core/partitions.c:172
+#: src/core/partitions.c:183
 msgid "Choose a partition or a free space, then an action. Before anything is written, the start of the disk is saved to FOLIO/BACKUP on this USB drive."
 msgstr "选择一个分区或一块可用空间，再选择操作。写入任何内容之前，磁盘的开头部分会保存到这个 U 盘的 FOLIO/BACKUP 中。"
 
-#: src/core/partitions.c:194
+#: src/core/partitions.c:218
 msgid "Create a FAT32 partition"
 msgstr "创建 FAT32 分区"
 
-#: src/core/partitions.c:200
+#: src/core/partitions.c:224
 msgid "Resize"
 msgstr "调整大小"
 
-#: src/core/partitions.c:206
+#: src/core/partitions.c:230
 msgid "Format as FAT32"
 msgstr "格式化为 FAT32"
 
-#: src/core/partitions.c:225
+#: src/core/partitions.c:249
 #, c-format
 msgid "+ FAT32 · %s, in this free space"
 msgstr "+ FAT32 · %s，位于这块可用空间"
 
-#: src/core/partitions.c:234
+#: src/core/partitions.c:261
 msgid "Name of the new volume:"
 msgstr "新卷的名称："
 
-#: src/core/partitions.c:238
+#: src/core/partitions.c:265
 msgid "Everything on this partition will be erased; it becomes an empty FAT32 volume."
 msgstr "此分区上的所有内容都将被清除，它会变成一个空的 FAT32 卷。"
 
-#: src/core/partitions.c:239
+#: src/core/partitions.c:266
 msgid "This partition and everything on it will be erased; its space becomes free."
 msgstr "此分区及其所有内容都将被清除，它的空间会变为可用。"
 
-#: src/core/partitions.c:247
+#: src/core/partitions.c:274
 msgid "Create"
 msgstr "创建"
 
-#: src/core/partitions.c:247
+#: src/core/partitions.c:274
 msgid "Apply"
 msgstr "应用"
 
-#: src/core/partitions.c:247
+#: src/core/partitions.c:274
 msgid "Format"
 msgstr "格式化"
 
@@ -2877,4 +2891,22 @@ msgstr "用方向键调整窗口大小 · Enter 确认 · Esc 取消"
 #: src/core/ui.c:283
 msgid "Close (Esc)"
 msgstr "关闭（Esc）"
+
+#, c-format
+#~ msgid " %d left as it is (open in another tab, or changed on both sides at the same minute)."
+#~ msgid_plural " %d left as they are (open in another tab, or changed on both sides at the same minute)."
+#~ msgstr[0] " %d 个保持不变（在其他标签页中打开，或两边在同一分钟内都有修改）。"
+
+#~ msgid "This partition holds LVM volumes. To make room, shrink them from Linux (lvreduce, then pvresize)."
+#~ msgstr "此分区包含 LVM 卷。要腾出空间，请在 Linux 中缩小它们（先 lvreduce，再 pvresize）。"
+
+#~ msgid "Each file is replaced only after the new copy has been checked, so a power cut never leaves FolioOS half updated."
+#~ msgstr "每个文件都在新副本校验通过后才替换，因此断电也不会让 FolioOS 只更新一半。"
+
+#, c-format
+#~ msgid "Before anything is written, the start of the disk (partition table and boot sectors) is saved to %s on this USB drive."
+#~ msgstr "在写入任何内容之前，磁盘开头（分区表和引导扇区）会先保存到这个 U 盘上的 %s。"
+
+#~ msgid "The update did not finish. FolioOS on the disk still works: every file is either the old or the new one."
+#~ msgstr "更新未完成。磁盘上的 FolioOS 仍可使用：每个文件要么是旧的，要么是新的。"
 

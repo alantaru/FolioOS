@@ -11,7 +11,7 @@ Windows 없음. Linux 없음. 인터넷 없음. 알림 없음. 오직 당신과 
 [![Build](https://github.com/alantaru/FolioOS/actions/workflows/build.yml/badge.svg)](https://github.com/alantaru/FolioOS/actions/workflows/build.yml)
 [![Latest release](https://img.shields.io/github/v/release/alantaru/FolioOS?label=download&color=b4561f)](https://github.com/alantaru/FolioOS/releases/latest)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
-[![Platform: UEFI x64 | IA32](https://img.shields.io/badge/platform-UEFI%20x64%20%7C%20IA32-555)](#hardware-compatibility)
+[![Platform: UEFI x64 | IA32 | ARM64 | BIOS](https://img.shields.io/badge/platform-UEFI%20x64%20%7C%20IA32%20%7C%20ARM64%20%7C%20BIOS-555)](#hardware-compatibility)
 [![Languages: 15](https://img.shields.io/badge/languages-15-success)](#13-15-languages-and-counting)
 [![Translations welcome](https://img.shields.io/badge/translations-welcome-ff69b4)](docs/TRANSLATING.md)
 
@@ -44,7 +44,8 @@ FolioOS는 **부팅 가능한 글쓰기 환경**입니다. 단 한 가지 일, �
 
 - **소설가, 기자, 학생, 블로거**: 새 하드웨어를 사지 않고 *writerdeck*, 즉 방해 요소 없는 글쓰기 전용 기기를 원하는 사람.
 - **NaNoWriMo 참가자**와 시간을 정해 두고 쓰는 스프린트나 모닝 페이지를 쓰는 모든 사람.
-- **서랍 속에 낡은 노트북이 있는 사람**: FolioOS는 디스크를 건드리지 않고 그 노트북에 두 번째 삶을 줍니다.
+- **서랍 속에 오래된 노트북이 있는 사람**: FolioOS가 노트북에 두 번째 삶을 줍니다. USB 드라이브에서
+  바로 실행하거나 디스크에 설치해, 단독으로 또는 이미 있는 시스템 옆에서 쓸 수 있습니다.
 - **학교와 도서관**: 간단한 오프라인 글쓰기 자리가 필요한 곳.
 - **개인 정보를 중시하는 작가**: 네트워크도, 원격 측정도, 클라우드도 없습니다.
 
@@ -302,11 +303,38 @@ USB 드라이브(FAT32)
 │   ├── THEMES/         당신의 테마(.INI)
 │   ├── LANGUAGES/      번역(.po)
 │   ├── KEYBOARDS/      키보드 배열(.txt)
-│   └── VERSIONS/       저장한 파일의 자동 이전 버전
-└── EFI/BOOT/           FolioOS 자체(BOOTX64.EFI, BOOTIA32.EFI)
+│   ├── VERSIONS/       저장한 파일의 자동 이전 버전
+│   └── BACKUP/         설치 프로그램이 무언가를 쓰기 전에 저장한 파티션 테이블
+└── EFI/BOOT/           FolioOS 자체(BOOTX64.EFI, BOOTIA32.EFI, BOOTAA64.EFI)
 ```
 
 데이터베이스도, 숨은 파티션도, 독점 형식도 없습니다. USB 드라이브를 어느 컴퓨터에 가져가든 당신의 글이 그대로 있습니다.
+
+<a id="15-install-it-on-the-computer-beta"></a>
+
+### 15. 컴퓨터에 설치하기 (베타)
+
+USB 드라이브만으로도 충분하지만, FolioOS를 컴퓨터 자체의 디스크에 둘 수도 있어 노트북을 켜면 바로 글쓰기로
+시작합니다. **Ctrl+K › 이 컴퓨터에 FolioOS 설치**(또는 *설정 › 시스템*)를 여세요:
+
+- **유일한 시스템으로**: 빈 디스크나 지우기로 한 디스크에 설치합니다. 단어를 입력해 확인합니다.
+- **Windows나 Linux 옆에**: 빈 공간에 설치하며 다른 파티션은 건드리지 않습니다. 부팅할 때마다 몇 초 동안
+  *아무 키나 누르면 글쓰기를 시작합니다*가 표시되고, 그다음 평소처럼 다른 시스템이 시작됩니다.
+  Windows는 언제나처럼 펌웨어가 직접 시작합니다.
+- **빈 공간이 없나요?** FolioOS는 데이터를 전혀 옮기지 않고 NTFS, FAT32, exFAT 파티션을 줄일 수 있습니다.
+  안전하지 않은 경우(최대 절전 모드나 빠른 시작이 켜진 Windows, `chkdsk`가 필요한 볼륨, 복구 키가 없는
+  BitLocker, LUKS, LVM, Apple 볼륨)는 거절하고 대신 무엇을 해야 하는지 알려 줍니다. ext4는 크기를 절대
+  바꾸지 않습니다. Linux에서 공간을 만든 뒤(GParted) 설치 프로그램을 다시 여세요.
+- 무언가를 쓰기 전에 파티션 테이블(디스크의 처음과 마지막 섹터)을 USB 드라이브의 `FOLIO/BACKUP`에 저장합니다. 글은 컴퓨터,
+  USB 드라이브, 또는 둘 다에 둘 수 있습니다.
+- 더 새로운 USB 드라이브로 **업데이트**하거나 **제거**하기: 글을 먼저 USB 드라이브로 복사하고, 다른 파티션은
+  원래 크기로 다시 늘어납니다.
+- *설정 › 시스템 › 디스크와 파티션*은 작은 파티션 관리자입니다: FAT32 파티션 만들기, 포맷,
+  NTFS/FAT32/exFAT 줄이기와 늘리기, 삭제.
+
+UEFI PC와 BIOS 전용 PC에서 동작합니다. **베타 버전입니다:** Windows와 Linux가 만든 디스크로 에뮬레이션한
+컴퓨터에서 모든 테스트를 통과했지만 아직 실제 하드웨어에서는 실행해 보지 않았습니다. 먼저 백업하거나
+여분의 디스크를 사용하세요.
 
 ---
 
@@ -331,11 +359,12 @@ USB 드라이브(FAT32)
 | | |
 |---|---|
 | **펌웨어** | UEFI 2.x — 64비트(`BOOTX64.EFI`), 32비트(`BOOTIA32.EFI`, Atom 태블릿과 넷북) 또는 ARM64(`BOOTAA64.EFI`: 커뮤니티 UEFI 펌웨어를 올린 Raspberry Pi 3/4/5, ARM 노트북). **BIOS만 있는 PC**(Legacy/CSM)는 `FOLIO\TOOLS\biosboot.exe`를 한 번 실행하면 FolioOS 자체 BIOS 브리지로 부팅합니다. Secure Boot는 꺼져 있어야 합니다. |
-| **화면** | 모든 UEFI GOP 프레임 버퍼(RGB, BGR, 비트 마스크, Blt 전용) 또는 구형 UGA, BIOS PC에서는 VESA/VBE. 기본 해상도, 자동 HiDPI 배율, 세로 화면은 자동 회전. |
+| **화면** | 모든 UEFI GOP 프레임 버퍼(RGB, BGR, 비트 마스크, Blt 전용) 또는 구형 UGA, BIOS PC에서는 VESA/VBE. 기본 해상도, 자동 HiDPI 배율, 세로 화면은 자동 회전. 사용할 수 있는 모드가 4:3뿐이고 와이드 화면이 이를 늘이는 경우 *설정 › 시스템 › 화면과 포인터*에서 비율을 유지할 수 있습니다(모니터, 16:9, 16:10, 4:3). |
 | **입력** | 키보드는 펌웨어를 통해(BIOS PC에서는 PS/2로 직접). 마우스, 터치패드, 펜 태블릿, 터치스크린은 펌웨어를 통해, 펌웨어에 드라이버가 없으면 FolioOS 자체 USB HID 및 PS/2 드라이버로. |
 | **소리** | Intel HD Audio와 AC'97(음악 플레이어에만 필요). |
+| **디스크 (설치 프로그램, 베타)** | 512바이트 섹터의 SATA, NVMe, IDE, USB 디스크, GPT 또는 MBR. NTFS, FAT32, exFAT는 데이터를 옮기지 않고 줄였다가 다시 늘릴 수 있습니다. BitLocker, LUKS, LVM, APFS/HFS+, ext4는 크기를 절대 바꾸지 않습니다. |
 | **지원하지 않음** | Secure Boot(현재), Apple Silicon Mac. Wi-Fi와 블루투스는 일부러 넣지 않았습니다. |
-| **테스트 환경** | 릴리스마다 에뮬레이션한 기계 13대: UEFI x64, IA32, ARM64, 그리고 USB와 IDE로 부팅하는 BIOS 전용 PC. 그래픽 카드 8종, PS/2와 USB 마우스, USB 태블릿, HD Audio와 AC'97. 각각 화면, 키보드, 마우스, 소리, 저장, 파일 시스템 무결성을 확인합니다. |
+| **테스트 환경** | 릴리스마다 에뮬레이션한 20대의 컴퓨터: UEFI x64, IA32, ARM64와 USB·IDE로 부팅하는 BIOS 전용 PC, 그래픽 카드 8종, PS/2·USB 마우스, USB 태블릿, HD Audio와 AC'97, SATA·IDE 디스크에 설치한 FolioOS, Windows(UEFI) 및 다른 시스템(BIOS) 옆의 듀얼 부팅, Windows가 만든 NTFS 줄이기, 비율 유지. 각 컴퓨터에서 화면, 키보드, 마우스, 소리, 저장, 파일 시스템 무결성을 확인합니다. |
 
 부팅할 때마다 FolioOS는 찾아낸 것을 `FOLIO/DIAGNOSTICS.TXT`에 기록합니다.
 [하드웨어 보고](https://github.com/alantaru/FolioOS/issues/new/choose)에 당신의 파일을 공유해 주세요. "그냥 잘 된다"는
@@ -348,8 +377,18 @@ USB 드라이브(FAT32)
 <details>
 <summary><b>컴퓨터나 USB 드라이브의 내용이 지워지나요?</b></summary>
 
-아니요. FolioOS는 내장 디스크를 절대 건드리지 않고, 설치는 USB 드라이브에 파일을 더할 뿐입니다. 원래 있던 것은 그대로
-남습니다. 드라이브를 뽑으면 PC는 평소의 시스템으로 다시 부팅합니다.
+아니요. USB 드라이브에서 실행하는 동안 FolioOS는 내부 디스크에 절대 쓰지 않으며, 드라이브에 설치해도
+파일만 추가될 뿐 원래 있던 것은 그대로 남습니다. 드라이브를 빼면 PC는 평소 시스템으로 다시 부팅됩니다.
+디스크는 직접 설치 프로그램을 열 때만 건드리며, 그때도 확인하고 파티션 테이블이 USB 드라이브에
+저장되기 전에는 아무것도 쓰지 않습니다.
+</details>
+
+<details>
+<summary><b>노트북에 Windows나 Linux와 함께 설치할 수 있나요?</b></summary>
+
+네, 4.4(베타)부터 가능합니다: **Ctrl+K › 이 컴퓨터에 FolioOS 설치**. 빈 공간을 쓰거나 데이터를 옮기지 않고
+NTFS, FAT32, exFAT 파티션을 줄이며, 부팅할 때마다 FolioOS와 다른 시스템 중에서 고를 수 있습니다. 제거하면
+공간이 돌아옵니다. [컴퓨터에 설치하기](#15-install-it-on-the-computer-beta)를 참고하세요.
 </details>
 
 <details>
@@ -425,7 +464,7 @@ Intel Mac은 UEFI 드라이브로 부팅할 수 있지만(켤 때 <kbd>Option</k
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
 .\build.ps1                                  # UEFI x64 + IA32 + ARM64, BIOS, 시뮬레이터, 패키지 — 그리고 테스트 모음
-.\tools\qemu-lab.ps1                         # 실제 바이너리를 에뮬레이션한 기계 13대에서 부팅하고 하나씩 확인
+.\tools\qemu-lab.ps1                         # 실제 바이너리를 에뮬레이션한 기계 20대에서 부팅하고 하나씩 확인
 .\build\folio_sim.exe                        # FolioOS를 창에서 실행
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # 실제 UEFI 프로그램을 창에서 실행
 .\flash_usb.ps1 -DriveLetter E:              # FAT32 USB 드라이브에 설치/업데이트, 파일은 유지
@@ -436,7 +475,8 @@ cd FolioOS
 
 테스트 모음은 스크립트로 만든 키 입력과 마우스 이벤트로 시뮬레이터와 실제 `BOOTX64.EFI`(작은 UEFI 호스트 안에서)를
 움직이고, 화면을 캡처하며, 모든 내보내기(ZIP + XML), 모든 번역(검증기에 대한 음성 대조 포함), 여섯 가지 프레임 버퍼 형식,
-BIOS 브리지의 FAT32 드라이버(무작위 작업 수천 번을 바이트 단위로 대조)를 검증합니다.
+BIOS 브리지의 FAT32 드라이버(무작위 작업 수천 번을 바이트 단위로 대조)를 검증합니다.설치 프로그램과 파티션 관리자는 Windows와 Linux가 만든 디스크 이미지에서 실행되며, 그 결과는 Windows의
+`chkdsk`와 Linux의 `fsck`로 확인합니다(`tools/ntfs-shrink-check.ps1`, `tools/linux-run.ps1`).
 
 <a id="macos-simulator"></a>
 
@@ -464,7 +504,8 @@ macOS 스크립트는 시뮬레이터만 빌드합니다. UEFI 바이너리, 패
 
 ```
 src/core/       이식 가능한 핵심(독립형 C, libc 없음): 편집기, Markdown, TrueType 래스터라이저,
-                UI 툴킷과 창 관리자, 내보내기, MP3, i18n, 키보드 배열, 테마
+                UI 툴킷과 창 관리자, 내보내기, MP3, i18n, 키보드 배열, 테마,
+                파티션 테이블, 파일 시스템 검사와 크기 조정, 설치 프로그램과 부팅 선택기
 src/platform/   uefi/  GOP/UGA 화면, 입력, FAT 입출력, HD Audio/AC'97, USB HID 및 PS/2 드라이버 — 펌웨어 위에서 동작
                 bios/  부트 섹터 + BIOS→UEFI 브리지(VBE, PS/2, 자체 FAT32 드라이버) — BIOS 전용 PC용
                 win32/ 개발과 자동 테스트에 쓰는 시뮬레이터
@@ -474,7 +515,7 @@ assets/         글꼴, 번역(.po), 키보드 배열, 예제 테마
 tests/          스크립트로 작성한 종단 간 테스트
 ```
 
-약 600 KB의 프로그램이 얇은 플랫폼 계층을 통해 기계 전체를 다룹니다. 자세한 내용은
+약 800 KB의 프로그램이 얇은 플랫폼 계층을 통해 기계 전체를 다룹니다. 자세한 내용은
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)를 보세요.
 
 <a id="roadmap"></a>
@@ -486,7 +527,7 @@ FolioOS는 같은 편집기를 공유하는 두 가지 에디션으로 나뉩니
 
 - [x] BIOS 전용 PC(Legacy/CSM)와 ARM64(UEFI 펌웨어의 Raspberry Pi, ARM 노트북)
 - [x] 한국어 입력(두벌식 한글)과 일본어 가나 입력(로마자 → 히라가나/가타카나)
-- [ ] 컴퓨터 디스크에 설치 — 단독 시스템으로 또는 다른 어떤 시스템과도 함께 — 파티션 관리자 포함
+- [x] 컴퓨터 디스크에 설치 — 단독 시스템으로 또는 다른 어떤 시스템과도 함께 — 파티션 관리자 포함 (4.4 beta)
 - [ ] FolioOS Sync: Wi-Fi와 WebDAV, SFTP, Git, Dropbox, Google Drive, OneDrive, Syncthing 동기화
 - [ ] 일본어 한자 변환과 중국어 병음 입력(사전 필요)
 - [ ] 복잡한 문자 조판과 오른쪽에서 왼쪽으로 쓰는 문자(아랍 문자, 히브리 문자, 데바나가리…)

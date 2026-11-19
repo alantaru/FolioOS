@@ -12,6 +12,7 @@
 param([switch]$NoTests, [switch]$Legacy, [switch]$Image, [int]$ImageMB = 2048, [switch]$Vhd)
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
+[Environment]::CurrentDirectory = $PSScriptRoot      # .NET calls ([IO.File]...) resolve relative paths from here too
 
 function Step($n, $msg) { Write-Host "[$n] $msg" -ForegroundColor Cyan }
 function Ok($msg) { Write-Host "      $msg" -ForegroundColor Green }
@@ -53,6 +54,8 @@ if ($clang) {
 
 Step 2c "BIOS-only PCs -> build\bios\BIOS.SYS (BIOS-to-UEFI bridge that runs BOOTIA32.EFI) + boot sectors"
 $nasm = Get-Command nasm -ErrorAction SilentlyContinue
+# nothing from an earlier build counts: the BIOS tests run only with what this build produced
+Remove-Item -Recurse -Force build\bios, build\fakeother.bin, build\biosboot.exe -ErrorAction SilentlyContinue
 if ($clang -and $nasm) {
     New-Item -ItemType Directory -Force build\bios | Out-Null
     $b32 = @("--target=i686-unknown-none-elf", "-march=i686", "-O2", "-ffreestanding", "-fno-pic", "-fno-stack-protector", "-mno-sse", "-mno-mmx",
@@ -69,14 +72,15 @@ if ($clang -and $nasm) {
     Run $nasm @("-f", "bin", "-i", "build/bios/", "src\platform\bios\stub.asm", "-o", "build\bios\BIOS.SYS")
     Run $nasm @("-f", "bin", "tools\fakeother.asm", "-o", "build\fakeother.bin")   # the "other system" MBR of the phase 3 tests
     Run gcc @("-O2", "-Wall", "-Wextra", "tools\biosboot.c", "-o", "build\biosboot.exe")
-    Run gcc @("-O2", "-Wall", "-Wextra", "tools\fat32_test.c", "src\core\fat32.c", "src\core\part.c", "-o", "build\fat32_test.exe")
-    Run gcc @("-O2", "-Wall", "-Wextra", "tools\part_test.c", "src\core\part.c", "src\core\fat32.c", "-o", "build\part_test.exe")
-    Run gcc @("-O2", "-Wall", "-Wextra", "tools\install_test.c", "src\core\install.c", "src\core\part.c", "src\core\fat32.c", "src\core\fscheck.c", "-o", "build\install_test.exe")
-    Run gcc @("-O2", "-Wall", "-Wextra", "tools\fscheck_test.c", "src\core\fscheck.c", "src\core\part.c", "src\core\fat32.c", "-o", "build\fscheck_test.exe")
-    Run gcc @("-O2", "-Wall", "tools\fatcat.c", "-o", "build\fatcat.exe")
 } else {
     Write-Host "      clang (LLVM) and nasm are needed: BIOS boot not built" -ForegroundColor Yellow
 }
+# the host test tools (partition tables, installer, file systems, FAT32 driver) need neither clang nor nasm
+Run gcc @("-O2", "-Wall", "-Wextra", "tools\fat32_test.c", "src\core\fat32.c", "src\core\part.c", "-o", "build\fat32_test.exe")
+Run gcc @("-O2", "-Wall", "-Wextra", "tools\part_test.c", "src\core\part.c", "src\core\fat32.c", "-o", "build\part_test.exe")
+Run gcc @("-O2", "-Wall", "-Wextra", "tools\install_test.c", "src\core\install.c", "src\core\part.c", "src\core\fat32.c", "src\core\fscheck.c", "-o", "build\install_test.exe")
+Run gcc @("-O2", "-Wall", "-Wextra", "tools\fscheck_test.c", "src\core\fscheck.c", "src\core\part.c", "src\core\fat32.c", "-o", "build\fscheck_test.exe")
+Run gcc @("-O2", "-Wall", "tools\fatcat.c", "-o", "build\fatcat.exe")
 
 Step 3 "Windows simulator -> build\folio_sim.exe"
 Run gcc (@("-O2", "-g", "-fno-strict-aliasing", "-Isrc/core") + $warn + $core + @("src\platform\win32\win32_main.c", "-o", "build\folio_sim.exe", "-lgdi32", "-luser32", "-lwinmm"))
@@ -291,10 +295,15 @@ if (-not $NoTests) {
     Remove-Item $vs
     Ok "video: RGB, 16-bit mask, Blt only, padded stride, UGA, rotated portrait; keep proportions (4:3 mode on 16:9) - OK"
     # FAT32 driver of the BIOS bridge: random create/write/truncate/rename/delete vs. a model, then a full volume check
-    if (Test-Path build\fat32_test.exe) {
+    # these tests include BIOS scenarios: they run only with the BIOS bridge built by THIS build (never stale tools)
+    $biosOk = Test-Path build\bios\BIOS.SYS
+    if (-not $biosOk) { Write-Host "      BIOS bridge not built (clang and nasm needed): FAT32 driver, partition, installer and file-system tests skipped" -ForegroundColor Yellow }
+    if ($biosOk) {
+        $savedFatcatVol = $env:FATCAT_VOL; Remove-Item Env:\FATCAT_VOL -ErrorAction SilentlyContinue   # extractions below choose their own volume
         Run gcc @("-O2", "-Wall", "tools\mkimg.c", "-o", "build\mkimg.exe")
         # disk images can take a few GB: FOLIO_WORK=<folder on another drive> keeps them off the system drive
-        $ft = if ($env:FOLIO_WORK) { "$env:FOLIO_WORK\fat32t" } else { "build\fat32t" }; if (Test-Path $ft) { Remove-Item -Recurse -Force $ft }
+        # a folder of this build only (an existing "fat32t" that belongs to something else is never removed)
+        $ft = [IO.Path]::GetFullPath($(if ($env:FOLIO_WORK) { "$env:FOLIO_WORK\fat32t-$PID" } else { "build\fat32t-$PID" })); if (Test-Path $ft) { Remove-Item -Recurse -Force $ft }
         New-Item -ItemType Directory -Force "$ft\seed\Docs" | Out-Null
         Set-Content -Encoding ascii "$ft\seed\seed.txt" "seed"; Set-Content -Encoding ascii "$ft\seed\Docs\old notes.md" "old"
         foreach ($cfg in @(@(64, 7), @(64, 21), @(1200, 99))) {
@@ -392,19 +401,23 @@ if (-not $NoTests) {
         # (never written) and a 600 MB one. First run: wrong words only, nothing may be written. Second run:
         # the right word in lowercase installs.
         function Zero1MB($p) { $b = New-Object byte[] 1MB; $s = [IO.File]::OpenRead($p); [void]$s.Read($b, 0, $b.Length); $s.Close(); [Linq.Enumerable]::SequenceEqual($b, (New-Object byte[] 1MB)) }
+        # refusals: not one byte anywhere on the disk (a write to the backup GPT at the end must be caught too)
+        function AllZero($p) { $s = [IO.File]::OpenRead($p); try { $b = New-Object byte[] 4MB; while (($k = $s.Read($b, 0, $b.Length)) -gt 0) { for ($i = 0; $i -lt $k; $i += 8) { if ([BitConverter]::ToUInt64($b, $i) -ne 0) { return $false } } }; return $true } finally { $s.Close() } }
         foreach ($d in @(@("small", 100MB), @("target", 600MB))) { $xf = [IO.File]::Create("$ft\$($d[0]).img"); $xf.SetLength($d[1]); $xf.Close() }
         $oldLang = $env:FOLIO_PLATFORM_LANG; $env:FOLIO_PLATFORM_LANG = "pt-BR"; $env:FOLIO_DISKS = "$ft\small.img;$ft\target.img"
         try {
             Fresh; Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\instalar_errado.txt", "--out", "build\shots") | Out-Null
-            if (-not (Zero1MB "$ft\target.img") -or (Test-Path "$t\FOLIO\BACKUP")) { throw "installer screen: a wrong confirmation word wrote to the disk" }
+            if (-not (AllZero "$ft\target.img") -or (Test-Path "$t\FOLIO\BACKUP")) { throw "installer screen: a wrong confirmation word wrote to the disk" }
             Fresh; Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\instalar.txt", "--out", "build\shots") | Out-Null
         } finally { $env:FOLIO_DISKS = $null; $env:FOLIO_PLATFORM_LANG = $oldLang }
         Run .\build\fat32_test.exe @("$ft\target.img", "--fsck") | Out-Null
         & .\build\fatcat.exe "$ft\target.img" "EFI/BOOT/BOOTX64.EFI" "$ft\copied.efi" 2>$null
         if (-not (Test-Path "$ft\copied.efi") -or (Get-FileHash "$ft\copied.efi").Hash -ne (Get-FileHash "$t\EFI\BOOT\BOOTX64.EFI").Hash) { throw "installer screen: EFI\BOOT\BOOTX64.EFI not copied to the disk" }
         if (@(Get-ChildItem "$t\FOLIO\BACKUP\disk-*.bin" -ErrorAction SilentlyContinue).Count -ne 1) { throw "installer screen: no safety copy of the disk on the USB drive" }
-        if (-not (Zero1MB "$ft\small.img")) { throw "installer screen: the disk that is too small was written to" }
+        if (-not (AllZero "$ft\small.img")) { throw "installer screen: the disk that is too small was written to" }
         # updating it through the screen (from this USB drive): the version in FOLIO\INSTALLED.ID becomes this one
+        # the disk starts as an older version: if the update does not run, the new version never shows up below
+        Run .\build\install_test.exe @("$ft\src", "$ft\target.img", "600", "--set-version", "0.0-old") | Out-Null
         $env:FOLIO_PLATFORM_LANG = "pt-BR"; $env:FOLIO_DISKS = "$ft\target.img"
         try { Fresh; Run .\build\folio_sim.exe @("--root", $t, "--script", "tests\atualizar.txt", "--out", "build\shots") | Out-Null }
         finally { $env:FOLIO_DISKS = $null; $env:FOLIO_PLATFORM_LANG = $oldLang }
@@ -569,8 +582,9 @@ if (-not $NoTests) {
         Run .\build\fat32_test.exe @("$ft\target2.img", "--fsck") | Out-Null
         Remove-Item "$ft\copied.efi"; & .\build\fatcat.exe "$ft\target2.img" "EFI/BOOT/BOOTX64.EFI" "$ft\copied.efi" 2>$null
         if (-not (Test-Path "$ft\copied.efi") -or (Get-FileHash "$ft\copied.efi").Hash -ne (Get-FileHash "$t\EFI\BOOT\BOOTX64.EFI").Hash) { throw "installer in BOOTX64.EFI: EFI\BOOT\BOOTX64.EFI not copied to the disk" }
-        if (-not (Zero1MB "$ft\small.img")) { throw "installer in BOOTX64.EFI: the disk that is too small was written to" }
+        if (-not (AllZero "$ft\small.img")) { throw "installer in BOOTX64.EFI: the disk that is too small was written to" }
         Remove-Item -Recurse -Force $ft
+        if ($null -ne $savedFatcatVol) { $env:FATCAT_VOL = $savedFatcatVol }
         Ok "partition tables + installer: GPT (UEFI) and MBR (BIOS) disks installed, every file CRC-checked, volumes consistent - OK"
         Ok "installer next to Windows: one new entry, other partitions and entry numbers untouched, \EFI\FolioOS added - OK"
         Ok "real BOOTX64.EFI: 3 disks listed through Block I/O (bus, model, size), GPT/MBR/empty tables read - OK"

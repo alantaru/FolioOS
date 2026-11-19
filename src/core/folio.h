@@ -18,7 +18,7 @@ typedef uint32_t u32; typedef int32_t i32;
 typedef uint64_t u64; typedef int64_t i64;
 typedef size_t usize;
 
-#define FOLIO_VERSION "4.4 beta"
+#define FOLIO_VERSION "4.4.1 beta"
 #define MIN(a,b) ((a)<(b)?(a):(b))
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define CLAMP(v,lo,hi) ((v)<(lo)?(lo):((v)>(hi)?(hi):(v)))
@@ -125,7 +125,7 @@ typedef struct {
 } Event;
 
 typedef struct { int year, month, day, hour, min, sec; } DateTime;
-typedef struct { char label[64]; bool boot; bool readonly; u64 size, free; bool has_guid; u8 part_guid[16]; } VolInfo;   /* part_guid: partição GPT do volume */
+typedef struct { char label[64]; bool boot; bool readonly; bool removable; u64 size, free; bool has_guid; u8 part_guid[16]; } VolInfo;   /* part_guid: partição GPT do volume; removable: pendrive, cartão (mídia removível ou no USB) */
 typedef struct { char name[256]; bool dir; u64 size; DateTime mtime; } FileEntry;
 typedef struct PalFile PalFile;
 
@@ -165,7 +165,7 @@ bool  pal_disk_flush(int disk);          /* esvazia o cache de escrita (chamado 
  * no começo da ordem de boot. Reaproveita uma entrada igual que já exista. false = o firmware não deixou (ou não é UEFI) */
 bool  pal_boot_entry_add(const char *desc, int part_num, u64 part_lba, u64 part_count, const u8 part_guid[16], const char *path);
 /* outro sistema para o seletor de boot: a 1ª entrada ativa da ordem de boot que não é o FolioOS */
-bool  pal_boot_entry_remove(void);         /* desinstalar: tira as entradas de boot do FolioOS da UEFI */
+bool  pal_boot_entry_remove(const u8 part_guid[16]);   /* desinstalar: tira as entradas de boot desta instalação (a partição com o programa) */
 bool  pal_chain_mbr(const u8 *code440);   /* PC só BIOS: inicia o MBR original do outro sistema (não volta; false = não deu) */
 bool  pal_boot_other(char *name, int cap);
 void  pal_boot_other_start(void);          /* inicia o outro sistema (só volta se não conseguir) */
@@ -627,6 +627,7 @@ typedef struct {
     int   aspect;            /* manter proporção: 0 desligado, 1 a do monitor, 2 16:9, 3 16:10, 4 4:3 */
     bool  shuffle, repeat;
     char  last_path[512]; int last_vol; int last_p, last_o;
+    char  last_vol_id[80];          /* identidade do volume do último documento (ver vol_ident em app.c) */
     int   today_date, today_words;  /* palavras escritas hoje (antes da sessão atual) */
     char  recent[6][300];           /* "vol|caminho" */
     int   recent_pos[6][2];         /* onde parou em cada recente (parágrafo, coluna) */
@@ -772,6 +773,7 @@ void  app_paper_sheet(Rect sheet);      /* desenha a folha de papel (guardada no
 bool  app_sheet_on(void);                /* folha de papel visível (tema + preferência + modo página) */
 float app_text_w(float area_w);         /* largura do texto: coluna (página) ou quase toda a tela */
 void  app_save_diag(void);              /* grava FOLIO\DIAGNOSTICO.TXT */
+void  app_last_vol_id(char *o, int cap);   /* identidade do volume do documento aberto (CONFIG.INI: last_volume_id=) */
 void  app_remember_pos(void);            /* guarda onde parou no documento atual (recentes) */
 extern Window win_music;
 

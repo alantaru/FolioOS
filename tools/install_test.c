@@ -223,7 +223,8 @@ static u32 crc_range(u64 lba, u64 count) {
     static u8 b[1 << 16]; u32 c = 0;
     for (u64 done = 0; done < count; ) {
         u32 n = count - done < sizeof b / 512 ? (u32)(count - done) : (u32)(sizeof b / 512);
-        dio(0, lba + done, n, b, false); c = crc32_buf(c, b, n * 512); done += n;
+        if (!dio(0, lba + done, n, b, false)) { fprintf(stderr, "FALHA: não deu para ler o setor %llu\n", (unsigned long long)(lba + done)); exit(1); }   /* nunca um CRC de dados velhos */
+        c = crc32_buf(c, b, n * 512); done += n;
     }
     return c;
 }
@@ -255,6 +256,14 @@ static int compare(const BlkDev *d, const char *before) {
     static PartTable a, b; int fails = 0;
     if (!part_read(&db, &b) || !part_read(d, &a)) { fprintf(stderr, "FALHA: tabela ilegível\n"); return 1; }
     if (a.n != b.n + 1) { fprintf(stderr, "FALHA: %d entradas antes, %d depois (devia ser uma a mais)\n", b.n, a.n); fails++; }
+    if (b.scheme == SCHEME_MBR) {                     /* cada entrada que existia: os 16 bytes iguais (ativa, tipo, CHS…) */
+        static u8 m0[512], m1[512];
+        if (!dio_b(0, 0, 1, m0, false) || !dio(0, 0, 1, m1, false)) { fprintf(stderr, "FALHA: ler o MBR\n"); fails++; }
+        else for (int s = 0; s < 4; s++) {
+            const u8 *e0 = m0 + 446 + 16 * s, *e1 = m1 + 446 + 16 * s;
+            if (e0[4] && memcmp(e0, e1, 16)) { fprintf(stderr, "FALHA: a entrada %d do MBR mudou (ativa, tipo ou posição)\n", s + 1); fails++; }
+        }
+    }
     for (int i = 0; i < b.n; i++) {
         const Part *o = &b.p[i], *n = 0;
         for (int k = 0; k < a.n; k++) if (b.scheme == SCHEME_MBR ? a.p[k].start == o->start : !memcmp(a.p[k].guid, o->guid, 16)) n = &a.p[k];   /* MBR: sem GUID */
@@ -272,7 +281,7 @@ static int compare(const BlkDev *d, const char *before) {
         static u8 x[1 << 16], y[1 << 16];
         for (u64 done = 0; done < o->count; ) {
             u32 m = o->count - done < sizeof x / 512 ? (u32)(o->count - done) : (u32)(sizeof x / 512);
-            dio_b(0, o->start + done, m, x, false); dio(0, o->start + done, m, y, false);
+            if (!dio_b(0, o->start + done, m, x, false) || !dio(0, o->start + done, m, y, false)) { fprintf(stderr, "FALHA: não deu para ler a partição %d (setor %llu)\n", o->slot + 1, (unsigned long long)(o->start + done)); fails++; break; }
             if (memcmp(x, y, m * 512)) { fprintf(stderr, "FALHA: o conteúdo da partição %d mudou (setor %llu)\n", o->slot + 1, (unsigned long long)(o->start + done)); fails++; break; }
             done += m;
         }
@@ -286,7 +295,8 @@ int main(int argc, char **argv) {
     SetConsoleOutputCP(CP_UTF8);
     if (argc < 4) { fprintf(stderr, "uso: install_test <origem> <imagem> <MB> [--bios] [--docs-stick] [--windows] [--alongside]\n"); return 2; }
     GetFullPathNameA(argv[1], MAX_PATH, root, 0);
-    u64 mb = (u64)atoll(argv[3]);
+    char *mend; u64 mb = strtoull(argv[3], &mend, 10);
+    if (!argv[3][0] || *mend || !mb || mb > (16ull << 20)) { fprintf(stderr, "tamanho inválido: \"%s\" (MB)\n", argv[3]); return 2; }
     InstallOpts o = { 0 }; o.label = "FOLIO"; o.efi_name = "BOOTX64.EFI"; o.version = "test";
     bool windows = false, alongside = false, shrink = false, remove_mode = false, update_mode = false;
     for (int i = 4; i < argc; i++) {
@@ -303,10 +313,41 @@ int main(int argc, char **argv) {
         if (!strcmp(argv[i], "--windows-bios") && i + 1 < argc) winbios = argv[++i];
         if (!strcmp(argv[i], "--mbr-fat32") && i + 1 < argc) mbrfat = argv[++i];
     }
-    img = fopen(argv[2], "r+b");
+    /* só leitura (--list, --compare, --same-table): a imagem como está, nada muda de tamanho. Nos outros modos uma
+     * imagem que já existe nunca encolhe (isso apagaria o fim dela): só uma nova (ou menor) ganha o tamanho pedido. */
+    bool readonly = false;
+    for (int i = 4; i < argc; i++) if (!strcmp(argv[i], "--list") || !strcmp(argv[i], "--compare") || !strcmp(argv[i], "--same-table")) readonly = true;
+    img = fopen(argv[2], readonly ? "rb" : "r+b");
+    if (!img && readonly) { perror(argv[2]); return 2; }
     if (!img) { img = fopen(argv[2], "w+b"); if (!img) { perror(argv[2]); return 2; } }
-    _chsize_s(_fileno(img), (long long)(mb << 20));
-    BlkDev d = { dio, 0, (mb << 20) / 512, 512, 0 };
+    _fseeki64(img, 0, SEEK_END); u64 have = (u64)_ftelli64(img);
+    if (!readonly && have < (mb << 20) && _chsize_s(_fileno(img), (long long)(mb << 20))) { fprintf(stderr, "não deu para criar a imagem de %llu MB\n", (unsigned long long)mb); fclose(img); return 2; }
+    u64 bytes = readonly || have > (mb << 20) ? have : (mb << 20);   /* o tamanho real do disco */
+    mb = bytes >> 20;
+    BlkDev d = { dio, 0, bytes / 512, 512, 0 };
+    /* --set-version <v>: o FOLIO/INSTALLED.ID da instalação passa a dizer version=<v> (o teste da atualização pela tela
+     * parte de uma versão antiga: se a atualização não rodar, a versão nova não aparece) */
+    for (int i = 4; i + 1 < argc; i++) if (!strcmp(argv[i], "--set-version")) {
+        static PartTable st; static Fat sv; static char id[1024], out[1100];
+        if (!part_read(&d, &st)) { fprintf(stderr, "FALHA: tabela\n"); return 1; }
+        for (int k = 0; k < st.n; k++) {
+            if (st.p[k].fs != FS_FAT32 || !fat_mount(&sv, dio, 0, st.p[k].start)) continue;
+            FatNode root, folio, idn; fat_root(&sv, &root);
+            u16 w1[8] = { 'F', 'O', 'L', 'I', 'O', 0 }, w2[16] = { 'I', 'N', 'S', 'T', 'A', 'L', 'L', 'E', 'D', '.', 'I', 'D', 0 };
+            if (fat_lookup(&sv, &root, w1, &folio) != FAT_OK || fat_lookup(&sv, &folio, w2, &idn) != FAT_OK || idn.size >= sizeof id) continue;
+            int n = fat_read(&sv, &idn, 0, id, idn.size); if (n != (int)idn.size) { fprintf(stderr, "FALHA: ler INSTALLED.ID\n"); return 1; }
+            id[n] = 0; int o = 0;
+            for (char *line = id; *line; ) {               /* troca só a linha version= */
+                char *e = line; while (*e && *e != '\n') e++;
+                if (!strncmp(line, "version=", 8)) o += snprintf(out + o, sizeof out - o, "version=%s\r\n", argv[i + 1]);
+                else { memcpy(out + o, line, (size_t)(e - line) + (*e ? 1 : 0)); o += (int)(e - line) + (*e ? 1 : 0); }
+                line = *e ? e + 1 : e;
+            }
+            if (fat_truncate(&sv, &idn, 0) != FAT_OK || fat_write(&sv, &idn, 0, out, (u32)o) != o || fat_flush(&sv) != FAT_OK) { fprintf(stderr, "FALHA: gravar INSTALLED.ID\n"); return 1; }
+            fclose(img); printf("versão instalada: %s\n", argv[i + 1]); return 0;
+        }
+        fprintf(stderr, "FALHA: nenhum FOLIO/INSTALLED.ID\n"); return 1;
+    }
     for (int i = 4; i + 1 < argc; i++) if (!strcmp(argv[i], "--compare")) { int rc = compare(&d, argv[i + 1]); fclose(img); return rc; }
     for (int i = 4; i + 1 < argc; i++) if (!strcmp(argv[i], "--put-winefi")) { int rc = put_winefi(&d, argv[i + 1]); fclose(img); return rc; }
     for (int i = 4; i + 1 < argc; i++) if (!strcmp(argv[i], "--same-table")) { int rc = same_table(&d, argv[i + 1]); fclose(img); return rc; }
@@ -523,7 +564,8 @@ int main(int argc, char **argv) {
         return 0;
     }
     u32 crcs[PART_MAX];
-    for (int i = 0; i < before.n; i++) crcs[i] = memcmp(before.p[i].type, GPT_ESP, 16) ? crc_range(before.p[i].start, before.p[i].count) : 0;
+    static bool has_crc[PART_MAX];                       /* 0 é um CRC válido: "tem" fica à parte */
+    for (int i = 0; i < before.n; i++) { has_crc[i] = memcmp(before.p[i].type, GPT_ESP, 16) != 0; crcs[i] = has_crc[i] ? crc_range(before.p[i].start, before.p[i].count) : 0; }
     Region fr[8]; int nf = part_free(&d, &before, fr, 8), big = -1;
     for (int i = 0; i < nf; i++) if (big < 0 || fr[i].count > fr[big].count) big = i;
     if (big < 0) { fprintf(stderr, "sem espaço livre\n"); return 2; }
@@ -537,7 +579,7 @@ int main(int argc, char **argv) {
         if (!b || b->slot != a->slot || b->start != a->start || b->count != a->count || memcmp(b->type, a->type, 16) || memcmp(b->name, a->name, sizeof a->name) || b->attrs != a->attrs) {
             fprintf(stderr, "FALHA: a entrada %d da tabela mudou\n", a->slot + 1); fails++; continue;
         }
-        if (crcs[i] && crc_range(a->start, a->count) != crcs[i]) { fprintf(stderr, "FALHA: o conteúdo da partição %d mudou\n", a->slot + 1); fails++; }
+        if (has_crc[i] && crc_range(a->start, a->count) != crcs[i]) { fprintf(stderr, "FALHA: o conteúdo da partição %d mudou\n", a->slot + 1); fails++; }
     }
     fclose(img);
     if (fails) return 1;

@@ -61,7 +61,7 @@ typedef struct {
     bool marked;                      /* tem o FOLIO/INSTALLED.ID (senão foi reconhecido pelo conteúdo) */
     bool bios;                        /* ao lado num PC só BIOS: o MBR original está em FOLIO/OTHERMBR.BIN (fase 3) */
     uint64_t part_start, part_count; uint8_t part_guid[16];   /* a partição de dados do FolioOS */
-    uint64_t esp_start;
+    uint64_t esp_start; uint8_t esp_guid[16];   /* a partição EFI (ao lado de outro sistema, UEFI): para achar a entrada de boot certa */
     int ntfs;                         /* a partição logo antes dela (NTFS, FAT32 ou exFAT), que pode crescer de volta (-1 = nenhuma) */
     int grow_fs;                      /* o sistema de arquivos dela (FS_*) */
     uint64_t ntfs_start, ntfs_count, ntfs_grow_to;   /* em setores; grow_to = o tamanho depois de crescer */

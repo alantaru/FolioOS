@@ -9,15 +9,18 @@ $ErrorActionPreference = "Stop"
 $admin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $admin) { throw "run as administrator (virtual disks and chkdsk need it)" }
 $Image = (Resolve-Path $Image).Path
-$vhd = [IO.Path]::ChangeExtension($Image, ".chk.vhd")
-if (Test-Path $vhd) { Dismount-DiskImage -ImagePath $vhd -ErrorAction SilentlyContinue | Out-Null; Remove-Item $vhd }
+# a copy at a path that belongs to this run only (an existing .vhd next to the image is never touched)
+$vhd = Join-Path ([IO.Path]::GetDirectoryName($Image)) ("chk-" + [guid]::NewGuid().ToString("N") + ".vhd")
 $mb = [math]::Ceiling((Get-Item $Image).Length / 1MB)
-$dp = [IO.Path]::GetTempFileName()
-"create vdisk file=`"$vhd`" maximum=$mb type=fixed" | Set-Content $dp -Encoding Ascii
-diskpart /s $dp | Out-Null; Remove-Item $dp
-$src = [IO.File]::OpenRead($Image); $dst = [IO.File]::OpenWrite($vhd); $src.CopyTo($dst); $dst.Dispose(); $src.Dispose()
 $bad = 0
 try {
+    # everything from here on is cleaned up by the finally below, even if creating or filling the VHD fails
+    $dp = [IO.Path]::GetTempFileName()
+    "create vdisk file=`"$vhd`" maximum=$mb type=fixed" | Set-Content $dp -Encoding Ascii
+    diskpart /s $dp | Out-Null; $drc = $LASTEXITCODE; Remove-Item $dp
+    if ($drc -ne 0 -or -not (Test-Path $vhd)) { throw "diskpart could not create $vhd (exit $drc)" }
+    $src = $null; $dst = $null
+    try { $src = [IO.File]::OpenRead($Image); $dst = [IO.File]::OpenWrite($vhd); $src.CopyTo($dst) } finally { if ($dst) { $dst.Dispose() }; if ($src) { $src.Dispose() } }
     $disk = Mount-DiskImage -ImagePath $vhd -PassThru | Get-Disk
     foreach ($p in Get-Partition -DiskNumber $disk.Number) {
         if ($p.Type -eq "Reserved") { continue }

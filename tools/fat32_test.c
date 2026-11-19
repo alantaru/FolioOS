@@ -138,7 +138,11 @@ static int fat_volumes(u64 *lba, int cap) {
     BlkDev d = { io, 0, size / 512, 512, 0 };
     static PartTable t; int n = 0;
     if (!part_read(&d, &t)) return 0;
-    for (int i = 0; i < t.n && n < cap; i++) if (t.p[i].fs == FS_FAT32) lba[n++] = t.p[i].start;
+    for (int i = 0; i < t.n; i++) if (t.p[i].fs == FS_FAT32) { if (n >= cap) return -1; lba[n++] = t.p[i].start; }   /* -1: não cabe (nunca conferir só uma parte) */
+    /* sem tabela e sem "FAT32   " no campo de tipo (que é só informativo): um FAT32 que monta no setor 0 também vale */
+    if (!n && t.scheme != SCHEME_GPT && t.scheme != SCHEME_MBR) { static Fat probe; if (fat_mount(&probe, io, 0, 0)) lba[n++] = 0; }
+    /* sem tabela e sem "FAT32   " no tipo (o campo é só informativo): um FAT32 que monta no setor 0 também vale */
+    if (!n && t.scheme != SCHEME_GPT && t.scheme != SCHEME_MBR) { static Fat probe; if (fat_mount(&probe, io, 0, 0)) lba[n++] = 0; }
     return n;
 }
 static bool mount(void) {
@@ -153,7 +157,8 @@ int main(int argc, char **argv) {
     if (argc > 3) rng = (u32)atoi(argv[3]);
     if (argc > 2 && !strcmp(argv[2], "--fsck")) {          /* só confere o volume (depois de uma sessão no laboratório) */
         img = fopen(argv[1], "rb"); if (!img) { perror(argv[1]); return 2; }
-        u64 lba[8]; int nv = fat_volumes(lba, 8);
+        static u64 lba[PART_MAX + 1]; int nv = fat_volumes(lba, PART_MAX + 1);
+        if (nv < 0) { fprintf(stderr, "volumes FAT32 demais para conferir\n"); return 1; }
         if (!nv) { fprintf(stderr, "nenhum volume FAT32\n"); return 1; }
         for (int v = 0; v < nv; v++) {                       /* confere todos os volumes FAT32 do disco */
             if (!fat_mount(&fat, io, 0, lba[v])) { fprintf(stderr, "não montou o volume em %llu\n", (unsigned long long)lba[v]); return 1; }

@@ -1,5 +1,5 @@
-FOLIO 4 — máquina de escrever digital (pen-drive inicializável)
-================================================================
+FolioOS — máquina de escrever digital, sem distrações, que dá boot por este pen-drive
+=====================================================================================
 
 Este pen-drive funciona de dois jeitos:
 
@@ -31,6 +31,11 @@ Este pen-drive funciona de dois jeitos:
    FOLIO\TABS\      textos sem nome abertos em abas (voltam após reiniciar).
    FOLIO\CONFIG.INI preferências (idioma, teclado, tema, fonte, metas…). Editável.
    FOLIO\DRAFT.MD   recuperação automática de textos ainda sem nome.
+   FOLIO\VERSIONS\  versões anteriores dos textos salvos (as 30 últimas de cada).
+   FOLIO\BACKUP\    tabelas de partição (os primeiros e os últimos setores de um
+                    disco) que o instalador guardou antes de mexer nesse disco
+                    (veja INSTALAR NO COMPUTADOR).
+   FOLIO\DIAGNOSTICS.TXT  o que o FolioOS encontrou no último início (veja o fim).
    EFI\BOOT\        o sistema em si. Não apague.
 
    Pen-drives preparados por versões anteriores continuam com os nomes antigos
@@ -46,10 +51,24 @@ IDIOMAS E TECLADOS
    idioma, edite FOLIO\LANGUAGES\<código>.po (Poedit ou qualquer editor) e
    reinicie. Os teclados (ABNT2, Portugal, EUA, internacional, Reino Unido,
    Espanha, América Latina, AZERTY, QWERTZ, italiano, polonês, turco, russo,
-   ucraniano) são arquivos de texto em FOLIO\KEYBOARDS.
+   ucraniano, coreano e japonês) são arquivos de texto em FOLIO\KEYBOARDS.
+   Coreano e japonês se digitam com os teclados "한국어 (두벌식)" (sílabas
+   Hangul) e "日本語 (ローマ字かな)" (romaji para kana); Ctrl+Espaço liga e
+   desliga o método de entrada. A conversão para kanji e o pinyin chinês ainda
+   não existem.
+
+SEM MOUSE
+   Tudo funciona pelo teclado. Uma janela aberta pelo seu atalho já recebe o
+   teclado: Tab / Shift+Tab e as setas andam entre os controles, Enter ou Espaço
+   apertam, Esquerda/Direita ajustam deslizantes e opções, Esc fecha. Ctrl+F6
+   leva o teclado entre o texto e as janelas abertas; Alt+M abre o menu com os
+   documentos recentes; Alt+F7 / Alt+F8 movem / redimensionam uma janela com as
+   setas (Enter confirma, Esc desfaz). Para desligar de vez o mouse e o
+   touchpad: Ajustes > Sistema > "Usar o mouse e o touchpad", Ctrl+K > "Mouse",
+   ou use_mouse=0 no FOLIO\CONFIG.INI.
 
 Os arquivos .md abrem em qualquer editor de texto (Bloco de Notas, TextEdit,
-VS Code, Obsidian, Typora…). Dentro do FOLIO, Ctrl+Shift+S exporta para Word
+VS Code, Obsidian, Typora…). Dentro do FolioOS, Ctrl+Shift+S exporta para Word
 (.docx), LibreOffice (.odt), e-book (.epub), página web (.html) e RTF.
 
 Atalhos principais: F1 ajuda · Ctrl+K comandos · F2 foco · F3 máquina de
@@ -73,7 +92,7 @@ LER E ESCREVER
    velocidade. No modo zen, a barra aparece tocando a borda de baixo da tela.
    Ctrl+PgUp / Ctrl+PgDn pulam para o capítulo (título #) anterior ou seguinte.
    Cada documento recente lembra onde você parou, até de um dia para o outro;
-   se desligar lendo, o FOLIO volta lendo.
+   se desligar lendo, o FolioOS volta lendo.
    Escrevendo: Ctrl+J vai à última alteração (e de novo volta); Ctrl+D duplica
    o parágrafo; Ctrl+Shift+K apaga o parágrafo; Shift+F3 troca entre
    minúsculas, Iniciais e MAIÚSCULAS; com um trecho selecionado, digitar ( [ "
@@ -116,18 +135,45 @@ ABERTURA
    exibir: Ajustes > Sistema > INICIALIZAÇÃO, ou splash=0 no CONFIG.INI.
 
 TELA
-   O FOLIO usa a resolução nativa do monitor e gira sozinho a imagem em tablets
+   O FolioOS usa a resolução nativa do monitor e gira sozinho a imagem em tablets
    com tela em pé. Em Ajustes > Sistema dá para escolher outra resolução e girar
    a tela. Atalhos: Ctrl+Alt+setas giram; Ctrl+Alt+Home volta ao automático
    (use se a imagem ficar errada). No CONFIG.INI: resolution=auto (ou 1920x1080,
    ou max), rotation=auto (ou 0, 90, 180, 270), fast_video=0 se a imagem falhar.
    Se os círculos parecerem ovais (o computador só oferece, por exemplo,
    1024x768 e a tela estica para widescreen), escolha o formato da sua tela em
-   Ajustes > Sistema (Monitor, 16:9, 16:10 ou 4:3): o FOLIO passa a desenhar
+   Ajustes > Sistema > TELA E PONTEIRO (Monitor, 16:9, 16:10 ou 4:3): o FolioOS passa a desenhar
    nesse formato e o esticamento se compensa. CONFIG.INI: keep_aspect=off (ou
    monitor, 16:9, 16:10, 4:3). Ctrl+Alt+Home desliga de novo.
    Se o PC não mostrar nada: placas de vídeo muito antigas (antes de ~2012) podem
    só funcionar no modo BIOS - prepare o pen-drive para o modo BIOS como no item 1).
+
+INSTALAR NO COMPUTADOR (beta)
+   O pen-drive basta, mas o FolioOS também pode ser instalado no disco do
+   próprio computador: Ctrl+K > "Instalar o FolioOS neste computador" (ou
+   Ajustes > Sistema).
+   - Como único sistema: num disco vazio, ou num que você decide apagar (você
+     digita uma palavra para confirmar).
+   - Ao lado do Windows ou do Linux, no espaço livre; as outras partições não
+     são tocadas. A cada início aparece "Aperte qualquer tecla para escrever"
+     por alguns segundos, e depois o outro sistema inicia como sempre (a espera
+     se ajusta em Ajustes > Sistema > INICIALIZAÇÃO; 0 vai direto ao FolioOS).
+   - Sem espaço livre: o FolioOS pode encolher uma partição NTFS, FAT32 ou exFAT
+     sem mover dados. Ele recusa o que não é seguro (Windows hibernado ou com
+     Inicialização Rápida, volume que precisa de chkdsk, LUKS, LVM, volumes da
+     Apple) e diz o que fazer. Num disco com BitLocker, pede para você
+     confirmar que tem a chave de recuperação. ext4 nunca é redimensionado:
+     abra espaço pelo Linux (GParted) antes.
+   - Antes de gravar qualquer coisa, a tabela de partições (os primeiros e os
+     últimos setores do disco) é salva em FOLIO\BACKUP neste pen-drive. Seus textos podem ficar no
+     computador, neste pen-drive ou nos dois (Ajustes > Sistema > TEXTOS).
+   - Atualizar: inicie por um pen-drive mais novo e escolha "Atualizar".
+     Desinstalar: seus textos são copiados antes para este pen-drive, e depois a
+     outra partição cresce de volta.
+   - Ajustes > Sistema > "Discos e partições" é um pequeno gerenciador de
+     partições.
+   É uma beta: passa em todos os testes em máquinas emuladas, mas ainda não
+   rodou em hardware real. Faça um backup antes, ou use um disco sobrando.
 
 SE ALGO NÃO FUNCIONAR (som, tela, mouse)
    O FolioOS grava FOLIO\DIAGNOSTICS.TXT a cada início (e em Ajustes > Sistema >

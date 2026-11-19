@@ -32,6 +32,11 @@ This drive works in two ways:
    FOLIO\CONFIG.INI    preferences (language, keyboard, theme, font, goals…).
                        Editable by hand.
    FOLIO\DRAFT.MD      automatic recovery of texts that have no name yet.
+   FOLIO\VERSIONS\     previous versions of saved texts (the last 30 of each).
+   FOLIO\BACKUP\       partition tables (the first and last sectors of a disk)
+                       saved by the installer before it changed that disk (see
+                       INSTALLING ON THIS COMPUTER).
+   FOLIO\DIAGNOSTICS.TXT  what FolioOS found on the last start (see the end).
    EFI\BOOT\           the system itself. Do not delete.
 
    Drives set up by older versions keep their Portuguese folder names (TEXTOS,
@@ -84,11 +89,35 @@ DISPLAY
    rotation=auto (or 0, 90, 180, 270), fast_video=0 if the picture glitches.
    If circles look like ovals (the computer only offers, say, 1024x768 and the
    screen stretches it to widescreen), choose the shape of your screen in
-   Settings > System (Monitor, 16:9, 16:10 or 4:3): FolioOS then draws at that
+   Settings > System > DISPLAY AND POINTER (Monitor, 16:9, 16:10 or 4:3): FolioOS
+   then draws at that
    shape and the stretching evens out. CONFIG.INI: keep_aspect=off (or monitor,
    16:9, 16:10, 4:3). Ctrl+Alt+Home turns it off again.
    If the PC shows nothing: very old graphics cards (before ~2012) may only work
    in BIOS mode - make the drive start in BIOS mode as explained in 1).
+
+INSTALLING ON THIS COMPUTER (beta)
+   The USB drive is enough, but FolioOS can also be installed on the computer's
+   own disk: Ctrl+K > "Install FolioOS on this computer" (or Settings > System).
+   - As the only system: on an empty disk, or one you choose to erase (you type a
+     word to confirm).
+   - Next to Windows or Linux, in free space; the other partitions are not
+     touched. Every start shows "Press any key to write" for a few seconds, then
+     starts the other system as usual (the wait is set in Settings > System >
+     STARTUP; 0 goes straight to FolioOS).
+   - No free space: FolioOS can shrink an NTFS, FAT32 or exFAT partition without
+     moving data. It refuses what is not safe (Windows hibernated or with Fast
+     Startup, a volume that needs chkdsk, LUKS, LVM, Apple volumes) and says what
+     to do instead. On a disk with BitLocker it asks you to confirm you have the
+     recovery key. ext4 is never resized: make room from Linux (GParted) first.
+   - Before anything is written, the partition table (the first and last sectors
+     of the disk) is saved to FOLIO\BACKUP on this drive. Your texts can live on the computer, on this
+     drive, or on both (Settings > System > TEXTS).
+   - Update: start from a newer USB drive and choose "Update". Uninstall: your
+     texts are copied to this drive first, then the other partition grows back.
+   - Settings > System > "Disks and partitions" is a small partition manager.
+   This is a beta: it passes every test on emulated machines, but has not run on
+   real hardware yet. Back up first, or use a spare disk.
 
 IF SOMETHING DOES NOT WORK (sound, display, mouse)
    FolioOS writes FOLIO\DIAGNOSTICS.TXT on every start (and in Settings > System >

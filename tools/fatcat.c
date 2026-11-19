@@ -23,19 +23,44 @@ static void rd(u64 off, void *b, size_t n) { if (_fseeki64(img, (long long)off, 
 static u16 le16(const u8 *p) { return (u16)(p[0] | p[1] << 8); }
 static u32 le32(const u8 *p) { return (u32)p[0] | (u32)p[1] << 8 | (u32)p[2] << 16 | (u32)p[3] << 24; }
 
+static u32 crc32(const u8 *p, size_t n) {
+    u32 c = 0xFFFFFFFFu;
+    while (n--) { c ^= *p++; for (int k = 0; k < 8; k++) c = (c >> 1) ^ (0xEDB88320u & (0u - (c & 1))); }
+    return ~c;
+}
+/* um cabeçalho GPT válido em hdr_lba (com os dois CRCs certos): *elba, *num, *esz; senão false */
+static int gpt_at(u64 hdr_lba, u64 *elba, u32 *num, u32 *esz) {
+    u8 h[512]; rd(hdr_lba * 512, h, 512);
+    if (memcmp(h, "EFI PART", 8)) return 0;
+    u32 hs = le32(h + 12); if (hs < 92 || hs > 512) return 0;
+    u32 hc = le32(h + 16); h[16] = h[17] = h[18] = h[19] = 0;
+    if (crc32(h, hs) != hc) return 0;
+    *elba = le32(h + 72) | (u64)le32(h + 76) << 32; *num = le32(h + 80); *esz = le32(h + 84);
+    if (*esz < 128 || *esz > 4096 || !*num || (u64)*num * *esz > (4u << 20)) return 0;
+    u8 *ents = malloc((size_t)*num * *esz); if (!ents) die("sem memória");
+    rd(*elba * 512, ents, (size_t)*num * *esz);
+    int ok = crc32(ents, (size_t)*num * *esz) == le32(h + 88);
+    free(ents);
+    return ok;
+}
 static void mount(void) {
     u8 s[512]; rd(0, s, 512);
     part = 0;
-    int want = getenv("FATCAT_VOL") ? atoi(getenv("FATCAT_VOL")) : 0, seen = 0;   /* FATCAT_VOL=N: o N-ésimo volume FAT (0 = o primeiro) */
+    int want = 0, seen = 0;                         /* FATCAT_VOL=N: o N-ésimo volume FAT (0 = o primeiro) */
+    if (getenv("FATCAT_VOL") && getenv("FATCAT_VOL")[0]) {
+        char *end; long v = strtol(getenv("FATCAT_VOL"), &end, 10);
+        if (*end || v < 0 || v > 255) die("FATCAT_VOL inválido (um número de volume: 0, 1, 2…)");
+        want = (int)v;
+    }
     if (s[510] == 0x55 && s[511] == 0xAA && !(s[0] == 0xEB || s[0] == 0xE9)) {   /* MBR: primeira partição FAT */
         for (int i = 0; i < 4; i++) {
             const u8 *e = s + 446 + 16 * i;
             if ((e[4] == 0x0B || e[4] == 0x0C || e[4] == 0x0E || e[4] == 0x06 || e[4] == 0xEF) && seen++ == want) { part = (u64)le32(e + 8) * 512; break; }
             if (e[4] == 0xEE) {                       /* GPT: primeira entrada com sistema FAT */
-                u8 h[512]; rd(512, h, 512);
-                if (memcmp(h, "EFI PART", 8)) die("GPT sem cabeçalho");
-                u64 elba = le32(h + 72) | (u64)le32(h + 76) << 32; u32 num = le32(h + 80), esz = le32(h + 84);
-                for (u32 k = 0; k < num && k < 128 && !part; k++) {
+                u64 elba; u32 num, esz;
+                _fseeki64(img, 0, SEEK_END); u64 last = (u64)_ftelli64(img) / 512 - 1;
+                if (!gpt_at(1, &elba, &num, &esz) && !gpt_at(last, &elba, &num, &esz)) die("GPT inválida (CRC do cabeçalho ou das entradas, nas duas cópias)");
+                for (u32 k = 0; k < num && !part; k++) {
                     u8 en[128], b[512]; rd(elba * 512 + (u64)k * esz, en, 128);
                     u64 st = le32(en + 32) | (u64)le32(en + 36) << 32;
                     if (!st) continue;
@@ -45,9 +70,9 @@ static void mount(void) {
                 break;
             }
         }
-        if (!part) die("nenhuma partição FAT no MBR");
+        if (!part) die(want ? "não há esse volume FAT (FATCAT_VOL)" : "nenhuma partição FAT no MBR");
         rd(part, s, 512);
-    }
+    } else if (want) die("disco sem tabela de partições: só há o volume 0 (FATCAT_VOL)");
     bps = le16(s + 11); spc = s[13]; rsv = le16(s + 14); nfats = s[16]; root_ents = le16(s + 17);
     total = le16(s + 19) ? le16(s + 19) : le32(s + 32);
     fatsz = le16(s + 22) ? le16(s + 22) : le32(s + 36);

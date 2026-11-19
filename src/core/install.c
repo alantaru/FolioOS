@@ -53,9 +53,12 @@ static bool skip(const char *path, bool dir) {
     (void)dir;
     return false;
 }
+static bool path_too_long;                        /* um nome não coube: a lista está incompleta (walk falha) */
 static void on_entry(void *u, const char *name, bool is_dir, u64 size) {
     (void)u;
     if (nent >= MAXENT || seq(name, ".") || seq(name, "..")) return;
+    /* o caminho inteiro tem de caber (pasta + "/" + nome + o zero final): truncado, ele apontaria para outro arquivo */
+    if (slen(cur_dir) + 1 + slen(name) + 1 > (int)sizeof ents[0].path || slen(cur_dir) + 1 + slen(name) + 1 > 160) { path_too_long = true; return; }
     char p[160]; scopy(p, cur_dir, sizeof p);
     if (p[0]) scat(p, "/", sizeof p);
     scat(p, name, sizeof p);
@@ -63,16 +66,17 @@ static void on_entry(void *u, const char *name, bool is_dir, u64 size) {
     Ent *e = &ents[nent++]; scopy(e->path, p, sizeof e->path); e->dir = is_dir; e->size = size; e->crc = 0;
 }
 static bool walk(void) {
-    nent = 0;
+    nent = 0; path_too_long = false;
     for (int i = -1; i < nent; i++) {                  /* em largura: cada pasta achada é listada depois */
         if (i >= 0 && !ents[i].dir) continue;
         scopy(cur_dir, i < 0 ? "" : ents[i].path, sizeof cur_dir);
         if (!S->list(S->ctx, cur_dir, on_entry, 0)) return false;
-        if (nent >= MAXENT) return false;
+        if (nent >= MAXENT || path_too_long) return false;
     }
     return true;
 }
 static bool has(const char *path) { for (int i = 0; i < nent; i++) if (sieq(ents[i].path, path)) return true; return false; }
+static bool has_file(const char *path) { for (int i = 0; i < nent; i++) if (sieq(ents[i].path, path)) return !ents[i].dir && ents[i].size > 0; return false; }
 
 /* ------------------------------------------------------------ disco de destino */
 static bool dio(void *ctx, u64 lba, u32 n, void *buf, bool w) { (void)ctx; return D->rw(D->ctx, lba, n, buf, w); }
@@ -99,12 +103,26 @@ static void prog(int pct, const char *what) { if (S->progress) S->progress(S->ct
 /* 1 e 2: a origem tem o sistema? cópia de segurança do começo (MBR + GPT) e do fim (GPT de reserva) do disco */
 /* a cópia de segurança do começo (MBR + GPT) e do fim (GPT de reserva) do disco, em FOLIO/BACKUP/disk-<data>.bin
  * no pendrive: um cabeçalho de 512 bytes ("FOLIOBAK" + setores do disco), os 34 primeiros e os 33 últimos setores */
+static const char *bk_want; static bool bk_seen;
+static void bk_entry(void *u, const char *name, bool is_dir, u64 size) { (void)u; (void)size; if (!is_dir && sieq(name, bk_want)) bk_seen = true; }
+static void u64_str(u64 v, char *o);
 static bool save_disk_start(const BlkDev *dev, const InstallSrc *src, InstallResult *r) {
     u32 n = 34; u8 *b = B;
     memcpy(b, "FOLIOBAK", 8); for (int i = 0; i < 8; i++) b[8 + i] = (u8)(dev->nsec >> (8 * i));
     memset(b + 16, 0, 512 - 16);
     if (!dev->rw(dev->ctx, 0, n, b + 512, false) || !dev->rw(dev->ctx, dev->nsec - 33, 33, b + 512 + n * 512, false)) { set_err(r, INST_ERR_READ, "disk"); return false; }
-    char name[64] = "disk-"; scat(name, src->date, sizeof name); scat(name, ".bin", sizeof name);
+    /* um nome que ainda não existe em FOLIO/BACKUP: uma nova tentativa (ou outro disco) no mesmo minuto não pode
+     * trocar a cópia original pela de uma tabela que a tentativa anterior já mudou */
+    static char name[64];
+    for (int k = 1; ; k++) {
+        scopy(name, "disk-", sizeof name); scat(name, src->date, sizeof name);
+        if (k > 1) { char num[24]; u64_str((u64)k, num); scat(name, "-", sizeof name); scat(name, num, sizeof name); }
+        scat(name, ".bin", sizeof name);
+        bk_want = name; bk_seen = false;
+        if (src->list) src->list(src->ctx, "FOLIO/BACKUP", bk_entry, 0);
+        if (!bk_seen) break;
+        if (k >= 999) { set_err(r, INST_ERR_BACKUP, name); return false; }
+    }
     if (!src->backup || !src->backup(src->ctx, name, b, 512 + (n + 33) * 512)) { set_err(r, INST_ERR_BACKUP, name); return false; }
     return true;
 }
@@ -117,8 +135,12 @@ static bool prepare(const BlkDev *dev, const InstallSrc *src, const InstallOpts 
     prog(0, "source");
     if (!walk()) { set_err(r, INST_ERR_READ, cur_dir); return false; }
     /* o mínimo para iniciar; pastas de fontes/idiomas podem ter nomes antigos (FOLIO/FONTES…) e vão como estão */
-    const char *need[] = { "EFI/BOOT", "FOLIO", o->bios ? "FOLIO/BIOS.SYS" : "EFI/BOOT", o->bios ? "EFI/BOOT/BOOTIA32.EFI" : "EFI/BOOT" };
-    for (int i = 0; i < 4; i++) if (!has(need[i])) { set_err(r, INST_ERR_SOURCE, need[i]); return false; }
+    if (!has("EFI/BOOT")) { set_err(r, INST_ERR_SOURCE, "EFI/BOOT"); return false; }
+    if (!has("FOLIO")) { set_err(r, INST_ERR_SOURCE, "FOLIO"); return false; }
+    /* o programa que vai iniciar este computador tem de estar lá, e não vazio, antes de qualquer gravação */
+    char exe[64] = "EFI/BOOT/"; scat(exe, o->bios ? "BOOTIA32.EFI" : (o->efi_name && o->efi_name[0] ? o->efi_name : "BOOTX64.EFI"), sizeof exe);
+    if (!has_file(exe)) { set_err(r, INST_ERR_SOURCE, exe); return false; }
+    if (o->bios && !has_file("FOLIO/BIOS.SYS")) { set_err(r, INST_ERR_SOURCE, "FOLIO/BIOS.SYS"); return false; }
     total = 0; done = 0;
     for (int i = 0; i < nent; i++) if (!ents[i].dir) total += ents[i].size;
     prog(1, "backup");
@@ -203,7 +225,8 @@ static bool write_marker(InstallResult *r, const char *kind) {
 static bool write_docs_place(InstallResult *r) {
     static u8 cfg[16384]; static char out[16384 + 64];
     int n = fat_get(&f, "FOLIO/CONFIG.INI", cfg, sizeof cfg - 1);
-    if (n < 0) n = 0;
+    if (n == -1) n = 0;                                /* só um CONFIG.INI que não existe começa do zero */
+    if (n < 0) { set_err(r, INST_ERR_READ, "FOLIO/CONFIG.INI"); return false; }   /* nunca trocar ajustes ilegíveis por padrões */
     cfg[n] = 0;
     int k = 0;
     for (int i = 0; i < n; ) {                         /* tira um docs_place= que já exista (copiado do pendrive) */
@@ -418,7 +441,7 @@ static void alongside_mbr(const BlkDev *dev, const InstallSrc *src, Region fr, I
     if (!dev->rw(dev->ctx, 0, 1, s, false)) { set_err(r, INST_ERR_READ, "MBR"); return; }
     memcpy(s, mbrc, 440); s[437] = (u8)slot;
     if (!dev->rw(dev->ctx, 0, 1, s, true)) { set_err(r, INST_ERR_WRITE, "MBR"); return; }
-    if (dev->flush) dev->flush(dev->ctx);
+    if (dev->flush && !dev->flush(dev->ctx)) { set_err(r, INST_ERR_WRITE, "MBR (flush)"); return; }
     memcpy(r->part_guid, t.disk_guid, 16);
     prog(100, "done");
     r->code = INST_OK;
@@ -455,6 +478,15 @@ void install_shrink_alongside(const BlkDev *dev, const InstallSrc *src, const In
     fs_check(dev, &t.p[k], &c);
     if (c.verdict != SAFE_OK) { set_err(r, INST_ERR_SHRINK, fs_safety_short(c.verdict)); return; }
     if ((end - part_start) * dev->bs < c.min_bytes) { set_err(r, INST_ERR_SHRINK, "size"); return; }
+    {   /* antes de encolher qualquer coisa: a partição do FolioOS cabe na tabela depois do encolhimento? (num MBR com
+         * as quatro primárias ocupadas, ou sem espaço que chegue, o volume do outro sistema nem é tocado) */
+        static PartTable tc; tc = t; tc.p[k].count = end - part_start;
+        Region pf[16]; int npf = part_free(dev, &tc, pf, 16), q = -1;
+        for (int i = 0; i < npf; i++) if (pf[i].start == end) q = i;
+        if (q < 0 || pf[q].count * dev->bs < ALONGSIDE_MIN_BYTES) { set_err(r, INST_ERR_SMALL, ""); return; }
+        u64 cnt = pf[q].count / 2048 * 2048; if (cnt > 0xFFFFFFFFull && mbr) cnt = 0xFFFFFFFFull & ~2047ull;
+        if (part_add(dev, &tc, end, cnt, GPT_MSDATA, 0x0C, "FolioOS", src->seed ^ 0xB105) < 0) { set_err(r, INST_ERR_REGION, mbr ? "4 primary partitions" : ""); return; }
+    }
     int rc = fs_resize(dev, t.p[k].fs, part_start, t.p[k].count, end - part_start);   /* NTFS, FAT32 ou exFAT */
     if (rc != NTFS_SHRINK_OK) {
         static const char *why[] = { "", "unreadable", "not clean", "size", "too small", "bad clusters", "write" };
@@ -463,7 +495,6 @@ void install_shrink_alongside(const BlkDev *dev, const InstallSrc *src, const In
     shrunk_start = part_start; shrunk_count = t.p[k].count;
     t.p[k].count = end - part_start;
     if (!part_write(dev, &t)) { set_err(r, INST_ERR_WRITE, "partition table"); return; }
-    if (dev->flush) dev->flush(dev->ctx);
     /* o espaço livre que começa onde a outra partição agora termina */
     Region fr[16]; int nf = part_free(dev, &t, fr, 16), pick = -1;
     for (int i = 0; i < nf; i++) if (fr[i].start == end) pick = i;
@@ -487,23 +518,27 @@ static Fat fd;                                    /* a partição de dados do Fo
 /* lê um arquivo inteiro de um volume FAT32 pelo caminho ("EFI/FolioOS/FOLIO.ID"); -1 = não existe ou não coube */
 static int fat_get(Fat *v, const char *path, u8 *buf, u32 cap) {
     bool ok; FatNode dir = dir_for(v, path, &ok), nf; u16 w[128]; to_w(base_name(path), w, 128);
-    if (!ok || fat_lookup(v, &dir, w, &nf) != FAT_OK || nf.size > cap) return -1;
-    return fat_read(v, &nf, 0, buf, nf.size);
+    if (!ok || fat_lookup(v, &dir, w, &nf) != FAT_OK) return -1;                 /* não existe */
+    if (nf.size > cap) return -2;                                                 /* existe, mas não cabe */
+    int got = fat_read(v, &nf, 0, buf, nf.size);
+    return got == (int)nf.size ? got : -2;                                         /* existe, mas não deu para ler inteiro */
 }
 /* percorre uma pasta da partição de dados (recursivo): cada arquivo vai para cb com o caminho relativo */
 typedef bool (*FileCb)(const char *rel, FatNode *n, void *u);
 static bool tree(FatNode *dir, const char *rel, int depth, FileCb cb, void *u) {
     if (depth > 16) return false;
     u32 cookie = 0; u16 nm[256]; FatNode n;
+    fd.io_err = false;
     while (fat_readdir(&fd, dir, &cookie, nm, &n) == 1) {
-        char name[200], p[400];
+        char name[800], p[1024];                       /* um nome longo do FAT (255 caracteres) cabe inteiro em UTF-8 */
         from_w(nm, name, sizeof name);
         if (seq(name, ".") || seq(name, "..")) continue;
+        if (slen(rel) + 1 + slen(name) + 1 > (int)sizeof p) return false;   /* truncado, apontaria para outro arquivo */
         scopy(p, rel, sizeof p); if (p[0]) scat(p, "/", sizeof p); scat(p, name, sizeof p);
         if (n.attr & 0x10) { if (!tree(&n, p, depth + 1, cb, u)) return false; }
         else if (!cb(p, &n, u)) return false;
     }
-    return true;
+    return !fd.io_err;                                 /* o fim da pasta, não um erro de leitura */
 }
 static bool count_cb(const char *rel, FatNode *n, void *u) { InstallFound *f = u; (void)rel; f->docs_files++; f->docs_bytes += n->size; return true; }
 
@@ -541,13 +576,15 @@ static void find_neighbor(const BlkDev *dev, const PartTable *t, InstallFound *f
          * do FolioOS, alinhada a 1 MiB, pode ter deixado um resto livre depois dela */
         u64 end = t->scheme == SCHEME_GPT ? dev->nsec - 33 : dev->nsec;   /* GPT: antes da cópia de reserva */
         for (int i = 0; i < t->n; i++) if (t->p[i].start >= f->part_start + f->part_count && t->p[i].start < end) end = t->p[i].start;
-        u64 want = end - t->p[q].start, max = fs_grow_max(dev, t->p[q].fs, t->p[q].start);
-        for (int i = 0; i + 5 < n; i++) {                       /* "shrunk=<início>,<tamanho>" (antes: "ntfs="): a outra antes de encolher */
+        /* só cresce a partição que a instalação encolheu, e só até o tamanho registrado ("shrunk=<início>,<tamanho>",
+         * antes "ntfs="): numa instalação no espaço livre não há registro, e a vizinha fica exatamente como está */
+        u64 room = end - t->p[q].start, want = 0, max = fs_grow_max(dev, t->p[q].fs, t->p[q].start);
+        for (int i = 0; i + 5 < n; i++) {
             int kl = !memcmp(id + i, "shrunk=", 7) ? 7 : !memcmp(id + i, "ntfs=", 5) ? 5 : 0;
             if (!kl) continue;
             int j = i + kl; u64 s0, c0;
             if (parse_u64((const char *)id, n, &j, &s0) && j < n && id[j] == ',' && (j++, parse_u64((const char *)id, n, &j, &c0))
-                && s0 == t->p[q].start && c0 > t->p[q].count && c0 <= want) want = c0;
+                && s0 == t->p[q].start && c0 > t->p[q].count && c0 <= room) want = c0;
             break;
         }
         if (max > want) max = want;
@@ -566,7 +603,7 @@ static bool find_alongside(const BlkDev *dev, const PartTable *t, InstallFound *
     int k = -1;
     for (int i = 0; i < t->n; i++) if (!memcmp(t->p[i].guid, g, 16)) k = i;
     if (k < 0) return false;
-    f->found = true; f->kind = FOUND_ALONGSIDE; f->esp_start = t->p[esp].start;
+    f->found = true; f->kind = FOUND_ALONGSIDE; f->esp_start = t->p[esp].start; memcpy(f->esp_guid, t->p[esp].guid, 16);
     f->part_start = t->p[k].start; f->part_count = t->p[k].count; memcpy(f->part_guid, g, 16);
     find_neighbor(dev, t, f, id, n);
     return true;
@@ -602,8 +639,10 @@ bool install_find(const BlkDev *dev, InstallFound *f) {
             const char *v = sfind((const char *)id, "version=");
             if (v) { int k = 0; v += 8; while (*v && *v != '\r' && *v != '\n' && k < 15) f->version[k++] = *v++; f->version[k] = 0; }
         }
-        FatNode root, docs; fat_root(&fd, &root); u16 w[16]; to_w("DOCUMENTS", w, 16);
-        if (fat_lookup(&fd, &root, w, &docs) == FAT_OK) tree(&docs, "", 0, count_cb, f);
+        FatNode root, docs; fat_root(&fd, &root); u16 w[16];
+        to_w("DOCUMENTS", w, 16);                        /* a pasta dos textos; nas instalações antigas, TEXTOS */
+        if (fat_lookup(&fd, &root, w, &docs) == FAT_OK || (to_w("TEXTOS", w, 16), fat_lookup(&fd, &root, w, &docs) == FAT_OK))
+            tree(&docs, "", 0, count_cb, f);
     }
     return true;
 }
@@ -612,7 +651,10 @@ bool install_find(const BlkDev *dev, InstallFound *f) {
 typedef struct { const char *dest; InstallResult *r; int done, total; } CopyCtx;
 static bool copy_cb(const char *rel, FatNode *n, void *u) {
     CopyCtx *c = u;
-    char p[400]; scopy(p, c->dest, sizeof p); scat(p, "/", sizeof p); scat(p, rel, sizeof p);
+    char p[1100];
+    /* o caminho inteiro tem de caber: dois textos que só diferem depois do corte iriam para o mesmo arquivo */
+    if (slen(c->dest) + 1 + slen(rel) + 1 > (int)sizeof p) { set_err(c->r, INST_ERR_COPY, rel); return false; }
+    scopy(p, c->dest, sizeof p); scat(p, "/", sizeof p); scat(p, rel, sizeof p);
     if (n->size > BSZ / 2) { set_err(c->r, INST_ERR_COPY, rel); return false; }         /* não cabe: não apaga nada */
     if (n->size && fat_read(&fd, n, 0, B, n->size) != (int)n->size) { set_err(c->r, INST_ERR_READ, rel); return false; }
     u32 crc = crc32_buf(0, B, n->size);
@@ -640,10 +682,19 @@ static bool parent_make(Fat *v, const char *path, FatNode *out) {
 /* grava src_path da origem em dest no volume v sem nunca deixar um arquivo pela metade: primeiro "<nome>.~new",
  * conferido relendo (CRC); só então o antigo sai e o novo ganha o nome. Uma queda no meio deixa o antigo ou o novo. */
 static bool copy_safe(Fat *v, const char *dest, const char *src_path, u64 size, InstallResult *r) {
-    FatNode dir, nf, old; u16 w[128], wt[136];
+    /* troca recuperável: o novo é gravado e conferido como "<nome>.~new"; o antigo vira "<nome>.~old"; o novo assume o
+     * nome; só então o antigo sai. Se a energia cair no meio, a próxima tentativa encontra "<nome>" ausente e
+     * "<nome>.~old" presente e põe o antigo de volta antes de qualquer outra coisa (o programa que o firmware inicia
+     * nunca fica sem uma cópia boa no disco) */
+    FatNode dir, nf, old; u16 w[128], wt[136], wo[136];
     if (!parent_make(v, dest, &dir)) { set_err(r, INST_ERR_WRITE, dest); return false; }
-    char tmp[140]; scopy(tmp, base_name(dest), sizeof tmp); scat(tmp, ".~new", sizeof tmp);
-    to_w(base_name(dest), w, 128); to_w(tmp, wt, 136);
+    char tmp[140], told[140]; scopy(tmp, base_name(dest), sizeof tmp); scat(tmp, ".~new", sizeof tmp);
+    scopy(told, base_name(dest), sizeof told); scat(told, ".~old", sizeof told);
+    to_w(base_name(dest), w, 128); to_w(tmp, wt, 136); to_w(told, wo, 136);
+    if (fat_lookup(v, &dir, w, &old) != FAT_OK && fat_lookup(v, &dir, wo, &old) == FAT_OK) {        /* uma troca interrompida */
+        if (fat_rename(v, &old, w) != FAT_OK || fat_flush(v) != FAT_OK) { set_err(r, INST_ERR_WRITE, dest); return false; }
+    }
+    if (fat_lookup(v, &dir, wo, &old) == FAT_OK && fat_delete(v, &old) != FAT_OK) { set_err(r, INST_ERR_WRITE, dest); return false; }
     if (fat_lookup(v, &dir, wt, &nf) == FAT_OK && fat_delete(v, &nf) != FAT_OK) { set_err(r, INST_ERR_WRITE, dest); return false; }
     if (fat_create(v, &dir, wt, false, &nf) != FAT_OK) { set_err(r, INST_ERR_WRITE, dest); return false; }
     u32 crc = 0;
@@ -662,11 +713,21 @@ static bool copy_safe(Fat *v, const char *dest, const char *src_path, u64 size, 
         back = crc32_buf(back, B, n); off += n;
     }
     if (back != crc) { set_err(r, INST_ERR_VERIFY, dest); return false; }
-    if (fat_lookup(v, &dir, w, &old) == FAT_OK && fat_delete(v, &old) != FAT_OK) { set_err(r, INST_ERR_WRITE, dest); return false; }
+    if (fat_lookup(v, &dir, w, &old) == FAT_OK && (fat_rename(v, &old, wo) != FAT_OK || fat_flush(v) != FAT_OK)) { set_err(r, INST_ERR_WRITE, dest); return false; }
     if (fat_lookup(v, &dir, wt, &nf) != FAT_OK || fat_rename(v, &nf, w) != FAT_OK || fat_flush(v) != FAT_OK) { set_err(r, INST_ERR_WRITE, dest); return false; }
+    if (fat_lookup(v, &dir, wo, &old) == FAT_OK && (fat_delete(v, &old) != FAT_OK || fat_flush(v) != FAT_OK)) { set_err(r, INST_ERR_WRITE, dest); return false; }
     return true;
 }
 
+/* o que a tela mostrou ainda é o que está no disco? (achado de novo agora, antes de qualquer gravação: se o disco
+ * mudou entre a escolha e o clique — outro pendrive, outra tabela —, nada é gravado) */
+static bool found_same(const BlkDev *dev, const InstallFound *a) {
+    static InstallFound b;
+    if (!install_find(dev, &b) || !b.found) return false;
+    return a->kind == b.kind && a->bios == b.bios && a->part_start == b.part_start && a->part_count == b.part_count
+        && !memcmp(a->part_guid, b.part_guid, 16) && a->esp_start == b.esp_start && a->ntfs == b.ntfs
+        && a->ntfs_start == b.ntfs_start && a->ntfs_count == b.ntfs_count && a->ntfs_grow_to == b.ntfs_grow_to;
+}
 void install_update(const BlkDev *dev, const InstallSrc *src, const InstallOpts *o, const InstallFound *fo, InstallResult *r) {
     static Fat ef;
     updating = true;
@@ -674,6 +735,7 @@ void install_update(const BlkDev *dev, const InstallSrc *src, const InstallOpts 
     updating = false;
     if (!ok) return;
     if (!fo->found) { set_err(r, INST_ERR_REGION, ""); return; }
+    if (!found_same(dev, fo)) { set_err(r, INST_ERR_REGION, "changed"); return; }
     if (!fat_mount(&fd, dio, 0, fo->part_start)) { set_err(r, INST_ERR_READ, "FolioOS partition"); return; }
     /* 1. pastas, depois os arquivos (cada um trocado inteiro, ver copy_safe) */
     prog(2, "update");
@@ -696,25 +758,38 @@ void install_update(const BlkDev *dev, const InstallSrc *src, const InstallOpts 
     }
     /* 3. a versão nova no FOLIO/INSTALLED.ID */
     prog(97, "FOLIO/INSTALLED.ID");
-    if (!fat_mount(&f, dio, 0, fo->part_start) || !write_marker(r, fo->kind == FOUND_WHOLE ? "whole" : "alongside")) return;
-    if (dev->flush) dev->flush(dev->ctx);
+    if (!fat_mount(&f, dio, 0, fo->part_start)) { set_err(r, INST_ERR_VERIFY, "mount"); return; }   /* o marcador da versão nova tem de ser gravado */
+    if (!write_marker(r, fo->kind == FOUND_WHOLE ? "whole" : "alongside")) return;
+    if (dev->flush && !dev->flush(dev->ctx)) { set_err(r, INST_ERR_WRITE, "flush"); return; }   /* sem confirmação de que chegou ao disco, não é sucesso */
     r->part_lba = fo->part_start; r->part_count = fo->part_count;
     prog(100, "done");
     r->code = INST_OK;
 }
 
 void install_remove(const BlkDev *dev, const InstallSrc *src, const InstallOpts *o, const InstallFound *f, bool copy_texts, bool grow, InstallResult *r) {
-    static PartTable t; static Fat ef;
+    static PartTable t; static Fat ef; bool esp_left = false;   /* a pasta EFI/FolioOS ainda com o FOLIO.ID (sai depois da tabela) */
     if (!prepare(dev, src, o, r)) return;                      /* inclui a cópia de segurança do início do disco */
     if (!f->found) { set_err(r, INST_ERR_REGION, ""); return; }
+    if (!found_same(dev, f)) { set_err(r, INST_ERR_REGION, "changed"); return; }
     /* 1. os textos para o pendrive, antes de apagar qualquer coisa: DOCUMENTS/computer-<data>/ */
-    if (copy_texts && f->docs_files) {
+    if (copy_texts) {
+        /* a pasta dos textos como o editor a vê (DOCUMENTS, ou TEXTOS das instalações antigas), lida de novo agora (não
+         * pela contagem da prévia); qualquer erro de leitura ou de cópia para tudo antes de apagar o que quer que seja */
         char dest[64] = "DOCUMENTS/computer-"; scat(dest, src->date, sizeof dest);
         CopyCtx c = { dest, r, 0, f->docs_files };
         if (!fat_mount(&fd, dio, 0, f->part_start)) { set_err(r, INST_ERR_READ, "FolioOS partition"); return; }
-        FatNode root, docs; fat_root(&fd, &root); u16 w[16]; to_w("DOCUMENTS", w, 16);
-        if (fat_lookup(&fd, &root, w, &docs) == FAT_OK && !tree(&docs, "", 0, copy_cb, &c)) return;
-        scopy(r->path, dest, sizeof r->path);                  /* onde os textos ficaram (para a tela) */
+        FatNode root, docs; fat_root(&fd, &root); u16 w[16]; bool have = false;
+        static const char *names[] = { "DOCUMENTS", "TEXTOS" };
+        for (int i = 0; i < 2 && !have; i++) {
+            to_w(names[i], w, 16); fd.io_err = false;
+            int lr = fat_lookup(&fd, &root, w, &docs);
+            if (lr == FAT_OK) have = true;
+            else if (fd.io_err) { set_err(r, INST_ERR_READ, names[i]); return; }
+        }
+        if (have) {
+            if (!tree(&docs, "", 0, copy_cb, &c)) { if (r->code == INST_OK) set_err(r, INST_ERR_READ, "DOCUMENTS"); return; }
+            if (c.done) scopy(r->path, dest, sizeof r->path); /* onde os textos ficaram (para a tela) */
+        }
     }
     if (f->kind == FOUND_WHOLE) {
         /* o FolioOS era o único sistema: o disco fica vazio, sem tabela (pronto para instalar outro sistema). Zera a
@@ -723,7 +798,7 @@ void install_remove(const BlkDev *dev, const InstallSrc *src, const InstallOpts 
         memset(B, 0, 64 * 512);
         u64 z[3][2] = { { 0, 34 }, { dev->nsec - 33, 33 }, { f->part_start, 32 } };
         for (int k = 0; k < 3; k++) if (!dev->rw(dev->ctx, z[k][0], (u32)z[k][1], B, true)) { set_err(r, INST_ERR_WRITE, "partition table"); return; }
-        if (dev->flush) dev->flush(dev->ctx);
+        if (dev->flush && !dev->flush(dev->ctx)) { set_err(r, INST_ERR_WRITE, "flush"); return; }   /* sem confirmação de que chegou ao disco, não é sucesso */
         r->part_lba = f->part_start; r->part_count = f->part_count;
         prog(100, "done");
         r->code = INST_OK;
@@ -751,18 +826,21 @@ void install_remove(const BlkDev *dev, const InstallSrc *src, const InstallOpts 
         FatNode root, efi, fol, n; fat_root(&ef, &root); u16 w[256];
         to_w("EFI", w, 256);
         if (fat_lookup(&ef, &root, w, &efi) == FAT_OK && (to_w("FolioOS", w, 256), fat_lookup(&ef, &efi, w, &fol) == FAT_OK)) {
+            /* agora só o programa; o FOLIO.ID fica até a tabela mudar (sem ele, uma desinstalação interrompida aqui
+             * não seria mais encontrada para ser repetida) */
             u32 cookie;
             for (;;) {                                         /* apaga um por vez e recomeça: a pasta muda */
                 cookie = 0; bool any = false;
                 while (fat_readdir(&ef, &fol, &cookie, w, &n) == 1) {
                     char nm[200]; from_w(w, nm, sizeof nm);
-                    if (seq(nm, ".") || seq(nm, "..")) continue;
+                    if (seq(nm, ".") || seq(nm, "..") || sieq(nm, "FOLIO.ID")) continue;
                     if (n.attr & 0x10 || fat_delete(&ef, &n) != FAT_OK) { set_err(r, INST_ERR_WRITE, "EFI/FolioOS"); return; }
                     any = true; break;
                 }
                 if (!any) break;
             }
-            if (fat_delete(&ef, &fol) != FAT_OK || fat_flush(&ef) != FAT_OK) { set_err(r, INST_ERR_WRITE, "EFI/FolioOS"); return; }
+            if (fat_flush(&ef) != FAT_OK) { set_err(r, INST_ERR_WRITE, "EFI/FolioOS"); return; }
+            esp_left = true;
         }
     }
     }
@@ -777,7 +855,16 @@ void install_remove(const BlkDev *dev, const InstallSrc *src, const InstallOpts 
     if (k < 0 || t.p[k].start != f->part_start) { set_err(r, INST_ERR_REGION, "partition"); return; }
     if (q >= 0) t.p[q].count = f->ntfs_grow_to;
     if (!part_del(&t, k) || !part_write(dev, &t)) { set_err(r, INST_ERR_WRITE, "partition table"); return; }
-    if (dev->flush) dev->flush(dev->ctx);
+    if (dev->flush && !dev->flush(dev->ctx)) { set_err(r, INST_ERR_WRITE, "flush"); return; }   /* sem confirmação de que chegou ao disco, não é sucesso */
+    /* 3b. a tabela mudou: agora sai o FOLIO.ID e a pasta \EFI\FolioOS */
+    if (esp_left) {
+        FatNode root, efi, fol, n; fat_root(&ef, &root); u16 w[64];
+        to_w("EFI", w, 64);
+        if (fat_lookup(&ef, &root, w, &efi) == FAT_OK && (to_w("FolioOS", w, 64), fat_lookup(&ef, &efi, w, &fol) == FAT_OK)) {
+            to_w("FOLIO.ID", w, 64);
+            if ((fat_lookup(&ef, &fol, w, &n) == FAT_OK && fat_delete(&ef, &n) != FAT_OK) || fat_delete(&ef, &fol) != FAT_OK || fat_flush(&ef) != FAT_OK) { set_err(r, INST_ERR_WRITE, "EFI/FolioOS"); return; }
+        }
+    }
     /* 4. o NTFS volta a ocupar o espaço (o Windows roda o chkdsk uma vez na próxima vez que iniciar) */
     if (q >= 0) {
         prog(80, "NTFS");
@@ -826,19 +913,19 @@ void part_op_create(const BlkDev *dev, const InstallSrc *src, uint64_t start, ui
     /* o volume primeiro (a tabela ainda não aponta para ele), depois a tabela */
     if (!fat32_format2(dio, 0, s, c, grow_room(dev, s, c), label && label[0] ? label : "DATA", (u32)(src->seed >> 9))) { set_err(r, INST_ERR_FORMAT, ""); return; }
     if (!part_write(dev, &t)) { set_err(r, INST_ERR_WRITE, "partition table"); return; }
-    if (dev->flush) dev->flush(dev->ctx);
+    if (dev->flush && !dev->flush(dev->ctx)) { set_err(r, INST_ERR_WRITE, "flush"); return; }   /* sem confirmação de que chegou ao disco, não é sucesso */
     r->part_lba = s; r->part_count = c; r->code = INST_OK;
 }
 void part_op_delete(const BlkDev *dev, const InstallSrc *src, uint64_t part_start, InstallResult *r) {
     static PartTable t; int k;
     if (!op_begin(dev, src, r, &t, part_start, &k)) return;
     if (k < 0) { set_err(r, INST_ERR_REGION, "partition"); return; }
-    u64 s = t.p[k].start;
+    u64 s = t.p[k].start, zn = t.p[k].count < 32 ? t.p[k].count : 32;   /* nunca além da própria partição */
     if (!part_del(&t, k) || !part_write(dev, &t)) { set_err(r, INST_ERR_WRITE, "partition table"); return; }
     /* o começo do volume zerado: nada mais o reconhece (o espaço fica realmente livre) */
     memset(B, 0, 32 * 512);
-    if (!dev->rw(dev->ctx, s, 32, B, true)) { set_err(r, INST_ERR_WRITE, "volume"); return; }
-    if (dev->flush) dev->flush(dev->ctx);
+    if (zn && !dev->rw(dev->ctx, s, (u32)zn, B, true)) { set_err(r, INST_ERR_WRITE, "volume"); return; }
+    if (dev->flush && !dev->flush(dev->ctx)) { set_err(r, INST_ERR_WRITE, "flush"); return; }   /* sem confirmação de que chegou ao disco, não é sucesso */
     r->part_lba = s; r->code = INST_OK;
 }
 void part_op_format(const BlkDev *dev, const InstallSrc *src, uint64_t part_start, const char *label, InstallResult *r) {
@@ -853,7 +940,7 @@ void part_op_format(const BlkDev *dev, const InstallSrc *src, uint64_t part_star
     if (t.scheme == SCHEME_GPT && memcmp(p->type, GPT_ESP, 16) && memcmp(p->type, GPT_MSDATA, 16)) { memcpy(p->type, GPT_MSDATA, 16); changed = true; }
     if (t.scheme == SCHEME_MBR && p->mbr_type != 0x0C && p->mbr_type != 0x0B && p->mbr_type != 0xEF) { p->mbr_type = 0x0C; changed = true; }
     if (changed && !part_write(dev, &t)) { set_err(r, INST_ERR_WRITE, "partition table"); return; }
-    if (dev->flush) dev->flush(dev->ctx);
+    if (dev->flush && !dev->flush(dev->ctx)) { set_err(r, INST_ERR_WRITE, "flush"); return; }   /* sem confirmação de que chegou ao disco, não é sucesso */
     r->part_lba = p->start; r->part_count = p->count; r->code = INST_OK;
 }
 void part_op_resize(const BlkDev *dev, const InstallSrc *src, uint64_t part_start, uint64_t new_count, InstallResult *r) {
@@ -862,9 +949,17 @@ void part_op_resize(const BlkDev *dev, const InstallSrc *src, uint64_t part_star
     if (k < 0 || !fs_resizable(t.p[k].fs)) { set_err(r, INST_ERR_SHRINK, "partition"); return; }
     Part *p = &t.p[k];
     fs_check(dev, p, &c);
-    if (c.verdict != SAFE_OK && !(c.verdict == SAFE_DIRTY && p->fs == FS_NTFS && new_count > p->count)) { set_err(r, INST_ERR_SHRINK, fs_safety_short(c.verdict)); return; }
-    if (new_count == p->count || !new_count) { set_err(r, INST_ERR_RESIZE, ""); return; }
-    if (new_count < p->count) {
+    if (c.verdict != SAFE_OK && !(c.verdict == SAFE_DIRTY && p->fs == FS_NTFS && new_count >= p->count)) { set_err(r, INST_ERR_SHRINK, fs_safety_short(c.verdict)); return; }
+    if (!new_count) { set_err(r, INST_ERR_RESIZE, ""); return; }
+    if (new_count == p->count) {
+        /* a entrada já tem esse tamanho, mas o volume ficou menor (um crescimento interrompido depois de gravar a
+         * tabela): termina de crescer o volume, com as mesmas verificações */
+        u64 vs = fs_size(dev, p->fs, p->start);
+        if (!vs || vs >= new_count) { set_err(r, INST_ERR_RESIZE, ""); return; }
+        if (new_count > fs_grow_max(dev, p->fs, p->start)) { set_err(r, INST_ERR_RESIZE, ""); return; }
+        int rc = fs_resize(dev, p->fs, p->start, new_count, new_count);
+        if (rc != NTFS_SHRINK_OK) { set_err(r, INST_ERR_RESIZE, "volume"); return; }
+    } else if (new_count < p->count) {
         if (new_count * dev->bs < c.min_bytes) { set_err(r, INST_ERR_RESIZE, ""); return; }
         int rc = fs_resize(dev, p->fs, p->start, p->count, new_count);       /* o volume, depois a tabela */
         if (rc != NTFS_SHRINK_OK) { set_err(r, INST_ERR_RESIZE, "volume"); return; }
@@ -877,7 +972,7 @@ void part_op_resize(const BlkDev *dev, const InstallSrc *src, uint64_t part_star
         int rc = fs_resize(dev, p->fs, p->start, new_count, new_count);
         if (rc != NTFS_SHRINK_OK) { set_err(r, INST_ERR_RESIZE, "volume"); return; }
     }
-    if (dev->flush) dev->flush(dev->ctx);
+    if (dev->flush && !dev->flush(dev->ctx)) { set_err(r, INST_ERR_WRITE, "flush"); return; }   /* sem confirmação de que chegou ao disco, não é sucesso */
     r->part_lba = p->start; r->part_count = new_count; r->code = INST_OK;
 }
 

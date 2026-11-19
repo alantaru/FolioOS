@@ -155,8 +155,13 @@ the interface, so Poedit and Weblate work here too. Keep Markdown, links, image 
 exactly as they are; translate the words (in code blocks, only the comments and descriptions).
 
 - `perl tools/readmes.pl` updates every `.po` (new and changed blocks appear empty or marked
-  *fuzzy*) and regenerates every `README.<code>.md` plus the language bar of `README.md`.
+  *fuzzy*) and regenerates every `README.<code>.md` plus the language bar of `README.md`. When an
+  English block changes, its previous translation stays at the end of the `.po` as a `#~` entry, so
+  you can start from it.
 - `perl tools/readmes.pl --check` lists languages with blocks still in English (the build runs it).
+- `perl tools/readmes.pl skeleton` prints every translatable block separated by `@@@` lines, and
+  `perl tools/readmes.pl import <code> <file>` reads translations in that format — the whole README,
+  or only the blocks still missing, in README order.
 - A block without a translation shows up in English, so the page is always complete.
 - Adding a language: add it to the list at the top of `tools/readmes.pl` and run it.
 

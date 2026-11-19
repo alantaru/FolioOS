@@ -153,6 +153,7 @@ if (Test-Path build\install_test.exe) {
 
 # ------------------------------------------------------------ run one configuration
 $port = 4460
+$script:vms = @()                                       # QEMU processes of the dual-boot scenarios (see Start-Dual, Start-Bios)
 $results = @()
 foreach ($m in $matrix) {
     if ($Only -and $m.name -notmatch $Only) { continue }
@@ -245,7 +246,7 @@ foreach ($m in $matrix) {
             }
         }
         $q.Quit()
-    } catch { Write-Host "  $_" -ForegroundColor Red }
+    } catch { Write-Host "  $_" -ForegroundColor Red; foreach ($v in $script:vms) { if (-not $v.HasExited) { Stop-Process -Id $v.Id -Force; [void]$v.WaitForExit(15000) } } }
     if (-not $p.WaitForExit(15000)) { Stop-Process -Id $p.Id -Force }
     Start-Sleep 1
     if ($m.audio -ne "none") { $peak = Wav-Peak $wav; $r.sound = if ($peak -gt 500) { "OK ($peak)" } else { "FAIL ($peak)" } }
@@ -319,7 +320,8 @@ if ((-not $Only -or $dc.name -match $Only) -and (Test-Path build\install_test.ex
         if ($stick) { $a += @("-device", "qemu-xhci,id=xhci", "-drive", "if=none,id=stick,format=raw,file=$dd\stick.img", "-device", "usb-storage,bus=xhci.0,drive=stick,bootindex=0") }
         $argline = ($a | ForEach-Object { if ($_ -match '\s') { "`"$_`"" } else { $_ } }) -join " "
         $pp = Start-Process -FilePath "$QemuDir\qemu-system-x86_64.exe" -ArgumentList $argline -PassThru -WindowStyle Hidden -RedirectStandardError "$dd\qemu-$tag.txt"
-        return @($pp, [Qmp]::new($script:port))
+        $script:vms += $pp                                  # stopped by the scenario's catch if something throws
+        try { return @($pp, [Qmp]::new($script:port)) } catch { if (-not $pp.HasExited) { Stop-Process -Id $pp.Id -Force }; throw }
     }
     function Wait-Paper($q, [string]$tag, [int]$secs, [scriptblock]$each) {
         for ($i = 0; $i -lt $secs / 3; $i++) {
@@ -392,7 +394,7 @@ if ((-not $Only -or $dc.name -match $Only) -and (Test-Path build\install_test.ex
             if ($ser -and $ser.IndexOf("FAKE WINDOWS STARTED") -ge 0 -and $ser.IndexOf("boot chooser") -lt 0) { $dualRes.after = "OK" }
             Remove-Item "$dd\orig.img" -ErrorAction SilentlyContinue
         }
-    } catch { Write-Host "  $_" -ForegroundColor Red }
+    } catch { Write-Host "  $_" -ForegroundColor Red; foreach ($v in $script:vms) { if (-not $v.HasExited) { Stop-Process -Id $v.Id -Force; [void]$v.WaitForExit(15000) } } }
     "  install {0} | other partitions untouched {1} | no key: other system {2} | key: FolioOS {3}" -f $dualRes.install, $dualRes.untouched, $dualRes.other, $dualRes.writer
     if ($dualRes.Contains("removed")) { "  removed: table as Windows made it {0} | then the firmware starts Windows directly {1}" -f $dualRes.removed, $dualRes.after }
     if (-not $Keep) { Remove-Item "$dd\win.img", "$dd\before.img", "$dd\stick.img", "$dd\vars.fd" -ErrorAction SilentlyContinue }
@@ -421,7 +423,8 @@ if ((-not $Only -or "dual-bios-ide" -match $Only) -and (Test-Path build\install_
         else { $a += @("-drive", "if=none,id=hd,format=raw,file=$dd\win.img", "-device", "ide-hd,drive=hd,bus=ide.0,bootindex=0") }
         $argline = ($a | ForEach-Object { if ($_ -match '\s') { "`"$_`"" } else { $_ } }) -join " "
         $pp = Start-Process -FilePath "$QemuDir\qemu-system-x86_64.exe" -ArgumentList $argline -PassThru -WindowStyle Hidden -RedirectStandardError "$dd\qemu-$tag.txt"
-        return @($pp, [Qmp]::new($script:port))
+        $script:vms += $pp                                  # stopped by the scenario's catch if something throws
+        try { return @($pp, [Qmp]::new($script:port)) } catch { if (-not $pp.HasExited) { Stop-Process -Id $pp.Id -Force }; throw }
     }
     function Wait-Paper2($q, [string]$tag, [int]$secs, [scriptblock]$each) {
         for ($i = 0; $i -lt $secs / 3; $i++) {
@@ -451,15 +454,18 @@ if ((-not $Only -or "dual-bios-ide" -match $Only) -and (Test-Path build\install_
         & .\build\fatcat.exe "$dd\win.img" "FOLIO/OTHERMBR.BIN" "$dd\OTHERMBR.BIN" 2>$null
         $ErrorActionPreference = "Stop"
         if ($fsok -and (Test-Path "$dd\OTHERMBR.BIN") -and (Get-Item "$dd\OTHERMBR.BIN").Length -ge 440) { $dualRes.install = "OK" }
-        $b0 = [IO.File]::ReadAllBytes("$dd\before.img")[446..509]; $b1 = New-Object byte[] 512; $fs = [IO.File]::OpenRead("$dd\win.img"); [void]$fs.Read($b1, 0, 512); $fs.Close()
-        $same = $true; for ($k = 0; $k -lt 64; $k++) { if ($b0[$k] -ne 0 -and $b0[$k] -ne $b1[446 + $k]) { $same = $false } }   # the old entries, byte for byte
+        $a0 = New-Object byte[] 512; $fs = [IO.File]::OpenRead("$dd\before.img"); [void]$fs.Read($a0, 0, 512); $fs.Close()   # only the first sector
+        $b1 = New-Object byte[] 512; $fs = [IO.File]::OpenRead("$dd\win.img"); [void]$fs.Read($b1, 0, 512); $fs.Close()
+        # every entry that was in use: all 16 bytes the same (zero bytes too); new entries only in slots that were empty
+        $same = $true
+        for ($s = 0; $s -lt 4; $s++) { $o = 446 + 16 * $s; if ($a0[$o + 4] -ne 0) { for ($k = 0; $k -lt 16; $k++) { if ($a0[$o + $k] -ne $b1[$o + $k]) { $same = $false } } } }
         if ($same) { $dualRes.untouched = "OK" }
         # B: only the disk, no key: FolioOS's chooser, then the original MBR
         $pq = Start-Bios $false "B"; $p = $pq[0]; $q = $pq[1]
-        $null = Wait-Serial "B" "FAKE OTHER STARTED" 180
+        $null = Wait-Serial "B" "FAKE OTHER STARTED \(DL OK\)" 180
         $q.Shot("$dd\B-other.png"); $q.Quit(); if (-not $p.WaitForExit(15000)) { Stop-Process -Id $p.Id -Force }
         $ser = Get-Content -Raw "$dd\serial-B.txt" -ErrorAction SilentlyContinue
-        if ($ser -and $ser.IndexOf("boot chooser: no key") -ge 0 -and $ser.IndexOf("FAKE OTHER STARTED") -gt $ser.IndexOf("boot chooser: no key")) { $dualRes.other = "OK" }
+        if ($ser -and $ser.IndexOf("boot chooser: no key") -ge 0 -and $ser.IndexOf("FAKE OTHER STARTED (DL OK)") -gt $ser.IndexOf("boot chooser: no key")) { $dualRes.other = "OK" }
         # C: only the disk, a key during the wait: the editor
         $pq = Start-Bios $false "C"; $p = $pq[0]; $q = $pq[1]
         $ok = Wait-Paper2 $q "C-writer" 180 { $q.Key(@("spc")) }
@@ -480,11 +486,11 @@ if ((-not $Only -or "dual-bios-ide" -match $Only) -and (Test-Path build\install_
         $null = & .\build\install_test.exe $stage "$dd\win.img" 1400 --same-table "$dd\before.img" 2>&1; if ($LASTEXITCODE -eq 0) { $dualRes.removed = "OK" }
         $ErrorActionPreference = "Stop"
         $pq = Start-Bios $false "E"; $p = $pq[0]; $q = $pq[1]
-        $null = Wait-Serial "E" "FAKE OTHER STARTED" 60
+        $null = Wait-Serial "E" "FAKE OTHER STARTED \(DL OK\)" 60
         $q.Shot("$dd\E-other.png"); $q.Quit(); if (-not $p.WaitForExit(15000)) { Stop-Process -Id $p.Id -Force }
         $ser = Get-Content -Raw "$dd\serial-E.txt" -ErrorAction SilentlyContinue
-        if ($ser -and $ser.IndexOf("FAKE OTHER STARTED") -ge 0 -and $ser.IndexOf("boot chooser") -lt 0) { $dualRes.after = "OK" }
-    } catch { Write-Host "  $_" -ForegroundColor Red }
+        if ($ser -and $ser.IndexOf("FAKE OTHER STARTED (DL OK)") -ge 0 -and $ser.IndexOf("boot chooser") -lt 0) { $dualRes.after = "OK" }
+    } catch { Write-Host "  $_" -ForegroundColor Red; foreach ($v in $script:vms) { if (-not $v.HasExited) { Stop-Process -Id $v.Id -Force; [void]$v.WaitForExit(15000) } } }
     "  install {0} | other entries untouched {1} | no key: other system {2} | key: FolioOS {3}" -f $dualRes.install, $dualRes.untouched, $dualRes.other, $dualRes.writer
     "  removed: table and MBR as before {0} | then the original MBR starts directly {1}" -f $dualRes.removed, $dualRes.after
     if (-not $Keep) { Remove-Item "$dd\win.img", "$dd\before.img", "$dd\stick.img" -ErrorAction SilentlyContinue }
@@ -500,7 +506,7 @@ if ($dualAll.Count) {
 }
 Set-Content -Encoding utf8 "$lab\report.md" $md
 if (-not $Keep) { Remove-Item -Recurse -Force "$lab\base.img", "$lab\inst-uefi.img", "$lab\inst-bios.img", $stage -ErrorAction SilentlyContinue }
-$bad = @($results | Where-Object { $_.boot -ne "OK" -or $_.keyboard -ne "OK" -or $_.mouse -ne "OK" -or $_.sound -like "FAIL*" -or $_.save -ne "OK" -or $_.fs -ne "OK" -or $_.diag -ne "OK" -or $_.disks -like "FAIL*" -or $_.install -eq "FAIL" }).Count
+$bad = @($results | Where-Object { $_.boot -ne "OK" -or $_.keyboard -ne "OK" -or $_.mouse -ne "OK" -or $_.sound -like "FAIL*" -or $_.save -ne "OK" -or $_.fs -ne "OK" -or $_.diag -ne "OK" -or $_.disks -like "FAIL*" -or $_.install -eq "FAIL" -or $_.video -like "FAIL*" }).Count
 foreach ($d in $dualAll) { if (@($d.Keys | Where-Object { $_ -ne "name" -and $d[$_] -ne "OK" }).Count) { $bad++ } }
 Write-Host ""; Write-Host "report: $lab\report.md - $($results.Count + $dualAll.Count) configurations, $bad with problems" -ForegroundColor $(if ($bad) { "Yellow" } else { "Green" })
 exit $(if ($bad) { 1 } else { 0 })

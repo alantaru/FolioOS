@@ -47,6 +47,7 @@ static void windows_fixture(const char *imgdir, const char *txtdir, const char *
     snprintf(path, sizeof path, "%s\\ntfs-%s.img", imgdir, name);
     f = fopen(path, "rb"); if (!f) { CHECK(0, "sem %s", path); return; }
     Ram r = { malloc(bytes), bytes, 512 };
+    if (!r.p) { fclose(f); CHECK(0, "%s: sem memória para %llu bytes", path, bytes); return; }
     got = (int)fread(r.p, 1, bytes, f); fclose(f);
     if ((u64)got != bytes) { CHECK(0, "%s: %d bytes, esperava %llu", path, got, bytes); free(r.p); return; }
     BlkDev d = ram_dev(&r);
@@ -57,7 +58,9 @@ static void windows_fixture(const char *imgdir, const char *txtdir, const char *
     Part *p = &t.p[k];
 
     static Ntfs n;
-    CHECK(ntfs_open(&n, &d, p->start), "%s: ntfs_open", name);
+    bool opened = ntfs_open(&n, &d, p->start);
+    CHECK(opened, "%s: ntfs_open", name);
+    if (!opened) { free(r.p); return; }                  /* os controles negativos abaixo usam as posições que ele acharia */
     CHECK(n.cs == cs && n.nclus == nclus && n.mft_lcn == mft, "%s: cluster %u/%llu, total %llu/%llu, MFT %llu/%llu",
           name, n.cs, cs, (unsigned long long)n.nclus, nclus, (unsigned long long)n.mft_lcn, mft);
     int fl = ntfs_flags(&n);
@@ -74,6 +77,7 @@ static void windows_fixture(const char *imgdir, const char *txtdir, const char *
 
     /* controle negativo 1: o fim do 1º setor do registro 3 ($Volume) deixa de bater com o número da sequência */
     u64 at = (p->start * 512) + n.mft_lcn * n.cs + 3ull * n.rec + 510;
+    if (at >= bytes || (p->start * 512) + n.mft_lcn * n.cs + 6ull * n.rec + 1022 >= bytes) { CHECK(0, "%s: a MFT fica fora da imagem", name); free(r.p); return; }
     u8 save = r.p[at]; r.p[at] ^= 0x5A;
     fs_check(&d, p, &c);
     CHECK(c.verdict == SAFE_UNREADABLE, "%s: $Volume estragado deu veredito %d", name, c.verdict);
@@ -97,7 +101,9 @@ static void windows_fixture(const char *imgdir, const char *txtdir, const char *
 
     /* encolher: recusado em volume que não está em ordem e abaixo do último cluster usado, sem mudar um
      * byte; aceito no limpo, e o resultado relido tem de bater */
-    u8 *orig = malloc(bytes); memcpy(orig, r.p, bytes);
+    u8 *orig = malloc(bytes);
+    if (!orig) { CHECK(0, "%s: sem memória", name); free(r.p); return; }
+    memcpy(orig, r.p, bytes);
     u64 minsec = (last + 1) * (cs / 512) + 1;
     if (want != SAFE_OK) {
         int rc = ntfs_shrink(&d, p->start, p->count, minsec + 2048);
@@ -288,27 +294,47 @@ static bool file_rw(void *ctx, u64 lba, u32 n, void *buf, bool w) {
     return w ? fwrite(buf, 512, n, ff) == n : fread(buf, 512, n, ff) == n;
 }
 static bool ff_io(void *ctx, u64 lba, u32 n, void *buf, bool w) { return file_rw(ctx, lba, n, buf, w); }
-typedef struct { char path[300]; u32 crc, size; } FEnt;
+/* o inventário dos arquivos: cada um com o CRC; na comparação, cada caminho guardado tem de aparecer exatamente uma
+ * vez, com o mesmo conteúdo. Erro de leitura, de pasta, nome longo demais ou lista cheia: falha (nunca "passa" com
+ * um inventário incompleto, nem compara dois erros de leitura como se fossem iguais). */
+typedef struct { char path[300]; u32 crc, size; int seen; } FEnt;
 static FEnt fents[2000]; static int nfe;
 static u8 fbuf[1 << 22];
 static void fat_walk(Fat *v, FatNode *dir, const char *rel, bool record, int *bad) {
     u32 ck = 0; u16 nm[256]; FatNode n;
+    v->io_err = false;
     while (fat_readdir(v, dir, &ck, nm, &n) == 1) {
         char name[256]; int k = 0; for (; nm[k] && k < 255; k++) name[k] = nm[k] < 128 ? (char)nm[k] : '?'; name[k] = 0;
         if (!strcmp(name, ".") || !strcmp(name, "..")) continue;
-        char p[300]; snprintf(p, sizeof p, "%s/%s", rel, name);
-        if (n.attr & 0x10) { fat_walk(v, &n, p, record, bad); continue; }
-        u32 got = n.size <= sizeof fbuf && fat_read(v, &n, 0, fbuf, n.size) == (int)n.size ? crc32_buf(0, fbuf, n.size) : 0xFFFFFFFFu;
-        if (record) { if (nfe < 2000) { snprintf(fents[nfe].path, sizeof fents[nfe].path, "%s", p); fents[nfe].crc = got; fents[nfe].size = n.size; nfe++; } }
-        else { bool ok = false; for (int i = 0; i < nfe; i++) if (!strcmp(fents[i].path, p)) ok = fents[i].crc == got && fents[i].size == n.size; if (!ok) { fprintf(stderr, "  diferente: %s\n", p); (*bad)++; } }
+        char p[300];
+        if ((size_t)snprintf(p, sizeof p, "%s/%s", rel, name) >= sizeof p) { fprintf(stderr, "  caminho longo demais: %s/%s\n", rel, name); (*bad)++; continue; }
+        if (n.attr & 0x10) { fat_walk(v, &n, p, record, bad); v->io_err = false; continue; }
+        u32 got = 0; bool rd_ok = true;                 /* em partes: qualquer tamanho */
+        for (u32 off = 0; off < n.size && rd_ok; ) {
+            u32 k = n.size - off < sizeof fbuf ? n.size - off : (u32)sizeof fbuf;
+            if (fat_read(v, &n, off, fbuf, k) != (int)k) rd_ok = false; else { got = crc32_buf(got, fbuf, k); off += k; }
+        }
+        if (!rd_ok) { fprintf(stderr, "  não deu para ler: %s\n", p); (*bad)++; continue; }
+        if (record) {
+            if (nfe >= 2000) { fprintf(stderr, "  inventário cheio\n"); (*bad)++; continue; }
+            snprintf(fents[nfe].path, sizeof fents[nfe].path, "%s", p); fents[nfe].crc = got; fents[nfe].size = n.size; fents[nfe].seen = 0; nfe++;
+        } else {
+            int hit = -1; for (int i = 0; i < nfe; i++) if (!strcmp(fents[i].path, p)) hit = i;
+            if (hit < 0) { fprintf(stderr, "  a mais: %s\n", p); (*bad)++; continue; }
+            fents[hit].seen++;
+            if (fents[hit].crc != got || fents[hit].size != n.size) { fprintf(stderr, "  diferente: %s\n", p); (*bad)++; }
+        }
     }
+    if (v->io_err) { fprintf(stderr, "  erro lendo a pasta %s\n", rel[0] ? rel : "/"); (*bad)++; }
 }
 static int files_check(u64 lba, bool record) {
     static Fat v; int bad = 0;
     if (!fat_mount(&v, ff_io, 0, lba)) return -1;
     FatNode root; fat_root(&v, &root);
     if (record) nfe = 0;
+    for (int i = 0; i < nfe; i++) fents[i].seen = 0;
     fat_walk(&v, &root, "", record, &bad);
+    if (!record) for (int i = 0; i < nfe; i++) if (fents[i].seen != 1) { fprintf(stderr, "  %s: %s\n", fents[i].seen ? "repetido" : "sumiu", fents[i].path); bad++; }
     return bad;
 }
 static int fat32_cycle(const char *path) {
@@ -325,20 +351,24 @@ static int fat32_cycle(const char *path) {
     u64 mn = fat32_min_sectors(&d, p->start), mx = fat32_max_sectors(&d, p->start);
     CHECK(mn > 0 && mn < total0 && mx >= total0, "fat32: mínimo %llu, máximo %llu, total %u", (unsigned long long)mn, (unsigned long long)mx, total0);
     /* guarda o volume inteiro para comparar no fim (fora o FSInfo) */
-    u64 vb = (u64)total0 * 512; u8 *orig = malloc(vb);
+    u64 vb = (u64)total0 * 512; u8 *orig = malloc(vb), *now = malloc(vb);
+    if (!orig || !now) { fprintf(stderr, "sem memória\n"); return 2; }
     _fseeki64(ff, (long long)(p->start * 512), SEEK_SET); if (fread(orig, 1, vb, ff) != vb) { fprintf(stderr, "ler\n"); return 2; }
     int rc = fat32_resize(&d, p->start, p->count, mn - 1);
     CHECK(rc == NTFS_SHRINK_TOO_SMALL || rc == NTFS_SHRINK_BAD_SIZE, "fat32: abaixo do mínimo devia ser recusado (rc %d)", rc);
+    _fseeki64(ff, (long long)(p->start * 512), SEEK_SET); if (fread(now, 1, vb, ff) != vb) return 2;
+    CHECK(!memcmp(orig, now, vb), "fat32: uma recusa mudou bytes");                  /* conferido já, antes das operações seguintes */
     u64 ns = mn + 8 * 1024;                                    /* um pouco acima do mínimo */
     rc = fat32_resize(&d, p->start, p->count, ns);
     CHECK(rc == NTFS_SHRINK_OK, "fat32: encolher para %llu setores (rc %d)", (unsigned long long)ns, rc);
+    { static u8 bb[512]; d.rw(0, p->start, 1, bb, false); u32 tot = bb[32] | bb[33] << 8 | bb[34] << 16 | (u32)bb[35] << 24;
+      CHECK(tot == ns, "fat32: depois de encolher o volume diz %u setores, esperava %llu", tot, (unsigned long long)ns); }   /* não foi um "ok" sem gravar */
     static Fat v; CHECK(fat_mount(&v, ff_io, 0, p->start), "fat32: montar depois de encolher");
     int bad = files_check(p->start, false);
     CHECK(bad == 0, "fat32: %d arquivos diferentes depois de encolher", bad);
     printf("  fat32  encolhido de %u para %llu setores (%u clusters), %d arquivos iguais\n", total0, (unsigned long long)ns, v.nclus, nfe);
     rc = fat32_resize(&d, p->start, p->count, total0);
     CHECK(rc == NTFS_SHRINK_OK, "fat32: crescer de volta (rc %d)", rc);
-    u8 *now = malloc(vb);
     _fseeki64(ff, (long long)(p->start * 512), SEEK_SET); if (fread(now, 1, vb, ff) != vb) return 2;
     u32 fsi = b0[48] | b0[49] << 8, bk = b0[50] | b0[51] << 8; u64 diffs = 0, first = 0;
     for (u64 s = 0; s < vb / 512; s++) {
@@ -358,7 +388,7 @@ static int fat32_cycle(const char *path) {
         _fseeki64(ff, (long long)(p->start * 512), SEEK_SET); if (fread(now, 1, vb, ff) != vb) return 2;
         int rc2 = fat32_resize(&d, p->start, p->count, mn + 8 * 1024);
         CHECK(rc2 == NTFS_SHRINK_UNREADABLE, "fat32: sem espelhamento: rc %d", rc2);
-        u8 *after = malloc(vb); _fseeki64(ff, (long long)(p->start * 512), SEEK_SET); if (fread(after, 1, vb, ff) != vb) return 2;
+        u8 *after = malloc(vb); if (!after) return 2; _fseeki64(ff, (long long)(p->start * 512), SEEK_SET); if (fread(after, 1, vb, ff) != vb) return 2;
         CHECK(!memcmp(now, after, vb), "fat32: uma recusa (sem espelhamento) mudou bytes");
         free(after);
         bb[40] = b0[40]; d.rw(0, p->start, 1, bb, true);
@@ -382,6 +412,7 @@ static int exfat_cycle(const char *path) {
     u64 mn = exfat_min_sectors(&d, p->start), mx = exfat_max_sectors(&d, p->start);
     CHECK(mn > 0 && mn < len0 && mx >= len0, "exfat: mínimo %llu, máximo %llu, total %llu", (unsigned long long)mn, (unsigned long long)mx, (unsigned long long)len0);
     u64 vb = len0 * 512; u8 *orig = malloc(vb), *now = malloc(vb);
+    if (!orig || !now) { fprintf(stderr, "sem memória\n"); return 2; }
     _fseeki64(ff, (long long)(p->start * 512), SEEK_SET); if (fread(orig, 1, vb, ff) != vb) return 2;
     int rc = exfat_resize(&d, p->start, p->count, mn - 8);
     CHECK(rc == NTFS_SHRINK_TOO_SMALL, "exfat: abaixo do mínimo devia ser recusado (rc %d)", rc);
@@ -390,6 +421,8 @@ static int exfat_cycle(const char *path) {
     u64 ns = mn + 64 * 1024;
     rc = exfat_resize(&d, p->start, p->count, ns);
     CHECK(rc == NTFS_SHRINK_OK, "exfat: encolher para %llu setores (rc %d)", (unsigned long long)ns, rc);
+    { static u8 bb[512]; d.rw(0, p->start, 1, bb, false); u64 vl = 0; for (int i = 0; i < 8; i++) vl |= (u64)bb[0x48 + i] << (8 * i);
+      CHECK(vl == ns, "exfat: depois de encolher o volume diz %llu setores, esperava %llu", (unsigned long long)vl, (unsigned long long)ns); }
     CHECK(exfat_min_sectors(&d, p->start) == mn, "exfat: o mínimo mudou depois de encolher");
     printf("  exfat  encolhido de %llu para %llu setores\n", (unsigned long long)len0, (unsigned long long)ns);
     rc = exfat_resize(&d, p->start, p->count, len0);
@@ -419,7 +452,7 @@ static int exfat_cycle(const char *path) {
             _fseeki64(ff, (long long)(p->start * 512), SEEK_SET); if (fread(now, 1, vb, ff) != vb) return 2;
             int rc2 = exfat_resize(&d, p->start, p->count, len0 - 64 * 1024);
             CHECK(rc2 == NTFS_SHRINK_UNREADABLE, "exfat: bitmap espalhado: rc %d", rc2);
-            u8 *after = malloc(vb); _fseeki64(ff, (long long)(p->start * 512), SEEK_SET); if (fread(after, 1, vb, ff) != vb) return 2;
+            u8 *after = malloc(vb); if (!after) return 2; _fseeki64(ff, (long long)(p->start * 512), SEEK_SET); if (fread(after, 1, vb, ff) != vb) return 2;
             CHECK(!memcmp(now, after, vb), "exfat: uma recusa (bitmap espalhado) mudou bytes");
             free(after);
             d.rw(0, at + sec, 1, s0, true); d.rw(0, fs, 1, f0, true);
@@ -439,15 +472,24 @@ static int resize_image(const char *path, unsigned long long mib) {
     static PartTable t; int k = -1;
     if (part_read(&d, &t)) for (int i = 0; i < t.n; i++) if ((t.p[i].fs == FS_NTFS || t.p[i].fs == FS_FAT32 || t.p[i].fs == FS_EXFAT) && memcmp(t.p[i].type, GPT_ESP, 16)) k = i;
     if (k < 0) { fprintf(stderr, "sem partição NTFS/FAT32\n"); return 2; }
-    Part *p = &t.p[k]; u64 ns = (u64)mib * 2048; bool grow = ns > p->count; int rc;
-    if (grow) {
+    /* a direção sai do tamanho do próprio volume, não da partição: depois de um crescimento interrompido (a tabela já
+     * maior, o volume ainda não), repetir o mesmo tamanho termina o trabalho em vez de tentar encolher */
+    Part *p = &t.p[k]; u64 ns = (u64)mib * 2048; int rc;
+    u64 vs = fs_size(&d, p->fs, p->start);
+    if (!vs) { fprintf(stderr, "não deu para ler o tamanho do volume\n"); return 1; }
+    bool grow = ns > vs;
+    if (grow && ns > p->count) {                        /* a tabela primeiro, depois o volume */
         if (part_overlaps(&d, &t, p->start, ns, k)) { fprintf(stderr, "não há espaço livre depois da partição\n"); return 1; }
         p->count = ns; if (!part_write(&d, &t)) { fprintf(stderr, "part_write\n"); return 1; }
     }
-    rc = p->fs == FS_NTFS ? (grow ? ntfs_grow(&d, p->start, ns, ns) : ntfs_shrink(&d, p->start, p->count, ns)) : p->fs == FS_EXFAT ? exfat_resize(&d, p->start, grow ? ns : p->count, ns) : fat32_resize(&d, p->start, grow ? ns : p->count, ns);
-    if (rc != NTFS_SHRINK_OK) { fprintf(stderr, "redimensionar: %d\n", rc); return 1; }
-    if (!grow) { p->count = ns; if (!part_write(&d, &t)) { fprintf(stderr, "part_write\n"); return 1; } }
-    fclose(ff);
+    rc = fs_resize(&d, p->fs, p->start, p->count, ns);
+    if (rc != NTFS_SHRINK_OK) {
+        if (grow) fprintf(stderr, "redimensionar: %d — a partição já tem %llu MiB, mas o volume não cresceu; rode de novo com o mesmo tamanho para terminar\n", rc, mib);
+        else fprintf(stderr, "redimensionar: %d\n", rc);
+        return 1;
+    }
+    if (!grow) { p->count = ns; if (!part_write(&d, &t)) { fprintf(stderr, "part_write\n"); return 1; } }   /* o volume primeiro, depois a tabela */
+    if (fflush(ff) || fclose(ff)) { fprintf(stderr, "gravar a imagem\n"); return 1; }
     printf("%s %s para %llu MiB\n", p->fs == FS_NTFS ? "NTFS" : p->fs == FS_EXFAT ? "exFAT" : "FAT32", grow ? "crescido" : "encolhido", mib);
     return 0;
 }
@@ -469,17 +511,23 @@ static int make_gpt(const char *path, unsigned long long mib, bool esp) {
     Region fr[4]; int nf = part_free(&d, &t, fr, 4);
     if (nf < 1 || part_add(&d, &t, fr[nf - 1].start, fr[nf - 1].count, GPT_LINUX, 0x83, "Linux", 7) < 0 || !part_write(&d, &t)) { fprintf(stderr, "GPT\n"); return 1; }
     FILE *f = fopen(path, "wb"); if (!f) { perror(path); return 2; }
-    fwrite(r.p, 1, bytes, f); fclose(f);
+    if (fwrite(r.p, 1, bytes, f) != bytes || fflush(f) || fclose(f)) { fprintf(stderr, "gravar %s\n", path); return 1; }
     return 0;
 }
 
+/* um tamanho em MiB: só dígitos, de 1 a 16 TiB; senão a ferramenta para antes de abrir a imagem */
+static unsigned long long mib_arg(const char *s) {
+    char *end; unsigned long long v = strtoull(s, &end, 10);
+    if (!*s || *end || v == 0 || v > (16ull << 20)) { fprintf(stderr, "tamanho inválido: \"%s\" (MiB)\n", s); exit(2); }
+    return v;
+}
 int main(int argc, char **argv) {
     if (argc == 3 && !strcmp(argv[1], "--fat32")) return fat32_cycle(argv[2]);
     if (argc == 3 && !strcmp(argv[1], "--exfat")) return exfat_cycle(argv[2]);
-    if (argc == 4 && !strcmp(argv[1], "--resize")) return resize_image(argv[2], strtoull(argv[3], 0, 10));
-    if (argc >= 4 && !strcmp(argv[1], "--mkgpt")) return make_gpt(argv[2], strtoull(argv[3], 0, 10), argc > 4 && !strcmp(argv[4], "--esp"));
-    if (argc == 4 && !strcmp(argv[1], "--shrunk")) return check_shrunk(argv[2], strtoull(argv[3], 0, 10));
-    if (argc == 4 && !strcmp(argv[1], "--shrink")) return shrink_image(argv[2], strtoull(argv[3], 0, 10));
+    if (argc == 4 && !strcmp(argv[1], "--resize")) return resize_image(argv[2], mib_arg(argv[3]));
+    if (argc >= 4 && !strcmp(argv[1], "--mkgpt")) return make_gpt(argv[2], mib_arg(argv[3]), argc > 4 && !strcmp(argv[4], "--esp"));
+    if (argc == 4 && !strcmp(argv[1], "--shrunk")) return check_shrunk(argv[2], mib_arg(argv[3]));
+    if (argc == 4 && !strcmp(argv[1], "--shrink")) return shrink_image(argv[2], mib_arg(argv[3]));
     if (argc < 3) { fprintf(stderr, "uso: fscheck_test <pasta das .img> <pasta das .txt>\n       fscheck_test --shrink <imagem> <MiB>\n"); return 2; }
     windows_fixture(argv[1], argv[2], "clean");
     windows_fixture(argv[1], argv[2], "dirty");

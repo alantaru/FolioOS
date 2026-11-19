@@ -30,6 +30,7 @@ typedef struct {
     uint32_t hint;           /* próximo cluster livre provável */
     uint32_t free_count;     /* livres (0xFFFFFFFF = desconhecido) */
     uint32_t memo_d, memo_i, memo_c;   /* última posição achada numa pasta */
+    bool io_err;                       /* uma leitura falhou desde que quem chama zerou (distingue "fim" de "erro") */
     struct { uint64_t lba; uint32_t age; bool used; uint8_t d[512]; } c[FAT_CACHE];
     uint32_t tick;
     void (*now)(uint16_t *date, uint16_t *time);
@@ -51,5 +52,8 @@ int  fat_rename(Fat *f, FatNode *n, const uint16_t *newname);
 int  fat_flush(Fat *f);
 uint32_t fat_free_clusters(Fat *f);
 bool fat32_format(FatIo io, void *ctx, uint64_t part_lba, uint64_t nsec, const char *label, uint32_t serial);
-bool fat32_format2(FatIo io, void *ctx, uint64_t part_lba, uint64_t nsec, uint64_t plan, const char *label, uint32_t serial);   /* FAT com folga para crescer até plan */
+/* FAT com folga para o volume crescer até plan setores, quando possível: se essa FAT deixasse menos de 65525 clusters
+ * (o volume não seria FAT32), formata sem a folga. É de melhor esforço: o tamanho até onde o volume pode crescer
+ * de fato é o que fscheck.c informa (fat32_max_sectors, pelo tamanho da FAT gravada). */
+bool fat32_format2(FatIo io, void *ctx, uint64_t part_lba, uint64_t nsec, uint64_t plan, const char *label, uint32_t serial);
 #endif

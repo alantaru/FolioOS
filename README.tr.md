@@ -11,7 +11,7 @@ Windows yok. Linux yok. İnternet yok. Bildirim yok. Yalnızca siz ve metin.
 [![Build](https://github.com/alantaru/FolioOS/actions/workflows/build.yml/badge.svg)](https://github.com/alantaru/FolioOS/actions/workflows/build.yml)
 [![Latest release](https://img.shields.io/github/v/release/alantaru/FolioOS?label=download&color=b4561f)](https://github.com/alantaru/FolioOS/releases/latest)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
-[![Platform: UEFI x64 | IA32](https://img.shields.io/badge/platform-UEFI%20x64%20%7C%20IA32-555)](#hardware-compatibility)
+[![Platform: UEFI x64 | IA32 | ARM64 | BIOS](https://img.shields.io/badge/platform-UEFI%20x64%20%7C%20IA32%20%7C%20ARM64%20%7C%20BIOS-555)](#hardware-compatibility)
 [![Languages: 15](https://img.shields.io/badge/languages-15-success)](#13-15-languages-and-counting)
 [![Translations welcome](https://img.shields.io/badge/translations-welcome-ff69b4)](docs/TRANSLATING.md)
 
@@ -47,7 +47,8 @@ dışa aktarın.
 - **Romancılar, gazeteciler, öğrenciler ve blog yazarları**: yeni donanım almadan bir *writerdeck* —
   dikkat dağıtmayan, yalnızca yazmaya ayrılmış bir cihaz — isteyenler.
 - **NaNoWriMo katılımcıları** ve süreli yazma sprintleri ya da sabah sayfaları yazan herkes.
-- **Çekmecesinde eski bir dizüstü olanlar**: FolioOS ona diskine dokunmadan ikinci bir hayat verir.
+- **Çekmecesinde eski bir dizüstü olanlar**: FolioOS ona ikinci bir hayat verir; doğrudan USB bellekten ya da
+  diskine kurularak, tek başına veya zaten üzerinde olan sistemin yanında.
 - **Okullar ve kütüphaneler**: basit, çevrimdışı bir yazı istasyonu arayanlar.
 - **Gizliliğe önem veren yazarlar**: ağ yok, telemetri yok, bulut yok.
 
@@ -324,12 +325,39 @@ USB bellek (FAT32)
 │   ├── THEMES/         temalarınız (.INI)
 │   ├── LANGUAGES/      çeviriler (.po)
 │   ├── KEYBOARDS/      klavye düzenleri (.txt)
-│   └── VERSIONS/       kaydedilen dosyaların otomatik önceki sürümleri
-└── EFI/BOOT/           FolioOS’un kendisi (BOOTX64.EFI, BOOTIA32.EFI)
+│   ├── VERSIONS/       kaydedilen dosyaların otomatik önceki sürümleri
+│   └── BACKUP/         kurulumun hiçbir şey yazmadan önce kaydettiği bölüm tabloları
+└── EFI/BOOT/           FolioOS’un kendisi (BOOTX64.EFI, BOOTIA32.EFI, BOOTAA64.EFI)
 ```
 
 Veritabanı yok, gizli bölüm yok, kapalı biçim yok. Belleği herhangi bir bilgisayara götürün; yazdıklarınız
 oradadır.
+
+<a id="15-install-it-on-the-computer-beta"></a>
+
+### 15. Bilgisayara kurun (beta)
+
+USB bellek yeterli, ama FolioOS bilgisayarın kendi diskinde de yaşayabilir; böylece dizüstü doğrudan yazınızla
+açılır. **Ctrl+K › FolioOS’u bu bilgisayara kur** komutunu açın (ya da *Ayarlar › Sistem*):
+
+- **Tek sistem olarak**, boş bir diske ya da silmeyi seçtiğiniz bir diske: bir sözcük yazarak onaylarsınız.
+- **Windows veya Linux’un yanında**, boş alanda, diğer bölümlere dokunmadan. Her açılışta birkaç saniye
+  *Yazmak için herhangi bir tuşa basın* görünür, ardından diğer sistem her zamanki gibi başlar; Windows’u
+  her zaman olduğu gibi aygıt yazılımının kendisi başlatır.
+- **Boş alan yok mu?** FolioOS bir NTFS, FAT32 veya exFAT bölümünü hiçbir veriyi taşımadan küçültebilir.
+  Güvenli olmayanı reddeder (hazırda bekleyen ya da Hızlı Başlatma açık Windows, `chkdsk` gerektiren bir birim,
+  kurtarma anahtarı olmadan BitLocker, LUKS, LVM, Apple birimleri) ve bunun yerine ne yapılacağını açıklar.
+  ext4 asla yeniden boyutlandırılmaz: Linux’tan yer açın (GParted) ve kurulumu yeniden çalıştırın.
+- Herhangi bir şey yazılmadan önce bölüm tablosu (diskin ilk ve son sektörleri) USB bellekteki
+  `FOLIO/BACKUP` klasörüne kaydedilir. Metinleriniz bilgisayarda, USB bellekte ya da her ikisinde durabilir.
+- Daha yeni bir USB bellekten **güncelleyin** ya da **kaldırın**: metinleriniz önce USB belleğe kopyalanır ve
+  diğer bölüm eski boyutuna geri büyür.
+- *Ayarlar › Sistem › Diskler ve bölümler* küçük bir bölüm yöneticisidir: FAT32 bölümü oluşturma, biçimlendirme,
+  NTFS/FAT32/exFAT küçültme veya büyütme, silme.
+
+UEFI’li PC’lerde ve yalnızca BIOS’lu PC’lerde çalışır. **Bu bir beta:** Windows ve Linux’un oluşturduğu
+disklerle, öykünülmüş makinelerdeki tüm testleri geçiyor, ama henüz gerçek donanımda çalışmadı: önce
+yedek alın ya da yedek bir disk kullanın.
 
 ---
 
@@ -354,11 +382,12 @@ oradadır.
 | | |
 |---|---|
 | **Donanım yazılımı** | UEFI 2.x — 64 bit (`BOOTX64.EFI`), 32 bit (`BOOTIA32.EFI`, Atom tabletler ve netbook’lar) veya ARM64 (`BOOTAA64.EFI`: topluluk UEFI donanım yazılımıyla Raspberry Pi 3/4/5, ARM dizüstüler). **Yalnızca BIOS’lu bilgisayarlar** (Legacy/CSM), `FOLIO\TOOLS\biosboot.exe` bir kez çalıştırıldıktan sonra FolioOS’un kendi BIOS köprüsüyle açılır. Secure Boot kapalı olmalıdır. |
-| **Ekran** | Herhangi bir UEFI GOP framebuffer (RGB, BGR, bit maskesi, yalnızca Blt) veya eski UGA; BIOS’lu bilgisayarlarda VESA/VBE. Doğal çözünürlük, otomatik HiDPI ölçekleme, dikey ekranlar otomatik döndürülür. |
+| **Ekran** | Herhangi bir UEFI GOP framebuffer (RGB, BGR, bit maskesi, yalnızca Blt) veya eski UGA; BIOS’lu bilgisayarlarda VESA/VBE. Doğal çözünürlük, otomatik HiDPI ölçekleme, dikey ekranlar otomatik döndürülür. Tek mod 4:3 olduğunda ve geniş ekran onu esnettiğinde *Ayarlar › Sistem › Ekran ve işaretçi* oranları korur (Monitör, 16:9, 16:10 veya 4:3). |
 | **Giriş** | Klavye donanım yazılımı üzerinden (BIOS’lu bilgisayarlarda doğrudan PS/2 ile). Fare, dokunmatik yüzey, çizim tableti ve dokunmatik ekran donanım yazılımı üzerinden — donanım yazılımında bunlar için sürücü yoksa FolioOS’un kendi USB HID ve PS/2 sürücüleriyle. |
 | **Ses** | Intel HD Audio ve AC'97 (yalnızca müzik çalar için gerekir). |
+| **Diskler (kurulum, beta)** | 512 bayt sektörlü SATA, NVMe, IDE ve USB diskler, GPT veya MBR. NTFS, FAT32 ve exFAT veri taşımadan küçültülüp yeniden büyütülebilir; BitLocker, LUKS, LVM, APFS/HFS+ ve ext4 asla yeniden boyutlandırılmaz. |
 | **Desteklenmeyenler** | Secure Boot (şimdilik), Apple Silicon Mac’ler. Wi-Fi ve Bluetooth bilerek dışarıda bırakılmıştır. |
-| **Test ortamı** | Her sürümde 13 öykünülmüş makine: UEFI x64, IA32 ve ARM64 ile USB ve IDE’den açılan yalnızca BIOS’lu bilgisayarlar; 8 ekran kartı, PS/2 ve USB fareler, USB tablet, HD Audio ve AC'97. Her birinde görüntü, klavye, fare, ses, kaydetme ve dosya sistemi bütünlüğü denetlenir. |
+| **Test ortamı** | Her sürümde 20 öykünülmüş makine: UEFI x64, IA32 ve ARM64 ile USB ve IDE’den açılan yalnızca BIOS’lu PC’ler; 8 ekran kartı, PS/2 ve USB fareler, USB tablet, HD Audio ve AC'97; SATA ve IDE disklere kurulmuş FolioOS, Windows (UEFI) ve başka bir sistemin (BIOS) yanında çift açılış, Windows’un oluşturduğu bir NTFS’nin küçültülmesi ve oranları koruma. Her birinde görüntü, klavye, fare, ses, kaydetme ve dosya sisteminin bütünlüğü denetlenir. |
 
 Her açılış, FolioOS’un bulduklarını `FOLIO/DIAGNOSTICS.TXT` dosyasına yazar. Kendinizinkini bir
 [donanım raporunda](https://github.com/alantaru/FolioOS/issues/new/choose) paylaşın — "sorunsuz çalışıyor"
@@ -371,8 +400,18 @@ bile diğer yazarların dizüstü seçmesine yardımcı olur.
 <details>
 <summary><b>Bilgisayarımı ya da USB belleğimi siler mi?</b></summary>
 
-Hayır. FolioOS dahili diske asla dokunmaz; kurulum belleğe yalnızca dosya ekler — orada olanlar kalır.
-Belleği çıkarın, bilgisayar yine her zamanki sistemini başlatır.
+Hayır. USB bellekten çalışırken FolioOS dahili diske asla yazmaz; belleğe kurmak da yalnızca dosya ekler,
+orada olanlar kalır. Belleği çıkarın, bilgisayar her zamanki sistemini yeniden başlatır.
+Diske yalnızca kurulumu kendiniz açarsanız dokunulur; o zaman bile siz onaylamadan ve bölüm tablosu USB
+belleğe kaydedilmeden hiçbir şey yazılmaz.
+</details>
+
+<details>
+<summary><b>Dizüstüne, Windows veya Linux’un yanına kurabilir miyim?</b></summary>
+
+Evet, 4.4’ten (beta) beri: **Ctrl+K › FolioOS’u bu bilgisayara kur**. Boş alanı kullanır ya da bir NTFS, FAT32
+veya exFAT bölümünü veri taşımadan küçültür; her açılışta FolioOS’u ya da diğer sistemi seçersiniz.
+Kaldırınca alan geri verilir. Bkz. [Bilgisayara kurun](#15-install-it-on-the-computer-beta).
 </details>
 
 <details>
@@ -455,7 +494,7 @@ Gereksinimler: Windows 10/11, PowerShell 5.1+ ve `PATH` üzerinde [MinGW-w64](ht
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
 .\build.ps1                                  # UEFI x64 + IA32 + ARM64, BIOS, simülatör, paketler — ve test paketi
-.\tools\qemu-lab.ps1                         # gerçek ikili dosyaları 13 öykünülmüş makinede açar ve her birini denetler
+.\tools\qemu-lab.ps1                         # gerçek ikili dosyaları 20 öykünülmüş makinede açar ve her birini denetler
 .\build\folio_sim.exe                        # FolioOS’u bir pencerede çalıştırır
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # gerçek UEFI programını bir pencerede çalıştırır
 .\flash_usb.ps1 -DriveLetter E:              # FAT32 belleğe kurar/günceller, dosyalar korunur
@@ -468,6 +507,8 @@ Test paketi, simülatörü ve gerçek `BOOTX64.EFI` dosyasını (küçük bir UE
 tuş vuruşları ve fare olaylarıyla yönetir, ekran görüntüleri alır, her dışa aktarımı (ZIP + XML), her
 çeviriyi (doğrulayıcı için negatif bir denetimle), altı framebuffer biçimini ve BIOS köprüsünün FAT32
 sürücüsünü (bayt bayt denetlenen binlerce rastgele işlem) doğrular.
+Kurulum ve bölüm yöneticisi, Windows ve Linux’un oluşturduğu disk kalıpları üzerinde çalışır; sonuçları Windows’un
+`chkdsk`’i ve Linux’un `fsck`’i denetler (`tools/ntfs-shrink-check.ps1`, `tools/linux-run.ps1`).
 
 <a id="macos-simulator"></a>
 
@@ -496,7 +537,8 @@ macOS betiği yalnızca simülatörü derler: UEFI ikili dosyaları, paketler, d
 
 ```
 src/core/       taşınabilir çekirdek (freestanding C, libc yok): düzenleyici, Markdown, TrueType taramacı,
-                arayüz araç takımı ve pencere yöneticisi, dışa aktarma, MP3, i18n, klavyeler, temalar
+                arayüz araç takımı ve pencere yöneticisi, dışa aktarma, MP3, i18n, klavyeler, temalar,
+                bölüm tabloları, dosya sistemi denetimi ve yeniden boyutlandırma, kurulum ve açılış seçicisi
 src/platform/   uefi/  GOP/UGA görüntü, giriş, FAT G/Ç, HD Audio/AC'97, USB HID ve PS/2 sürücüleri — donanım yazılımı üzerinde
                 bios/  önyükleme sektörleri + BIOS→UEFI köprüsü (VBE, PS/2, kendi FAT32 sürücüsü), yalnızca BIOS’lu bilgisayarlar için
                 win32/ geliştirme ve otomatik testler için simülatör
@@ -506,7 +548,7 @@ assets/         yazı tipleri, çeviriler (.po), klavye düzenleri, örnek tema
 tests/          betikli uçtan uca testler
 ```
 
-~600 KB’lık bir program, ince bir platform katmanı aracılığıyla tüm makineyi yönetir. Ayrıntılar
+~800 KB’lık bir program, ince bir platform katmanı aracılığıyla tüm makineyi yönetir. Ayrıntılar
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) belgesinde.
 
 <a id="roadmap"></a>
@@ -519,7 +561,7 @@ metinlerinizi eşitleyen, Wi-Fi’lı minimal bir Linux olan **FolioOS Sync**. P
 
 - [x] Yalnızca BIOS’lu bilgisayarlar (Legacy/CSM) ve ARM64 (UEFI donanım yazılımlı Raspberry Pi, ARM dizüstüler)
 - [x] Korece giriş (2 setli Hangıl) ve Japonca kana girişi (romaji → hiragana/katakana)
-- [ ] Bilgisayarın diskine kurulum — tek sistem olarak ya da herhangi bir sistemin yanına — bölüm yöneticisiyle
+- [x] Bilgisayarın diskine kurulum — tek sistem olarak ya da herhangi bir sistemin yanına — bölüm yöneticisiyle (4.4 beta)
 - [ ] FolioOS Sync: Wi-Fi ve WebDAV, SFTP, Git, Dropbox, Google Drive, OneDrive ve Syncthing ile eşitleme
 - [ ] Japonca kanji dönüşümü ve Çince pinyin girişi (sözlük gerektirir)
 - [ ] Metin biçimlendirme ve sağdan sola yazılar (Arapça, İbranice, Devanagari…)

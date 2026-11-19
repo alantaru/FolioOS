@@ -79,7 +79,10 @@ sub read_po {
     return ({}, {}) unless defined $s;
     my (%tr, %fz);
     for my $e (split /\n\s*\n/, $s) {
-        next if $e =~ /^#~/m && $e !~ /^msgid/m;
+        # blocos obsoletos (#~): continuam lidos, para que a tradução antiga sobreviva a novas execuções
+        # (é a referência de quem vai traduzir o bloco que mudou) — antes, a 2ª execução as apagava
+        my $obs = $e =~ /^#~ msgid/m;
+        $e =~ s/^#~ //mg if $obs;
         my ($id, $str, $field, $fuzzy) = (undef, undef, '', $e =~ /^#,.*fuzzy/m);
         for my $l (split /\n/, $e) {
             if ($l =~ /^msgid "(.*)"$/) { $id = po_unescape($1); $field = 'id'; }
