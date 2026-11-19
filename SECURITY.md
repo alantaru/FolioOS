@@ -29,5 +29,9 @@ in the release notes unless you prefer to stay anonymous.
 - Disks are only written after the user confirms in the installer or the partition manager, and
   only after the first sectors are backed up to the USB drive. Partition tables that cannot be read
   or written back exactly are never changed, and volumes that cannot be fully verified (encrypted,
-  hibernated, dirty, non-mirrored FAT32, scattered exFAT bitmap) are never resized. Formatting or
+  hibernated, dirty, non-mirrored FAT32, scattered exFAT bitmap) are never resized. The one
+  exception is an NTFS volume marked for `chkdsk` (FolioOS's own shrink marks it): it can only grow,
+  or get the table update of a shrink that already reached the volume, and the journal, hibernation
+  and capacity checks still apply. Uninstalling checks that the partition can grow back before
+  anything is written. Formatting or
   deleting a partition in the partition manager erases it whatever its state, after a typed confirmation.

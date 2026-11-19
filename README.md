@@ -307,8 +307,9 @@ straight into your writing. Open **Ctrl+K › Install FolioOS on this computer**
 - **Update** from a newer USB drive: only FolioOS's own files are replaced; your texts and the partitions
   stay as they are.
 - **Uninstall**: you can have your texts copied to the drive FolioOS started from first. If the installer
-  shrank a partition to make room, that partition grows back to the size it had; otherwise the space
-  becomes free.
+  shrank a partition to make room, that partition grows back to the size it had, as long as the space
+  after it is still free; otherwise the space becomes free. If Windows is hibernated (or uses Fast
+  Startup), FolioOS asks you to shut it down fully first and changes nothing.
 - *Settings › System › Disks and partitions* is a small partition manager: create a FAT32 partition,
   format, shrink or grow NTFS/FAT32/exFAT, delete.
 - The 4.4 beta is a pre-release: download it from
@@ -353,10 +354,11 @@ writers pick a laptop.
 <details>
 <summary><b>Will it erase my computer or my USB drive?</b></summary>
 
-No. Running from the USB drive, FolioOS never writes to the internal disk, and installing it on the drive
-only adds files — what is already there stays. Take the drive out and the PC boots its usual system again.
-The disk is only touched if you open the installer or *Disks and partitions* yourself, and even then
-nothing is written before you confirm and the partition table is saved to the drive FolioOS started from.
+No. Running from the USB drive, FolioOS writes to the internal disk only when you ask it to: saving a text
+on one of its volumes writes that file, and only the installer and *Disks and partitions* change
+partitions — even then, nothing is written before you confirm and the partition table is saved to the
+drive FolioOS started from. Installing it on the USB drive only adds files — what is already there
+stays. Take the drive out and the PC boots its usual system again.
 </details>
 
 <details>
@@ -364,7 +366,7 @@ nothing is written before you confirm and the partition table is saved to the dr
 
 Yes, since 4.4 (beta): **Ctrl+K › Install FolioOS on this computer**. It uses free space, or shrinks an
 NTFS, FAT32 or exFAT partition without moving data, and each start lets you pick FolioOS or the other
-system. Uninstalling grows back a partition the installer shrank (otherwise the space becomes free). See [Install it on the computer](#15-install-it-on-the-computer-beta).
+system. Uninstalling grows back a partition the installer shrank, when the space after it is still free (otherwise the space becomes free). See [Install it on the computer](#15-install-it-on-the-computer-beta).
 </details>
 
 <details>

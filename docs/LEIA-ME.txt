@@ -171,8 +171,10 @@ INSTALAR NO COMPUTADOR (beta)
    - Atualizar: inicie por um pen-drive mais novo e escolha "Atualizar"; só os
      arquivos do próprio FolioOS são trocados.
      Desinstalar: você pode ter seus textos copiados antes para este pen-drive. Se
-     o instalador encolheu uma partição para abrir espaço, ela cresce de volta;
-     senão, o espaço fica livre.
+     o instalador encolheu uma partição para abrir espaço, ela cresce de volta
+     se o espaço depois dela ainda estiver livre; senão, o espaço fica livre. Se
+     o Windows estiver hibernado (ou com Inicialização Rápida), desligue-o por
+     completo antes.
    - Ajustes > Sistema > "Discos e partições" é um pequeno gerenciador de
      partições.
    É uma beta: passa em todos os testes em máquinas emuladas, mas ainda não

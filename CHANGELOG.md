@@ -40,11 +40,14 @@ All notable changes to this project are documented here. The format follows
 - FAT32: the free-cluster count is marked "unknown" instead of being adjusted, so a retried resize
   cannot apply the change twice.
 - Deleting a partition shorter than 32 sectors no longer zeroes the start of the next one.
+- Installing on a whole disk stops if the current partition table cannot be read (a blank disk or a
+  damaged table still reads fine).
 - Installing next to another system checks that the new partition fits in the table (MBR with four
   primaries) before shrinking anything.
 - Uninstalling only grows back a partition the installer itself shrank (recorded at install time); a
   free-space install leaves the neighbour exactly as it was. Updating keeps that record, so an
-  updated installation still gives the space back. `\EFI\FolioOS\FOLIO.ID` is removed only
+  updated installation still gives the space back. Before anything is written, uninstalling
+  checks that this partition can grow (a hibernated Windows or Fast Startup stops it with a message). `\EFI\FolioOS\FOLIO.ID` is removed only
   after the table changed, so an interrupted uninstall can be run again.
 - The texts are copied before uninstalling also from the old `TEXTOS` folder, are always listed again,
   and any read error, long path or failed copy stops the uninstall before anything is deleted.
@@ -54,14 +57,16 @@ All notable changes to this project are documented here. The format follows
 - Update and uninstall check that the disk still holds the installation shown on the screen.
 - A retry after an interrupted grow (the table larger than the volume) finishes growing the volume, in
   the engine and in *Disks and partitions* (a *Finish resizing* button). A retry after a shrink
-  whose table update failed only writes the table.
+  whose table update failed only writes the table. This also works for an NTFS volume already marked for `chkdsk`,
+  and exFAT finishes a pending bitmap update first.
 - The safety copy in `FOLIO/BACKUP` never overwrites an earlier one, and if the folder cannot be
   listed nothing is written. A directory read error is no longer taken for a missing `CONFIG.INI`.
 
 ### Fixed — your texts
 - Exchanging texts with the USB drive skips a text with unsaved changes, never replaces a file whose
   previous version could not be saved first (nor one whose existence could not be checked), and reports
-  the texts it could not copy (before the ones it skipped, so the warning is never cut off).
+  the texts it could not copy (before the ones it skipped, so the warning is never cut off). If the
+  previous version cannot be confirmed, the file is not replaced.
 - Versions of documents with the same name in different folders no longer overwrite each other in
   `FOLIO/VERSIONS`, nor do two versions saved in the same minute. Pruning old versions never removes the
   one just saved.
@@ -88,7 +93,8 @@ All notable changes to this project are documented here. The format follows
   `ROADMAP.md`, `CONTRIBUTING.md`, `SECURITY.md` and the issue and pull request templates. They
   now say that the partition manager writes to disks too, that copying the texts on uninstall is
   optional, that only a partition the installer shrank grows back, where the safety copy goes when
-  FolioOS started from a disk, and where to download the beta.
+  FolioOS started from a disk, and where to download the beta. Saving a text is named as the
+  other way FolioOS writes to an internal volume.
 - Tests and tools are stricter: refusals are checked on the whole disk, file inventories fail on any
   missing, extra or unreadable file, read errors fail comparisons, test tools are built without
   clang/nasm, the build uses a work folder of its own, the lab counts video failures and stops its

@@ -122,7 +122,7 @@ void partitions_poll(void) {
     mem_free(s.buf);
     char m[240];
     if (res.code == INST_OK) str_copy(m, L("Done. The previous start of the disk is saved on this USB drive."), sizeof m);
-    else fmt(m, sizeof m, res.path[0] ? "%s: %s" : "%s", L(install_error(res.code)), res.path);
+    else fmt(m, sizeof m, res.path[0] ? "%s: %s" : "%s", L(install_error(res.code)), L(res.path));   /* um motivo sai traduzido; um caminho fica como é */
     ui_toast(m);
     dbg("partitions: op %d -> %d (%s)", st, res.code, res.path);
     st = PS_LIST; word[0] = 0; finish_count = 0; win_parts.nav = -1; ui.focus = 0;
@@ -226,7 +226,9 @@ static void parts_body(Window *w, Rect r) {
                 /* um crescimento interrompido: a partição já maior que o volume (o NTFS fica marcado para o chkdsk, e o
                  * mínimo não é calculado). Oferece só terminar, com o mesmo tamanho; o motor confere o resto */
                 u64 vsz = (c->verdict == SAFE_OK || (c->verdict == SAFE_DIRTY && p->fs == FS_NTFS)) ? vsz_of[rw->d][rw->part] : 0;
-                if (vsz && vsz + 2048 <= rw->count) {
+                /* NTFS ocupa a partição inteira (o volume conta a cópia do boot no fim): qualquer diferença é um crescimento
+                 * interrompido. FAT32/exFAT podem sobrar uns setores de alinhamento: só a partir de 1 MiB */
+                if (vsz && (p->fs == FS_NTFS ? vsz < rw->count : vsz + 2048 <= rw->count)) {
                     if (ui_button(rect(bx, by, SI(220), SI(40)), L("Finish resizing"), BTN_PRIMARY)) {
                         st = PS_RESIZE; size_lo = size_hi = size_mb = (float)(rw->count >> 11); finish_count = rw->count; w->nav = -1;
                     }

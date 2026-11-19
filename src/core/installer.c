@@ -524,7 +524,7 @@ static void installer_body(Window *w, Rect r) {
     }
     /* ST_FAIL */
     y = wrap(fb, S(16), x, y + S(18), wd, removing ? L("The removal did not finish.") : updating ? L("The update did not finish. Some files on the disk may already be the new ones: start the update again from this USB drive to finish it.") : L("The installation did not finish."), 0xFFC0392B) + S(8);
-    fmt(line, sizeof line, res.path[0] ? "%s: %s" : "%s", L(install_error(res.code)), res.path);
+    fmt(line, sizeof line, res.path[0] ? "%s: %s" : "%s", L(install_error(res.code)), L(res.path));   /* um motivo (fs_safety_short) sai traduzido; um caminho fica como é */
     y = wrap(f, S(14), x, y, wd, line, T->panel_text) + S(8);
     if (backup_name[0]) { fmt(line, sizeof line, L("The previous start of the disk is saved in %s."), backup_name); y = wrap(f, S(13), x, y, wd, line, dim); }
     wrap(f, S(13), x, y + S(6), wd, L("Your texts on this USB drive were not touched. You can try again, or keep using FolioOS from the USB drive."), dim);

@@ -152,7 +152,9 @@ static const char *docs_dir_on(int vol);
 static bool snapshot(int vol, const char *path, bool force) {
     if (!force && str_eq(last_snap_path, path) && ui.in.now - last_snap_ms < 10 * 60000) return true;
     bool d;
-    if (!pal_exists(vol, path, &d) || d) return true;
+    /* force (a troca, que já confirmou que o arquivo existe): sem conseguir confirmar de novo, não há versão salva */
+    if (!pal_exists(vol, path, &d)) return !force;
+    if (d) return true;
     u8 *old; usize len;
     if (!pal_read(vol, path, &old, &len)) return false;
     paths_ensure(boot_vol, DIR_VERSIONS);

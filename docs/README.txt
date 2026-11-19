@@ -116,8 +116,9 @@ INSTALLING ON THIS COMPUTER (beta)
      on both (Settings > System > TEXTS).
    - Update: start from a newer USB drive and choose "Update"; only FolioOS's own
      files are replaced. Uninstall: you can have your texts copied to this drive
-     first. If the installer shrank a partition to make room, it grows back;
-     otherwise the space becomes free.
+     first. If the installer shrank a partition to make room, it grows back
+     when the space after it is still free; otherwise the space becomes free.
+     If Windows is hibernated (or uses Fast Startup), shut it down fully first.
    - Settings > System > "Disks and partitions" is a small partition manager.
    This is a beta: it passes every test on emulated machines, but has not run on
    real hardware yet. Back up first, or use a spare disk.

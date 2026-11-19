@@ -490,7 +490,9 @@ static int resize_image(const char *path, unsigned long long mib) {
         p->count = ns; if (!part_write(&d, &t)) { fprintf(stderr, "part_write\n"); return 1; }
     }
     /* o volume já com esse tamanho (um encolhimento cuja tabela não foi gravada): só falta a tabela */
-    rc = ns == vs ? NTFS_SHRINK_OK : fs_resize(&d, p->fs, p->start, p->count, ns);
+    /* (no exFAT ainda pode faltar o tamanho do bitmap: exfat_resize termina isso, e sem nada a fazer diz "mesmo tamanho") */
+    rc = ns != vs ? fs_resize(&d, p->fs, p->start, p->count, ns) : p->fs != FS_EXFAT ? NTFS_SHRINK_OK : fs_resize(&d, p->fs, p->start, p->count, ns);
+    if (ns == vs && rc == NTFS_SHRINK_BAD_SIZE) rc = NTFS_SHRINK_OK;
     if (rc != NTFS_SHRINK_OK) {
         if (grow) fprintf(stderr, "redimensionar: %d — a partição já tem %llu MiB, mas o volume não cresceu; rode de novo com o mesmo tamanho para terminar\n", rc, mib);
         else fprintf(stderr, "redimensionar: %d\n", rc);

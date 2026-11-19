@@ -352,8 +352,9 @@ iniciar direto na sua escrita. Abra **Ctrl+K › Instalar o FolioOS neste comput
 - **Atualize** por um pen-drive mais novo: só os arquivos do próprio FolioOS são trocados; seus textos e as
   partições ficam como estão.
 - **Desinstale**: antes, você pode ter seus textos copiados para a unidade de onde o FolioOS iniciou. Se o
-  instalador encolheu uma partição para abrir espaço, ela cresce de volta ao tamanho que tinha; senão, o
-  espaço fica livre.
+  instalador encolheu uma partição para abrir espaço, ela cresce de volta ao tamanho que tinha, desde que o
+  espaço depois dela ainda esteja livre; senão, o espaço fica livre. Se o Windows estiver hibernado (ou usar a
+  Inicialização Rápida), o FolioOS pede que você o desligue por completo antes e não muda nada.
 - *Ajustes › Sistema › Discos e partições* é um pequeno gerenciador de partições: criar uma partição FAT32,
   formatar, encolher ou aumentar NTFS/FAT32/exFAT, apagar.
 - A 4.4 beta é uma pré-versão: baixe-a pela
@@ -404,10 +405,11 @@ ajuda outros escritores a escolher um notebook.
 <details>
 <summary><b>Ele vai apagar o meu computador ou o meu pen-drive?</b></summary>
 
-Não. Rodando do pen-drive, o FolioOS nunca grava no disco interno, e instalá-lo no pen-drive só acrescenta
-arquivos: o que já estava lá continua. Tire o pen-drive e o PC volta a iniciar o sistema de sempre.
-O disco só é tocado se você mesmo abrir o instalador ou *Discos e partições*, e mesmo assim nada é gravado
-antes de você confirmar e de a tabela de partições ser salva na unidade de onde o FolioOS iniciou.
+Não. Rodando do pen-drive, o FolioOS só grava no disco interno quando você pede: salvar um texto num dos
+volumes dele grava esse arquivo, e só o instalador e *Discos e partições* mudam partições; mesmo assim, nada é
+gravado antes de você confirmar e de a tabela de partições ser salva na unidade de onde o FolioOS iniciou.
+Instalá-lo no pen-drive só acrescenta arquivos: o que já estava lá continua. Tire o pen-drive e o PC volta a
+iniciar o sistema de sempre.
 </details>
 
 <details>
@@ -415,7 +417,7 @@ antes de você confirmar e de a tabela de partições ser salva na unidade de on
 
 Sim, desde a 4.4 (beta): **Ctrl+K › Instalar o FolioOS neste computador**. Ele usa o espaço livre ou
 encolhe uma partição NTFS, FAT32 ou exFAT sem mover dados, e a cada início você escolhe o FolioOS ou o
-outro sistema. Desinstalar faz crescer de volta a partição que o instalador encolheu (senão, o espaço fica livre). Veja [Instale no computador](#15-install-it-on-the-computer-beta).
+outro sistema. Desinstalar faz crescer de volta a partição que o instalador encolheu, se o espaço depois dela ainda estiver livre (senão, o espaço fica livre). Veja [Instale no computador](#15-install-it-on-the-computer-beta).
 </details>
 
 <details>

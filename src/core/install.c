@@ -257,7 +257,7 @@ void install_whole_disk(const BlkDev *dev, const InstallSrc *src, const InstallO
     /* 3. tabela nova com uma partição FAT32 do tamanho do disco (FAT32 vai até 2 TB) */
     prog(2, "partition");
     static PartTable t;
-    if (!part_read(dev, &t)) memset(&t, 0, sizeof t);
+    if (!part_read(dev, &t)) { set_err(r, INST_ERR_READ, "partition table"); return; }   /* erro de leitura: nada é gravado (disco em branco ou tabela estragada leem bem) */
     part_new(&t, o->bios ? SCHEME_MBR : SCHEME_GPT, src->seed);
     memset(t.mbr_code, 0, sizeof t.mbr_code);
     Region rg[4];
@@ -788,6 +788,18 @@ void install_remove(const BlkDev *dev, const InstallSrc *src, const InstallOpts 
     if (!prepare(dev, src, o, r)) return;                      /* inclui a cópia de segurança do início do disco */
     if (!f->found) { set_err(r, INST_ERR_REGION, ""); return; }
     if (!found_same(dev, f)) { set_err(r, INST_ERR_REGION, "changed"); return; }
+    /* 0. a partição que vai crescer de volta tem de poder crescer (Windows hibernado ou com Inicialização Rápida, por
+     * exemplo, não pode): confere antes de qualquer gravação, para nunca tirar o FolioOS e deixar a outra menor.
+     * NTFS marcado para o chkdsk (o próprio encolhimento da instalação marca) pode crescer. */
+    if (grow && f->ntfs >= 0) {
+        static PartTable pt; static FsCheck fc; int qq = -1;
+        if (!part_read(dev, &pt)) { set_err(r, INST_ERR_READ, "partition table"); return; }
+        for (int i = 0; i < pt.n; i++) if (pt.p[i].start == f->ntfs_start && pt.p[i].fs == f->grow_fs) qq = i;
+        if (qq < 0) { set_err(r, INST_ERR_REGION, "partition"); return; }
+        fs_check(dev, &pt.p[qq], &fc);
+        if (fc.verdict != SAFE_OK && !(fc.verdict == SAFE_DIRTY && f->grow_fs == FS_NTFS)) { set_err(r, INST_ERR_GROW, fs_safety_short(fc.verdict)); return; }
+        if (f->ntfs_grow_to > fs_grow_max(dev, f->grow_fs, f->ntfs_start)) { set_err(r, INST_ERR_GROW, ""); return; }
+    }
     /* 1. os textos para o pendrive, antes de apagar qualquer coisa: DOCUMENTS/computer-<data>/ */
     if (copy_texts) {
         /* a pasta dos textos como o editor a vê (DOCUMENTS, ou TEXTOS das instalações antigas), lida de novo agora (não
@@ -960,13 +972,23 @@ void part_op_format(const BlkDev *dev, const InstallSrc *src, uint64_t part_star
     if (dev->flush && !dev->flush(dev->ctx)) { set_err(r, INST_ERR_WRITE, "flush"); return; }   /* sem confirmação de que chegou ao disco, não é sucesso */
     r->part_lba = p->start; r->part_count = p->count; r->code = INST_OK;
 }
+/* o volume já tem o tamanho pedido: no exFAT ainda pode faltar o tamanho do bitmap (o último passo do encolhimento),
+ * e exfat_resize termina isso; sem nada a fazer ele responde "mesmo tamanho". Os outros não têm passo pendente. */
+static int same_size(const BlkDev *dev, int fs, u64 start, u64 part, u64 n) {
+    if (fs != FS_EXFAT) return NTFS_SHRINK_OK;
+    int rc = fs_resize(dev, fs, start, part, n);
+    return rc == NTFS_SHRINK_BAD_SIZE ? NTFS_SHRINK_OK : rc;
+}
 void part_op_resize(const BlkDev *dev, const InstallSrc *src, uint64_t part_start, uint64_t new_count, InstallResult *r) {
     static PartTable t; static FsCheck c; int k;
     if (!op_begin(dev, src, r, &t, part_start, &k)) return;
     if (k < 0 || !fs_resizable(t.p[k].fs)) { set_err(r, INST_ERR_SHRINK, "partition"); return; }
     Part *p = &t.p[k];
     fs_check(dev, p, &c);
-    if (c.verdict != SAFE_OK && !(c.verdict == SAFE_DIRTY && p->fs == FS_NTFS && new_count >= p->count)) { set_err(r, INST_ERR_SHRINK, fs_safety_short(c.verdict)); return; }
+    /* NTFS marcado para o chkdsk: só crescer, ou só gravar a tabela de um encolhimento cujo volume já ficou desse
+     * tamanho (o flush final do encolhimento falhou); um encolhimento novo continua recusado */
+    bool table_only = new_count < p->count && fs_size(dev, p->fs, p->start) == new_count;
+    if (c.verdict != SAFE_OK && !(c.verdict == SAFE_DIRTY && p->fs == FS_NTFS && (new_count >= p->count || table_only))) { set_err(r, INST_ERR_SHRINK, fs_safety_short(c.verdict)); return; }
     if (!new_count) { set_err(r, INST_ERR_RESIZE, ""); return; }
     if (new_count == p->count) {
         /* a entrada já tem esse tamanho, mas o volume ficou menor (um crescimento interrompido depois de gravar a
@@ -979,7 +1001,7 @@ void part_op_resize(const BlkDev *dev, const InstallSrc *src, uint64_t part_star
     } else if (new_count < p->count) {
         if (new_count * dev->bs < c.min_bytes) { set_err(r, INST_ERR_RESIZE, ""); return; }
         /* o volume, depois a tabela; o volume já desse tamanho (a tabela não foi gravada da outra vez): só a tabela */
-        int rc = fs_size(dev, p->fs, p->start) == new_count ? NTFS_SHRINK_OK : fs_resize(dev, p->fs, p->start, p->count, new_count);
+        int rc = table_only ? same_size(dev, p->fs, p->start, p->count, new_count) : fs_resize(dev, p->fs, p->start, p->count, new_count);
         if (rc != NTFS_SHRINK_OK) { set_err(r, INST_ERR_RESIZE, "volume"); return; }
         p->count = new_count;
         if (!part_write(dev, &t)) { set_err(r, INST_ERR_WRITE, "partition table"); return; }

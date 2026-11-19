@@ -354,7 +354,9 @@ açılır. **Ctrl+K › FolioOS’u bu bilgisayara kur** komutunu açın (ya da 
 - Daha yeni bir USB bellekten **güncelleyin**: yalnızca FolioOS’un kendi dosyaları değiştirilir; metinleriniz
   ve bölümler olduğu gibi kalır.
 - **Kaldırın**: önce metinlerinizi FolioOS’un başladığı sürücüye kopyalatabilirsiniz. Kurulum yer açmak için
-  bir bölümü küçülttüyse o bölüm eski boyutuna geri büyür; aksi hâlde alan boş kalır.
+  bir bölümü küçülttüyse, arkasındaki alan hâlâ boşsa o bölüm eski boyutuna geri büyür; aksi hâlde alan boş
+  kalır. Windows hazırda bekletmedeyse (ya da Hızlı Başlatma kullanıyorsa) FolioOS önce onu tamamen
+  kapatmanızı ister ve hiçbir şeyi değiştirmez.
 - *Ayarlar › Sistem › Diskler ve bölümler* küçük bir bölüm yöneticisidir: FAT32 bölümü oluşturma, biçimlendirme,
   NTFS/FAT32/exFAT küçültme veya büyütme, silme.
 - 4.4 beta bir ön sürümdür: onu “latest” yerine
@@ -405,10 +407,11 @@ bile diğer yazarların dizüstü seçmesine yardımcı olur.
 <details>
 <summary><b>Bilgisayarımı ya da USB belleğimi siler mi?</b></summary>
 
-Hayır. USB bellekten çalışırken FolioOS dahili diske asla yazmaz; belleğe kurmak da yalnızca dosya ekler,
-orada olanlar kalır. Belleği çıkarın, bilgisayar her zamanki sistemini yeniden başlatır.
-Diske yalnızca kurulumu ya da *Diskler ve bölümler*’i kendiniz açarsanız dokunulur; o zaman bile siz onaylamadan
-ve bölüm tablosu FolioOS’un başladığı sürücüye kaydedilmeden hiçbir şey yazılmaz.
+Hayır. USB bellekten çalışırken FolioOS dahili diske yalnızca siz isterseniz yazar: bir metni onun
+birimlerinden birine kaydetmek o dosyayı yazar; bölümleri yalnızca kurulum ve *Diskler ve bölümler* değiştirir,
+o zaman bile siz onaylamadan ve bölüm tablosu FolioOS’un başladığı sürücüye kaydedilmeden hiçbir şey yazılmaz.
+Belleğe kurmak yalnızca dosya ekler, orada olanlar kalır. Belleği çıkarın, bilgisayar her zamanki sistemini
+yeniden başlatır.
 </details>
 
 <details>
@@ -416,7 +419,7 @@ ve bölüm tablosu FolioOS’un başladığı sürücüye kaydedilmeden hiçbir 
 
 Evet, 4.4’ten (beta) beri: **Ctrl+K › FolioOS’u bu bilgisayara kur**. Boş alanı kullanır ya da bir NTFS, FAT32
 veya exFAT bölümünü veri taşımadan küçültür; her açılışta FolioOS’u ya da diğer sistemi seçersiniz.
-Kaldırınca, kurulumun küçülttüğü bölüm yeniden büyür (aksi hâlde alan boş kalır). Bkz. [Bilgisayara kurun](#15-install-it-on-the-computer-beta).
+Kaldırınca, kurulumun küçülttüğü bölüm, arkasındaki alan hâlâ boşsa yeniden büyür (aksi hâlde alan boş kalır). Bkz. [Bilgisayara kurun](#15-install-it-on-the-computer-beta).
 </details>
 
 <details>

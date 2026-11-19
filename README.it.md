@@ -356,8 +356,9 @@ direttamente nella tua scrittura. Apri **Ctrl+K › Installa FolioOS su questo c
 - **Aggiorna** da una chiavetta più recente: vengono sostituiti solo i file di FolioOS; i tuoi testi e le
   partizioni restano come sono.
 - **Disinstalla**: puoi far copiare prima i tuoi testi sull’unità da cui è partito FolioOS. Se l’installer
-  ha ridotto una partizione per fare spazio, quella partizione torna alla dimensione che aveva; altrimenti lo
-  spazio diventa libero.
+  ha ridotto una partizione per fare spazio, quella partizione torna alla dimensione che aveva, purché lo
+  spazio dopo di essa sia ancora libero; altrimenti lo spazio diventa libero. Se Windows è in ibernazione (o
+  usa l’avvio rapido), FolioOS ti chiede prima di spegnerlo del tutto e non cambia nulla.
 - *Impostazioni › Sistema › Dischi e partizioni* è un piccolo gestore delle partizioni: creare una partizione
   FAT32, formattare, ridurre o allargare NTFS/FAT32/exFAT, eliminare.
 - La 4.4 beta è una versione preliminare: scaricala dalla
@@ -408,10 +409,11 @@ aiuta altri scrittori a scegliere un portatile.
 <details>
 <summary><b>Cancellerà il mio computer o la mia chiavetta?</b></summary>
 
-No. Avviato dalla chiavetta USB, FolioOS non scrive mai sul disco interno, e installarlo sulla chiavetta aggiunge
-solo file: quello che c’era resta. Togli la chiavetta e il PC riavvia il suo sistema di sempre.
-Il disco viene toccato solo se apri tu l’installer o *Dischi e partizioni*, e anche allora non si scrive nulla
-prima che tu confermi e che la tabella delle partizioni sia salvata sull’unità da cui è partito FolioOS.
+No. Avviato dalla chiavetta USB, FolioOS scrive sul disco interno solo quando glielo chiedi tu: salvare un testo
+su uno dei suoi volumi scrive quel file, e solo l’installer e *Dischi e partizioni* cambiano le partizioni;
+anche allora non si scrive nulla prima che tu confermi e che la tabella delle partizioni sia salvata sull’unità
+da cui è partito FolioOS. Installarlo sulla chiavetta aggiunge solo file: quello che c’era resta. Togli la
+chiavetta e il PC riavvia il suo sistema di sempre.
 </details>
 
 <details>
@@ -419,7 +421,7 @@ prima che tu confermi e che la tabella delle partizioni sia salvata sull’unit�
 
 Sì, dalla 4.4 (beta): **Ctrl+K › Installa FolioOS su questo computer**. Usa lo spazio libero, oppure riduce
 una partizione NTFS, FAT32 o exFAT senza spostare dati, e a ogni avvio scegli FolioOS o l’altro sistema.
-Disinstallando, la partizione che l’installer ha ridotto torna a crescere (altrimenti lo spazio diventa libero). Vedi [Installalo sul computer](#15-install-it-on-the-computer-beta).
+Disinstallando, la partizione che l’installer ha ridotto torna a crescere se lo spazio dopo di essa è ancora libero (altrimenti lo spazio diventa libero). Vedi [Installalo sul computer](#15-install-it-on-the-computer-beta).
 </details>
 
 <details>
