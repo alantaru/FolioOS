@@ -38,7 +38,10 @@ $matrix = @(
     @{ name = "bios-pc-cirrus-ide-ich9";  sys = "x86_64";  fw = "bios"; machine = "pc";   vga = "-vga cirrus";            input = "ps2";    audio = "ich9"; disk = "ide" },
     # installed on the computer's own disk (no USB drive): GPT on a SATA disk with UEFI, MBR on an IDE disk with BIOS
     @{ name = "inst-uefi-q35-sata";       sys = "x86_64";  fw = "uefi64"; machine = "q35"; vga = "-vga std";              input = "ps2";    audio = "hda";  disk = "sata"; src = "inst-uefi"; extra = "nvme" },
-    @{ name = "inst-bios-pc-ide";         sys = "x86_64";  fw = "bios"; machine = "pc";   vga = "-vga std";               input = "ps2";    audio = "ac97"; disk = "ide";  src = "inst-bios"; extra = "ide" }
+    @{ name = "inst-bios-pc-ide";         sys = "x86_64";  fw = "bios"; machine = "pc";   vga = "-vga std";               input = "ps2";    audio = "ac97"; disk = "ide";  src = "inst-bios"; extra = "ide" },
+    # keep proportions: a 4:3 mode (1024x768) on a 16:9 panel, drawn at 1024x576 and stretched to the mode (UEFI GOP and BIOS VBE)
+    @{ name = "aspect-uefi-q35-std";      sys = "x86_64";  fw = "uefi64"; machine = "q35"; vga = "-vga std";              input = "ps2";    audio = "none"; ini = "resolution=1024x768`r`nkeep_aspect=16:9"; aspect = "1024x576" },
+    @{ name = "aspect-bios-pc-std";       sys = "i386";    fw = "bios"; machine = "pc";   vga = "-vga std";               input = "ps2";    audio = "none"; ini = "resolution=1024x768`r`nkeep_aspect=16:9"; aspect = "1024x576" }
 )
 if ($List) { $matrix | ForEach-Object { "{0,-26} {1,-7} {2,-6} {3}  input={4} audio={5}" -f $_.name, $_.fw, $_.machine, $_.vga, $_.input, $_.audio }; return }
 
@@ -156,6 +159,13 @@ foreach ($m in $matrix) {
     $dir = "$lab\$($m.name)"; if (Test-Path $dir) { Remove-Item -Recurse -Force $dir }; New-Item -ItemType Directory $dir | Out-Null
     if ($m.src -and -not (Test-Path "$lab\$($m.src).img")) { continue }     # installer test images need build\install_test.exe
     $img = "$dir\disk.img"; Copy-Item $(if ($m.src) { "$lab\$($m.src).img" } else { "$lab\base.img" }) $img
+    if ($m.ini) {                                 # its own drive: the test CONFIG.INI plus this configuration's settings
+        $st2 = "$dir\drive"; Copy-Item -Recurse $stage $st2
+        Add-Content -Encoding ascii "$st2\FOLIO\CONFIG.INI" $m.ini
+        & .\build\mkimg.exe $st2 $img 256 | Out-Null; if ($LASTEXITCODE -ne 0) { throw "mkimg failed" }
+        if (Test-Path build\biosboot.exe) { & .\build\biosboot.exe $img | Out-Null }
+        Remove-Item -Recurse -Force $st2
+    }
     $wav = (Resolve-Path $dir).Path + "\audio.wav"
     $port++
     $exe = "$QemuDir\qemu-system-$($m.sys).exe"
@@ -256,6 +266,11 @@ foreach ($m in $matrix) {
         $d = Get-Content -Raw -Encoding UTF8 "$dir\DIAGNOSTICS.TXT"
         $r.diag = "OK"
         $v = [regex]::Match($d, "in use:[^\r\n]*"); if ($v.Success) { $r.video = $v.Value.Substring(7).Trim() }
+        if ($m.aspect) {                         # keep proportions: drawn at the panel's shape, the picture still fills the 1024x768 mode
+            $sh = if (Test-Path "$dir\01-editor.png") { Read-Shot "$dir\01-editor.png" } else { $null }
+            $ok = $d -match "keep proportions: drawn at $($m.aspect), stretched to 1024x768" -and $d -match "logical screen $($m.aspect)" -and $sh -and $sh.w -eq 1024 -and $sh.h -eq 768 -and $sh.dark -lt 0.05
+            $r.video = $(if ($ok) { "OK keep proportions $($m.aspect) -> 1024x768" } else { "FAIL keep proportions: $($r.video)" })
+        }
         # disks: the one FolioOS started from must be recognised, with its FAT32 volume
         $dk = [regex]::Match($d, "== Disks \((\d+) found\)")
         $want = if ($m.extra) { 2 } else { 1 }

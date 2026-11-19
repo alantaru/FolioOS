@@ -82,6 +82,11 @@ DISPLAY
    resolution and rotate the screen. Ctrl+Alt+arrows rotate; Ctrl+Alt+Home goes
    back to automatic. In CONFIG.INI: resolution=auto (or 1920x1080, or max),
    rotation=auto (or 0, 90, 180, 270), fast_video=0 if the picture glitches.
+   If circles look like ovals (the computer only offers, say, 1024x768 and the
+   screen stretches it to widescreen), choose the shape of your screen in
+   Settings > System (Monitor, 16:9, 16:10 or 4:3): FolioOS then draws at that
+   shape and the stretching evens out. CONFIG.INI: keep_aspect=off (or monitor,
+   16:9, 16:10, 4:3). Ctrl+Alt+Home turns it off again.
    If the PC shows nothing: very old graphics cards (before ~2012) may only work
    in BIOS mode - make the drive start in BIOS mode as explained in 1).
 

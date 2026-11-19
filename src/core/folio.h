@@ -423,6 +423,8 @@ int  pal_rotation(void);                 /* rotação em uso, 0..3 */
 void pal_set_video_mode(const char *pref);   /* "" automática, "max" ou "LxA" */
 void pal_video_mode(int *w, int *h);     /* modo físico em uso */
 int  pal_video_modes(int *ws, int *hs, int max);
+void pal_set_aspect(int w, int h);       /* proporção do painel quando o monitor estica a imagem: 0 desligado, -1 a do monitor (EDID), senão w:h */
+void pal_video_apply(void);              /* aplica já as mudanças de vídeo pendentes (só fora de um quadro) */
 float pal_display_dpi(void);             /* 0 se o monitor não informar o tamanho */            /* framebuffer em write-combining (MTRR) */
 
 /* ======================================================================
@@ -622,6 +624,7 @@ typedef struct {
     bool  video_fast;        /* vídeo em write-combining */
     int   rotation;          /* 0 automática, 1..4 = 0°, 90°, 180°, 270° */
     char  video_mode[16];    /* "" automática (nativa), "max" ou "LxA" */
+    int   aspect;            /* manter proporção: 0 desligado, 1 a do monitor, 2 16:9, 3 16:10, 4 4:3 */
     bool  shuffle, repeat;
     char  last_path[512]; int last_vol; int last_p, last_o;
     int   today_date, today_words;  /* palavras escritas hoje (antes da sessão atual) */

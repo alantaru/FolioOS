@@ -72,6 +72,8 @@ void pal_power(int a) {
  *  - framebuffer inválido (endereço, tamanho, linha) ou acima de 4 GB no modo 32 bits: Blt;
  *  - tela girada (tablets com painel em retrato): rotação automática, 0/90/180/270 nos ajustes
  *    ou Ctrl+Alt+setas; toque é convertido junto;
+ *  - manter proporção (ajuste): quando o modo tem outra proporção que o painel e o monitor estica
+ *    a imagem, o app desenha numa tela lógica com a proporção do painel, reamostrada para o modo;
  *  - escala automática pelo tamanho físico (DPI) informado pelo EDID. */
 static EFI_GUID uga_guid   = { 0x982c298b, 0xf4fa, 0x41cb, { 0xb8, 0x38, 0x77, 0xaa, 0x68, 0x8f, 0xb8, 0x39 } };
 static EFI_GUID edidd_guid = { 0x1c0c34f6, 0xd380, 0x41fa, { 0xa0, 0x49, 0x8a, 0xd0, 0x6c, 0x1a, 0x66, 0xaa } };
@@ -79,6 +81,9 @@ static EFI_GRAPHICS_OUTPUT_PROTOCOL *gop;
 static EFI_UGA_DRAW_PROTOCOL *uga;
 static Surface screen;
 static int pw, ph;                    /* tamanho físico do modo */
+static int rw, rh;                    /* tela antes da reamostragem (orientação física): = pw×ph sem "manter proporção" */
+static int asp_w, asp_h; static bool pending_asp;   /* proporção pedida: 0 nenhuma, -1 a do monitor */
+static usize tmp_cap;
 static int rot, rot_pref;             /* rotação em uso (0..3 × 90° horário); preferência 0 = automática, 1..4 */
 static int fb_format; static u32 *fb; static u32 fb_stride; static int fb_bpp = 4;
 static u32 *shadow, *tmp;
@@ -218,21 +223,39 @@ static bool video_setup(void) {
     fb_format = format;
     fb = format == PixelBltOnly ? 0 : (u32 *)(uintptr_t)base;
     fb_stride = stride;
+    /* manter proporção: a tela lógica fica com a proporção do painel e cabe no modo (só amplia) */
+    rw = pw; rh = ph;
+    {
+        int tw = asp_w, th = asp_h;
+        if (tw < 0) { if (edid_ok) { tw = edid_w; th = edid_h; } else { tw = 16; th = 9; } }
+        if (tw > 0 && th > 0) {
+            if ((pw >= ph) != (tw >= th)) { int t = tw; tw = th; th = t; }
+            u64 a = (u64)pw * (u64)th, b = (u64)ph * (u64)tw;
+            if (a + b / 100 < b) rh = (int)((u64)pw * (u64)th / (u64)tw);          /* modo mais "alto" que o painel */
+            else if (a > b + b / 100) rw = (int)((u64)ph * (u64)tw / (u64)th);     /* modo mais largo que o painel */
+            rw = CLAMP(rw, 320, pw); rh = CLAMP(rh, 200, ph);
+        }
+    }
     rot = rot_pref ? rot_pref - 1 : (ph > pw ? 1 : 0);    /* painel em retrato (tablet): deita a imagem */
-    int lw = (rot & 1) ? ph : pw, lh = (rot & 1) ? pw : ph;
+    int lw = (rot & 1) ? rh : rw, lh = (rot & 1) ? rw : rh;
     if (screen.w != lw || screen.h != lh || !screen.px) {
-        mem_free(screen.px); mem_free(shadow); mem_free(tmp);
+        mem_free(screen.px); mem_free(shadow);
         screen.w = lw; screen.h = lh; screen.stride = lw;
         screen.px = mem_alloc(sizeof(u32) * (usize)lw * lh);
         shadow = mem_alloc(sizeof(u32) * (usize)lw * lh);       /* cópia do que está na tela: só o que mudou é enviado */
-        tmp = mem_alloc(sizeof(u32) * 64 * (usize)MAX(pw, ph));
-        if (!screen.px || !tmp) return false;
+        if (!screen.px) return false;
         memset(screen.px, 0, sizeof(u32) * (usize)lw * lh);
+    }
+    if (tmp_cap < 64 * (usize)MAX(pw, ph)) {                  /* 64 linhas físicas */
+        mem_free(tmp); tmp_cap = 64 * (usize)MAX(pw, ph);
+        tmp = mem_alloc(sizeof(u32) * tmp_cap);
+        if (!tmp) { tmp_cap = 0; return false; }
     }
     if (shadow) for (usize k = 0, n = (usize)lw * lh; k < n; k++) shadow[k] = 0x5A5A5A5Au;
     static const char *fn[] = { "RGB", "BGR", "bit mask", "Blt only" };
     VL("  in use: %dx%d · %s%s%s · %d bytes/pixel · stride %d px · rotation %d°\r\n", pw, ph, uga ? "UGA " : "", fn[fb_format & 3],
        "", fb_bpp, (int)fb_stride, rot * 90);
+    if (rw != pw || rh != ph) VL("  keep proportions: drawn at %dx%d, stretched to %dx%d\r\n", rw, rh, pw, ph);
     return true;
 }
 
@@ -247,7 +270,7 @@ float pal_display_dpi(void) {
     if (!edid_ok || edid_mmw <= 0 || edid_mmh <= 0) return 0;
     bool same = (pw >= ph) == (edid_w >= edid_h);
     float mm = (float)(same ? edid_mmw : edid_mmh);
-    return (float)pw / (mm / 25.4f);
+    return (float)rw / (mm / 25.4f);
 }
 
 /* ------------------------------------------------------------ memória de vídeo em write-combining
@@ -463,8 +486,10 @@ static void blt_out(u32 *buf, int x, int y, int w, int h) {
     else if (uga) uga->Blt(uga, buf, EfiUgaBltBufferToVideo, 0, 0, (UINTN)x, (UINTN)y, (UINTN)w, (UINTN)h, (UINTN)w * 4);
 }
 /* envia um retângulo lógico (no máximo 64 linhas) girando e convertendo o formato conforme preciso */
+static void emit_scaled(int lx0, int ly0, int lx1, int ly1);
 static void emit_rect(int lx0, int ly0, int lx1, int ly1) {
     if (lx1 <= lx0 || ly1 <= ly0) return;
+    if (rw != pw || rh != ph) { emit_scaled(lx0, ly0, lx1, ly1); return; }
     if (shadow) for (int y = ly0; y < ly1; y++) memcpy(shadow + (usize)y * screen.w + lx0, screen.px + (usize)y * screen.stride + lx0, (usize)(lx1 - lx0) * 4);
     int X0, Y0, w, h;
     switch (rot) {
@@ -489,11 +514,69 @@ static void emit_rect(int lx0, int ly0, int lx1, int ly1) {
     if (!direct) blt_out(tmp, X0, Y0, w, h);
     present_px += (u64)w * (u64)h;
 }
+/* "manter proporção": a tela lógica (rw×rh depois da rotação) é ampliada para o modo pw×ph com
+ * interpolação linear; numa das direções a escala é 1, então na prática só uma direção interpola */
+static inline u32 rot_px(int x, int y) {                       /* pixel (x, y) da tela já girada, rw×rh */
+    const u32 *S = screen.px; usize ss = (usize)screen.stride;
+    switch (rot) {
+    case 0:  return S[(usize)y * ss + (usize)x];
+    case 1:  return S[(usize)(rw - 1 - x) * ss + (usize)y];
+    case 2:  return S[(usize)(rh - 1 - y) * ss + (usize)(rw - 1 - x)];
+    default: return S[(usize)x * ss + (usize)(rh - 1 - y)];
+    }
+}
+static inline u32 lerp_px(u32 a, u32 b, u32 f) {               /* f em 0..256 */
+    if (a == b || !f) return a;
+    u32 rb = ((a & 0xFF00FF) * (256 - f) + (b & 0xFF00FF) * f) >> 8 & 0xFF00FF;
+    u32 g = ((a & 0x00FF00) * (256 - f) + (b & 0x00FF00) * f) >> 8 & 0x00FF00;
+    return rb | g;
+}
+/* centro do pixel físico i (de n) na escala da tela lógica (de m), em 1/256 de pixel */
+static inline int src_pos(int i, int n, int m) {
+    int v = (int)(((2 * (i64)i + 1) * m * 256) / (2 * (i64)n)) - 128;
+    return CLAMP(v, 0, (m - 1) * 256);
+}
+static void emit_scaled(int lx0, int ly0, int lx1, int ly1) {
+    if (lx1 <= lx0 || ly1 <= ly0) return;
+    if (shadow) for (int y = ly0; y < ly1; y++) memcpy(shadow + (usize)y * screen.w + lx0, screen.px + (usize)y * screen.stride + lx0, (usize)(lx1 - lx0) * 4);
+    int a0, b0, a1, b1;                                          /* o retângulo na tela girada */
+    switch (rot) {
+    case 0:  a0 = lx0;      b0 = ly0;      a1 = lx1;      b1 = ly1;      break;
+    case 1:  a0 = rw - ly1; b0 = lx0;      a1 = rw - ly0; b1 = lx1;      break;
+    case 2:  a0 = rw - lx1; b0 = rh - ly1; a1 = rw - lx0; b1 = rh - ly0; break;
+    default: a0 = ly0;      b0 = rh - lx1; a1 = ly1;      b1 = rh - lx0; break;
+    }
+    /* pixels físicos que dependem dele (a interpolação lê um vizinho de cada lado) */
+    int X0 = (int)((i64)(a0 - 1) * pw / rw), X1 = (int)(((i64)(a1 + 1) * pw + rw - 1) / rw);
+    int Y0 = (int)((i64)(b0 - 1) * ph / rh), Y1 = (int)(((i64)(b1 + 1) * ph + rh - 1) / rh);
+    X0 = CLAMP(X0, 0, pw); X1 = CLAMP(X1, X0, pw); Y0 = CLAMP(Y0, 0, ph); Y1 = CLAMP(Y1, Y0, ph);
+    int w = X1 - X0;
+    if (w <= 0 || Y1 <= Y0) return;
+    static int xs[8192]; static u16 xf[8192];
+    for (int i = 0; i < w; i++) { int p = src_pos(X0 + i, pw, rw); xs[i] = p >> 8; xf[i] = (u16)(p & 255); }
+    bool direct = fb_format != PixelBltOnly;
+    for (int Yc = Y0; Yc < Y1; Yc += 64) {
+        int hc = MIN(64, Y1 - Yc);
+        for (int j = 0; j < hc; j++) {
+            int Y = Yc + j, p = src_pos(Y, ph, rh), y0 = p >> 8, fy = p & 255, y1 = MIN(y0 + 1, rh - 1);
+            u32 *row = direct ? tmp : tmp + (usize)j * (usize)w;
+            for (int i = 0; i < w; i++) {
+                int x0 = xs[i], x1 = MIN(x0 + 1, rw - 1);
+                u32 t = lerp_px(rot_px(x0, y0), rot_px(x1, y0), xf[i]);
+                if (fy) t = lerp_px(t, lerp_px(rot_px(x0, y1), rot_px(x1, y1), xf[i]), (u32)fy);
+                row[i] = t;
+            }
+            if (direct) fb_write_row(X0, Y, row, w);
+        }
+        if (!direct) blt_out(tmp, X0, Yc, w, hc);
+    }
+    present_px += (u64)w * (u64)(Y1 - Y0);
+}
 void pal_present(Rect r) {
     r = rect_clip(r, rect(0, 0, screen.w, screen.h));
     if (r.w <= 0 || r.h <= 0 || (!gop && !uga) || !tmp) return;
     u64 t0 = rdtsc();
-    bool fast = rot == 0 && fb_format == PixelBlueGreenRedReserved8BitPerColor && shadow;
+    bool fast = rot == 0 && fb_format == PixelBlueGreenRedReserved8BitPerColor && shadow && rw == pw && rh == ph;
     if (!shadow) {
         for (int y = r.y; y < r.y + r.h; y += 64) emit_rect(r.x, y, r.x + r.w, MIN(y + 64, r.y + r.h));
     } else {
@@ -546,6 +629,7 @@ static void apply_pending(void);
 void pal_set_rotation(int pref) { pref = CLAMP(pref, 0, 4); if (pref != rot_pref) pending_rot = pref; if (!present_n) apply_pending(); }
 int  pal_rotation(void) { return rot; }
 void pal_set_video_mode(const char *pref) { str_copy(mode_pref, pref ? pref : "", sizeof mode_pref); pending_mode = true; if (!present_n) apply_pending(); }
+void pal_set_aspect(int w, int h) { if (w != asp_w || h != asp_h) { asp_w = w; asp_h = h; pending_asp = true; } if (!present_n) apply_pending(); }
 void pal_video_mode(int *w, int *h) { *w = pw; *h = ph; }
 /* modos utilizáveis, do maior para o menor, sem repetições */
 int pal_video_modes(int *ws, int *hs, int max) {
@@ -856,7 +940,8 @@ static void poll_keys(void) {
 
 /* rotação/resolução pedidas nos ajustes: aplicadas aqui, entre um quadro e outro */
 static void apply_pending(void) {
-    if (pending_rot < 0 && !pending_mode) return;
+    if (pending_rot < 0 && !pending_mode && !pending_asp) return;
+    pending_asp = false;
     if (pending_rot >= 0) { rot_pref = pending_rot; pending_rot = -1; }
     if (pending_mode) { pending_mode = false; pick_mode(); }
     if (!video_setup()) return;
@@ -864,6 +949,7 @@ static void apply_pending(void) {
     mx = CLAMP(mx, 0.0f, (float)(screen.w - 1)); my = CLAMP(my, 0.0f, (float)(screen.h - 1));
     emit_move();                               /* acorda o laço principal para redesenhar */
 }
+void pal_video_apply(void) { apply_pending(); }
 bool pal_poll(Event *e) {
     apply_pending();
     if (qh == qt) { poll_keys(); poll_pointers(); }

@@ -1088,10 +1088,17 @@ static void app_write_diag(bool notify) {
 
 void app_save_diag(void) { app_write_diag(false); }
 
+/* manter proporção: o que o ajuste pede à PAL */
+static void app_apply_aspect(void) {
+    static const int aw[5] = { 0, -1, 16, 16, 4 }, ah[5] = { 0, -1, 9, 10, 3 };
+    int a = CLAMP(prefs.aspect, 0, 4);
+    pal_set_aspect(aw[a], ah[a]);
+}
+
 /* volta à resolução e rotação automáticas (atalho Ctrl+Alt+Home, útil se a imagem sumir) */
 static void app_video_reset(void) {
-    prefs.rotation = 0; prefs.video_mode[0] = 0;
-    pal_set_rotation(0); pal_set_video_mode("");
+    prefs.rotation = 0; prefs.video_mode[0] = 0; prefs.aspect = 0;
+    pal_set_rotation(0); pal_set_video_mode(""); pal_set_aspect(0, 0);
     prefs_save();
     ui_toast(L("Display restored: automatic resolution and rotation"));
 }
@@ -1254,6 +1261,12 @@ static void settings_body(Window *w, Rect r) {
             }
             if (ui_button(rect(cur.x + wd - SI(150), cur.y, SI(150), SI(38)), L("Restore display"), BTN_GHOST)) app_video_reset();
             cur.y += SI(46);
+            /* manter proporção: quando o modo de vídeo tem outra proporção que o painel e o monitor estica a imagem */
+            const char *as[] = { L("Proportions: off"), L("Monitor"), "16:9", "16:10", "4:3" };
+            if (ui_segmented(rect(cur.x, cur.y, wd, SI(38)), as, 5, &prefs.aspect)) { app_apply_aspect(); prefs_save(); }
+            cur.y += SI(46);
+            draw_text(f, S(12.5f), cur.x, cur.y + S(12), L("If circles look like ovals, choose the shape of your screen."), -1, col_alpha(T->panel_text, 0.5f));
+            cur.y += SI(30);
             draw_text(f, S(12.5f), cur.x, cur.y + S(12), L("If the picture looks wrong or goes black: Ctrl+Alt+Home restores it; Ctrl+Alt+arrows rotate the screen."), -1, col_alpha(T->panel_text, 0.5f));
             cur.y += SI(34);
         }
@@ -2171,6 +2184,8 @@ void app_init(void) {
     pal_audio_set_gpio(prefs.audio_gpio);
     if (prefs.rotation) pal_set_rotation(prefs.rotation);
     if (prefs.video_mode[0]) pal_set_video_mode(prefs.video_mode);
+    if (prefs.aspect) app_apply_aspect();
+    pal_video_apply();                   /* antes do DIAGNOSTICS.TXT, que mostra a tela em uso */
     pal_video_fast(prefs.video_fast);
     pal_audio_probe();
     doc_init(&app.doc);

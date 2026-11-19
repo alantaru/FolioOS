@@ -121,6 +121,11 @@ TELA
    a tela. Atalhos: Ctrl+Alt+setas giram; Ctrl+Alt+Home volta ao automático
    (use se a imagem ficar errada). No CONFIG.INI: resolution=auto (ou 1920x1080,
    ou max), rotation=auto (ou 0, 90, 180, 270), fast_video=0 se a imagem falhar.
+   Se os círculos parecerem ovais (o computador só oferece, por exemplo,
+   1024x768 e a tela estica para widescreen), escolha o formato da sua tela em
+   Ajustes > Sistema (Monitor, 16:9, 16:10 ou 4:3): o FOLIO passa a desenhar
+   nesse formato e o esticamento se compensa. CONFIG.INI: keep_aspect=off (ou
+   monitor, 16:9, 16:10, 4:3). Ctrl+Alt+Home desliga de novo.
    Se o PC não mostrar nada: placas de vídeo muito antigas (antes de ~2012) podem
    só funcionar no modo BIOS - prepare o pen-drive para o modo BIOS como no item 1).
 

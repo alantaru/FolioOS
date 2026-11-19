@@ -119,6 +119,7 @@ void prefs_load(void) {
         else if (str_eq(k, "fast_video")) prefs.video_fast = bv;
         else if (str_eq(k, "rotation")) prefs.rotation = str_ieq(v, "auto") ? 0 : iv == 0 && v[0] == '0' ? 1 : iv == 90 ? 2 : iv == 180 ? 3 : iv == 270 ? 4 : 0;
         else if (str_eq(k, "resolution")) str_copy(prefs.video_mode, str_ieq(v, "auto") ? "" : v, sizeof prefs.video_mode);
+        else if (str_eq(k, "keep_aspect")) prefs.aspect = str_ieq(v, "monitor") ? 1 : str_eq(v, "16:9") ? 2 : str_eq(v, "16:10") ? 3 : str_eq(v, "4:3") ? 4 : 0;
         else if (str_eq(k, "shuffle")) prefs.shuffle = bv;
         else if (str_eq(k, "repeat")) prefs.repeat = bv;
         else if (str_eq(k, "last_file")) str_copy(prefs.last_path, v, sizeof prefs.last_path);
@@ -182,6 +183,8 @@ void prefs_save(void) {
     {
         static const char *rn[5] = { "auto", "0", "90", "180", "270" };
         buf_printf(&b, "rotation=%s\r\nresolution=%s\r\n", rn[CLAMP(prefs.rotation, 0, 4)], prefs.video_mode[0] ? prefs.video_mode : "auto");
+        static const char *an[5] = { "off", "monitor", "16:9", "16:10", "4:3" };
+        buf_printf(&b, "keep_aspect=%s\r\n", an[CLAMP(prefs.aspect, 0, 4)]);
     }
     if (app.has_path) {
         buf_printf(&b, "last_file=%s\r\nlast_volume=%d\r\nlast_paragraph=%d\r\nlast_column=%d\r\n", app.path, app.vol, preview_top_para(), preview_active() ? 0 : app.caret.o);

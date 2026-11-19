@@ -268,8 +268,23 @@ if (-not $NoTests) {
         Fresh; Run .\build\efi_host.exe (@("build\efi\BOOTX64.EFI", "--root", $t, "--script", $vs, "--out", "build\shots") + $g) | Out-Null
         if (-not (Select-String -Quiet -Path "$t\FOLIO\DIAGNOSTICS.TXT" -Pattern "in use: ")) { throw "video $($g -join ' '): no output configured" }
     }
+    # keep proportions: a 4:3 mode on a 16:9 panel is drawn at 1024x576 and stretched to the mode
+    # (framebuffer, Blt only, rotated); "monitor" with an EDID that matches the mode changes nothing
+    foreach ($g in @(@(), @("--gop", "blt"), @("--gop", "mask16"))) {
+        foreach ($r in @("auto", "90")) {
+            Fresh; Set-Content -Encoding ascii "$t\FOLIO\CONFIG.INI" "keep_aspect=16:9`r`nrotation=$r`r`n"
+            Run .\build\efi_host.exe (@("build\efi\BOOTX64.EFI", "--root", $t, "--script", $vs, "--out", "build\shots", "--size", "1024x768") + $g) | Out-Null
+            if (-not (Select-String -Quiet -Path "$t\FOLIO\DIAGNOSTICS.TXT" -Pattern "keep proportions: drawn at 1024x576, stretched to 1024x768")) { throw "keep proportions $($g -join ' ') rotation $r`: not applied" }
+            $ls = if ($r -eq "90") { "screen 576x1024" } else { "screen 1024x576" }
+            if (-not (Select-String -Quiet -Path "$t\FOLIO\DIAGNOSTICS.TXT" -Pattern "logical $ls")) { throw "keep proportions $($g -join ' ') rotation $r`: logical screen is not $ls" }
+        }
+    }
+    Copy-Item build\shots\v.png build\shots\proporcao.png
+    Fresh; Set-Content -Encoding ascii "$t\FOLIO\CONFIG.INI" "keep_aspect=monitor`r`n"
+    Run .\build\efi_host.exe @("build\efi\BOOTX64.EFI", "--root", $t, "--script", $vs, "--out", "build\shots", "--size", "1024x768", "--edid") | Out-Null
+    if (Select-String -Quiet -Path "$t\FOLIO\DIAGNOSTICS.TXT" -Pattern "keep proportions") { throw "keep proportions: changed the picture although the mode matches the monitor" }
     Remove-Item $vs
-    Ok "video: RGB, 16-bit mask, Blt only, padded stride, UGA, rotated portrait - OK"
+    Ok "video: RGB, 16-bit mask, Blt only, padded stride, UGA, rotated portrait; keep proportions (4:3 mode on 16:9) - OK"
     # FAT32 driver of the BIOS bridge: random create/write/truncate/rename/delete vs. a model, then a full volume check
     if (Test-Path build\fat32_test.exe) {
         Run gcc @("-O2", "-Wall", "tools\mkimg.c", "-o", "build\mkimg.exe")
