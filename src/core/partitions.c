@@ -11,7 +11,7 @@
 enum { PS_LIST, PS_CREATE, PS_RESIZE, PS_FORMAT, PS_DELETE, PS_WORKING };
 #define PD 16
 #define PR 48
-typedef struct { int d; bool free; int part; u64 start, count; } Row;        /* uma linha: partição ou espaço livre */
+typedef struct { int d; bool free, none; int part; u64 start, count; } Row;        /* uma linha: partição ou espaço livre */
 static struct { int k; DiskInfo di; char why[96]; } dsk[PD];
 static int ndsk;
 static PartTable tab[PD];                                                     /* a tabela de cada disco, como foi lida */
@@ -56,10 +56,13 @@ static void scan(void) {
         while ((pi < t->n || fi < nf) && count < PR && nrows < PD * PR) {
             bool take_free = fi < nf && (pi >= t->n || fr[fi].start < t->p[order[pi]].start);
             Row *rw = &rows[nrows++]; rw->d = d;
+            rw->none = false;
             if (take_free) { rw->free = true; rw->part = -1; rw->start = fr[fi].start; rw->count = fr[fi].count; fi++; }
             else { rw->free = false; rw->part = order[pi]; rw->start = t->p[order[pi]].start; rw->count = t->p[order[pi]].count; pi++; }
             count++;
         }
+        /* um disco sem nenhuma linha (tabela ilegível ou travada sem partições) continua na lista, com o motivo */
+        if (!count && nrows < PD * PR) { Row *rw = &rows[nrows++]; rw->d = d; rw->none = true; rw->free = false; rw->part = -1; rw->start = rw->count = 0; }
     }
     if (cur >= nrows) cur = nrows - 1;
     if (cur < 0 && nrows) cur = 0;
@@ -132,6 +135,7 @@ static void disk_title(int d, char *o, int cap) {
 }
 static void row_text(const Row *rw, char *o, int cap) {
     char sz[24]; disk_size_text(rw->count * 512, sz, sizeof sz);
+    if (rw->none) { str_copy(o, dsk[rw->d].why[0] ? dsk[rw->d].why : L("Empty: no partitions"), cap); return; }
     if (rw->free) { fmt(o, cap, L("Free space · %s"), sz); return; }
     PartTable *t = &tab[rw->d]; Part *p = &t->p[rw->part];
     const char *ty = part_type_name(p, t->scheme), *fs = part_fs_name(p->fs);
@@ -184,7 +188,7 @@ static void parts_body(Window *w, Rect r) {
             y += S(36);
         }
         /* as ações do item escolhido */
-        if (cur >= 0 && cur < nrows && !dsk[rows[cur].d].why[0]) {
+        if (cur >= 0 && cur < nrows && !dsk[rows[cur].d].why[0] && !rows[cur].none) {
             Row *rw = &rows[cur]; int bx = x;
             if (rw->free) {
                 if (rw->count * 512 >= (64ull << 20) && ui_button(rect(bx, by, SI(240), SI(40)), L("Create a FAT32 partition"), BTN_PRIMARY)) {

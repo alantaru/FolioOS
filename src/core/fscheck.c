@@ -774,7 +774,10 @@ void fs_check(const BlkDev *d, const Part *p, FsCheck *o) {
         if (p->fs == FS_FAT32) { u32 e1 = rd32(fat + 4); dirty = !(e1 & 0x08000000u) || !(e1 & 0x04000000u) || (b[0x41] & 1); }
         else { u16 e1 = rd16(fat + 2); dirty = !(e1 & 0x8000) || !(e1 & 0x4000) || (b[0x25] & 1); }
         o->verdict = dirty ? SAFE_DIRTY : SAFE_OK;
-        if (!dirty && p->fs == FS_FAT32) o->min_bytes = fat32_min_sectors(d, p->start) * d->bs;
+        /* sem espelhamento, o driver FAT32 do FolioOS (que aloca pela FAT 0) não pode gravar ali: o estado acima vale
+         * como diagnóstico, mas o volume não é liberado (nem para \EFI\FolioOS numa partição EFI, nem para redimensionar) */
+        if (!dirty && p->fs == FS_FAT32 && (rd16(b + 40) & 0x80)) o->verdict = SAFE_UNSUPPORTED;
+        if (o->verdict == SAFE_OK && p->fs == FS_FAT32) o->min_bytes = fat32_min_sectors(d, p->start) * d->bs;
         return;
     }
     case FS_EXT: {

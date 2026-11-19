@@ -353,6 +353,8 @@ static int fat32_cycle(const char *path) {
         static u8 bb[512]; d.rw(0, p->start, 1, bb, false);
         bb[40] |= 0x80; bb[40] = (u8)((bb[40] & 0xF0) | 1); d.rw(0, p->start, 1, bb, true);   /* espelhamento desligado, FAT 1 ativa */
         CHECK(fat32_min_sectors(&d, p->start) == 0 && fat32_max_sectors(&d, p->start) == 0, "fat32: sem espelhamento devia impedir redimensionar");
+        { static FsCheck fc; fs_check(&d, p, &fc);                        /* nem liberado para gravar (ex.: \EFI\FolioOS numa EFI assim) */
+          CHECK(fc.verdict == SAFE_UNSUPPORTED && !fc.min_bytes, "fat32: sem espelhamento: veredito %d (devia ser 'não suportado')", fc.verdict); }
         _fseeki64(ff, (long long)(p->start * 512), SEEK_SET); if (fread(now, 1, vb, ff) != vb) return 2;
         int rc2 = fat32_resize(&d, p->start, p->count, mn + 8 * 1024);
         CHECK(rc2 == NTFS_SHRINK_UNREADABLE, "fat32: sem espelhamento: rc %d", rc2);

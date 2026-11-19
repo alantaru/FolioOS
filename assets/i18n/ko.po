@@ -1193,7 +1193,7 @@ msgstr "테마 저장"
 msgid "Cancel"
 msgstr "취소"
 
-#: src/core/app.c:1601 src/core/app.c:1602 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:204 src/core/partitions.c:243
+#: src/core/app.c:1601 src/core/app.c:1602 src/core/filedlg.c:57 src/core/filedlg.c:315 src/core/filedlg.c:318 src/core/filedlg.c:318 src/core/partitions.c:208 src/core/partitions.c:247
 msgid "Delete"
 msgstr "삭제"
 
@@ -1957,7 +1957,7 @@ msgstr "“%s” 폴더와 그 안의 모든 내용을 삭제할까요? 되돌�
 msgid "Delete \"%s\"? This cannot be undone."
 msgstr "“%s”을(를) 삭제할까요? 되돌릴 수 없습니다."
 
-#: src/core/filedlg.c:327 src/core/partitions.c:224
+#: src/core/filedlg.c:327 src/core/partitions.c:228
 msgid "Size"
 msgstr "크기"
 
@@ -1995,79 +1995,79 @@ msgstr[0] "항목 %d개"
 msgid "Open"
 msgstr "열기"
 
-#: src/core/fscheck.c:812
+#: src/core/fscheck.c:815
 msgid "This partition is encrypted with BitLocker. To make room, shrink it in Windows (Disk Management, Shrink Volume) or turn BitLocker off first."
 msgstr "이 파티션은 BitLocker로 암호화되어 있습니다. 공간을 만들려면 Windows에서 축소하거나(디스크 관리, 볼륨 축소) 먼저 BitLocker를 끄세요."
 
-#: src/core/fscheck.c:813
+#: src/core/fscheck.c:816
 msgid "This partition is encrypted (LUKS). To make room, shrink it from Linux with the encryption tools."
 msgstr "이 파티션은 암호화되어 있습니다(LUKS). 공간을 만들려면 Linux에서 암호화 도구로 축소하세요."
 
-#: src/core/fscheck.c:814
+#: src/core/fscheck.c:817
 msgid "This partition holds LVM volumes. To make room, shrink them from Linux (lvreduce, then pvresize)."
 msgstr "이 파티션에는 LVM 볼륨이 있습니다. 공간을 만들려면 Linux에서 축소하세요(lvreduce 다음 pvresize)."
 
-#: src/core/fscheck.c:815
+#: src/core/fscheck.c:818
 msgid "This is a Mac partition (APFS or HFS+). To make room, use Disk Utility on the Mac."
 msgstr "Mac 파티션입니다(APFS 또는 HFS+). 공간을 만들려면 Mac의 디스크 유틸리티를 사용하세요."
 
-#: src/core/fscheck.c:816
+#: src/core/fscheck.c:819
 msgid "Windows is hibernated or uses Fast Startup. Start Windows, then shut it down while holding Shift (or turn Fast Startup off in Power Options), and try again."
 msgstr "Windows가 최대 절전 모드이거나 빠른 시작을 사용 중입니다. Windows를 시작한 다음 Shift 키를 누른 채 종료하고(또는 전원 옵션에서 빠른 시작을 끄고) 다시 시도하세요."
 
-#: src/core/fscheck.c:817
+#: src/core/fscheck.c:820
 msgid "Windows marked this partition as needing a check. Start Windows, run chkdsk /f on it, and try again."
 msgstr "Windows가 이 파티션을 검사가 필요하다고 표시했습니다. Windows를 시작해 이 파티션에 chkdsk /f를 실행한 뒤 다시 시도하세요."
 
-#: src/core/fscheck.c:818
+#: src/core/fscheck.c:821
 msgid "This Linux partition was not unmounted cleanly. Start Linux and shut it down normally, then try again."
 msgstr "이 Linux 파티션이 정상적으로 마운트 해제되지 않았습니다. Linux를 시작해 정상적으로 종료한 뒤 다시 시도하세요."
 
-#: src/core/fscheck.c:819
+#: src/core/fscheck.c:822
 msgid "Linux found errors on this partition. Check it with fsck from Linux, then try again."
 msgstr "Linux가 이 파티션에서 오류를 발견했습니다. Linux에서 fsck로 검사한 뒤 다시 시도하세요."
 
-#: src/core/fscheck.c:820
+#: src/core/fscheck.c:823
 msgid "This partition could not be read safely, so FolioOS will not change it."
 msgstr "이 파티션을 안전하게 읽을 수 없어 FolioOS는 이 파티션을 변경하지 않습니다."
 
-#: src/core/fscheck.c:821
+#: src/core/fscheck.c:824
 msgid "FolioOS cannot resize this file system yet."
 msgstr "FolioOS는 아직 이 파일 시스템의 크기를 조정할 수 없습니다."
 
-#: src/core/fscheck.c:827
+#: src/core/fscheck.c:830
 msgid "encrypted (BitLocker)"
 msgstr "암호화됨(BitLocker)"
 
-#: src/core/fscheck.c:828
+#: src/core/fscheck.c:831
 msgid "encrypted (LUKS)"
 msgstr "암호화됨(LUKS)"
 
-#: src/core/fscheck.c:830
+#: src/core/fscheck.c:833
 msgid "Mac (APFS/HFS+)"
 msgstr "Mac(APFS/HFS+)"
 
-#: src/core/fscheck.c:831
+#: src/core/fscheck.c:834
 msgid "Windows hibernated or Fast Startup"
 msgstr "Windows 최대 절전 모드 또는 빠른 시작"
 
-#: src/core/fscheck.c:832
+#: src/core/fscheck.c:835
 msgid "needs a check (chkdsk)"
 msgstr "검사 필요(chkdsk)"
 
-#: src/core/fscheck.c:833
+#: src/core/fscheck.c:836
 msgid "not unmounted cleanly"
 msgstr "정상적으로 마운트 해제되지 않음"
 
-#: src/core/fscheck.c:834
+#: src/core/fscheck.c:837
 msgid "has errors (fsck)"
 msgstr "오류 있음(fsck)"
 
-#: src/core/fscheck.c:835
+#: src/core/fscheck.c:838
 msgid "unreadable"
 msgstr "읽을 수 없음"
 
-#: src/core/fscheck.c:836
+#: src/core/fscheck.c:839
 msgid "cannot be resized yet"
 msgstr "아직 크기 조정 불가"
 
@@ -2239,7 +2239,7 @@ msgstr "Windows를 유지하려면 Windows에서 C: 드라이브를 축소한 �
 msgid "Partition table unreadable"
 msgstr "파티션 테이블을 읽을 수 없음"
 
-#: src/core/installer.c:107
+#: src/core/installer.c:107 src/core/partitions.c:138
 msgid "Empty: no partitions"
 msgstr "비어 있음: 파티션 없음"
 
@@ -2249,7 +2249,7 @@ msgid "…and %d more partition"
 msgid_plural "…and %d more partitions"
 msgstr[0] "…외 파티션 %d개"
 
-#: src/core/installer.c:124 src/core/partitions.c:131
+#: src/core/installer.c:124 src/core/partitions.c:134
 msgid "disk"
 msgstr "디스크"
 
@@ -2277,7 +2277,7 @@ msgstr "FolioOS를 기존 시스템 옆의 빈 공간에 설치하거나, 디스
 msgid "Choose where:"
 msgstr "위치를 선택하세요:"
 
-#: src/core/installer.c:290 src/core/partitions.c:169
+#: src/core/installer.c:290 src/core/partitions.c:173
 msgid "No disk was found besides the USB drive FolioOS started from."
 msgstr "FolioOS를 시작한 USB 메모리 외에는 디스크가 없습니다."
 
@@ -2346,7 +2346,7 @@ msgstr "각 파일은 새 사본을 확인한 뒤에만 바뀌므로, 전원이 
 msgid "Before anything is written, the start of the disk (partition table and boot sectors) is saved to %s on this USB drive."
 msgstr "무엇이든 쓰기 전에 디스크의 앞부분(파티션 테이블과 부트 섹터)을 이 USB 메모리의 %s에 저장합니다."
 
-#: src/core/installer.c:341 src/core/installer.c:382 src/core/installer.c:435 src/core/installer.c:458 src/core/partitions.c:242
+#: src/core/installer.c:341 src/core/installer.c:382 src/core/installer.c:435 src/core/installer.c:458 src/core/partitions.c:246
 msgid "Back"
 msgstr "뒤로"
 
@@ -2363,7 +2363,7 @@ msgstr "이 디스크에서 FolioOS를 제거합니다:"
 msgid "− FolioOS · FAT32 · %s"
 msgstr "− FolioOS · FAT32 · %s"
 
-#: src/core/installer.c:357 src/core/installer.c:405 src/core/partitions.c:222
+#: src/core/installer.c:357 src/core/installer.c:405 src/core/partitions.c:226
 #, c-format
 msgid "%s%s: %s → %s"
 msgstr "%s%s: %s → %s"
@@ -2394,7 +2394,7 @@ msgstr "EFI 시스템 파티션에서는 EFI/FolioOS 폴더만 사라지고, 컴
 msgid "The next time Windows starts, it checks its partition (chkdsk) once; this is expected."
 msgstr "다음에 Windows를 시작하면 파티션을 한 번 검사(chkdsk)하며, 이는 정상입니다."
 
-#: src/core/installer.c:373 src/core/installer.c:443 src/core/partitions.c:216
+#: src/core/installer.c:373 src/core/installer.c:443 src/core/partitions.c:220
 msgid "ERASE"
 msgstr "ERASE"
 
@@ -2403,7 +2403,7 @@ msgstr "ERASE"
 msgid "Your texts on this computer will be lost. To confirm, type %s:"
 msgstr "이 컴퓨터의 텍스트가 사라집니다. 확인하려면 %s을(를) 입력하세요:"
 
-#: src/core/installer.c:377 src/core/installer.c:385 src/core/installer.c:453 src/core/installer.c:461 src/core/partitions.c:237 src/core/partitions.c:246
+#: src/core/installer.c:377 src/core/installer.c:385 src/core/installer.c:453 src/core/installer.c:461 src/core/partitions.c:241 src/core/partitions.c:250
 #, c-format
 msgid "To confirm, type %s:"
 msgstr "확인하려면 %s를 입력하세요:"
@@ -2425,11 +2425,11 @@ msgstr "+ FolioOS · FAT32 · %s, 새로 생긴 공간에"
 msgid "Size for FolioOS"
 msgstr "FolioOS 크기"
 
-#: src/core/installer.c:412 src/core/partitions.c:226
+#: src/core/installer.c:412 src/core/partitions.c:230
 msgid "No file is moved: FolioOS only takes free space from the end of that partition. The next time Windows starts, it checks the partition (chkdsk) once; this is expected."
 msgstr "파일은 옮기지 않습니다. FolioOS는 그 파티션 끝의 빈 공간만 사용합니다. 다음에 Windows를 시작하면 파티션을 한 번 검사(chkdsk)하며, 이는 정상입니다."
 
-#: src/core/installer.c:412 src/core/partitions.c:226
+#: src/core/installer.c:412 src/core/partitions.c:230
 msgid "No file is moved: FolioOS only takes free space from the end of that partition."
 msgstr "파일은 옮기지 않습니다. FolioOS는 그 파티션 끝의 빈 공간만 사용합니다."
 
@@ -2648,61 +2648,61 @@ msgid "%d track · %s"
 msgid_plural "%d tracks · %s"
 msgstr[0] "%d곡 · %s"
 
-#: src/core/partitions.c:107
+#: src/core/partitions.c:110
 msgid "Done. The previous start of the disk is saved on this USB drive."
 msgstr "완료했습니다. 디스크의 이전 시작 부분은 이 USB 메모리에 저장되어 있습니다."
 
-#: src/core/partitions.c:135
+#: src/core/partitions.c:139
 #, c-format
 msgid "Free space · %s"
 msgstr "빈 공간 · %s"
 
-#: src/core/partitions.c:165
+#: src/core/partitions.c:169
 msgid "Working… Do not turn off the computer or remove the USB drive."
 msgstr "작업 중… 컴퓨터를 끄거나 USB 메모리를 뽑지 마세요."
 
-#: src/core/partitions.c:168
+#: src/core/partitions.c:172
 msgid "Choose a partition or a free space, then an action. Before anything is written, the start of the disk is saved to FOLIO/BACKUP on this USB drive."
 msgstr "파티션이나 빈 공간을 고른 다음 작업을 고르세요. 무엇이든 쓰기 전에 디스크의 시작 부분을 이 USB 메모리의 FOLIO/BACKUP에 저장합니다."
 
-#: src/core/partitions.c:190
+#: src/core/partitions.c:194
 msgid "Create a FAT32 partition"
 msgstr "FAT32 파티션 만들기"
 
-#: src/core/partitions.c:196
+#: src/core/partitions.c:200
 msgid "Resize"
 msgstr "크기 조정"
 
-#: src/core/partitions.c:202
+#: src/core/partitions.c:206
 msgid "Format as FAT32"
 msgstr "FAT32로 포맷"
 
-#: src/core/partitions.c:221
+#: src/core/partitions.c:225
 #, c-format
 msgid "+ FAT32 · %s, in this free space"
 msgstr "+ FAT32 · %s, 이 빈 공간에"
 
-#: src/core/partitions.c:230
+#: src/core/partitions.c:234
 msgid "Name of the new volume:"
 msgstr "새 볼륨 이름:"
 
-#: src/core/partitions.c:234
+#: src/core/partitions.c:238
 msgid "Everything on this partition will be erased; it becomes an empty FAT32 volume."
 msgstr "이 파티션의 모든 내용이 지워지고 빈 FAT32 볼륨이 됩니다."
 
-#: src/core/partitions.c:235
+#: src/core/partitions.c:239
 msgid "This partition and everything on it will be erased; its space becomes free."
 msgstr "이 파티션과 그 안의 모든 내용이 지워지고 공간은 비게 됩니다."
 
-#: src/core/partitions.c:243
+#: src/core/partitions.c:247
 msgid "Create"
 msgstr "만들기"
 
-#: src/core/partitions.c:243
+#: src/core/partitions.c:247
 msgid "Apply"
 msgstr "적용"
 
-#: src/core/partitions.c:243
+#: src/core/partitions.c:247
 msgid "Format"
 msgstr "포맷"
 
