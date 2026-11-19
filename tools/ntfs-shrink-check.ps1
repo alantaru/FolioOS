@@ -46,7 +46,7 @@ function Mount-Vhd([string]$vhd) {
 function Get-Hashes([string]$root) {
     $h = @{}
     Get-ChildItem -Recurse -File -Force $root -ErrorAction SilentlyContinue | Where-Object { $_.FullName -notmatch "System Volume Information" } |
-        ForEach-Object { $h[$_.FullName.Substring(3)] = (Get-FileHash $_.FullName -Algorithm SHA256).Hash }
+        ForEach-Object { $h[$_.FullName.Substring(3)] = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash }
     return $h
 }
 
@@ -58,9 +58,7 @@ Copy-Item $orig $shr
 if ($LASTEXITCODE -ne 0) { throw "fscheck_test --shrink failed" }
 
 $v1 = New-Vhd $orig
-$m = Mount-Vhd $v1
-$before = Get-Hashes "$($m.letter):\"
-Dismount-DiskImage -ImagePath $v1 | Out-Null
+try { $m = Mount-Vhd $v1; $before = Get-Hashes "$($m.letter):\" } finally { Dismount-DiskImage -ImagePath $v1 -ErrorAction SilentlyContinue | Out-Null }   # detached even if reading fails
 Write-Host "  original: $($before.Count) files"
 
 $v2 = New-Vhd $shr
@@ -110,7 +108,7 @@ function Get-Vols([string]$vhd) {    # letter for every partition Windows can mo
     foreach ($p in Get-Partition -DiskNumber $disk.Number) {
         if ($p.GptType -eq "{c12a7328-f81f-11d2-ba4b-00a0c93ec93b}" -or $p.Type -eq "Reserved") { continue }
         if (-not $p.DriveLetter -or $p.DriveLetter -eq [char]0) { $p | Add-PartitionAccessPath -AssignDriveLetter; Start-Sleep -Milliseconds 500; $p = Get-Partition -DiskNumber $disk.Number -PartitionNumber $p.PartitionNumber }
-        $r += @{ letter = $p.DriveLetter; size = $p.Size; fs = (Get-Volume -DriveLetter $p.DriveLetter).FileSystem; label = (Get-Volume -DriveLetter $p.DriveLetter).FileSystemLabel }
+        $r += @{ letter = $p.DriveLetter; size = $p.Size; vsize = (Get-Volume -DriveLetter $p.DriveLetter).Size; fs = (Get-Volume -DriveLetter $p.DriveLetter).FileSystem; label = (Get-Volume -DriveLetter $p.DriveLetter).FileSystemLabel }
     }
     return $r
 }
@@ -163,7 +161,7 @@ $tag = $kind.ToLower(); $fo = "$work\$tag-orig.img"; $fx = "$work\$tag.img"
 $i = [IO.File]::OpenRead("tests\fixtures\$tag-data.img.gz"); $g = New-Object IO.Compression.GZipStream($i, [IO.Compression.CompressionMode]::Decompress)
 $o = [IO.File]::Create($fo); $g.CopyTo($o); $o.Dispose(); $g.Dispose(); $i.Dispose()
 Copy-Item $fo $fx
-$vf = New-Vhd $fo; $v = Get-Vols $vf; $fb = Get-Hashes "$(($v | Where-Object { $_.fs -eq $kind }).letter):\"; Dismount-DiskImage -ImagePath $vf | Out-Null
+$vf = New-Vhd $fo; try { $v = Get-Vols $vf; $fb = Get-Hashes "$(($v | Where-Object { $_.fs -eq $kind }).letter):\" } finally { Dismount-DiskImage -ImagePath $vf -ErrorAction SilentlyContinue | Out-Null }
 foreach ($step in @(@{ mib = 400; what = "shrunk" }, @{ mib = 900; what = "grown" })) {
     & .\build\fscheck_test.exe --resize $fx $step.mib
     if ($LASTEXITCODE -ne 0) { Fail "fscheck_test --resize $($step.mib)"; break }
@@ -171,7 +169,7 @@ foreach ($step in @(@{ mib = 400; what = "shrunk" }, @{ mib = 900; what = "grown
     $vf = New-Vhd $fx
     try {
         $v = Get-Vols $vf; $fv = $v | Where-Object { $_.fs -eq $kind }
-        if ($fv -and [math]::Abs($fv.size - [int64]$step.mib * 1MB) -lt 2MB) { Pass "$kind $($step.what) to $($step.mib) MiB: Windows mounts it" } else { Fail "$kind after $($step.what): $(($v | ForEach-Object { "$($_.fs) $($_.size)" }) -join ', ')"; continue }
+        if ($fv -and [math]::Abs($fv.size - [int64]$step.mib * 1MB) -lt 2MB -and $fv.vsize -le [int64]$step.mib * 1MB -and $fv.vsize -gt ([int64]$step.mib - 16) * 1MB) { Pass "$kind $($step.what) to $($step.mib) MiB: Windows mounts it" } else { Fail "$kind after $($step.what): $(($v | ForEach-Object { "$($_.fs) $($_.size)" }) -join ', ')"; continue }
         $fa = Get-Hashes "$($fv.letter):\"
         $diff = @($fb.Keys | Where-Object { $fa[$_] -ne $fb[$_] })
         if ($fa.Count -eq $fb.Count -and $diff.Count -eq 0) { Pass "all $($fa.Count) files the same" } else { Fail "files differ: $($diff -join ', ')" }

@@ -18,6 +18,7 @@ typedef UINT64 EFI_PHYSICAL_ADDRESS;
 #define EFI_ERR(x) (((UINTN)1 << (sizeof(UINTN) * 8 - 1)) | (x))
 #define EFI_BUFFER_TOO_SMALL EFI_ERR(5)
 #define EFI_NOT_READY EFI_ERR(6)
+#define EFI_NOT_FOUND EFI_ERR(14)
 #define EFI_ERROR(s) (((INTN)(s)) < 0)
 
 typedef struct { UINT32 Data1; UINT16 Data2, Data3; UINT8 Data4[8]; } EFI_GUID;
@@ -84,7 +85,7 @@ typedef struct {
     EFI_STATUS (EFIAPI *HandleProtocol)(EFI_HANDLE, EFI_GUID *, void **);
     void *Reserved, *RegisterProtocolNotify, *LocateHandle, *LocateDevicePath, *InstallConfigurationTable;
     void *LoadImage, *StartImage, *Exit, *UnloadImage, *ExitBootServices;
-    void *GetNextMonotonicCount;
+    EFI_STATUS (EFIAPI *GetNextMonotonicCount)(UINT64 *);   /* os 32 bits altos: quantos boots a plataforma já fez */
     EFI_STATUS (EFIAPI *Stall)(UINTN);
     EFI_STATUS (EFIAPI *SetWatchdogTimer)(UINTN, UINT64, UINTN, CHAR16 *);
     EFI_STATUS (EFIAPI *ConnectController)(EFI_HANDLE, EFI_HANDLE *, void *, BOOLEAN);

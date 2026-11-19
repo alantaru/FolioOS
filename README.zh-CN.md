@@ -11,7 +11,7 @@
 [![Build](https://github.com/alantaru/FolioOS/actions/workflows/build.yml/badge.svg)](https://github.com/alantaru/FolioOS/actions/workflows/build.yml)
 [![Latest release](https://img.shields.io/github/v/release/alantaru/FolioOS?label=download&color=b4561f)](https://github.com/alantaru/FolioOS/releases/latest)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
-[![Platform: UEFI x64 | IA32](https://img.shields.io/badge/platform-UEFI%20x64%20%7C%20IA32-555)](#hardware-compatibility)
+[![Platform: UEFI x64 | IA32 | ARM64 | BIOS](https://img.shields.io/badge/platform-UEFI%20x64%20%7C%20IA32%20%7C%20ARM64%20%7C%20BIOS-555)](#hardware-compatibility)
 [![Languages: 15](https://img.shields.io/badge/languages-15-success)](#13-15-languages-and-counting)
 [![Translations welcome](https://img.shields.io/badge/translations-welcome-ff69b4)](docs/TRANSLATING.md)
 
@@ -44,7 +44,8 @@ FolioOS 是一个**可启动的写作环境**：一个只做一件事的小小�
 
 - **小说家、记者、学生和博主**：想要一台 *writerdeck*——一台专用的无干扰写作设备——又不想购买新硬件。
 - **NaNoWriMo 参与者**，以及所有进行限时写作冲刺或写晨间日记的人。
-- **抽屉里有台旧笔记本的人**：FolioOS 让它重获新生，而且不碰它的硬盘。
+- **抽屉里有旧笔记本的人**：FolioOS 让它重获新生——直接从 U 盘运行，或安装到它的硬盘上，
+  单独使用或与已有的系统并存。
 - **学校和图书馆**：需要一个简单的离线写作工位。
 - **重视隐私的写作者**：没有网络、没有遥测、没有云。
 
@@ -290,11 +291,40 @@ U 盘（FAT32）
 │   ├── THEMES/         你的主题（.INI）
 │   ├── LANGUAGES/      翻译（.po）
 │   ├── KEYBOARDS/      键盘布局（.txt）
-│   └── VERSIONS/       已保存文件的自动历史版本
-└── EFI/BOOT/           FolioOS 本身（BOOTX64.EFI、BOOTIA32.EFI）
+│   ├── VERSIONS/       已保存文件的自动历史版本
+│   └── BACKUP/         安装程序在写入任何内容之前保存的分区表
+└── EFI/BOOT/           FolioOS 本身（BOOTX64.EFI、BOOTIA32.EFI、BOOTAA64.EFI）
 ```
 
 没有数据库，没有隐藏分区，没有专有格式。把 U 盘带到任何一台电脑上，你写的东西都在那里。
+
+<a id="15-install-it-on-the-computer-beta"></a>
+
+### 15. 安装到电脑上（测试版）
+
+U 盘就足够了，但 FolioOS 也可以安装在电脑自己的硬盘上，让笔记本一开机就进入你的写作。
+打开 **Ctrl+K › 将 FolioOS 安装到这台电脑**（或 *设置 › 系统*）：
+
+- **作为唯一的系统**，装在空磁盘或你选择清除的磁盘上——需要输入一个词来确认。
+- **与 Windows 或 Linux 并存**，使用空闲空间，不碰其他分区。每次开机会显示几秒
+  *按任意键开始写作*，然后照常启动另一个系统；Windows 由固件本身启动，和以前完全一样。
+- **没有空闲空间？** FolioOS 可以在不移动任何数据的情况下缩小 NTFS、FAT32 或 exFAT 分区。
+  不安全的情况会被拒绝（休眠或开启快速启动的 Windows、需要 `chkdsk` 的卷、没有恢复密钥的 BitLocker、
+  LUKS、LVM、Apple 卷），并说明该怎么做。ext4 永远不会被调整大小：请在 Linux 中腾出空间（GParted），
+  然后重新打开安装程序。
+- 更改任何分区之前，分区表（磁盘的开头和末尾扇区）会保存到 FolioOS 启动所用的驱动器（通常是 U 盘）的
+  `FOLIO/BACKUP` 中。你的文本可以放在电脑上、U 盘上，或两者都放。
+- 用更新的 U 盘**更新**：只替换 FolioOS 自己的文件；你的文本和分区保持不变。
+- **卸载**：可以先把你的文本复制到 FolioOS 启动所用的驱动器。如果安装程序曾为腾出空间而缩小某个分区，
+  只要它后面的空间仍然空闲，该分区就会恢复到原来的大小；否则空间会变为空闲。如果该分区需要恢复且其中的 Windows 处于休眠状态
+  （或使用了快速启动），FolioOS 会先请你将它完全关机，并且不更改任何分区。
+- *设置 › 系统 › 磁盘和分区* 是一个小型分区管理器：创建 FAT32 分区、格式化、缩小或扩大
+  NTFS/FAT32/exFAT、删除。
+- 4.4 测试版是预发布版本：请从
+  [它的发布页面](https://github.com/alantaru/FolioOS/releases/tag/v4.4.1-beta)下载，而不是从“latest”。
+
+支持 UEFI 电脑和纯 BIOS 电脑。**这是测试版：**它在模拟机器上通过了全部测试（使用 Windows 和 Linux
+创建的磁盘），但还没有在真实硬件上运行过——请先备份，或使用一块闲置的磁盘。
 
 ---
 
@@ -319,11 +349,12 @@ U 盘（FAT32）
 | | |
 |---|---|
 | **固件** | UEFI 2.x——64 位（`BOOTX64.EFI`）、32 位（`BOOTIA32.EFI`，Atom 平板和上网本）或 ARM64（`BOOTAA64.EFI`：装有社区 UEFI 固件的 Raspberry Pi 3/4/5、ARM 笔记本）。**仅有 BIOS 的电脑**（Legacy/CSM）在运行一次 `FOLIO\TOOLS\biosboot.exe` 后，通过 FolioOS 自己的 BIOS 桥启动。必须关闭 Secure Boot。 |
-| **显示** | 任何 UEFI GOP 帧缓冲（RGB、BGR、位掩码、仅 Blt）或旧式 UGA；BIOS 电脑上使用 VESA/VBE。原生分辨率，自动 HiDPI 缩放，竖屏自动旋转。 |
+| **显示** | 任何 UEFI GOP 帧缓冲（RGB、BGR、位掩码、仅 Blt）或旧式 UGA；BIOS 电脑上使用 VESA/VBE。原生分辨率，自动 HiDPI 缩放，竖屏自动旋转。 当唯一的模式是 4:3 而宽屏把它拉伸时，*设置 › 系统 › 显示与指针* 可以保持比例（显示器、16:9、16:10 或 4:3）。 |
 | **输入** | 键盘通过固件（BIOS 电脑上直接通过 PS/2）。鼠标、触摸板、数位板和触摸屏通过固件；固件没有相应驱动时，使用 FolioOS 自己的 USB HID 和 PS/2 驱动。 |
 | **声音** | Intel HD Audio 和 AC'97（仅音乐播放器需要）。 |
+| **磁盘（安装程序，测试版）** | 512 字节扇区的 SATA、NVMe、IDE 和 USB 磁盘，GPT 或 MBR。NTFS、FAT32 和 exFAT 可以在不移动数据的情况下缩小并重新扩大；BitLocker、LUKS、LVM、APFS/HFS+ 和 ext4 永远不会被调整大小。 |
 | **不支持** | Secure Boot（暂时）、Apple Silicon Mac。Wi-Fi 和蓝牙是刻意不支持的。 |
-| **测试平台** | 每个版本都在 13 台模拟机器上测试：UEFI x64、IA32 和 ARM64，以及从 USB 和 IDE 启动的仅 BIOS 电脑；8 种显卡、PS/2 和 USB 鼠标、USB 数位板、HD Audio 和 AC'97。每台都检查画面、键盘、鼠标、声音、保存和文件系统完整性。 |
+| **测试平台** | 每个版本都在 20 台模拟机器上测试：UEFI x64、IA32 和 ARM64，以及从 USB 和 IDE 启动的纯 BIOS 电脑；8 种显卡、PS/2 和 USB 鼠标、USB 数位板、HD Audio 和 AC'97；安装在 SATA 和 IDE 磁盘上的 FolioOS、与 Windows（UEFI）和另一个系统（BIOS）的双系统启动、缩小 Windows 创建的 NTFS，以及保持比例。每台机器都会检查画面、键盘、鼠标、声音、保存和文件系统完整性。 |
 
 每次启动时，FolioOS 都会把它发现的硬件写入 `FOLIO/DIAGNOSTICS.TXT`。欢迎在[硬件报告](https://github.com/alantaru/FolioOS/issues/new/choose)
 中分享你的文件——哪怕只是“一切正常”，也能帮助其他写作者挑选笔记本。
@@ -335,7 +366,17 @@ U 盘（FAT32）
 <details>
 <summary><b>它会清空我的电脑或 U 盘吗？</b></summary>
 
-不会。FolioOS 从不触碰内置硬盘，安装它也只是往 U 盘里添加文件——原有的东西都会保留。拔掉 U 盘，电脑又会启动它平常的系统。
+不会。从 U 盘运行时，FolioOS 只在你要求时才写入内置硬盘：把文本保存到它的某个卷上会写入那个文件，而只有安装程序和
+*磁盘和分区*会更改分区；即便如此，在你确认并把分区表保存到 FolioOS 启动所用的驱动器之前，任何分区都不会改变（打开的文本会先保存在原处）。
+安装到 U 盘也只是添加文件，原有内容都会保留。拔掉 U 盘，电脑就会像往常一样启动原来的系统。
+</details>
+
+<details>
+<summary><b>可以把它安装到笔记本上，与 Windows 或 Linux 并存吗？</b></summary>
+
+可以，从 4.4（测试版）开始：**Ctrl+K › 将 FolioOS 安装到这台电脑**。它使用空闲空间，或在不移动数据的
+情况下缩小 NTFS、FAT32 或 exFAT 分区，每次开机都可以选择 FolioOS 或另一个系统。卸载后，如果后面的空间仍然空闲，被安装程序缩小的分区会恢复（否则空间变为空闲）。
+参见[安装到电脑上](#15-install-it-on-the-computer-beta)。
 </details>
 
 <details>
@@ -406,7 +447,7 @@ ARM64 和 BIOS 版本还需要 [LLVM](https://llvm.org) 的 `clang` 和 `nasm`�
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
 .\build.ps1                                  # UEFI x64 + IA32 + ARM64、BIOS、模拟器、发布包——以及测试套件
-.\tools\qemu-lab.ps1                         # 在 13 台模拟机器上启动真正的二进制文件并逐一检查
+.\tools\qemu-lab.ps1                         # 在 20 台模拟机器上启动真正的二进制文件并逐一检查
 .\build\folio_sim.exe                        # 在窗口中运行 FolioOS
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # 在窗口中运行真正的 UEFI 程序
 .\flash_usb.ps1 -DriveLetter E:              # 安装/更新 FAT32 U 盘，保留用户文件
@@ -416,7 +457,8 @@ cd FolioOS
 ```
 
 测试套件用脚本化的按键和鼠标事件驱动模拟器和真正的 `BOOTX64.EFI`（运行在一个小型 UEFI 宿主中），截取屏幕，并验证每一种导出
-（ZIP + XML）、每一种翻译（并对校验器做反向检查）、六种帧缓冲格式，以及 BIOS 桥的 FAT32 驱动（数千次随机操作，逐字节核对）。
+（ZIP + XML）、每一种翻译（并对校验器做反向检查）、六种帧缓冲格式，以及 BIOS 桥的 FAT32 驱动（数千次随机操作，逐字节核对）。安装程序和分区管理器在由 Windows 和 Linux 创建的磁盘映像上运行，结果由 Windows 的 `chkdsk`
+和 Linux 的 `fsck` 检查（`tools/ntfs-shrink-check.ps1`、`tools/linux-run.ps1`）。
 
 <a id="macos-simulator"></a>
 
@@ -444,7 +486,8 @@ macOS 脚本只编译模拟器：UEFI 二进制文件、发布包、磁盘映像
 
 ```
 src/core/       可移植核心（独立 C，无 libc）：编辑器、Markdown、TrueType 光栅化器、
-                界面工具包和窗口管理器、导出、MP3、i18n、键盘布局、主题
+                界面工具包和窗口管理器、导出、MP3、i18n、键盘布局、主题,
+                分区表、文件系统检查与调整大小、安装程序和启动选择器
 src/platform/   uefi/  GOP/UGA 显示、输入、FAT 读写、HD Audio/AC'97、USB HID 和 PS/2 驱动——运行在固件之上
                 bios/  启动扇区 + BIOS→UEFI 桥（VBE、PS/2、自有 FAT32 驱动），用于仅有 BIOS 的电脑
                 win32/ 用于开发和自动测试的模拟器
@@ -454,7 +497,7 @@ assets/         字体、翻译（.po）、键盘布局、示例主题
 tests/          脚本化的端到端测试
 ```
 
-一个约 600 KB 的程序通过一层很薄的平台层掌控整台机器。详见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。
+一个约 800 KB 的程序通过一层很薄的平台层掌控整台机器。详见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。
 
 <a id="roadmap"></a>
 
@@ -465,7 +508,7 @@ FolioOS 正在分成两个共用同一编辑器的版本：永远离线的 **Fol
 
 - [x] 仅有 BIOS 的电脑（Legacy/CSM）和 ARM64（装有 UEFI 固件的 Raspberry Pi、ARM 笔记本）
 - [x] 韩文输入（两套式韩文）和日文假名输入（罗马字 → 平假名/片假名）
-- [ ] 安装到电脑硬盘——作为唯一系统或与任何其他系统并存——并附带分区管理器
+- [x] 安装到电脑硬盘——作为唯一系统或与任何其他系统并存——并附带分区管理器 (4.4 beta)
 - [ ] FolioOS Sync：Wi-Fi，以及通过 WebDAV、SFTP、Git、Dropbox、Google Drive、OneDrive 和 Syncthing 同步
 - [ ] 日文汉字转换和中文拼音输入（需要词典）
 - [ ] 复杂文字排版和从右到左的文字（阿拉伯文、希伯来文、天城文…）

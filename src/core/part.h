@@ -44,6 +44,7 @@ typedef struct {
     Part p[PART_MAX];
     bool gpt_backup_used;   /* o cabeçalho principal estava estragado: lido do reserva */
     bool has_extended;      /* MBR com partição estendida */
+    uint64_t ext_start, ext_count;   /* a extensão da estendida, guardada na leitura */
     bool locked;            /* lida, mas o FolioOS não a regravaria fielmente (GPT com outra quantidade ou outro tamanho
                              * de entrada, mais de PART_MAX partições, MBR com estendida): nada nela é alterado */
 } PartTable;

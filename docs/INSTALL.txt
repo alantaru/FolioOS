@@ -2,7 +2,8 @@ FolioOS — how to install it on a USB drive (no disk image needed)
 =================================================================
 
 You do not need to write a disk image or erase the whole drive. FolioOS takes about
-7 MB; the rest of the drive stays free for whatever you like.
+60 MB (most of it fonts, including Chinese, Japanese and Korean); the rest of the
+drive stays free for whatever you like.
 
 1) The drive must be FAT32 (that is what UEFI firmware can read).
    - Drives up to 32 GB almost always come as FAT32: skip to step 2.
@@ -30,6 +31,10 @@ You do not need to write a disk image or erase the whole drive. FolioOS takes ab
    (E: is the drive's letter). It writes only the BIOS boot code: no file is touched,
    the drive stays an ordinary FAT32 drive and the UEFI boot keeps working.
 
+5) Optional (beta): install on the computer's own disk, alone or next to Windows
+   or Linux. Start from the drive and use Ctrl+K > "Install FolioOS on this
+   computer". Details in README.txt, "INSTALLING ON THIS COMPUTER".
+
 EVERYTHING IS INCLUDED: FolioOS.zip already brings 11 free font families for
 writing and reading and the fonts for Chinese, Japanese and Korean. Every one of
 the 15 languages works out of the box; nothing else to download.
@@ -39,5 +44,7 @@ UPDATING: unzip the new version on top and confirm "replace". Only the system
 FOLIO\BIOS.SYS), the README files and the
 example DOCUMENTS\Welcome.md are replaced; your texts, music and preferences
 (FOLIO\CONFIG.INI) stay.
+On a computer where FolioOS was installed: start from the drive with the new
+version and choose "Update" in the installer.
 
 More details in README.txt.

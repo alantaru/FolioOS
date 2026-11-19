@@ -69,14 +69,59 @@ static void bank_session(void) {          /* ao trocar de documento, guarda o qu
     app.session_start_words = doc_words(&app.doc);
 }
 
+/* ------------------------------------------------------------ volumes lembrados pela identidade, não só pelo índice
+ * O índice de um volume é a posição dele na lista do início: sem o pendrive, outro volume pode ocupar o mesmo
+ * número. Cada entrada lembrada ("vol@identidade|caminho") só volta no volume com a mesma identidade — o GUID da
+ * partição, ou (pendrive sem GPT) o rótulo e o tamanho; se ele estiver em outro índice, vai para lá. */
+static void vol_ident(int v, char *o, int cap) {
+    VolInfo vi; o[0] = 0;
+    if (!pal_vol_info(v, &vi)) return;
+    if (vi.has_guid) { int k = 0; for (int i = 0; i < 16 && k + 2 < cap; i++) { o[k++] = "0123456789abcdef"[vi.part_guid[i] >> 4]; o[k++] = "0123456789abcdef"[vi.part_guid[i] & 15]; } o[k] = 0; return; }
+    char lab[64]; int k = 0;
+    for (int i = 0; vi.label[i] && k < 40; i++) { char c = vi.label[i]; if (c == '|' || c == '@' || c == '#') c = '_'; lab[k++] = c; }
+    lab[k] = 0;
+    fmt(o, cap, "%s#%d", lab, (int)(vi.size >> 20));
+}
+static void entry_make(char *o, int cap, int vol, const char *path) {
+    char id[80]; vol_ident(vol, id, sizeof id);
+    fmt(o, cap, "%d@%s|%s", vol, id, path);
+}
+/* o volume de uma entrada lembrada (-1 = não está aqui agora); *path aponta para o caminho dentro de e */
+static int entry_vol(const char *e, const char **path) {
+    const char *bar = e; while (*bar && *bar != '|') bar++;
+    *path = *bar ? bar + 1 : bar;
+    if (!*bar) return -1;
+    int vol = str_to_int(e);
+    const char *at = e; while (at < bar && *at != '@') at++;
+    if (at == bar) return vol == boot_vol ? vol : -1;   /* formato antigo, sem identidade: só o volume de onde o FolioOS iniciou */
+    char want[80]; int n = (int)(bar - at - 1); if (n < 0 || n >= (int)sizeof want) return -1;
+    memcpy(want, at + 1, (usize)n); want[n] = 0;
+    char id[80];
+    if (vol >= 0 && vol < pal_vol_count()) { vol_ident(vol, id, sizeof id); if (str_eq(id, want)) return vol; }
+    /* em outro índice, só pelo GUID da partição (único); rótulo + tamanho não bastam para dizer que é o mesmo
+     * pendrive (dois iguais existem), então sem GUID só vale o índice gravado, como antes */
+    bool guid = n == 32; for (int i = 0; guid && i < n; i++) { char c = want[i]; guid = (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'); }
+    if (guid) for (int v = 0; v < pal_vol_count(); v++) { vol_ident(v, id, sizeof id); if (str_eq(id, want)) return v; }
+    return -1;
+}
+
+/* o volume do último documento: pela identidade gravada (last_volume_id=); sem ela (CONFIG.INI antigo), só o de boot */
+static int last_volume(void) {
+    char e[sizeof prefs.last_vol_id + 32];
+    if (!prefs.last_vol_id[0]) return prefs.last_vol == boot_vol ? boot_vol : -1;
+    fmt(e, sizeof e, "%d@%s|x", prefs.last_vol, prefs.last_vol_id);
+    const char *p; return entry_vol(e, &p);
+}
+void app_last_vol_id(char *o, int cap) { if (app.has_path) vol_ident(app.vol, o, cap); else o[0] = 0; }
+
 /* ------------------------------------------------------------ recentes (cada um lembra onde você parou) */
 static int recent_find(int vol, const char *path) {
-    char key[sizeof prefs.recent[0]]; fmt(key, sizeof key, "%d|%s", vol, path);
-    for (int i = 0; i < 6; i++) if (str_eq(prefs.recent[i], key)) return i;
+    /* pelo volume que a entrada indica hoje (que pode ter mudado de índice) e pelo caminho */
+    for (int i = 0; i < 6; i++) { const char *p; if (prefs.recent[i][0] && entry_vol(prefs.recent[i], &p) == vol && str_eq(p, path)) return i; }
     return -1;
 }
 static void add_recent(int vol, const char *path) {
-    char key[sizeof prefs.recent[0]]; fmt(key, sizeof key, "%d|%s", vol, path);
+    char key[sizeof prefs.recent[0]]; entry_make(key, sizeof key, vol, path);
     int i = recent_find(vol, path), pp = 0, po = 0;
     if (i >= 0) { pp = prefs.recent_pos[i][0]; po = prefs.recent_pos[i][1]; } else i = 5;
     for (; i > 0; i--) {
@@ -101,35 +146,63 @@ static Pos recent_pos_of(int vol, const char *path) {
 
 /* ------------------------------------------------------------ versões: cópia do arquivo anterior antes de sobrescrever */
 static u64 last_snap_ms; static char last_snap_path[512];
-static void snapshot(int vol, const char *path, bool force) {
-    if (!force && str_eq(last_snap_path, path) && ui.in.now - last_snap_ms < 10 * 60000) return;
+static const char *docs_dir_on(int vol);
+/* true = não havia versão anterior, ou ela ficou guardada; false = havia e não deu para guardar (quem vai
+ * substituir o arquivo sem poder voltar atrás, como a troca com o pendrive, tem de parar) */
+static bool snapshot(int vol, const char *path, bool force) {
+    if (!force && str_eq(last_snap_path, path) && ui.in.now - last_snap_ms < 10 * 60000) return true;
     bool d;
-    if (!pal_exists(vol, path, &d) || d) return;
+    /* force (a troca, que já confirmou que o arquivo existe): sem conseguir confirmar de novo, não há versão salva */
+    if (!pal_exists(vol, path, &d)) return !force;
+    if (d) return true;
     u8 *old; usize len;
-    if (!pal_read(vol, path, &old, &len)) return;
+    if (!pal_read(vol, path, &old, &len)) return false;
     paths_ensure(boot_vol, DIR_VERSIONS);
-    char base[128]; str_copy(base, path_basename(path), sizeof base);
+    /* o nome leva a pasta do documento quando ele não está direto em DOCUMENTS: "rascunho (contos)" e
+     * "rascunho (cartas)" são documentos diferentes e não podem dividir as versões */
+    char base[200]; str_copy(base, path_basename(path), sizeof base);
     char *dot = 0; for (char *c = base; *c; c++) if (*c == '.') dot = c;
     const char *ext = dot ? path_ext(path) : ".md";
     if (dot) *dot = 0;
+    {
+        char par[300]; str_copy(par, path, sizeof par);
+        int k = str_len(par); while (k > 0 && par[k - 1] != '/') k--;
+        if (k > 0) par[k - 1] = 0; else par[0] = 0;
+        const char *pn = path_basename(par);
+        if (par[0] && !str_ieq(par, docs_dir_on(vol)) && pn[0]) { str_cat(base, " (", sizeof base); str_cat(base, pn, sizeof base); str_cat(base, ")", sizeof base); }
+    }
     DateTime t; pal_now(&t);
-    char vp[400]; fmt(vp, sizeof vp, "%s/%s · %04d-%02d-%02d %02dh%02d%s", paths_dir(DIR_VERSIONS), base, t.year, t.month, t.day, t.hour, t.min, ext);
-    pal_write(boot_vol, vp, old, len);
+    char vp[400];
+    for (int n = 1; ; n++) {                               /* nunca sobrescreve uma versão que já existe */
+        if (n == 1) fmt(vp, sizeof vp, "%s/%s · %04d-%02d-%02d %02dh%02d%s", paths_dir(DIR_VERSIONS), base, t.year, t.month, t.day, t.hour, t.min, ext);
+        else fmt(vp, sizeof vp, "%s/%s · %04d-%02d-%02d %02dh%02d (%d)%s", paths_dir(DIR_VERSIONS), base, t.year, t.month, t.day, t.hour, t.min, n, ext);
+        bool dd; if (!pal_exists(boot_vol, vp, &dd)) break;
+        if (n >= 99) { mem_free(old); return false; }
+    }
+    bool saved = pal_write(boot_vol, vp, old, len);
     mem_free(old);
+    if (!saved) return false;
     last_snap_ms = ui.in.now; str_copy(last_snap_path, path, sizeof last_snap_path);
     /* mantém as 30 versões mais recentes deste documento */
     FileEntry *l; int n = pal_list(boot_vol, paths_dir(DIR_VERSIONS), &l);
-    if (n <= 30) { if (n >= 0) mem_free(l); return; }
-    char pre[140]; fmt(pre, sizeof pre, "%s · ", base);
+    if (n <= 30) { if (n >= 0) mem_free(l); return true; }
+    char pre[240]; fmt(pre, sizeof pre, "%s · ", base);
     int cnt = 0; for (int i = 0; i < n; i++) if (str_starts(l[i].name, pre)) cnt++;
+    const char *mine = path_basename(vp);                  /* a versão que acabou de ser gravada nunca é a que sai */
+    #define VKEY(e) (((((i64)(e).mtime.year * 12 + (e).mtime.month) * 31 + (e).mtime.day) * 24 + (e).mtime.hour) * 3600 + (i64)(e).mtime.min * 60 + (e).mtime.sec)
     while (cnt > 30) {
         int oldest = -1;
-        for (int i = 0; i < n; i++) if (l[i].name[0] && str_starts(l[i].name, pre) && (oldest < 0 || str_cmp_i(l[i].name, l[oldest].name) < 0)) oldest = i;
+        for (int i = 0; i < n; i++) {
+            if (!l[i].name[0] || !str_starts(l[i].name, pre) || str_ieq(l[i].name, mine)) continue;
+            if (oldest < 0 || VKEY(l[i]) < VKEY(l[oldest]) || (VKEY(l[i]) == VKEY(l[oldest]) && str_cmp_i(l[i].name, l[oldest].name) < 0)) oldest = i;
+        }
+    #undef VKEY
         if (oldest < 0) break;
         char p[400]; path_join(p, sizeof p, paths_dir(DIR_VERSIONS), l[oldest].name);
         pal_remove(boot_vol, p); l[oldest].name[0] = 0; cnt--;
     }
     mem_free(l);
+    return true;
 }
 
 /* sintaxe do documento ativo pelo nome do arquivo (sem nome: Markdown); chamar depois de trocar app.path */
@@ -330,12 +403,11 @@ static bool slot_from_entry(int i, const char *e, int pp, int po) {
         d->doc.modified = true;
         tab_draft[i] = id; tab_dver[i] = d->doc.version;
     } else {
-        int vol = str_to_int(e);
-        const char *bar = e; while (*bar && *bar != '|') bar++;
+        const char *path; int vol = entry_vol(e, &path);      /* -1: o volume de onde ela veio não está aqui */
         bool dir;
-        if (!*bar || vol >= pal_vol_count() || !pal_exists(vol, bar + 1, &dir) || dir || !pal_read(vol, bar + 1, &data, &len)) { doc_free(&d->doc); return false; }
+        if (vol < 0 || !pal_exists(vol, path, &dir) || dir || !pal_read(vol, path, &data, &len)) { doc_free(&d->doc); return false; }
         doc_set(&d->doc, (const char *)data, len); d->crlf = text_crlf(data, len); mem_free(data);
-        d->vol = vol; str_copy(d->path, bar + 1, sizeof d->path); d->has_path = true;
+        d->vol = vol; str_copy(d->path, path, sizeof d->path); d->has_path = true;
         d->syntax = (u8)doc_syntax_from_path(d->path);
         str_copy(d->title, path_basename(d->path), sizeof d->title);
     }
@@ -344,8 +416,8 @@ static bool slot_from_entry(int i, const char *e, int pp, int po) {
 }
 static bool entry_is_current(const char *e) {
     if (e[0] == '*') return !app.has_path && cur_draft && str_to_int(e + 2) == cur_draft;
-    const char *bar = e; while (*bar && *bar != '|') bar++;
-    return app.has_path && *bar && str_to_int(e) == app.vol && str_eq(bar + 1, app.path);
+    const char *p; int v = entry_vol(e, &p);
+    return app.has_path && v >= 0 && v == app.vol && str_eq(p, app.path);
 }
 
 void app_tabs_to_prefs(void) {
@@ -354,7 +426,7 @@ void app_tabs_to_prefs(void) {
     for (int i = 0; i < ntabs && n < MAX_TABS; i++) {
         AppDoc *d = tab_at(i);
         char *e = prefs.tab_list[n];
-        if (d->has_path) fmt(e, sizeof prefs.tab_list[0], "%d|%s", d->vol, d->path);
+        if (d->has_path) entry_make(e, sizeof prefs.tab_list[0], d->vol, d->path);
         else {
             int *dr = i == cur_tab ? &cur_draft : &tab_draft[i];
             u32 *dv = i == cur_tab ? &cur_dver : &tab_dver[i];
@@ -447,10 +519,11 @@ static void guard_then(int action) {
 /* ------------------------------------------------------------ onde ficam os textos (docs_place=) */
 bool app_installed(void) { bool d; return pal_exists(boot_vol, "/FOLIO/INSTALLED.ID", &d) && !d; }
 int app_texts_stick(void) {
-    /* um outro volume, gravável, com a pasta de textos: o pendrive (o primeiro achado) */
+    /* um outro volume, gravável, removível (pendrive, cartão), com a pasta de textos: o pendrive (o primeiro achado).
+     * Uma partição interna com uma pasta DOCUMENTS nunca faz esse papel (os textos ficariam no computador) */
     for (int v = 0; v < pal_vol_count(); v++) {
         VolInfo vi; bool d;
-        if (v == boot_vol || !pal_vol_info(v, &vi) || vi.readonly) continue;
+        if (v == boot_vol || !pal_vol_info(v, &vi) || vi.readonly || !vi.removable) continue;
         if ((pal_exists(v, "/DOCUMENTS", &d) && d) || (pal_exists(v, "/TEXTOS", &d) && d)) return v;
     }
     return -1;
@@ -469,9 +542,12 @@ const char *app_docs_dir(void) { return docs_dir_on(app_docs_vol()); }
 /* troca dos textos com o pendrive (docs_place=both): o que só existe de um lado vai para o outro; o que existe nos
  * dois e é diferente fica com a versão mais nova (a mais velha vai antes para FOLIO/VERSIONS). Nada é apagado.
  * Um texto aberto em outra aba e diferente fica de fora (não pode haver duas versões dele na memória). */
-typedef struct { int a, b, to_b, to_a, skipped; } Xch;
+typedef struct { int a, b, to_b, to_a, skipped, failed; } Xch;
 static i64 dt_key(DateTime t) { return ((((i64)t.year * 12 + t.month) * 31 + t.day) * 24 + t.hour) * 3600 + (i64)t.min * 60 + t.sec; }
+/* um texto que não pode entrar na troca agora: aberto em outra aba, ou aberto com alterações ainda não salvas (o
+ * arquivo no disco não é o que a pessoa está vendo; trocá-lo e recarregar perderia o que ela escreveu) */
 static bool open_elsewhere(int vol, const char *path) {
+    if (app.has_path && app.vol == vol && str_eq(app.path, path) && app.doc.modified) return true;
     for (int i = 0; prefs.tabs && i < ntabs; i++) {
         if (i == cur_tab) continue;
         AppDoc *d = tab_at(i);
@@ -481,8 +557,21 @@ static bool open_elsewhere(int vol, const char *path) {
 }
 static bool xch_copy(int sv, const char *sp, int dv, const char *dp) {
     u8 *data; usize len; bool d;
+    /* o destino existe? pela lista da pasta (pal_exists diz "não" também quando não consegue ler): se a lista falhar,
+     * não há como saber, e nada é substituído */
+    bool there = false;
+    {
+        char par[512]; str_copy(par, dp, sizeof par);
+        int k = str_len(par); while (k > 0 && par[k - 1] != '/') k--;
+        const char *nm = dp + k; par[k > 1 ? k - 1 : k] = 0; if (!par[0]) str_copy(par, "/", sizeof par);
+        FileEntry *l; int n = pal_list(dv, par, &l);
+        if (n < 0) return false;
+        for (int i = 0; i < n; i++) if (!l[i].dir && str_ieq(l[i].name, nm)) there = true;
+        mem_free(l);
+    }
     if (!pal_read(sv, sp, &data, &len)) return false;
-    if (pal_exists(dv, dp, &d) && !d) snapshot(dv, dp, true);   /* a versão que vai ser substituída fica guardada */
+    /* a versão que vai ser substituída fica guardada; sem conseguir guardá-la, não substitui */
+    if (there && (!pal_exists(dv, dp, &d) || d || !snapshot(dv, dp, true))) { mem_free(data); return false; }
     bool ok = pal_write(dv, dp, data, len);
     mem_free(data);
     if (ok && app.has_path && app.vol == dv && str_eq(app.path, dp)) load_into(dv, dp, app.caret);   /* o texto aberto */
@@ -492,8 +581,13 @@ static void xch_dir(Xch *x, const char *pa, const char *pb, int depth) {
     if (depth > 12) return;
     FileEntry *la = 0, *lb = 0;
     int na = pal_list(x->a, pa, &la), nb = pal_list(x->b, pb, &lb);
-    if (na < 0) na = 0;
-    if (nb < 0) nb = 0;
+    if (na < 0 || nb < 0) {                              /* uma pasta que não deu para ler não é "igual": conta como falha */
+        if (na < 0) x->failed++;
+        if (nb < 0) x->failed++;
+        if (na < 0) na = 0;
+        if (nb < 0) nb = 0;
+        if (!na || !nb) { if (la) mem_free(la); if (lb) mem_free(lb); return; }
+    }
     for (int pass = 0; pass < 2; pass++) {               /* 0: o que está em A (e talvez em B); 1: o que só está em B */
         FileEntry *l = pass ? lb : la; int n = pass ? nb : na;
         for (int i = 0; i < n; i++) {
@@ -511,19 +605,19 @@ static void xch_dir(Xch *x, const char *pa, const char *pb, int depth) {
             }
             if (!o) {                                      /* só de um lado: copia */
                 if (open_elsewhere(pass ? x->b : x->a, pass ? b : a)) { x->skipped++; continue; }
-                if (pass ? xch_copy(x->b, b, x->a, a) : xch_copy(x->a, a, x->b, b)) { if (pass) x->to_a++; else x->to_b++; }
+                if (pass ? xch_copy(x->b, b, x->a, a) : xch_copy(x->a, a, x->b, b)) { if (pass) x->to_a++; else x->to_b++; } else x->failed++;
                 continue;
             }
             u8 *da, *db; usize ln_a, ln_b;
-            if (!pal_read(x->a, a, &da, &ln_a)) continue;
-            if (!pal_read(x->b, b, &db, &ln_b)) { mem_free(da); continue; }
+            if (!pal_read(x->a, a, &da, &ln_a)) { x->failed++; continue; }
+            if (!pal_read(x->b, b, &db, &ln_b)) { mem_free(da); x->failed++; continue; }
             bool same = ln_a == ln_b && !memcmp(da, db, ln_a);
             mem_free(da); mem_free(db);
             if (same) continue;
             bool a_newer = dt_key(e->mtime) > dt_key(o->mtime);
             if (dt_key(e->mtime) == dt_key(o->mtime)) { x->skipped++; continue; }   /* mesma hora, conteúdo diferente: não adivinha */
             if (open_elsewhere(x->a, a) || open_elsewhere(x->b, b)) { x->skipped++; continue; }
-            if (a_newer ? xch_copy(x->a, a, x->b, b) : xch_copy(x->b, b, x->a, a)) { if (a_newer) x->to_b++; else x->to_a++; }
+            if (a_newer ? xch_copy(x->a, a, x->b, b) : xch_copy(x->b, b, x->a, a)) { if (a_newer) x->to_b++; else x->to_a++; } else x->failed++;
         }
     }
     if (la) mem_free(la);
@@ -533,14 +627,15 @@ void app_exchange_texts(void) {
     int s = app_texts_stick();
     if (s < 0) { ui_toast(L("Connect the USB drive with your texts (a DOCUMENTS folder) first.")); return; }
     app_flush_all();                                       /* os textos abertos vão para o disco antes de comparar */
-    Xch x = { boot_vol, s, 0, 0, 0 };
+    Xch x = { boot_vol, s, 0, 0, 0, 0 };
     xch_dir(&x, docs_dir_on(boot_vol), docs_dir_on(s), 0);
-    char m[200];
-    if (!x.to_a && !x.to_b && !x.skipped) str_copy(m, L("The texts on this computer and on the USB drive are already the same."), sizeof m);
+    char m[1024];                                          /* traduções longas (japonês, russo…) cabem inteiras */
+    if (!x.to_a && !x.to_b && !x.skipped && !x.failed) str_copy(m, L("The texts on this computer and on the USB drive are already the same."), sizeof m);
     else fmt(m, sizeof m, L("Texts exchanged: %d to the USB drive, %d to this computer."), x.to_b, x.to_a);
-    if (x.skipped) { char k[120]; fmt(k, sizeof k, LN(" %d left as it is (open in another tab, or changed on both sides at the same minute).", " %d left as they are (open in another tab, or changed on both sides at the same minute).", x.skipped), x.skipped); str_cat(m, k, sizeof m); }
+    if (x.failed) { char k[400]; fmt(k, sizeof k, LN(" %d could not be copied (nothing was replaced without its previous version saved).", " %d could not be copied (nothing was replaced without its previous version saved).", x.failed), x.failed); str_cat(m, k, sizeof m); }
+    if (x.skipped) { char k[400]; fmt(k, sizeof k, LN(" %d left as it is (open in another tab or with unsaved changes, or changed on both sides at the same minute).", " %d left as they are (open in another tab or with unsaved changes, or changed on both sides at the same minute).", x.skipped), x.skipped); str_cat(m, k, sizeof m); }
     ui_toast(m);
-    dbg("texts exchanged: to stick %d, to computer %d, skipped %d", x.to_b, x.to_a, x.skipped);
+    dbg("texts exchanged: to stick %d, to computer %d, skipped %d, failed %d", x.to_b, x.to_a, x.skipped, x.failed);
 }
 
 void app_open_path(int vol, const char *path) {
@@ -986,13 +1081,11 @@ static void c_menu(void) {
     win_menu.nav = 0;            /* pelo teclado (Alt+M): ↑/↓ e Enter já funcionam */
 }
 static void open_recent(int i) {
-    const char *r = prefs.recent[i];
-    int vol = str_to_int(r);
-    const char *bar = r; while (*bar && *bar != '|') bar++;
-    if (!*bar) return;
+    const char *path; int vol = entry_vol(prefs.recent[i], &path);
+    if (!path[0]) return;
     bool d;
-    if (vol >= pal_vol_count() || !pal_exists(vol, bar + 1, &d)) { ui_toast(L("File not found (a different USB drive?)")); return; }
-    app_open_path(vol, bar + 1);
+    if (vol < 0 || !pal_exists(vol, path, &d)) { ui_toast(L("File not found (a different USB drive?)")); return; }
+    app_open_path(vol, path);
 }
 static void menu_body(Window *w, Rect r) {
     typedef struct { const char *n, *k; void (*fn)(void); int ic; int recent; } It;
@@ -2203,7 +2296,7 @@ void app_init(void) {
     last_frame_ms = ui.in.now; last_mouse_ms = ui.in.now;
     ui.in.mx = s->w / 2; ui.in.my = s->h / 2;
     /* restaura a sessão anterior */
-    bool d;
+    bool d; int lv;
     if (prefs.tabs && prefs.ntab_saved > 0) {
         /* abas: reabre todas (arquivos e rascunhos de FOLIO\ABAS) na aba em que estava */
         prefs.tabs = false;
@@ -2211,8 +2304,8 @@ void app_init(void) {
         if (app.has_path && prefs.last_reading && str_eq(app.path, prefs.last_path) && app.syntax != SYN_TEX) preview_open();
         char m[120]; fmt(m, sizeof m, ntabs == 1 ? L("Welcome back. Picking up where you left off.") : LN("Welcome back: %d tab reopened.", "Welcome back: %d tabs reopened.", ntabs), ntabs);
         ui_toast(m);
-    } else if (prefs.last_path[0] && prefs.last_vol < pal_vol_count() && pal_exists(prefs.last_vol, prefs.last_path, &d) && !d) {
-        load_into(prefs.last_vol, prefs.last_path, (Pos){ prefs.last_p, prefs.last_o });
+    } else if (prefs.last_path[0] && (lv = last_volume()) >= 0 && pal_exists(lv, prefs.last_path, &d) && !d) {
+        load_into(lv, prefs.last_path, (Pos){ prefs.last_p, prefs.last_o });
         if (prefs.last_reading && app.syntax != SYN_TEX) { preview_open(); ui_toast(L("Welcome back. Reading continues where you left off.")); }
         else ui_toast(L("Welcome back. Picking up where you left off."));
     } else if (pal_exists(boot_vol, paths_dir(FILE_DRAFT), &d) && !d) {

@@ -12,7 +12,8 @@ static bool other_name(char *o, int cap) {
     if (pal_boot_other(o, cap)) return true;
     bool d;
     if (!pal_exists(app_boot_vol(), "/FOLIO/OTHERMBR.BIN", &d) || d) return false;
-    if (!pal_read(app_boot_vol(), "/FOLIO/OTHERMBR.BIN", &other_mbr, &other_len) || other_len < 440) return false;
+    if (!pal_read(app_boot_vol(), "/FOLIO/OTHERMBR.BIN", &other_mbr, &other_len)) { other_mbr = 0; return false; }
+    if (other_len < 440) { mem_free(other_mbr); other_mbr = 0; other_len = 0; return false; }
     if (other_len > 440) { int n = (int)MIN(other_len - 440, (usize)cap - 1); memcpy(o, other_mbr + 440, (usize)n); o[n] = 0; }
     else str_copy(o, L("the other system"), cap);
     return true;
@@ -41,7 +42,7 @@ static void draw(const char *other, int secs) {
 }
 
 /* devolve quando o usuário quer escrever (ou se o outro sistema não puder ser iniciado) */
-void boot_chooser(void) {
+static void chooser_run(void) {
     char other[96];
     if (prefs.boot_wait <= 0 || !other_name(other, sizeof other)) return;
     dbg("boot chooser: %s in %d s", other, prefs.boot_wait);
@@ -61,4 +62,8 @@ void boot_chooser(void) {
     }
     dbg("boot chooser: no key, starting the other system");
     start_other();                                             /* só volta se o firmware não deixar: fica no FolioOS */
+}
+void boot_chooser(void) {
+    chooser_run();
+    mem_free(other_mbr); other_mbr = 0; other_len = 0;   /* ficou no FolioOS: o MBR guardado não serve mais */
 }

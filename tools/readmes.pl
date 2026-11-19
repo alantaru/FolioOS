@@ -79,7 +79,10 @@ sub read_po {
     return ({}, {}) unless defined $s;
     my (%tr, %fz);
     for my $e (split /\n\s*\n/, $s) {
-        next if $e =~ /^#~/m && $e !~ /^msgid/m;
+        # blocos obsoletos (#~): continuam lidos, para que a tradução antiga sobreviva a novas execuções
+        # (é a referência de quem vai traduzir o bloco que mudou) — antes, a 2ª execução as apagava
+        my $obs = $e =~ /^#~ msgid/m;
+        $e =~ s/^#~ //mg if $obs;
         my ($id, $str, $field, $fuzzy) = (undef, undef, '', $e =~ /^#,.*fuzzy/m);
         for my $l (split /\n/, $e) {
             if ($l =~ /^msgid "(.*)"$/) { $id = po_unescape($1); $field = 'id'; }
@@ -105,7 +108,7 @@ sub write_po {
     for my $id (sort keys %$tr) {       # blocos que mudaram no inglês: ficam como referência
         next if $seen{$id} || $tr->{$id} eq '';
         my $e = po_str('msgid', $id) . po_str('msgstr', $tr->{$id});
-        $e =~ s/^/#~ /mg; $o .= "$e\n";
+        $e =~ s/^/#~ /mg; $o .= ($fz->{$id} ? "#, fuzzy\n" : "") . "$e\n";   # a marca "fuzzy" vai junto: se o bloco voltar, volta como não revisado
     }
     spit($f, $o);
 }

@@ -66,7 +66,9 @@ int part_probe(const BlkDev *d, u64 start, u64 count, char *label, int cap) {
     static u8 tmp[8192 + 4096], b[4096];
     if (label && cap) label[0] = 0;
     if (count == 0) return FS_UNKNOWN;
-    if (!rd_bytes(d, start, 0, b, 4096 < count * d->bs ? 4096 : (u32)(count * d->bs), tmp)) return FS_UNKNOWN;
+    u32 got = 4096 < count * d->bs ? 4096 : (u32)(count * d->bs);
+    if (!rd_bytes(d, start, 0, b, got, tmp)) return FS_UNKNOWN;
+    memset(b + got, 0, sizeof b - got);                   /* partição curta: nada de restos da leitura anterior */
     if (!memcmp(b + 3, "-FVE-FS-", 8)) return FS_BITLOCKER;
     if (!memcmp(b, "LUKS\xBA\xBE", 6)) return FS_LUKS;
     if (!memcmp(b + 3, "NTFS    ", 8)) return FS_NTFS;
@@ -75,7 +77,7 @@ int part_probe(const BlkDev *d, u64 start, u64 count, char *label, int cap) {
     if (!memcmp(b, "XFSB", 4)) return FS_XFS;
     if (!memcmp(b + 32, "NXSB", 4)) return FS_APFS;
     if (b[510] == 0x55 && b[511] == 0xAA) {
-        if (!memcmp(b + 82, "FAT32   ", 8)) { if (label) copy_label(label, cap, b + 71, 11); if (label && !memcmp(label, "NO NAME", 7)) label[0] = 0; return FS_FAT32; }
+        if (!memcmp(b + 82, "FAT32   ", 8)) { if (label) copy_label(label, cap, b + 71, 11); if (label && cap >= 8 && !memcmp(label, "NO NAME", 7)) label[0] = 0; return FS_FAT32; }
         if (!memcmp(b + 54, "FAT16   ", 8)) { if (label) copy_label(label, cap, b + 43, 11); return FS_FAT16; }
         if (!memcmp(b + 54, "FAT12   ", 8)) { if (label) copy_label(label, cap, b + 43, 11); return FS_FAT12; }
     }
@@ -87,7 +89,7 @@ int part_probe(const BlkDev *d, u64 start, u64 count, char *label, int cap) {
         if (sb[0] == 'H' && (sb[1] == '+' || sb[1] == 'X')) return FS_HFSP;
     }
     if (count * d->bs >= 65536 + 4096 && rd_bytes(d, start, 65536 + 64, sb, 8, tmp) && !memcmp(sb, "_BHRfS_M", 8)) return FS_BTRFS;
-    bool zero = true; for (int i = 0; i < 4096 && i < (int)(count * d->bs); i++) if (b[i]) { zero = false; break; }
+    bool zero = true; for (u32 i = 0; i < got; i++) if (b[i]) { zero = false; break; }
     return zero ? FS_EMPTY : FS_UNKNOWN;
 }
 const char *part_fs_name(int fs) {
@@ -205,7 +207,7 @@ bool part_read(const BlkDev *d, PartTable *t) {
             u8 ty = e[4]; u32 s = rd32(e + 8), c = rd32(e + 12);
             if (!ty || !c) continue;
             if (is_ext(ty)) {
-                t->has_extended = true;
+                t->has_extended = true; t->ext_start = s; t->ext_count = c;
                 u64 ebr = s; static u8 eb[4096];
                 for (int guard = 0; guard < 64 && t->n < PART_MAX; guard++) {
                     if (ebr >= d->nsec || !d->rw(d->ctx, ebr, 1, eb, false) || eb[510] != 0x55 || eb[511] != 0xAA) break;
@@ -242,9 +244,8 @@ static void usable(const BlkDev *d, const PartTable *t, u64 *lo, u64 *hi) {
 static void ext_region(const BlkDev *d, const PartTable *t, u64 *s, u64 *c) {
     *s = *c = 0;
     if (t->scheme != SCHEME_MBR || !t->has_extended) return;
-    static u8 m[4096];
-    if (!d->rw(d->ctx, 0, 1, m, false)) return;
-    for (int i = 0; i < 4; i++) { const u8 *e = m + 446 + i * 16; if (is_ext(e[4])) { *s = rd32(e + 8); *c = rd32(e + 12); } }
+    *s = t->ext_start; *c = t->ext_count;             /* guardada pelo part_read: não depende de reler o setor 0 */
+    if (!*c) { *s = 0; *c = d->nsec; }                /* sem a extensão: o disco inteiro fica reservado */
 }
 bool part_overlaps(const BlkDev *d, const PartTable *t, u64 start, u64 count, int ignore) {
     for (int i = 0; i < t->n; i++) {
@@ -324,9 +325,17 @@ static bool write_gpt(const BlkDev *d, const PartTable *t) {
         wr64(e + 32, p->start); wr64(e + 40, p->start + p->count - 1); wr64(e + 48, p->attrs);
         for (int c = 0; c < 36; c++) wr16(e + 56 + 2 * c, p->name[c]);
     }
-    u32 ecrc = crc32_buf(0, ents, 128 * 128);
     u64 last = d->nsec - 1;
-    for (int pass = 0; pass < 2; pass++) {            /* 0: cópia de reserva (fim do disco), 1: principal */
+    for (int i = 0; i < t->n; i++) {                  /* nada pode invadir as GPTs: a principal no começo, a reserva no fim */
+        const Part *p = &t->p[i];
+        if (!p->count || p->start < 2 + es || p->start + p->count - 1 > last - es - 1) return false;
+    }
+    u32 ecrc = crc32_buf(0, ents, 128 * 128);
+    /* normalmente a reserva primeiro e depois a principal; se a principal estava estragada (lida pela reserva),
+     * a principal primeiro, para nunca regravar a única cópia boa antes de existir outra. Entre as duas, um
+     * flush: a primeira cópia nova chega ao disco antes de a segunda ser tocada. */
+    for (int step = 0; step < 2; step++) {
+        int pass = t->gpt_backup_used ? 1 - step : step;  /* 0: cópia de reserva (fim do disco), 1: principal */
         u64 my = pass ? 1 : last, alt = pass ? last : 1, elba = pass ? 2 : last - es;
         memset(h, 0, d->bs);
         memcpy(h, "EFI PART", 8); wr32(h + 8, 0x00010000); wr32(h + 12, 92);
@@ -334,6 +343,7 @@ static bool write_gpt(const BlkDev *d, const PartTable *t) {
         memcpy(h + 56, t->disk_guid, 16); wr64(h + 72, elba); wr32(h + 80, 128); wr32(h + 84, 128); wr32(h + 88, ecrc);
         wr32(h + 16, crc32_buf(0, h, 92));
         if (!d->rw(d->ctx, elba, es, ents, true) || !d->rw(d->ctx, my, 1, h, true)) return false;
+        if (step == 0 && d->flush && !d->flush(d->ctx)) return false;
     }
     /* MBR protetor: se já existe um válido (o do Windows, com os CHS que ele calculou), fica como está, só com o
      * código de boot e a assinatura da tabela (que vieram dele mesmo); senão, um novo */

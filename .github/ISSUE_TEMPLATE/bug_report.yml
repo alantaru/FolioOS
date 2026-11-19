@@ -4,7 +4,7 @@ labels: [bug]
 body:
   - type: markdown
     attributes:
-      value: Thanks for reporting! Please attach `FOLIO\DIAGNOSTICS.TXT` from the USB drive — it lists the display, sound and pointer devices FolioOS found.
+      value: Thanks for reporting! Please attach `FOLIO\DIAGNOSTICS.TXT` from the USB drive (or, when FolioOS is installed on the computer, from its partition) — it lists the display, sound, pointer devices and disks FolioOS found.
   - type: textarea
     id: what
     attributes:
@@ -17,7 +17,7 @@ body:
     attributes:
       label: FolioOS version
       description: Settings › System › About
-      placeholder: "4.1"
+      placeholder: "4.4.1 beta"
   - type: input
     id: hardware
     attributes:
@@ -29,7 +29,10 @@ body:
       label: Where does it happen?
       options:
         - Booting from the USB drive (real hardware)
+        - FolioOS installed on the computer's disk (real hardware)
+        - Installer or Disks and partitions (real hardware)
         - Windows simulator (folio_sim.exe)
+        - macOS simulator (build_macos.sh)
         - UEFI host (efi_host.exe)
   - type: textarea
     id: diag

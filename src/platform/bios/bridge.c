@@ -467,6 +467,11 @@ static bool bdisk_init(BDisk *d, u8 drv) {
         rm(0x13, &r);
         if (!(r.eflags & 1)) {
             u64 tot = *(u64 *)(p + 0x10);
+            u16 bps = *(u16 *)(p + 0x18);                 /* bytes por setor (EDD 1.1+) */
+            if (bps && bps != 512) {                      /* tudo aqui (e o buffer de troca) conta setores de 512 */
+                puts_("  drive "); putn(drv, 16); puts_("h: "); putn(bps, 10); puts_("-byte sectors, not offered\r\n");
+                return false;
+            }
             if (tot && tot < (1ull << 40)) nsec = tot;
             d->media.RemovableMedia = (*(u16 *)(p + 2) & 4) != 0;
             if (*(u16 *)p >= 0x42 && *(u16 *)(p + 0x1E) == 0xBEDD) { memcpy(bus, p + 0x28, 8); bus[8] = 0; }

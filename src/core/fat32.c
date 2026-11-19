@@ -23,7 +23,7 @@ static u8 *cache_get(Fat *f, u64 lba) {
         u32 a = f->c[i].used ? f->c[i].age : 0;
         if (a < oldest) { oldest = a; victim = i; }
     }
-    if (!f->io(f->ctx, lba, 1, f->c[victim].d, false)) { f->c[victim].used = false; return 0; }
+    if (!f->io(f->ctx, lba, 1, f->c[victim].d, false)) { f->c[victim].used = false; f->io_err = true; return 0; }
     f->c[victim].used = true; f->c[victim].lba = lba; f->c[victim].age = ++f->tick;
     return f->c[victim].d;
 }

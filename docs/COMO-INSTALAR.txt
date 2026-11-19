@@ -2,7 +2,8 @@ FolioOS — como instalar num pen-drive (sem imagem de disco)
 ===========================================================
 
 Não é preciso gravar imagem nem apagar o pen-drive inteiro. O FolioOS ocupa
-uns 7 MB; o resto do pen-drive continua livre para o que você quiser.
+uns 60 MB (a maior parte são fontes, inclusive de chinês, japonês e coreano); o
+resto do pen-drive continua livre para o que você quiser.
 
 1) O pen-drive precisa estar em FAT32 (é o que o firmware UEFI sabe ler).
    - Pen-drives de até 32 GB quase sempre já vêm em FAT32: pule para o passo 2.
@@ -25,8 +26,27 @@ uns 7 MB; o resto do pen-drive continua livre para o que você quiser.
    F9 HP, F8 Asus, Esc/F11 outros) e escolha a opção "UEFI" do pen-drive.
    Se não aparecer, desative o "Secure Boot" no setup do firmware (F2/Del).
 
+4) Só para PCs SEM UEFI (só BIOS/Legacy, em geral de antes de ~2012): no
+   Windows, clique com o botão direito no PowerShell > "Executar como
+   administrador" e rode, uma vez:
+       E:\FOLIO\TOOLS\biosboot.exe E:
+   (E: é a letra do pen-drive). Ele só grava o código de boot do BIOS: nenhum
+   arquivo é tocado, o pen-drive continua um FAT32 comum e o boot UEFI continua
+   funcionando.
+
+5) Opcional (beta): instalar no disco do computador, sozinho ou ao lado do
+   Windows ou do Linux. Inicie pelo pen-drive e use Ctrl+K > "Instalar o
+   FolioOS neste computador". Detalhes em LEIA-ME.txt, "INSTALAR NO COMPUTADOR".
+
+JÁ VEM TUDO: o FolioOS.zip já traz 11 famílias de fontes livres para escrever
+e ler e as fontes de chinês, japonês e coreano. Os 15 idiomas funcionam
+direto; não há mais nada para baixar.
+
 ATUALIZAR: descompacte a versão nova por cima e confirme "substituir". Só o
-sistema (EFI, FOLIOonts, folioanguages, foliokeyboards), os leia-me e o exemplo documentswelcome.md são
-substituídos; seus textos, músicas e preferências (FOLIO\CONFIG.INI) ficam.
+sistema (EFI\, FOLIO\FONTS\, FOLIO\LANGUAGES\, FOLIO\KEYBOARDS\, FOLIO\TOOLS\,
+FOLIO\BIOS.SYS), os leia-me e o exemplo DOCUMENTS\Welcome.md são substituídos;
+seus textos, músicas e preferências (FOLIO\CONFIG.INI) ficam.
+Num computador onde o FolioOS foi instalado: inicie pelo pen-drive com a
+versão nova e escolha "Atualizar" no instalador.
 
 Mais detalhes em LEIA-ME.txt.

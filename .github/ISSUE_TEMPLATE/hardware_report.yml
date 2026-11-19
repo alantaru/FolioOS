@@ -8,6 +8,22 @@ body:
       label: Computer model
     validations:
       required: true
+  - type: input
+    id: version
+    attributes:
+      label: FolioOS version
+      description: Shown on the splash screen and in Settings › System › About
+      placeholder: "4.4.1 beta"
+  - type: dropdown
+    id: firmware
+    attributes:
+      label: How does it start?
+      options:
+        - UEFI, 64-bit
+        - UEFI, 32-bit (Atom tablet or netbook)
+        - ARM64 (Raspberry Pi, ARM laptop)
+        - BIOS only (Legacy/CSM, after biosboot.exe)
+        - I don't know
   - type: checkboxes
     id: works
     attributes:
@@ -15,10 +31,24 @@ body:
       options:
         - label: Boots
         - label: Display (correct resolution)
+        - label: Keep proportions (only if the picture was stretched)
         - label: Keyboard
         - label: Touchpad / mouse
         - label: Sound (MP3 player)
         - label: Saving to the USB drive
+  - type: checkboxes
+    id: installer
+    attributes:
+      label: Installer (beta) — only if you tried it
+      options:
+        - label: Installed as the only system
+        - label: Installed next to Windows
+        - label: Installed next to Linux
+        - label: Made room by shrinking a partition (NTFS, FAT32 or exFAT)
+        - label: The boot chooser starts both systems
+        - label: Windows still starts without asking for the BitLocker recovery key
+        - label: Updated from a newer USB drive
+        - label: Uninstalled, and the other system starts as before
   - type: textarea
     id: notes
     attributes:

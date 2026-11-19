@@ -112,7 +112,7 @@ bool pal_disk_flush(int k) { disks_open(); return k >= 0 && k < ndimg && fflush(
 bool pal_boot_entry_add(const char *desc, int part_num, u64 part_lba, u64 part_count, const u8 part_guid[16], const char *path) {
     (void)desc; (void)part_num; (void)part_lba; (void)part_count; (void)part_guid; (void)path; return false;
 }
-bool pal_boot_entry_remove(void) { printf("boot entry removed\n"); fflush(stdout); return true; }
+bool pal_boot_entry_remove(const u8 part_guid[16]) { (void)part_guid; printf("boot entry removed\n"); fflush(stdout); return true; }
 bool pal_chain_mbr(const u8 *code) { printf("chain other mbr: %02x %02x\n", code[0], code[1]); fflush(stdout); ExitProcess(0); }
 bool pal_boot_other(char *name, int cap) { const char *e = getenv("FOLIO_OTHER_OS"); if (!e || !*e) return false; snprintf(name, cap, "%s", e); return true; }
 void pal_boot_other_start(void) { printf("boot other: %s\n", getenv("FOLIO_OTHER_OS")); fflush(stdout); ExitProcess(0); }
@@ -123,10 +123,15 @@ bool pal_vol_info(int v, VolInfo *o) {
     memset(o, 0, sizeof *o);
     o->boot = v == 0;
     snprintf(o->label, sizeof o->label, v == 0 ? "FOLIO" : "BACKUP");
+    o->removable = v != 0;                           /* no simulador, o segundo volume faz o papel do pendrive */
     /* FOLIO_VOL_GUID: o volume finge ser a partição GPT com esse GUID (para testar \EFI\FolioOS\FOLIO.ID) */
     extern bool part_guid_parse(const char *s, u8 g[16]);
     const char *g = getenv("FOLIO_VOL_GUID");
     if (v == 0 && g && part_guid_parse(g, o->part_guid)) o->has_guid = true;
+    /* FOLIO_VOL2_GUID: o mesmo para o segundo volume (uma partição de dados separada da EFI, como numa instalação
+     * ao lado de outro sistema: o FOLIO.ID do primeiro aponta para ela) */
+    const char *g2 = getenv("FOLIO_VOL2_GUID");
+    if (v == 1 && g2 && part_guid_parse(g2, o->part_guid)) o->has_guid = true;
     return true;
 }
 static void ft_to_dt(FILETIME ft, DateTime *d) {

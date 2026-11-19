@@ -11,7 +11,7 @@ Pas de Windows. Pas de Linux. Pas d’internet. Pas de notifications. Juste vous
 [![Build](https://github.com/alantaru/FolioOS/actions/workflows/build.yml/badge.svg)](https://github.com/alantaru/FolioOS/actions/workflows/build.yml)
 [![Latest release](https://img.shields.io/github/v/release/alantaru/FolioOS?label=download&color=b4561f)](https://github.com/alantaru/FolioOS/releases/latest)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
-[![Platform: UEFI x64 | IA32](https://img.shields.io/badge/platform-UEFI%20x64%20%7C%20IA32-555)](#hardware-compatibility)
+[![Platform: UEFI x64 | IA32 | ARM64 | BIOS](https://img.shields.io/badge/platform-UEFI%20x64%20%7C%20IA32%20%7C%20ARM64%20%7C%20BIOS-555)](#hardware-compatibility)
 [![Languages: 15](https://img.shields.io/badge/languages-15-success)](#13-15-languages-and-counting)
 [![Translations welcome](https://img.shields.io/badge/translations-welcome-ff69b4)](docs/TRANSLATING.md)
 
@@ -48,7 +48,8 @@ partager.
 - **Romanciers, journalistes, étudiants et blogueurs** qui veulent un *writerdeck* — un appareil dédié à
   l’écriture sans distraction — sans acheter de nouveau matériel.
 - **Participants au NaNoWriMo** et tous ceux qui font des sprints d’écriture chronométrés ou des pages du matin.
-- **Ceux qui ont un vieux portable dans un tiroir** : FolioOS lui offre une seconde vie sans toucher à son disque.
+- **Les personnes qui ont un vieux portable dans un tiroir** : FolioOS lui offre une seconde vie, directement depuis
+  la clé USB ou installé sur son disque, seul ou à côté du système qu’il a déjà.
 - **Écoles et bibliothèques** qui ont besoin d’un poste d’écriture simple et hors ligne.
 - **Auteurs soucieux de leur vie privée** : pas de réseau, pas de télémétrie, pas de cloud.
 
@@ -329,12 +330,47 @@ Clé USB (FAT32)
 │   ├── THEMES/         vos thèmes (.INI)
 │   ├── LANGUAGES/      traductions (.po)
 │   ├── KEYBOARDS/      dispositions de clavier (.txt)
-│   └── VERSIONS/       versions précédentes automatiques des fichiers enregistrés
-└── EFI/BOOT/           FolioOS lui-même (BOOTX64.EFI, BOOTIA32.EFI)
+│   ├── VERSIONS/       versions précédentes automatiques des fichiers enregistrés
+│   └── BACKUP/         tables de partitions enregistrées par l’installateur avant toute écriture
+└── EFI/BOOT/           FolioOS lui-même (BOOTX64.EFI, BOOTIA32.EFI, BOOTAA64.EFI)
 ```
 
 Pas de base de données, pas de partition cachée, pas de format propriétaire. Emportez la clé sur n’importe
 quel ordinateur et vos textes sont là.
+
+<a id="15-install-it-on-the-computer-beta"></a>
+
+### 15. L’installer sur l’ordinateur (bêta)
+
+La clé USB suffit, mais FolioOS peut aussi vivre sur le disque de l’ordinateur, pour que le portable démarre
+directement sur votre texte. Ouvrez **Ctrl+K › Installer FolioOS sur cet ordinateur** (ou *Réglages › Système*) :
+
+- **Comme seul système**, sur un disque vide ou que vous choisissez d’effacer : vous confirmez en tapant un mot.
+- **À côté de Windows ou de Linux**, dans l’espace libre, sans toucher aux autres partitions. Chaque démarrage
+  affiche *Appuyez sur une touche pour écrire* pendant quelques secondes, puis lance l’autre système comme
+  d’habitude ; Windows est démarré par le firmware lui-même, comme toujours.
+- **Pas d’espace libre ?** FolioOS peut réduire une partition NTFS, FAT32 ou exFAT sans déplacer aucune donnée.
+  Il refuse ce qui n’est pas sûr (Windows en veille prolongée ou avec le démarrage rapide, un volume qui a besoin
+  de `chkdsk`, BitLocker sans la clé de récupération, LUKS, LVM, volumes Apple) et explique quoi faire à la place.
+  ext4 n’est jamais redimensionné : faites de la place depuis Linux (GParted) et relancez l’installateur.
+- Avant toute modification des partitions, la table de partitions (les premiers et les derniers secteurs du
+  disque) est enregistrée dans `FOLIO/BACKUP` sur le support depuis lequel FolioOS a démarré, normalement la
+  clé USB. Vos textes peuvent vivre sur l’ordinateur, sur la clé USB ou sur les deux.
+- **Mettez à jour** depuis une clé plus récente : seuls les fichiers de FolioOS sont remplacés ; vos textes et
+  les partitions restent tels quels.
+- **Désinstallez** : vous pouvez d’abord faire copier vos textes sur le support depuis lequel FolioOS a démarré.
+  Si l’installateur a réduit une partition pour faire de la place, elle retrouve la taille qu’elle avait, tant
+  que l’espace qui la suit est encore libre ; sinon, l’espace devient libre. Si cette partition doit être agrandie et que le
+  Windows qu’elle contient est en veille prolongée (ou utilise le démarrage rapide), FolioOS vous demande d’abord
+  de l’arrêter complètement et ne modifie aucune partition.
+- *Réglages › Système › Disques et partitions* est un petit gestionnaire de partitions : créer une partition
+  FAT32, formater, réduire ou agrandir NTFS/FAT32/exFAT, supprimer.
+- La 4.4 bêta est une préversion : téléchargez-la depuis
+  [sa page de version](https://github.com/alantaru/FolioOS/releases/tag/v4.4.1-beta), pas depuis « latest ».
+
+Fonctionne sur les PC UEFI et sur les PC à BIOS seul. **C’est une bêta :** elle réussit tous les tests sur des
+machines émulées, avec des disques créés par Windows et par Linux, mais n’a pas encore tourné sur du vrai
+matériel : faites d’abord une sauvegarde, ou utilisez un disque de rechange.
 
 ---
 
@@ -359,11 +395,12 @@ quel ordinateur et vos textes sont là.
 | | |
 |---|---|
 | **Firmware** | UEFI 2.x — 64 bits (`BOOTX64.EFI`), 32 bits (`BOOTIA32.EFI`, tablettes et netbooks Atom) ou ARM64 (`BOOTAA64.EFI` : Raspberry Pi 3/4/5 avec le firmware UEFI communautaire, portables ARM). **Les PC uniquement BIOS** (Legacy/CSM) démarrent via le pont BIOS propre à FolioOS après avoir lancé une fois `FOLIO\TOOLS\biosboot.exe`. Le Secure Boot doit être désactivé. |
-| **Affichage** | Tout framebuffer UEFI GOP (RGB, BGR, masque de bits, Blt seul) ou UGA ancien ; VESA/VBE sur les PC BIOS. Résolution native, mise à l’échelle HiDPI automatique, écrans en portrait pivotés automatiquement. |
+| **Affichage** | Tout framebuffer UEFI GOP (RGB, BGR, masque de bits, Blt seul) ou UGA ancien ; VESA/VBE sur les PC BIOS. Résolution native, mise à l’échelle HiDPI automatique, écrans en portrait pivotés automatiquement. Quand le seul mode est en 4:3 et qu’un écran large l’étire, *Réglages › Système › Écran et pointeur* conserve les proportions (Écran, 16:9, 16:10 ou 4:3). |
 | **Saisie** | Clavier via le firmware (directement en PS/2 sur les PC BIOS). Souris, pavé tactile, tablette graphique et écran tactile via le firmware — et, quand le firmware n’a pas de pilote pour eux, via les pilotes USB HID et PS/2 propres à FolioOS. |
 | **Son** | Intel HD Audio et AC'97 (nécessaire uniquement pour le lecteur de musique). |
+| **Disques (installateur, bêta)** | Disques SATA, NVMe, IDE et USB à secteurs de 512 octets, GPT ou MBR. NTFS, FAT32 et exFAT peuvent être réduits puis agrandis à nouveau sans déplacer de données ; BitLocker, LUKS, LVM, APFS/HFS+ et ext4 ne sont jamais redimensionnés. |
 | **Non pris en charge** | Secure Boot (pour l’instant), Mac Apple Silicon. Wi-Fi et Bluetooth sont exclus volontairement. |
-| **Testé sur** | 13 machines émulées à chaque version : UEFI x64, IA32 et ARM64, et PC uniquement BIOS démarrant en USB et en IDE ; 8 cartes graphiques, souris PS/2 et USB, tablette USB, HD Audio et AC'97. Chacune est vérifiée pour l’image, le clavier, la souris, le son, l’enregistrement et l’intégrité du système de fichiers. |
+| **Testé sur** | 20 machines émulées à chaque version : UEFI x64, IA32 et ARM64, et PC BIOS seul démarrant depuis USB et IDE ; 8 cartes graphiques, souris PS/2 et USB, tablette USB, HD Audio et AC'97 ; FolioOS installé sur des disques SATA et IDE, double démarrage à côté de Windows (UEFI) et d’un autre système (BIOS), réduction d’un NTFS créé par Windows et conservation des proportions. Sur chacune, on vérifie l’image, le clavier, la souris, le son, l’enregistrement et l’intégrité du système de fichiers. |
 
 Chaque démarrage écrit `FOLIO/DIAGNOSTICS.TXT` avec ce que FolioOS a trouvé. Partagez le vôtre dans un
 [rapport matériel](https://github.com/alantaru/FolioOS/issues/new/choose) — même « ça marche » aide d’autres
@@ -374,8 +411,20 @@ auteurs à choisir un portable.
 <details>
 <summary><b>Va-t-il effacer mon ordinateur ou ma clé USB ?</b></summary>
 
-Non. FolioOS ne touche jamais au disque interne, et l’installer ne fait qu’ajouter des fichiers à la clé —
-ce qui s’y trouvait reste. Retirez la clé et le PC redémarre sur son système habituel.
+Non. Lancé depuis la clé USB, FolioOS n’écrit sur le disque interne que lorsque vous le lui demandez :
+enregistrer un texte sur l’un de ses volumes écrit ce fichier, et seuls l’installateur et *Disques et partitions*
+modifient les partitions ; même alors, aucune partition ne change avant votre confirmation et la sauvegarde de la
+table de partitions sur le support depuis lequel FolioOS a démarré (vos textes ouverts sont d’abord enregistrés,
+là où ils sont). L’installer sur la clé ne fait qu’ajouter des
+fichiers : ce qui s’y trouvait reste. Retirez la clé et le PC redémarre sur son système habituel.
+</details>
+
+<details>
+<summary><b>Puis-je l’installer sur le portable, à côté de Windows ou de Linux ?</b></summary>
+
+Oui, depuis la 4.4 (bêta) : **Ctrl+K › Installer FolioOS sur cet ordinateur**. Il utilise l’espace libre ou
+réduit une partition NTFS, FAT32 ou exFAT sans déplacer de données, et chaque démarrage vous laisse choisir
+FolioOS ou l’autre système. La désinstallation agrandit à nouveau la partition que l’installateur a réduite si l’espace qui la suit est encore libre (sinon, l’espace devient libre). Voir [L’installer sur l’ordinateur](#15-install-it-on-the-computer-beta).
 </details>
 
 <details>
@@ -460,7 +509,7 @@ s’installent avec `winget`.
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
 .\build.ps1                                  # UEFI x64 + IA32 + ARM64, BIOS, simulateur, paquets — et la suite de tests
-.\tools\qemu-lab.ps1                         # démarre les vrais binaires sur 13 machines émulées et vérifie chacune
+.\tools\qemu-lab.ps1                         # démarre les vrais binaires sur 20 machines émulées et vérifie chacune
 .\build\folio_sim.exe                        # lance FolioOS dans une fenêtre
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # lance le vrai binaire UEFI dans une fenêtre
 .\flash_usb.ps1 -DriveLetter E:              # installe/met à jour une clé FAT32 en gardant les fichiers
@@ -473,6 +522,8 @@ La suite de tests pilote le simulateur et le vrai `BOOTX64.EFI` (dans un petit h
 des événements de souris scriptés, prend des captures d’écran, valide chaque export (ZIP + XML), chaque
 traduction (avec un contrôle négatif du validateur), six formats de framebuffer et le pilote FAT32 du pont
 BIOS (des milliers d’opérations aléatoires, vérifiées octet par octet).
+L’installateur et le gestionnaire de partitions s’exécutent sur des images de disque créées par Windows et par Linux,
+et les résultats sont vérifiés par `chkdsk` de Windows et `fsck` de Linux (`tools/ntfs-shrink-check.ps1`, `tools/linux-run.ps1`).
 
 <a id="macos-simulator"></a>
 
@@ -503,7 +554,8 @@ tests qui lancent le vrai `BOOTX64.EFI` dans `efi_host` demandent toujours la co
 
 ```
 src/core/       cœur portable (C freestanding, sans libc) : éditeur, Markdown, rastériseur TrueType,
-                boîte à outils d’interface et gestionnaire de fenêtres, exports, MP3, i18n, claviers, thèmes
+                boîte à outils d’interface et gestionnaire de fenêtres, exports, MP3, i18n, claviers, thèmes,
+                tables de partitions, vérification et redimensionnement des systèmes de fichiers, installateur et sélecteur de démarrage
 src/platform/   uefi/  affichage GOP/UGA, saisie, E/S FAT, HD Audio/AC'97, pilotes USB HID et PS/2 — sur le firmware
                 bios/  secteurs de démarrage + pont BIOS→UEFI (VBE, PS/2, pilote FAT32 propre) pour les PC uniquement BIOS
                 win32/ simulateur utilisé pour le développement et les tests automatiques
@@ -513,7 +565,7 @@ assets/         polices, traductions (.po), dispositions de clavier, thème d’
 tests/          tests de bout en bout scriptés
 ```
 
-Un binaire d’environ 600 Ko gère toute la machine à travers une fine couche de plateforme. Détails dans
+Un binaire d’environ 800 Ko gère toute la machine à travers une fine couche de plateforme. Détails dans
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 <a id="roadmap"></a>
@@ -526,7 +578,7 @@ FolioOS se divise en deux éditions qui partagent le même éditeur : **FolioOS*
 
 - [x] PC uniquement BIOS (Legacy/CSM) et ARM64 (Raspberry Pi avec firmware UEFI, portables ARM)
 - [x] Saisie du coréen (hangul 2 séries) et des kana japonais (romaji → hiragana/katakana)
-- [ ] Installation sur le disque de l’ordinateur — comme seul système ou à côté de n’importe quel autre — avec un gestionnaire de partitions
+- [x] Installation sur le disque de l’ordinateur — comme seul système ou à côté de n’importe quel autre — avec un gestionnaire de partitions (4.4 beta)
 - [ ] FolioOS Sync : Wi-Fi et synchronisation avec WebDAV, SFTP, Git, Dropbox, Google Drive, OneDrive et Syncthing
 - [ ] Conversion en kanji (japonais) et saisie pinyin (chinois) (nécessitent des dictionnaires)
 - [ ] Mise en forme du texte et écritures de droite à gauche (arabe, hébreu, devanagari…)

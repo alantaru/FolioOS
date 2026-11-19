@@ -62,6 +62,7 @@ int exfat_resize(const BlkDev *d, uint64_t part_lba, uint64_t part_sectors, uint
  * a entrada da tabela antes, com part_sectors = o tamanho novo). fs_grow_max: até quanto a partição pode crescer. */
 bool fs_resizable(int fs);
 int fs_resize(const BlkDev *d, int fs, uint64_t part_lba, uint64_t part_sectors, uint64_t new_sectors);
+uint64_t fs_size(const BlkDev *d, int fs, uint64_t part_lba);   /* setores do volume pelo setor de boot (0 = não sei) */
 uint64_t fs_grow_max(const BlkDev *d, int fs, uint64_t part_lba);
 int ntfs_grow(const BlkDev *d, uint64_t part_lba, uint64_t part_sectors, uint64_t new_sectors);
 #endif

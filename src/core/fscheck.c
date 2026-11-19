@@ -213,13 +213,23 @@ static int root_lookup(Ntfs *n, const char *name, u64 *rec) {
     return 0;
 }
 
+/* os flags do $VOLUME_INFORMATION (0x70) num registro já lido: só com o cabeçalho residente e o valor
+ * inteiro dentro do atributo (um atributo estragado não leva a leitura nem a gravação para fora) */
+static u8 *vol_flags(u8 *rec, u32 rlen) {
+    u8 *vi = (u8 *)attr_find(rec, rlen, 0x70, true);
+    if (!vi || vi[8]) return 0;
+    u32 al = rd32(vi + 4), vl = rd32(vi + 0x10), vo = rd16(vi + 0x14);
+    if (al < 0x18 || vl < 12 || vo < 0x18 || vo > al || vl > al - vo) return 0;   /* sem somar: nada de estouro de u32 */
+    return vi + vo + 0x0A;
+}
+
 int ntfs_flags(Ntfs *n) {
     static u8 rec[4096];
     int fl = 0;
     if (!mft_record(n, 3, rec)) return -1;                     /* $Volume */
-    const u8 *vi = attr_find(rec, n->rec, 0x70, true);
-    if (!vi || vi[8] || rd32(vi + 0x10) < 12) return -1;
-    if (rd16(vi + rd16(vi + 0x14) + 0x0A) & 0x0001) fl |= NTFS_DIRTY;
+    const u8 *vf = vol_flags(rec, n->rec);
+    if (!vf) return -1;
+    if (rd16(vf) & 0x0001) fl |= NTFS_DIRTY;
     u64 h;
     int found = root_lookup(n, "hiberfil.sys", &h);
     if (found < 0) return -1;
@@ -269,21 +279,45 @@ bool ntfs_last_used(Ntfs *n, u64 *lcn) {
     return true;
 }
 
-/* $LogFile fechado de forma limpa? (área de reinício com RESTART_VOLUME_IS_CLEAN, ou sem clientes)
- * Se não, o Windows vai repetir o diário na próxima montagem, por cima do que se mudar aqui. */
+/* $LogFile fechado de forma limpa? Há duas páginas de reinício (no início do arquivo e logo depois da
+ * primeira); vale a válida com o maior current_lsn. Ela tem de estar limpa (RESTART_VOLUME_IS_CLEAN, ou
+ * sem clientes em uso). Se não, o Windows vai repetir o diário na próxima montagem, por cima do que se
+ * mudar aqui. Página da versão 2.0 (Windows 8+ com o diário ativo; o ntfs-3g também recusa) ou qualquer
+ * dúvida sobre qual página vale: não está limpo. */
+static int log_page(Ntfs *n, const u8 *a, u64 off, u8 *pg, u32 cap, u64 *lsn, bool *clean) {
+    /* 1 = página válida (lsn, clean), 0 = não há página aqui (outra assinatura), -1 = ilegível/estragada */
+    if (!nonres_read(n, a, off, pg, 4096)) return -1;
+    if (memcmp(pg, "RSTR", 4)) {                                 /* sem "RSTR": só uma página nunca usada (toda zero) é "não há" */
+        for (u32 i = 0; i < 4096; i++) if (pg[i]) return -1;       /* qualquer outra coisa (estragada, RCRD, CHKD…): na dúvida, não */
+        return 0;
+    }
+    u32 ps = rd32(pg + 0x10);                                    /* tamanho da página do sistema */
+    if (ps < 512 || ps > cap || ps % n->bps || (ps & (ps - 1))) return -1;
+    if (ps > 4096 && !nonres_read(n, a, off, pg, ps)) return -1;
+    if (!fixup(pg, ps, "RSTR")) return -1;
+    u16 minor = rd16(pg + 0x1A), major = rd16(pg + 0x1C);
+    if (major == 2 && minor == 0) return -1;                     /* 2.0: não dá para saber se está limpo */
+    if (!(major == 1 && minor == 1)) return -1;                  /* só a versão que conhecemos */
+    u32 ro = rd16(pg + 0x18);
+    if (ro < 0x1E || ro + 0x10 > ps) return -1;
+    const u8 *ra = pg + ro;
+    *lsn = rd64(ra);
+    *clean = (rd16(ra + 0x0E) & 0x0002) || rd16(ra + 0x0C) == 0xFFFF;
+    return 1;
+}
 bool ntfs_log_clean(Ntfs *n) {
     static u8 rec[4096], pg[8192]; bool split;
     const u8 *a = attr_get(n, 2, 0x80, true, rec, &split);
-    if (!a || a == ATTR_ERR || !a[8] || rd64(a + 0x30) < 4096) return false;
-    if (!nonres_read(n, a, 0, pg, 4096) || memcmp(pg, "RSTR", 4)) return false;
-    u32 ps = rd32(pg + 0x10);                                    /* tamanho da página do sistema */
-    if (ps < 512 || ps > sizeof pg || ps % n->bps) return false;
-    if (ps > 4096 && !nonres_read(n, a, 0, pg, ps)) return false;
-    if (!fixup(pg, ps, "RSTR")) return false;
-    u32 ro = rd16(pg + 0x18);
-    if (ro + 0x10 > ps) return false;
-    const u8 *ra = pg + ro;
-    return (rd16(ra + 0x0E) & 0x0002) || rd16(ra + 0x0C) == 0xFFFF;
+    if (!a || a == ATTR_ERR || !a[8] || split || rd64(a + 0x30) < 8192) return false;
+    u64 l0 = 0, l1 = 0; bool c0 = false, c1 = false;
+    int r0 = log_page(n, a, 0, pg, sizeof pg, &l0, &c0);
+    if (r0 != 1) return false;                                   /* a primeira página tem de existir e ser legível */
+    u32 ps = rd32(pg + 0x10);
+    if ((u64)ps * 2 > rd64(a + 0x30)) return false;
+    int r1 = log_page(n, a, ps, pg, sizeof pg, &l1, &c1);
+    if (r1 < 0) return false;                                    /* a segunda está lá, mas estragada: na dúvida, não */
+    if (r1 == 0) return c0;
+    return l1 > l0 ? c1 : l0 > l1 ? c0 : (c0 && c1);
 }
 
 /* ------------------------------------------------------------ encolher NTFS (sem mover dados) */
@@ -346,6 +380,7 @@ int ntfs_shrink(const BlkDev *d, u64 part_lba, u64 part_sectors, u64 new_sectors
     if (!ntfs_log_clean(&n)) return NTFS_SHRINK_NOT_CLEAN;
     u64 last;
     if (!ntfs_last_used(&n, &last)) return NTFS_SHRINK_UNREADABLE;
+    if (nclus >= n.nclus) return NTFS_SHRINK_BAD_SIZE;           /* só encolhe: crescer é ntfs_grow (o $Bitmap precisa dos bits novos livres) */
     if (last >= nclus || n.mft_lcn >= nclus || rd64(boot + 0x38) >= nclus) return NTFS_SHRINK_TOO_SMALL;
     /* $BadClus:$Bad tem de ser uma run esparsa só (nenhum cluster defeituoso marcado) */
     if (!mft_record(&n, 8, rec)) return NTFS_SHRINK_UNREADABLE;
@@ -367,9 +402,9 @@ int ntfs_shrink(const BlkDev *d, u64 part_lba, u64 part_sectors, u64 new_sectors
     /* 3. marca o volume para verificação: se algo parar no meio, o Windows roda o chkdsk antes de usar */
     static u8 vol[4096];
     if (!mft_record(&n, 3, vol)) return NTFS_SHRINK_UNREADABLE;
-    u8 *vi = (u8 *)attr_find(vol, n.rec, 0x70, true);
-    if (!vi || vi[8]) return NTFS_SHRINK_UNREADABLE;
-    u8 *vf = vi + rd16(vi + 0x14) + 0x0A; wr16(vf, rd16(vf) | 0x0001);
+    u8 *vf = vol_flags(vol, n.rec);
+    if (!vf) return NTFS_SHRINK_UNREADABLE;
+    wr16(vf, rd16(vf) | 0x0001);
     if (!mft_write(&n, 3, vol)) return NTFS_SHRINK_WRITE;
     {   /* $MFTMirr guarda os registros 0 a 3: o mesmo registro 3, byte a byte (com o mesmo número de sequência) */
         u64 mirr = rd64(boot + 0x38), off = 3ull * n.rec; static u8 raw[4096];
@@ -414,7 +449,7 @@ int ntfs_shrink(const BlkDev *d, u64 part_lba, u64 part_sectors, u64 new_sectors
     }
     /* 6. por último, o setor de boot principal com o total novo */
     if (!d->rw(d->ctx, part_lba, 1, boot, true)) return NTFS_SHRINK_WRITE;
-    if (d->flush) d->flush(d->ctx);
+    if (d->flush && !d->flush(d->ctx)) return NTFS_SHRINK_WRITE;   /* sem confirmar que chegou ao disco, não é sucesso */
     return NTFS_SHRINK_OK;
 }
 
@@ -444,9 +479,9 @@ static int bm_set(Ntfs *n, const u8 *bma, u64 from, u64 to, int val) {
 static int mark_dirty(Ntfs *n, const u8 *boot) {
     static u8 vol[4096], raw[4096];
     if (!mft_record(n, 3, vol)) return NTFS_SHRINK_UNREADABLE;
-    u8 *vi = (u8 *)attr_find(vol, n->rec, 0x70, true);
-    if (!vi || vi[8]) return NTFS_SHRINK_UNREADABLE;
-    u8 *vf = vi + rd16(vi + 0x14) + 0x0A; wr16(vf, rd16(vf) | 0x0001);
+    u8 *vf = vol_flags(vol, n->rec);
+    if (!vf) return NTFS_SHRINK_UNREADABLE;
+    wr16(vf, rd16(vf) | 0x0001);
     if (!mft_write(n, 3, vol)) return NTFS_SHRINK_WRITE;
     u64 mirr = rd64(boot + 0x38), off = 3ull * n->rec;
     if (n->mft_runs[0].vcn != 0 || n->mft_runs[0].len * n->cs < 4ull * n->rec) return NTFS_SHRINK_UNREADABLE;
@@ -512,7 +547,7 @@ int ntfs_grow(const BlkDev *d, u64 part_lba, u64 part_sectors, u64 new_sectors) 
     wr64(wa + 0x30, bytes); wr64(wa + 0x38, bytes);
     if (!mft_write(&n, bm_rec, bm)) return NTFS_SHRINK_WRITE;
     if (!d->rw(d->ctx, part_lba, 1, boot, true)) return NTFS_SHRINK_WRITE;
-    if (d->flush) d->flush(d->ctx);
+    if (d->flush && !d->flush(d->ctx)) return NTFS_SHRINK_WRITE;   /* sem confirmar que chegou ao disco, não é sucesso */
     return NTFS_SHRINK_OK;
 }
 
@@ -583,13 +618,14 @@ int fat32_resize(const BlkDev *d, u64 lba, u64 part_sectors, u64 new_sectors) {
             c = (sec + 1) * 128;
         }
     }
-    /* FSInfo (e a cópia junto do setor de boot reserva): os livres mudam pela diferença; a dica volta ao começo */
+    /* FSInfo (e a cópia junto do setor de boot reserva): a contagem de livres vira "desconhecida" (0xFFFFFFFF,
+     * que a especificação permite; o sistema recalcula) e a dica volta ao começo. Somar a diferença aplicaria
+     * a mesma diferença duas vezes se a operação fosse repetida depois de uma interrupção. */
     u32 secs_fsi[2] = { g.fsinfo, g.bkboot ? g.bkboot + g.fsinfo : 0 };
     for (int k = 0; k < 2; k++) {
         if (!secs_fsi[k] || secs_fsi[k] >= g.rsvd || !d->rw(d->ctx, lba + secs_fsi[k], 1, s, false)) continue;
         if (rd32(s) != 0x41615252u || rd32(s + 484) != 0x61417272u) continue;
-        u32 fc = rd32(s + 488);
-        if (fc != 0xFFFFFFFFu) { i64 nf = (i64)fc + (i64)nc - (i64)g.nclus; fc = nf < 0 ? 0xFFFFFFFFu : (u32)nf; }
+        u32 fc = 0xFFFFFFFFu;
         s[488] = (u8)fc; s[489] = (u8)(fc >> 8); s[490] = (u8)(fc >> 16); s[491] = (u8)(fc >> 24);
         s[492] = 2; s[493] = s[494] = s[495] = 0;
         if (!d->rw(d->ctx, lba + secs_fsi[k], 1, s, true)) return NTFS_SHRINK_WRITE;
@@ -602,7 +638,7 @@ int fat32_resize(const BlkDev *d, u64 lba, u64 part_sectors, u64 new_sectors) {
     }
     b[32] = (u8)nt; b[33] = (u8)(nt >> 8); b[34] = (u8)(nt >> 16); b[35] = (u8)(nt >> 24);
     if (!d->rw(d->ctx, lba, 1, b, true)) return NTFS_SHRINK_WRITE;
-    if (d->flush) d->flush(d->ctx);
+    if (d->flush && !d->flush(d->ctx)) return NTFS_SHRINK_WRITE;   /* sem confirmar que chegou ao disco, não é sucesso */
     return NTFS_SHRINK_OK;
 }
 
@@ -672,7 +708,11 @@ static u32 ex_cap(const ExGeo *g) {
 u64 exfat_min_sectors(const BlkDev *d, u64 lba) {
     static u8 b[512]; ExGeo g; u32 last;
     if (!ex_geo(d, lba, &g, b) || !ex_last_used(d, lba, &g, &last)) return 0;
-    return (u64)g.heap + (u64)(last >= 2 ? last - 1 : 1) * g.spc;
+    u64 need = last >= 2 ? last - 1 : 1;
+    /* e o bitmap continua ocupando os mesmos clusters (ver exfat_resize) */
+    u64 cb = (u64)g.spc * 512, bmc = (g.bm_len + cb - 1) / cb, floor_nc = (bmc - 1) * cb * 8 + 1;
+    if (need < floor_nc) need = floor_nc;
+    return (u64)g.heap + need * g.spc;
 }
 u64 exfat_max_sectors(const BlkDev *d, u64 lba) {
     static u8 b[512]; ExGeo g;
@@ -685,6 +725,14 @@ static u32 ex_boot_sum(const u8 *reg) {
     for (u32 i = 0; i < 11 * 512; i++) { if (i == 106 || i == 107 || i == 112) continue; sum = ((sum & 1) ? 0x80000000u : 0) + (sum >> 1) + reg[i]; }
     return sum;
 }
+/* o tamanho do bitmap na entrada 0x81 (a especificação pede exatamente ceil(ClusterCount / 8)) */
+static int ex_set_bm_len(const BlkDev *d, const ExGeo *g, u32 nc, u8 *s) {
+    if (!d->rw(d->ctx, g->bm_ent_lba, 1, s, false)) return NTFS_SHRINK_UNREADABLE;
+    u64 bl = (nc + 7) / 8;
+    for (int i = 0; i < 8; i++) s[g->bm_ent_off + 24 + i] = (u8)(bl >> (8 * i));
+    if (!d->rw(d->ctx, g->bm_ent_lba, 1, s, true)) return NTFS_SHRINK_WRITE;
+    return NTFS_SHRINK_OK;
+}
 int exfat_resize(const BlkDev *d, u64 lba, u64 part_sectors, u64 new_sectors) {
     static u8 b[512], reg[12 * 512], s[512]; ExGeo g;
     if (!ex_geo(d, lba, &g, b)) return NTFS_SHRINK_UNREADABLE;
@@ -693,11 +741,23 @@ int exfat_resize(const BlkDev *d, u64 lba, u64 part_sectors, u64 new_sectors) {
     u64 nc64 = (new_sectors - g.heap) / g.spc;
     if (nc64 < 1 || nc64 > ex_cap(&g) || nc64 > 0xFFFFFFF5ull) return NTFS_SHRINK_TOO_SMALL;
     u32 nc = (u32)nc64;
-    if (nc == g.nclus) return NTFS_SHRINK_BAD_SIZE;
+    if (nc == g.nclus) {
+        /* o volume já tem esse tamanho; um encolhimento interrompido pode ter deixado só o tamanho do bitmap para trás:
+         * termina esse passo (e só esse); sem nada a fazer, continua sendo "mesmo tamanho" */
+        if (g.bm_len != (nc + 7) / 8) {
+            int rc = ex_set_bm_len(d, &g, nc, s); if (rc) return rc;
+            if (d->flush && !d->flush(d->ctx)) return NTFS_SHRINK_WRITE;
+            return NTFS_SHRINK_OK;
+        }
+        return NTFS_SHRINK_BAD_SIZE;
+    }
     u64 bm_at = lba + g.heap + (u64)(g.bm_clus - 2) * g.spc;
     if (nc < g.nclus) {
         u32 last; if (!ex_last_used(d, lba, &g, &last)) return NTFS_SHRINK_UNREADABLE;
         if (last >= nc + 2) return NTFS_SHRINK_TOO_SMALL;                      /* há dados depois do novo fim */
+        /* o bitmap não perde clusters: a capacidade de crescer de volta (ex_cap) sai dos clusters que ele ocupa */
+        u64 cb = (u64)g.spc * 512;
+        if (((nc + 7) / 8 + cb - 1) / cb < (g.bm_len + cb - 1) / cb) return NTFS_SHRINK_TOO_SMALL;
     } else {
         /* crescer: os bits dos clusters novos (e o resto do último byte) ficam zerados no bitmap */
         for (u32 n = g.nclus; n < nc; ) {
@@ -708,11 +768,9 @@ int exfat_resize(const BlkDev *d, u64 lba, u64 part_sectors, u64 new_sectors) {
             n = (sec + 1) * 4096;
         }
     }
-    /* o tamanho do bitmap na entrada 0x81 (a especificação pede exatamente ceil(ClusterCount / 8)) */
-    if (!d->rw(d->ctx, g.bm_ent_lba, 1, s, false)) return NTFS_SHRINK_UNREADABLE;
-    u64 bl = (nc + 7) / 8;
-    for (int i = 0; i < 8; i++) s[g.bm_ent_off + 24 + i] = (u8)(bl >> (8 * i));
-    if (!d->rw(d->ctx, g.bm_ent_lba, 1, s, true)) return NTFS_SHRINK_WRITE;
+    /* ao crescer, o tamanho do bitmap muda antes do volume; ao encolher, depois (uma interrupção deixa o bitmap
+     * no máximo maior que o necessário, nunca menor que o volume) */
+    if (nc > g.nclus) { int rc = ex_set_bm_len(d, &g, nc, s); if (rc) return rc; }
     /* as duas regiões de boot: VolumeLength, ClusterCount, PercentInUse desconhecido, soma recalculada; a reserva primeiro */
     for (int pass = 0; pass < 2; pass++) {
         u64 base = lba + (pass == 0 ? 12 : 0);
@@ -725,16 +783,37 @@ int exfat_resize(const BlkDev *d, u64 lba, u64 part_sectors, u64 new_sectors) {
         for (u32 i = 0; i < 512; i += 4) { reg[11 * 512 + i] = (u8)sum; reg[11 * 512 + i + 1] = (u8)(sum >> 8); reg[11 * 512 + i + 2] = (u8)(sum >> 16); reg[11 * 512 + i + 3] = (u8)(sum >> 24); }
         if (!d->rw(d->ctx, base, 12, reg, true)) return NTFS_SHRINK_WRITE;
     }
-    if (d->flush) d->flush(d->ctx);
+    if (nc < g.nclus) { int rc = ex_set_bm_len(d, &g, nc, s); if (rc) return rc; }
+    if (d->flush && !d->flush(d->ctx)) return NTFS_SHRINK_WRITE;   /* sem confirmar que chegou ao disco, não é sucesso */
     return NTFS_SHRINK_OK;
 }
 
 /* ------------------------------------------------------------ redimensionar, qualquer um dos três (tamanho = a partição) */
 bool fs_resizable(int fs) { return fs == FS_NTFS || fs == FS_FAT32 || fs == FS_EXFAT; }
+/* setores que o volume ocupa de fato, pelo próprio setor de boot (0 = não sei): depois de uma operação
+ * interrompida a entrada da tabela e o volume podem ter tamanhos diferentes */
+u64 fs_size(const BlkDev *d, int fs, u64 lba) {
+    static u8 b[4096];
+    if (d->bs > sizeof b || !d->rw(d->ctx, lba, 1, b, false) || b[510] != 0x55 || b[511] != 0xAA) return 0;
+    if (fs == FS_NTFS && !memcmp(b + 3, "NTFS    ", 8)) return rd64(b + 0x28) + 1;      /* + a cópia do boot no fim */
+    if (fs == FS_EXFAT && !memcmp(b + 3, "EXFAT   ", 8)) return rd64(b + 0x48);
+    if (fs == FS_FAT32 && !memcmp(b + 82, "FAT32   ", 8)) return rd32(b + 32);
+    return 0;
+}
 int fs_resize(const BlkDev *d, int fs, u64 lba, u64 part_sectors, u64 new_sectors) {
     if (fs == FS_FAT32) return fat32_resize(d, lba, part_sectors > new_sectors ? part_sectors : new_sectors, new_sectors);
     if (fs == FS_EXFAT) return exfat_resize(d, lba, part_sectors > new_sectors ? part_sectors : new_sectors, new_sectors);
-    if (fs == FS_NTFS) return new_sectors < part_sectors ? ntfs_shrink(d, lba, part_sectors, new_sectors) : ntfs_grow(d, lba, new_sectors, new_sectors);
+    if (fs == FS_NTFS) {
+        /* a direção sai do tamanho do próprio volume (o setor de boot), não da partição: depois de uma operação
+         * interrompida os dois podem diferir, e um "encolher" para um tamanho maior que o volume o aumentaria
+         * sem liberar os bits novos do $Bitmap */
+        static u8 b[4096];
+        if (d->bs > sizeof b || !d->rw(d->ctx, lba, 1, b, false) || memcmp(b + 3, "NTFS    ", 8)) return NTFS_SHRINK_UNREADABLE;
+        u64 vol = rd64(b + 0x28) + 1;                                 /* + a cópia do setor de boot no fim */
+        if (new_sectors == vol) return NTFS_SHRINK_BAD_SIZE;
+        return new_sectors < vol ? ntfs_shrink(d, lba, part_sectors, new_sectors)   /* partição menor que o volume: ele recusa */
+                                 : ntfs_grow(d, lba, part_sectors > new_sectors ? part_sectors : new_sectors, new_sectors);
+    }
     return NTFS_SHRINK_UNREADABLE;
 }
 u64 fs_grow_max(const BlkDev *d, int fs, u64 lba) {
@@ -814,7 +893,7 @@ const char *fs_safety_text(int v) {
     case SAFE_OK: return "";
     case SAFE_BITLOCKER: return N_("This partition is encrypted with BitLocker. To make room, shrink it in Windows (Disk Management, Shrink Volume) or turn BitLocker off first.");
     case SAFE_LUKS: return N_("This partition is encrypted (LUKS). To make room, shrink it from Linux with the encryption tools.");
-    case SAFE_LVM: return N_("This partition holds LVM volumes. To make room, shrink them from Linux (lvreduce, then pvresize).");
+    case SAFE_LVM: return N_("This partition holds LVM volumes. To make room, shrink it from Linux, in this order: the file system and its logical volume (lvreduce --resizefs), the physical volume (pvresize), then the partition itself (parted or GParted). Then open the installer again.");
     case SAFE_APPLE: return N_("This is a Mac partition (APFS or HFS+). To make room, use Disk Utility on the Mac.");
     case SAFE_HIBERNATED: return N_("Windows is hibernated or uses Fast Startup. Start Windows, then shut it down while holding Shift (or turn Fast Startup off in Power Options), and try again.");
     case SAFE_DIRTY: return N_("Windows marked this partition as needing a check. Start Windows, run chkdsk /f on it, and try again.");

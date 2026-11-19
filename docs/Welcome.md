@@ -8,6 +8,8 @@ This is a sample document. Delete it (or keep it as a manual).
 - **Ctrl+O** opens the file manager: folders, drives, create, rename and delete.
 - **Ctrl+P** shows the formatted text, like a book.
 - **Ctrl+K** opens the palette with every command — including **Language**.
+- To start this computer straight into FolioOS, **Ctrl+K › Install FolioOS on this computer**
+  puts it on the disk, alone or next to the system that is already there (beta).
 
 ## Writing without distractions
 

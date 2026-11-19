@@ -11,7 +11,7 @@ Geen Windows. Geen Linux. Geen internet. Geen meldingen. Alleen jij en de tekst.
 [![Build](https://github.com/alantaru/FolioOS/actions/workflows/build.yml/badge.svg)](https://github.com/alantaru/FolioOS/actions/workflows/build.yml)
 [![Latest release](https://img.shields.io/github/v/release/alantaru/FolioOS?label=download&color=b4561f)](https://github.com/alantaru/FolioOS/releases/latest)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
-[![Platform: UEFI x64 | IA32](https://img.shields.io/badge/platform-UEFI%20x64%20%7C%20IA32-555)](#hardware-compatibility)
+[![Platform: UEFI x64 | IA32 | ARM64 | BIOS](https://img.shields.io/badge/platform-UEFI%20x64%20%7C%20IA32%20%7C%20ARM64%20%7C%20BIOS-555)](#hardware-compatibility)
 [![Languages: 15](https://img.shields.io/badge/languages-15-success)](#13-15-languages-and-counting)
 [![Translations welcome](https://img.shields.io/badge/translations-welcome-ff69b4)](docs/TRANSLATING.md)
 
@@ -47,7 +47,8 @@ delen.
 - **Romanschrijvers, journalisten, studenten en bloggers** die een *writerdeck* willen — een apart,
   afleidingsvrij schrijfapparaat — zonder nieuwe hardware te kopen.
 - **NaNoWriMo-deelnemers** en iedereen die getimede schrijfsprints of ochtendpagina’s doet.
-- **Mensen met een oude laptop in een la**: FolioOS geeft hem een tweede leven zonder de schijf aan te raken.
+- **Mensen met een oude laptop in een la**: FolioOS geeft hem een tweede leven, rechtstreeks vanaf de
+  USB-stick of geïnstalleerd op de schijf, alleen of naast het systeem dat er al op staat.
 - **Scholen en bibliotheken** die een eenvoudige offline schrijfplek nodig hebben.
 - **Privacybewuste schrijvers**: geen netwerk, geen telemetrie, geen cloud.
 
@@ -325,12 +326,47 @@ USB-stick (FAT32)
 │   ├── THEMES/         je thema’s (.INI)
 │   ├── LANGUAGES/      vertalingen (.po)
 │   ├── KEYBOARDS/      toetsenbordindelingen (.txt)
-│   └── VERSIONS/       automatische eerdere versies van opgeslagen bestanden
-└── EFI/BOOT/           FolioOS zelf (BOOTX64.EFI, BOOTIA32.EFI)
+│   ├── VERSIONS/       automatische eerdere versies van opgeslagen bestanden
+│   └── BACKUP/         partitietabellen die het installatieprogramma bewaart voordat het iets schrijft
+└── EFI/BOOT/           FolioOS zelf (BOOTX64.EFI, BOOTIA32.EFI, BOOTAA64.EFI)
 ```
 
 Geen database, geen verborgen partitie, geen gesloten formaat. Neem de stick mee naar elke computer en je
 tekst staat er gewoon.
+
+<a id="15-install-it-on-the-computer-beta"></a>
+
+### 15. Installeren op de computer (bèta)
+
+De USB-stick is genoeg, maar FolioOS kan ook op de schijf van de computer zelf wonen, zodat de laptop
+meteen in je tekst opstart. Open **Ctrl+K › FolioOS op deze computer installeren** (of *Instellingen › Systeem*):
+
+- **Als enige systeem**, op een lege schijf of een die je wilt wissen: je bevestigt door een woord te typen.
+- **Naast Windows of Linux**, in de vrije ruimte, zonder de andere partities aan te raken. Bij elke start staat
+  er een paar seconden *Druk op een toets om te schrijven*, daarna start het andere systeem zoals altijd;
+  Windows wordt door de firmware zelf gestart, net als altijd.
+- **Geen vrije ruimte?** FolioOS kan een NTFS-, FAT32- of exFAT-partitie verkleinen zonder gegevens te
+  verplaatsen. Wat niet veilig is, weigert het (Windows in sluimerstand of met Snel opstarten, een volume dat
+  `chkdsk` nodig heeft, BitLocker zonder herstelsleutel, LUKS, LVM, Apple-volumes), met uitleg wat je wel kunt
+  doen. ext4 wordt nooit van grootte veranderd: maak ruimte vanuit Linux (GParted) en start de installatie opnieuw.
+- Voordat er iets aan de partities verandert, wordt de partitietabel (de eerste en laatste sectoren van de schijf)
+  bewaard in `FOLIO/BACKUP` op het station waarvan FolioOS is gestart, normaal de USB-stick. Je teksten
+  kunnen op de computer staan, op de USB-stick of op allebei.
+- **Bijwerken** vanaf een nieuwere USB-stick: alleen de bestanden van FolioOS zelf worden vervangen; je teksten
+  en de partities blijven zoals ze zijn.
+- **Verwijderen**: je kunt je teksten eerst laten kopiëren naar het station waarvan FolioOS is gestart. Als de
+  installatie een partitie heeft verkleind om ruimte te maken, groeit die terug naar de grootte die ze had,
+  zolang de ruimte erachter nog vrij is; anders komt de ruimte vrij. Moet die partitie terug groeien en staat de Windows
+  daarop in sluimerstand (of gebruikt het Snel opstarten), dan vraagt FolioOS je het eerst volledig af te sluiten
+  en verandert het geen enkele partitie.
+- *Instellingen › Systeem › Schijven en partities* is een klein partitiebeheer: een FAT32-partitie maken,
+  formatteren, NTFS/FAT32/exFAT verkleinen of vergroten, verwijderen.
+- De 4.4 bèta is een voorlopige versie: download hem via
+  [zijn releasepagina](https://github.com/alantaru/FolioOS/releases/tag/v4.4.1-beta), niet via "latest".
+
+Werkt op pc’s met UEFI en op pc’s met alleen BIOS. **Dit is een bèta:** alle tests slagen op geëmuleerde
+machines, met schijven van Windows en van Linux, maar het heeft nog niet op echte hardware gedraaid: maak
+eerst een back-up of gebruik een reserveschijf.
 
 ---
 
@@ -355,11 +391,12 @@ tekst staat er gewoon.
 | | |
 |---|---|
 | **Firmware** | UEFI 2.x — 64-bits (`BOOTX64.EFI`), 32-bits (`BOOTIA32.EFI`, Atom-tablets en netbooks) of ARM64 (`BOOTAA64.EFI`: Raspberry Pi 3/4/5 met de UEFI-firmware van de community, ARM-laptops). **Pc’s met alleen BIOS** (Legacy/CSM) starten via de eigen BIOS-brug van FolioOS nadat `FOLIO\TOOLS\biosboot.exe` één keer is uitgevoerd. Secure Boot moet uit staan. |
-| **Beeld** | Elke UEFI GOP-framebuffer (RGB, BGR, bitmasker, alleen Blt) of oudere UGA; VESA/VBE op BIOS-pc’s. Eigen resolutie, automatische HiDPI-schaling, staande schermen worden automatisch gedraaid. |
+| **Beeld** | Elke UEFI GOP-framebuffer (RGB, BGR, bitmasker, alleen Blt) of oudere UGA; VESA/VBE op BIOS-pc’s. Eigen resolutie, automatische HiDPI-schaling, staande schermen worden automatisch gedraaid. Als de enige modus 4:3 is en een breedbeeldscherm die uitrekt, behoudt *Instellingen › Systeem › Scherm en aanwijzer* de verhoudingen (Monitor, 16:9, 16:10 of 4:3). |
 | **Invoer** | Toetsenbord via de firmware (op BIOS-pc’s rechtstreeks via PS/2). Muis, touchpad, tekentablet en touchscreen via de firmware — en als de firmware er geen driver voor heeft, via de eigen USB HID- en PS/2-drivers van FolioOS. |
 | **Geluid** | Intel HD Audio en AC'97 (alleen nodig voor de muziekspeler). |
+| **Schijven (installatie, bèta)** | SATA-, NVMe-, IDE- en USB-schijven met sectoren van 512 bytes, GPT of MBR. NTFS, FAT32 en exFAT kunnen worden verkleind en weer vergroot zonder gegevens te verplaatsen; BitLocker, LUKS, LVM, APFS/HFS+ en ext4 worden nooit van grootte veranderd. |
 | **Niet ondersteund** | Secure Boot (voorlopig), Macs met Apple Silicon. Wifi en Bluetooth zijn bewust weggelaten. |
-| **Getest op** | 13 geëmuleerde machines bij elke versie: UEFI x64, IA32 en ARM64, en pc’s met alleen BIOS die opstarten via USB en IDE; 8 grafische kaarten, PS/2- en USB-muizen, USB-tablet, HD Audio en AC'97. Op elke machine worden beeld, toetsenbord, muis, geluid, opslaan en de integriteit van het bestandssysteem gecontroleerd. |
+| **Getest op** | 20 geëmuleerde machines bij elke versie: UEFI x64, IA32 en ARM64, en pc’s met alleen BIOS die opstarten vanaf USB en IDE; 8 videokaarten, PS/2- en USB-muizen, USB-tablet, HD Audio en AC'97; FolioOS geïnstalleerd op SATA- en IDE-schijven, dual boot naast Windows (UEFI) en een ander systeem (BIOS), het verkleinen van een NTFS van Windows en verhoudingen behouden. Op elke machine worden beeld, toetsenbord, muis, geluid, opslaan en de integriteit van het bestandssysteem gecontroleerd. |
 
 Elke start schrijft `FOLIO/DIAGNOSTICS.TXT` met wat FolioOS heeft gevonden. Deel het jouwe in een
 [hardwaremelding](https://github.com/alantaru/FolioOS/issues/new/choose) — zelfs "het werkt gewoon" helpt
@@ -372,8 +409,19 @@ andere schrijvers een laptop te kiezen.
 <details>
 <summary><b>Wist het mijn computer of mijn USB-stick?</b></summary>
 
-Nee. FolioOS raakt de interne schijf nooit aan, en installeren voegt alleen bestanden aan de stick toe — wat
-er al op stond, blijft staan. Haal de stick eruit en de pc start weer zijn gewone systeem.
+Nee. Vanaf de USB-stick schrijft FolioOS alleen naar de interne schijf als je daarom vraagt: een tekst opslaan
+op een van de volumes schrijft dat bestand, en alleen het installatieprogramma en *Schijven en partities*
+veranderen partities; ook dan verandert er geen partitie voordat je bevestigt en de partitietabel is bewaard op het
+station waarvan FolioOS is gestart (je open teksten worden eerst opgeslagen, waar ze staan). Installeren op de stick voegt alleen bestanden toe: wat er al op staat,
+blijft. Haal de stick eruit en de pc start weer zijn gewone systeem.
+</details>
+
+<details>
+<summary><b>Kan ik het op de laptop installeren, naast Windows of Linux?</b></summary>
+
+Ja, sinds 4.4 (bèta): **Ctrl+K › FolioOS op deze computer installeren**. Het gebruikt vrije ruimte of verkleint
+een NTFS-, FAT32- of exFAT-partitie zonder gegevens te verplaatsen, en bij elke start kies je FolioOS of het
+andere systeem. Verwijderen laat de partitie die de installatie verkleinde weer groeien als de ruimte erachter nog vrij is (anders komt de ruimte vrij). Zie [Installeren op de computer](#15-install-it-on-the-computer-beta).
 </details>
 
 <details>
@@ -456,7 +504,7 @@ x86_64-versie) in het `PATH`. De ARM64- en BIOS-versies gebruiken ook `clang` va
 git clone https://github.com/alantaru/FolioOS.git
 cd FolioOS
 .\build.ps1                                  # UEFI x64 + IA32 + ARM64, BIOS, simulator, pakketten — en de testsuite
-.\tools\qemu-lab.ps1                         # de echte programma’s op 13 geëmuleerde machines starten en elk controleren
+.\tools\qemu-lab.ps1                         # de echte programma’s op 20 geëmuleerde machines starten en elk controleren
 .\build\folio_sim.exe                        # FolioOS in een venster draaien
 .\build\efi_host.exe build\efi\BOOTX64.EFI   # het echte UEFI-programma in een venster draaien
 .\flash_usb.ps1 -DriveLetter E:              # FAT32-stick installeren/bijwerken, bestanden blijven staan
@@ -469,6 +517,8 @@ De testsuite bestuurt de simulator en het echte `BOOTX64.EFI` (in een kleine UEF
 toetsaanslagen en muisgebeurtenissen, maakt schermafbeeldingen en controleert elke export (ZIP + XML), elke
 vertaling (met een negatieve controle voor de validator), zes framebufferformaten en de FAT32-driver van de
 BIOS-brug (duizenden willekeurige bewerkingen, byte voor byte gecontroleerd).
+Het installatieprogramma en het partitiebeheer draaien op schijfkopieën die Windows en Linux hebben gemaakt, en de
+resultaten worden gecontroleerd door `chkdsk` van Windows en `fsck` van Linux (`tools/ntfs-shrink-check.ps1`, `tools/linux-run.ps1`).
 
 ### macOS-simulator
 
@@ -495,7 +545,8 @@ het echte `BOOTX64.EFI` in `efi_host` draaien, hebben nog steeds de Windows-buil
 
 ```
 src/core/       draagbare kern (freestanding C, zonder libc): editor, Markdown, TrueType-rasterizer,
-                UI-toolkit en vensterbeheer, exports, MP3, i18n, toetsenborden, thema’s
+                UI-toolkit en vensterbeheer, exports, MP3, i18n, toetsenborden, thema’s,
+                partitietabellen, controleren en vergroten/verkleinen van bestandssystemen, installatieprogramma en opstartkeuze
 src/platform/   uefi/  GOP/UGA-beeld, invoer, FAT-I/O, HD Audio/AC'97, USB HID- en PS/2-drivers — op de firmware
                 bios/  opstartsectoren + BIOS→UEFI-brug (VBE, PS/2, eigen FAT32-driver) voor pc’s met alleen BIOS
                 win32/ simulator voor ontwikkeling en automatische tests
@@ -505,7 +556,7 @@ assets/         lettertypen, vertalingen (.po), toetsenbordindelingen, voorbeeld
 tests/          gescripte end-to-end-tests
 ```
 
-Een programma van ~600 KB bestuurt de hele machine via een dunne platformlaag. Details in
+Een programma van ~800 KB bestuurt de hele machine via een dunne platformlaag. Details in
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 <a id="roadmap"></a>
@@ -518,7 +569,7 @@ een minimale Linux met wifi die je teksten synchroniseert. Het volledige plan st
 
 - [x] Pc’s met alleen BIOS (Legacy/CSM) en ARM64 (Raspberry Pi met UEFI-firmware, ARM-laptops)
 - [x] Koreaanse invoer (Hangul met 2 sets) en Japanse kana-invoer (romaji → hiragana/katakana)
-- [ ] Installeren op de schijf van de computer — als enig systeem of naast elk ander — met partitiebeheer
+- [x] Installeren op de schijf van de computer — als enig systeem of naast elk ander — met partitiebeheer (4.4 beta)
 - [ ] FolioOS Sync: wifi en synchronisatie met WebDAV, SFTP, Git, Dropbox, Google Drive, OneDrive en Syncthing
 - [ ] Japanse kanji-omzetting en Chinese pinyin-invoer (hebben woordenboeken nodig)
 - [ ] Tekstvormgeving en schriften van rechts naar links (Arabisch, Hebreeuws, Devanagari…)

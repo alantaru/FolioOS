@@ -481,7 +481,7 @@ static EFI_STATUS hd_rw(EFI_BLOCK_IO_PROTOCOL *b, UINT32 m, UINT64 lba, UINTN sz
 }
 static EFI_STATUS EFIAPI hd_read(EFI_BLOCK_IO_PROTOCOL *b, UINT32 m, UINT64 lba, UINTN sz, void *buf) { return hd_rw(b, m, lba, sz, buf, 0); }
 static EFI_STATUS EFIAPI hd_write(EFI_BLOCK_IO_PROTOCOL *b, UINT32 m, UINT64 lba, UINTN sz, void *buf) { return hd_rw(b, m, lba, sz, buf, 1); }
-static EFI_STATUS EFIAPI hd_flush(EFI_BLOCK_IO_PROTOCOL *b) { fflush(((HDisk *)b)->f); return 0; }
+static EFI_STATUS EFIAPI hd_flush(EFI_BLOCK_IO_PROTOCOL *b) { return fflush(((HDisk *)b)->f) ? EFI_ERR(7) : 0; }   /* DEVICE_ERROR se não foi para o arquivo */
 static EFI_STATUS EFIAPI hd_reset(EFI_BLOCK_IO_PROTOCOL *b, BOOLEAN x) { (void)b; (void)x; return 0; }
 static EFI_STATUS EFIAPI hd_identify(EFI_DISK_INFO_PROTOCOL *p, void *buf, UINT32 *sz) {
     HDisk *d = (HDisk *)((char *)p - offsetof(HDisk, di));

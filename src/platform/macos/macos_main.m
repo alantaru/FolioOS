@@ -122,7 +122,7 @@ bool pal_poll(Event *e) {
     return true;
 }
 void pal_wait(int ms) {
-    if (headless) return;
+    if (headless) { fake_ms += (u64)(ms > 0 ? ms : 1); return; }   /* roteiro: o tempo falso anda (a espera do seletor de boot termina) */
     @autoreleasepool {
         NSEvent *ev = [NSApp nextEventMatchingMask:NSEventMaskAny untilDate:[NSDate dateWithTimeIntervalSinceNow:ms / 1000.0]
                                             inMode:NSDefaultRunLoopMode dequeue:YES];
@@ -146,7 +146,7 @@ bool pal_disk_flush(int k) { (void)k; return false; }
 bool pal_boot_entry_add(const char *desc, int part_num, u64 part_lba, u64 part_count, const u8 part_guid[16], const char *path) {
     (void)desc; (void)part_num; (void)part_lba; (void)part_count; (void)part_guid; (void)path; return false;
 }
-bool pal_boot_entry_remove(void) { return false; }
+bool pal_boot_entry_remove(const u8 part_guid[16]) { (void)part_guid; return false; }
 bool pal_chain_mbr(const u8 *code) { (void)code; return false; }
 bool pal_boot_other(char *name, int cap) { (void)name; (void)cap; return false; }
 void pal_boot_other_start(void) {}
@@ -157,6 +157,7 @@ bool pal_vol_info(int v, VolInfo *o) {
     memset(o, 0, sizeof *o);
     o->boot = v == 0;
     snprintf(o->label, sizeof o->label, v == 0 ? "FOLIO" : "BACKUP");
+    o->removable = v != 0;                           /* no simulador, o segundo volume faz o papel do pendrive */
     return true;
 }
 static void tm_to_dt(time_t t, DateTime *d) {
