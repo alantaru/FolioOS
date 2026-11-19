@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+- macOS simulator: app icon (the splash mark), drawn by `tools/mkicon_macos.m` at build time and
+  packed with `iconutil`, so no image file is kept in the repository.
+
+### Fixed
+- macOS simulator: builds again (`pal_log` was missing from `src/platform/macos`).
+
 ## [4.4.0-beta] — 2026-11-18
 
 **Beta.** The installer writes to the computer's own disk. It passes every test on emulated

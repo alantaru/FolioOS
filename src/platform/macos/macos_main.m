@@ -90,6 +90,7 @@ int  pal_video_modes(int *ws, int *hs, int max) { if (max < 1) return 0; ws[0] =
 /* the surface is in backing pixels: on Retina report the dpi that makes auto_scale() (110 dpi = 100%)
  * give the same apparent size per point as a 1x screen */
 float pal_display_dpi(void) { if (headless || bscale <= 1) return 0; return 110.0f * (float)bscale; }
+void pal_log(const char *s) { fputs(s, stderr); }
 void pal_diag(Buf *o) { buf_printf(o, "macOS simulator (no direct hardware access)\r\nAudio: %s\r\n", pal_audio_info()); }
 static int ns_mods(NSEventModifierFlags f) {
     int m = 0;
@@ -886,6 +887,13 @@ static FolioDelegate *delegate;
 static void gui_start(int W, int H) {
     [NSApplication sharedApplication];
     [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+    /* the .app gets its icon from Info.plist; the bare binary loads FolioOS.icns from its own folder */
+    if (![[NSBundle mainBundle].bundlePath hasSuffix:@".app"]) {
+        NSString *icns = [[[NSBundle mainBundle].executablePath stringByDeletingLastPathComponent]
+                          stringByAppendingPathComponent:@"FolioOS.icns"];
+        NSImage *icon = [[NSImage alloc] initWithContentsOfFile:icns];
+        if (icon) NSApp.applicationIconImage = icon;
+    }
     delegate = [FolioDelegate new];
     NSApp.delegate = delegate;
     NSMenu *bar = [NSMenu new];
